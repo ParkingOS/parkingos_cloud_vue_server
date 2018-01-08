@@ -1,4 +1,4 @@
-package parkingos.com.bolink.serviceImpl;
+package parkingos.com.bolink.service.impl;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
