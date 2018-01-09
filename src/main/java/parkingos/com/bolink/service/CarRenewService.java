@@ -10,5 +10,5 @@ public interface CarRenewService {
 
 	public int selectCountByConditions(CardRenewTb cardRenewTb);
 
-	JSONObject selectResultByConditions(Map<String,String[]> map);
+	JSONObject selectResultByConditions(Map<String,String> map);
 }

@@ -4,6 +4,9 @@ package parkingos.com.bolink.utils;
 import org.apache.log4j.Logger;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
 
 
 public class RequestUtil {
@@ -135,6 +138,23 @@ public class RequestUtil {
 		}
 		return false;
 	}
-	
 
+
+	//取request字符数据
+	public static Map<String, String> readBodyFormRequset(HttpServletRequest request) {
+		Map<String,String> params = new HashMap<String,String>();
+		Map<String,String[]> requestParams = request.getParameterMap();
+		for (Iterator<String> iter = requestParams.keySet().iterator(); iter.hasNext();) {
+			String name = (String) iter.next();
+			String[] values = (String[]) requestParams.get(name);
+			String valueStr = "";
+			for (int i = 0; i < values.length; i++) {
+				valueStr = (i == values.length - 1) ? valueStr + values[i]
+						: valueStr + values[i] + ",";
+			}
+			//logger.info("name："+name+" value:"+valueStr);
+			params.put(name, valueStr);
+		}
+		return params;
+	}
 }

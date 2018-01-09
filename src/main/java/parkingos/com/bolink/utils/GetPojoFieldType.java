@@ -1,0 +1,69 @@
+package parkingos.com.bolink.utils;
+
+import com.zld.common_dao.util.StringUtil;
+
+import java.lang.reflect.Field;
+import java.lang.reflect.Type;
+import java.util.HashMap;
+import java.util.Map;
+
+public class GetPojoFieldType<T> {
+
+    public  Map<String, Integer> getFieldTypes(T t) {
+        Map<String,Integer> resutlMap = new HashMap<>();
+        if (t == null) {
+            return null;
+        } else {
+            Field[] declaredFields = t.getClass().getDeclaredFields();
+            Field[] arr$ = declaredFields;
+            String tableName = t.getClass().getName();
+            for(int i$ = 0; i$ < arr$.length; ++i$) {
+                Field field = arr$[i$];
+                Type type = field.getGenericType();
+                String fieldName = StringUtil.camel2Underline(field.getName());
+                if(isSelectField(tableName,fieldName)){
+                    resutlMap.put(fieldName,FieldTypes.SELECT);
+                }else if(fieldName.contains("time")){
+                    resutlMap.put(fieldName,FieldTypes.DATE);
+                }else if(type.toString().contains("Long")||type.toString().contains("Integer")){
+                    resutlMap.put(fieldName,FieldTypes.INT);
+                }else if(type.toString().contains("String")) {
+                    resutlMap.put(fieldName, FieldTypes.STRING);
+                }else if(type.toString().contains("Double")) {
+                    resutlMap.put(fieldName, FieldTypes.DOUBLE);
+                }else if(type.toString().contains("BigDecimal")) {
+                    resutlMap.put(fieldName, FieldTypes.DOUBLE);
+                }
+               /* if(type ==java.lang.Long.TYPE||type==Integer.TYPE||type==Double.TYPE){
+                    System.out.println(field.getName()+":"+type.toString());
+                }else {
+                    ParameterizedType pt  = (ParameterizedType)type;
+                    System.out.println((Class<?>)pt.getActualTypeArguments()[0]);
+                }*/
+            }
+            System.out.println(resutlMap);
+            return resutlMap;
+        }
+    }
+
+   /* public static void  main(String [] args){
+        GetPojoFieldType<CardRenewTb> gpt = new GetPojoFieldType<>();
+        gpt.getFieldTypes(CardRenewTb);
+    }*/
+
+    /**
+     * 新加的表，要注意把在页面是选择类型的字段注册在这里
+     * 过滤是选择条件的字段，来自于页面的定义
+     * @param tableName 表名
+     * @param field 字段名
+     * @return 是否是选择字段
+     */
+    private boolean isSelectField(String tableName,String field){
+        /*if(tableName.contains("CardRenewTb")){
+            if(field.equals("pay_type"))
+                return true;
+        }*/
+        return false;
+    }
+
+}
