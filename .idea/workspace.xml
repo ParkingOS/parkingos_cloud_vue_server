@@ -7,14 +7,6 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="1e1907b4-ad75-4369-9213-b3ef8e3b24b9" name="Default" comment="设备管理模块，因为对应的数据库表没找到，所以只写了页面框架，请求链没有调通">
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../parkingos_cloud_vue/.idea/workspace.xml" afterPath="$PROJECT_DIR$/../parkingos_cloud_vue/.idea/workspace.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../parkingos_cloud_vue/package-lock.json" afterPath="$PROJECT_DIR$/../parkingos_cloud_vue/package-lock.json" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../parkingos_cloud_vue/package.json" afterPath="$PROJECT_DIR$/../parkingos_cloud_vue/package.json" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../parkingos_cloud_vue/src/api/api.js" afterPath="$PROJECT_DIR$/../parkingos_cloud_vue/src/api/api.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../parkingos_cloud_vue/src/pages/park/EquipmentManage_Channel.vue" afterPath="$PROJECT_DIR$/../parkingos_cloud_vue/src/pages/park/EquipmentManage_Channel.vue" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../parkingos_cloud_vue/src/pages/park/EquipmentManage_Intercom.vue" afterPath="$PROJECT_DIR$/../parkingos_cloud_vue/src/pages/park/EquipmentManage_Intercom.vue" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../parkingos_cloud_vue/src/pages/park/EquipmentManage_Monitor.vue" afterPath="$PROJECT_DIR$/../parkingos_cloud_vue/src/pages/park/EquipmentManage_Monitor.vue" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../parkingos_cloud_vue/src/pages/park/EquipmentManage_WorkStation.vue" afterPath="$PROJECT_DIR$/../parkingos_cloud_vue/src/pages/park/EquipmentManage_WorkStation.vue" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
     </list>
     <ignored path="$PROJECT_DIR$/out/" />
@@ -565,7 +557,7 @@
       <workItem from="1515637311536" duration="3911000" />
       <workItem from="1515649369641" duration="583000" />
       <workItem from="1515650265276" duration="885000" />
-      <workItem from="1515651335983" duration="13251000" />
+      <workItem from="1515651335983" duration="13613000" />
     </task>
     <task id="LOCAL-00001" summary="设备管理模块，因为对应的数据库表没找到，所以只写了页面框架，请求链没有调通">
       <created>1515664608265</created>
@@ -581,11 +573,25 @@
       <option name="project" value="LOCAL" />
       <updated>1515664966043</updated>
     </task>
-    <option name="localTasksCounter" value="3" />
+    <task id="LOCAL-00003" summary="设备管理模块，因为对应的数据库表没找到，所以只写了页面框架，请求链没有调通">
+      <created>1515665035992</created>
+      <option name="number" value="00003" />
+      <option name="presentableId" value="LOCAL-00003" />
+      <option name="project" value="LOCAL" />
+      <updated>1515665035992</updated>
+    </task>
+    <task id="LOCAL-00004" summary="设备管理模块，因为对应的数据库表没找到，所以只写了页面框架，请求链没有调通">
+      <created>1515665384213</created>
+      <option name="number" value="00004" />
+      <option name="presentableId" value="LOCAL-00004" />
+      <option name="project" value="LOCAL" />
+      <updated>1515665384213</updated>
+    </task>
+    <option name="localTasksCounter" value="5" />
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="27345000" />
+    <option name="totallyTimeSpent" value="27707000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="-8" y="-8" width="1456" height="876" extended-state="6" />
