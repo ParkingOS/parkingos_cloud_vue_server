@@ -42,7 +42,7 @@ public class CarRenewServiceImpl implements CarRenewService {
 		int count =0;
 		List<CardRenewTb> list =null;
 		List<Map<String, Object>> resList =new ArrayList<>();
-				Map searchMap = supperSearchService.getBaseSearch(new CardRenewTb(),reqmap);
+		Map searchMap = supperSearchService.getBaseSearch(new CardRenewTb(),reqmap);
 		logger.info(searchMap);
 		if(searchMap!=null&&!searchMap.isEmpty()){
 			CardRenewTb baseQuery =(CardRenewTb)searchMap.get("base");
