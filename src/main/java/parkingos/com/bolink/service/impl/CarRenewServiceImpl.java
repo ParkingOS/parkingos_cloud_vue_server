@@ -1,11 +1,7 @@
 package parkingos.com.bolink.service.impl;
 
-import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.zld.common_dao.dao.CommonDao;
-import com.zld.common_dao.qo.PageOrderConfig;
-import com.zld.common_dao.qo.SearchBean;
-import com.zld.common_dao.util.OrmUtil;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -13,8 +9,6 @@ import parkingos.com.bolink.models.CardRenewTb;
 import parkingos.com.bolink.service.CarRenewService;
 import parkingos.com.bolink.service.SupperSearchService;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Map;
 
 
@@ -37,7 +31,10 @@ public class CarRenewServiceImpl implements CarRenewService {
 
 		logger.info(reqmap);
 		//测试期间设置登录有效期为1小时
-		String str = "{\"total\":0,\"page\":1,\"rows\":[]}";
+		CardRenewTb cardRenewTb = new CardRenewTb();
+		cardRenewTb.setComid("21782");
+		JSONObject result = supperSearchService.supperSearch(cardRenewTb,reqmap);
+		/*String str = "{\"total\":0,\"page\":1,\"rows\":[]}";
 		JSONObject result = JSONObject.parseObject(str);
 		int count =0;
 		List<CardRenewTb> list =null;
@@ -68,6 +65,7 @@ public class CarRenewServiceImpl implements CarRenewService {
 		}
 		result.put("total", count);
 		result.put("page", Integer.parseInt(reqmap.get("page")));
+		return result;*/
 		return result;
 	}
 

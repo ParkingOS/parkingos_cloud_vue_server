@@ -1,21 +1,14 @@
 package parkingos.com.bolink.service.impl;
 
-import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.zld.common_dao.dao.CommonDao;
-import com.zld.common_dao.qo.PageOrderConfig;
-import com.zld.common_dao.qo.SearchBean;
-import com.zld.common_dao.util.OrmUtil;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import parkingos.com.bolink.models.CarTypeTb;
 import parkingos.com.bolink.models.CarowerProduct;
 import parkingos.com.bolink.service.SupperSearchService;
 import parkingos.com.bolink.service.VipService;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Map;
 
 
@@ -32,8 +25,8 @@ public class VipServiceImpl implements VipService {
 
     @Override
     public JSONObject selectResultByConditions(Map<String, String> reqmap) {
-
-        logger.info(reqmap);
+        JSONObject result = supperSearchService.supperSearch(new CarowerProduct(),reqmap);
+        /*logger.info(reqmap);
         //测试期间设置登录有效期为1小时
         String str = "{\"total\":0,\"page\":1,\"rows\":[]}";
         JSONObject result = JSONObject.parseObject(str);
@@ -75,7 +68,7 @@ public class VipServiceImpl implements VipService {
                 }
             }
         }
-
+*/
 //        CarowerProduct carowerProduct = new CarowerProduct();
 //        carowerProduct.setComId(21782L);
 //        carowerProduct.setIsDelete(0L);
@@ -107,8 +100,8 @@ public class VipServiceImpl implements VipService {
 //                result.put("rows", JSON.toJSON(resList));
 //            }
 //        }
-        result.put("total", count);
-        result.put("page", Integer.parseInt(reqmap.get("page")));
+//        result.put("total", count);
+//        result.put("page", Integer.parseInt(reqmap.get("page")));
 
         return result;
     }

@@ -1,10 +1,15 @@
 package parkingos.com.bolink.service.impl;
 
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
+import com.zld.common_dao.dao.CommonDao;
 import com.zld.common_dao.enums.FieldOperator;
 import com.zld.common_dao.qo.PageOrderConfig;
 import com.zld.common_dao.qo.SearchBean;
+import com.zld.common_dao.util.OrmUtil;
 import com.zld.common_dao.util.StringUtil;
 import org.apache.log4j.Logger;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import parkingos.com.bolink.service.SupperSearchService;
 import parkingos.com.bolink.utils.Check;
@@ -23,8 +28,10 @@ import java.util.Map;
 public class SuperSearchServiceImp<T> implements SupperSearchService<T> {
 
     Logger logger = Logger.getLogger(SupperSearchService.class);
+    @Autowired
+    private CommonDao commonDao;
 
-    @Override
+
     public  Map<String,Object> getBaseSearch(T t ,Map<String,String> params){
         //返回结果
         Map<String,Object> result = new HashMap<>();
@@ -94,6 +101,42 @@ public class SuperSearchServiceImp<T> implements SupperSearchService<T> {
         return result;
     }
 
+    @Override
+    public JSONObject supperSearch(T t, Map<String, String> params) {
+        String str = "{\"total\":12,\"page\":1,\"rows\":[]}";
+        JSONObject result = JSONObject.parseObject(str);
+
+
+        int count =0;
+        List<T> list =null;
+        List<Map<String, Object>> resList =new ArrayList<>();
+        Map searchMap = getBaseSearch(t,params);
+        logger.info(searchMap);
+        if(searchMap!=null&&!searchMap.isEmpty()){
+            T t1 =(T)searchMap.get("base");
+            List<SearchBean> supperQuery = null;
+            if(searchMap.containsKey("supper"))
+                supperQuery = (List<SearchBean>)searchMap.get("supper");
+            PageOrderConfig config = null;
+            if(searchMap.containsKey("config"))
+                config = (PageOrderConfig)searchMap.get("config");
+            count = commonDao.selectCountByConditions(t1,supperQuery);
+            if(count>0){
+                list  = commonDao.selectListByConditions(t1,supperQuery,config);
+                if (list != null && !list.isEmpty()) {
+                    for (T t2 : list) {
+                        OrmUtil<T> otm = new OrmUtil<>();
+                        Map<String, Object> map = otm.pojoToMap(t2);
+                        resList.add(map);
+                    }
+                    result.put("rows", JSON.toJSON(resList));
+                }
+            }
+        }
+        result.put("total",count);
+        result.put("page",Integer.parseInt(params.get("page")));
+        return result;
+    }
 
     /**
      * 高级查询组件
