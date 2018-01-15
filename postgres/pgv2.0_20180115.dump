@@ -19485,6 +19485,8 @@ COPY com_brake_tb (id, brake_name, serial, ip, passid, state, upload_time, comid
 --
 
 COPY com_camera_tb (id, camera_name, ip, port, cusername, cpassword, manufacturer, passid, state, upload_time, comid) FROM stdin;
+1	联合测试入口	192.168.1.201	554	\N	\N	停车宝	1	-1	\N	3
+2	联合测试出口	192.168.1.202	554	\N	\N	停车宝	2	-1	\N	3
 \.
 
 
@@ -19501,6 +19503,7 @@ COPY com_comment_tb (id, uin, comid, comment, create_time) FROM stdin;
 --
 
 COPY com_info_tb (id, company_name, phone, fax, address, zipcode, homepage, resume, create_time, longitude, latitude, parking_type, parking_total, share_number, auto_order, mobile, total_money, money, property, type, stop_type, update_time, state, biz_id, uid, city, recom_code, nfc, etc, book, navi, monthlypay, isnight, isfixed, iscancel, firstprovince, mcompany, record_number, epay, is_hasparker, isview, remarks, invalid_order, fixed_pass_time, car_type, passfree, activity, activity_content, upload_uin, minprice_unit, isshowepay, ishidehdbutton, isautopay, allowance, order_per, entry_set, entry_month2_set, chanid, groupid, ishdmoney, pid, full_set, leave_set, areaid, cityid, hotarea_id, empty, upload_union_time, union_state, ukey) FROM stdin;
+3	联合测试	18211111111	\N	北京市北京市海淀区信息中路12号	\N	\N	\N	1515985123	116.316061	40.046672	0	1000	0	\N		0.00	0.00	\N	0	0	1515985272	0	-1	-1	110000	\N	0	2	0	0	0	0	0	1	\N	上地	\N	0	0	1	\N	0	\N	0	0	0		-1	0.00	1	0	1	0.00	0	0	0	-1	-1	0	-1	0	0	-1	-1	-1	0	\N	0	HY07LT5FUQ0GM2TM
 \.
 
 
@@ -19509,6 +19512,8 @@ COPY com_info_tb (id, company_name, phone, fax, address, zipcode, homepage, resu
 --
 
 COPY com_led_tb (id, ledip, ledport, leduid, movemode, movespeed, dwelltime, ledcolor, showcolor, typeface, typesize, matercont, passid, width, height, type, rsport, state, upload_time, comid) FROM stdin;
+1	192.168.1.203	8888	41	9	1	1	1	0	1	1	停车宝	1	64	32	\N	2	-1	\N	3
+2	192.168.1.204	8888	41	9	1	1	1	0	1	1	停车宝	2	64	32	\N	2	-1	\N	3
 \.
 
 
@@ -19541,6 +19546,8 @@ COPY com_parkstatus_tb (id, comid, total, empty, sheduled, rscheduled, internal,
 --
 
 COPY com_pass_tb (id, worksite_id, passname, passtype, description, comid, state, month_set, month2_set, channel_id) FROM stdin;
+1	1	联合测试入口	0	\N	3	0	-1	-1	1
+2	1	联合测试出口	1	\N	3	0	-1	-1	2
 \.
 
 
@@ -19581,6 +19588,7 @@ COPY com_temp_tb (id, next_time) FROM stdin;
 --
 
 COPY com_worksite_tb (id, comid, worksite_name, description, net_type, host_name, host_memory, host_internal, upload_time, state) FROM stdin;
+1	3	联合测试	联合测试	0	\N	\N	\N	\N	0
 \.
 
 
@@ -20478,7 +20486,7 @@ SELECT pg_catalog.setval('seq_com_brake_tb', 1, false);
 -- Name: seq_com_camera_tb; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('seq_com_camera_tb', 1, false);
+SELECT pg_catalog.setval('seq_com_camera_tb', 2, true);
 
 
 --
@@ -20492,14 +20500,14 @@ SELECT pg_catalog.setval('seq_com_comment_tb', 1, false);
 -- Name: seq_com_info_tb; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('seq_com_info_tb', 1, false);
+SELECT pg_catalog.setval('seq_com_info_tb', 3, true);
 
 
 --
 -- Name: seq_com_led_tb; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('seq_com_led_tb', 1, false);
+SELECT pg_catalog.setval('seq_com_led_tb', 2, true);
 
 
 --
@@ -20527,7 +20535,7 @@ SELECT pg_catalog.setval('seq_com_parkstatus_tb', 1, false);
 -- Name: seq_com_pass_tb; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('seq_com_pass_tb', 1, false);
+SELECT pg_catalog.setval('seq_com_pass_tb', 2, true);
 
 
 --
@@ -20562,7 +20570,7 @@ SELECT pg_catalog.setval('seq_com_temp_tb', 1, false);
 -- Name: seq_com_worksite_tb; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('seq_com_worksite_tb', 1, false);
+SELECT pg_catalog.setval('seq_com_worksite_tb', 1, true);
 
 
 --
@@ -21178,7 +21186,7 @@ SELECT pg_catalog.setval('seq_switch_line_tb', 1, false);
 -- Name: seq_sync_info_pool_tb; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('seq_sync_info_pool_tb', 1, false);
+SELECT pg_catalog.setval('seq_sync_info_pool_tb', 10, true);
 
 
 --
@@ -21248,7 +21256,7 @@ SELECT pg_catalog.setval('seq_user_friend_tb', 1, false);
 -- Name: seq_user_info_tb; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('seq_user_info_tb', 1, false);
+SELECT pg_catalog.setval('seq_user_info_tb', 7, true);
 
 
 --
@@ -21269,7 +21277,7 @@ SELECT pg_catalog.setval('seq_user_local_tb', 1, false);
 -- Name: seq_user_log_tb; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('seq_user_log_tb', 1, false);
+SELECT pg_catalog.setval('seq_user_log_tb', 2, true);
 
 
 --
@@ -21517,6 +21525,16 @@ COPY switch_line_tb (id, comid, create_time, end_time) FROM stdin;
 --
 
 COPY sync_info_pool_tb (id, comid, table_name, table_id, create_time, operate, state) FROM stdin;
+1	3	com_pass_tb	1	1515985124	0	0
+2	3	com_pass_tb	2	1515985124	0	0
+3	3	com_info_tb	3	1515985272	1	0
+4	3	user_info_tb	1	1515985331	0	0
+5	3	user_info_tb	2	1515989632	0	0
+6	3	user_info_tb	3	1515989651	0	0
+7	3	user_info_tb	4	1515989665	0	0
+8	3	user_info_tb	5	1515990247	0	0
+9	3	user_info_tb	6	1515990254	0	0
+10	3	user_info_tb	7	1515990266	0	0
 \.
 
 
@@ -21597,6 +21615,13 @@ COPY user_friend_tb (id, buin, euin, ctime, atype, is_add_hx) FROM stdin;
 --
 
 COPY user_info_tb (id, nickname, password, strid, sex, email, phone, mobile, address, resume, reg_time, logon_time, logoff_time, online_flag, comid, auth_flag, balance, state, recom_code, md5pass, cid, department_id, media, isview, collector_pics, collector_auditor, imei, client_type, version, wxp_openid, wx_name, wx_imgurl, shop_id, credit_limit, is_auth, reward_score, firstorderquota, rewardquota, recommendquota, ticketquota, hx_name, hx_pass, role_id, order_hid, chanid, groupid, creator_id, cityid, union_state, upload_union_time, member_id, operate_type, is_sync, update_time, user_id) FROM stdin;
+524768	联合测试	123456	test524768	-1	\N	\N	18688888888	\N	\N	1515985331	\N	\N	\N	3	1	0.00	0	\N	\N	\N	\N	0	1	0	\N	\N	0	\N	\N	\N	\N	\N	0.00	0	0.00	8.00	2.00	5.00	-1.00	\N	\N	30	0	-1	-1	\N	\N	0	\N	\N	\N	0	\N	1
+524767	联合测试2	123456	test524767	-1	\N	\N	\N	\N	\N	1515989632	\N	\N	\N	3	1	0.00	0	\N	\N	\N	\N	0	0	0	\N	\N	0	\N	\N	\N	\N	\N	0.00	0	0.00	8.00	2.00	5.00	-1.00	\N	\N	30	0	-1	-1	\N	\N	0	\N	\N	\N	0	\N	2
+524766	联合测试3	123456	test524766	-1	\N	\N	\N	\N	\N	1515989651	\N	\N	\N	3	1	0.00	0	\N	\N	\N	\N	0	0	0	\N	\N	0	\N	\N	\N	\N	\N	0.00	0	0.00	8.00	2.00	5.00	-1.00	\N	\N	30	0	-1	-1	\N	\N	0	\N	\N	\N	0	\N	3
+524765	联合测试4	123456	test524765	-1	\N	\N	\N	\N	\N	1515989665	\N	\N	\N	3	1	0.00	0	\N	\N	\N	\N	0	0	0	\N	\N	0	\N	\N	\N	\N	\N	0.00	0	0.00	8.00	2.00	5.00	-1.00	\N	\N	30	0	-1	-1	\N	\N	0	\N	\N	\N	0	\N	4
+524764	联合测试5	123456	test524764	-1	\N	\N	\N	\N	\N	1515990246	\N	\N	\N	3	1	0.00	0	\N	\N	\N	\N	0	0	0	\N	\N	0	\N	\N	\N	\N	\N	0.00	0	0.00	8.00	2.00	5.00	-1.00	\N	\N	30	0	-1	-1	\N	\N	0	\N	\N	\N	0	\N	5
+524763	联合测试6	123456	test524763	-1	\N	\N	\N	\N	\N	1515990253	\N	\N	\N	3	1	0.00	0	\N	\N	\N	\N	0	0	0	\N	\N	0	\N	\N	\N	\N	\N	0.00	0	0.00	8.00	2.00	5.00	-1.00	\N	\N	30	0	-1	-1	\N	\N	0	\N	\N	\N	0	\N	6
+524762	联合测试7	123456	test524762	-1	\N	\N	\N	\N	\N	1515990266	\N	\N	\N	3	1	0.00	0	\N	\N	\N	\N	0	0	0	\N	\N	0	\N	\N	\N	\N	\N	0.00	0	0.00	8.00	2.00	5.00	-1.00	\N	\N	30	0	-1	-1	\N	\N	0	\N	\N	\N	0	\N	7
 1000001	\N	123456	admin	1	\N	\N	\N	\N	\N	\N	1400743883	\N	22	0	0	0.00	0	\N	18432daeaf270b986d347513a1d78761	\N	\N	0	1	0	\N	\N	0	\N	\N	\N	\N	\N	0.00	0	0.00	8.00	2.00	5.00	-1.00	\N	\N	0	0	-1	-1	\N	-1	0	\N	\N	\N	0	\N	\N
 \.
 
@@ -21622,6 +21647,8 @@ COPY user_local_tb (id, uid, distance, is_onseat, lat, lon, ctime) FROM stdin;
 --
 
 COPY user_log_tb (id, comid, create_time, logs, type, uid) FROM stdin;
+1	0	1515985125	新建了停车场,1	100	admin
+2	3	1515985272	后台修改了停车场,编号：3(update com_info_tb set invalid_order=?,company_name=?,address=?,phone=?,mobile=?,mcompany=?,parking_total=?,parking_type=?,type=?,minprice_unit=?,share_number=?,update_time=?,uid=?,biz_id=?,state=? ,etc=?,nfc=?,book=?,navi=?,monthlypay=?,isnight=?,isfixed=?,epay=?,city=?,longitude=?,latitude=?,fixed_pass_time=?,isview=?,car_type=?,passfree=?,activity=?,activity_content=?,isautopay=?,full_set=?,leave_set=?,allowance=?,pid=?  where id=?,params:0,联合测试,北京市北京市海淀区信息中路12号,18211111111,,上地,1000,0,0,0.0,0,1515985272,-1,-1,0,2,0,0,0,0,0,0,0,110000,116.316061,40.046672,null,1,0,0,0,,1,0,0,0.0,-1,3,)	101	admin
 \.
 
 

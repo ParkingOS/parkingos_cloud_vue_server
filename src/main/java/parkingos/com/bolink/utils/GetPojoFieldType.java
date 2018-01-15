@@ -25,13 +25,13 @@ public class GetPojoFieldType<T> {
                     resutlMap.put(fieldName,FieldTypes.SELECT);
                 }else if(fieldName.contains("time")){
                     resutlMap.put(fieldName,FieldTypes.DATE);
-                }else if(type.toString().contains("Long")||type.toString().contains("Integer")){
+                }else if(type.toString().contains(FieldTypes._LONG)||type.toString().contains(FieldTypes._INTEGER)){
                     resutlMap.put(fieldName,FieldTypes.INT);
-                }else if(type.toString().contains("String")) {
+                }else if(type.toString().contains(FieldTypes._STRING)) {
                     resutlMap.put(fieldName, FieldTypes.STRING);
-                }else if(type.toString().contains("Double")) {
+                }else if(type.toString().contains(FieldTypes._DOUBLE)) {
                     resutlMap.put(fieldName, FieldTypes.DOUBLE);
-                }else if(type.toString().contains("BigDecimal")) {
+                }else if(type.toString().contains(FieldTypes._BIGDECIMAL)) {
                     resutlMap.put(fieldName, FieldTypes.DOUBLE);
                 }
                /* if(type ==java.lang.Long.TYPE||type==Integer.TYPE||type==Double.TYPE){

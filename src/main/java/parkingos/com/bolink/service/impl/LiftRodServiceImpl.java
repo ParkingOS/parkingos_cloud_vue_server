@@ -1,27 +1,20 @@
 package parkingos.com.bolink.service.impl;
 
-import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.mongodb.BasicDBObject;
 import com.mongodb.DB;
 import com.mongodb.DBCollection;
 import com.mongodb.DBObject;
 import com.zld.common_dao.dao.CommonDao;
-import com.zld.common_dao.qo.PageOrderConfig;
-import com.zld.common_dao.qo.SearchBean;
-import com.zld.common_dao.util.OrmUtil;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import parkingos.com.bolink.models.CarpicTb;
 import parkingos.com.bolink.models.LiftRodTb;
-import parkingos.com.bolink.models.UserInfoTb;
 import parkingos.com.bolink.service.LiftRodService;
 import parkingos.com.bolink.service.SupperSearchService;
 import parkingos.com.bolink.utils.MongoClientFactory;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Map;
 
 @Service
@@ -36,8 +29,8 @@ public class LiftRodServiceImpl implements LiftRodService {
 
     @Override
     public JSONObject selectResultByConditions(Map<String, String> reqmap) {
-
-        String str = "{\"total\":12,\"page\":1,\"rows\":[]}";
+        JSONObject result = supperSearchService.supperSearch(new LiftRodTb(),reqmap);
+        /*String str = "{\"total\":12,\"page\":1,\"rows\":[]}";
         JSONObject result = JSONObject.parseObject(str);
 
         int count = 0;
@@ -75,7 +68,7 @@ public class LiftRodServiceImpl implements LiftRodService {
                     result.put("rows", JSON.toJSON(resList));
                 }
             }
-        }
+        }*/
 
 //        LiftRodTb liftRodTb = new LiftRodTb();
 //        liftRodTb.setComid(21782L);
@@ -103,8 +96,8 @@ public class LiftRodServiceImpl implements LiftRodService {
 //                result.put("rows", JSON.toJSON(resList));
 //            }
 //        }
-        result.put("total", count);
-        result.put("page", Integer.parseInt(reqmap.get("page")));
+//        result.put("total", count);
+//        result.put("page", Integer.parseInt(reqmap.get("page")));
         return result;
     }
 

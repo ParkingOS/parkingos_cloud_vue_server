@@ -1,5 +1,7 @@
 package parkingos.com.bolink.service;
 
+import com.alibaba.fastjson.JSONObject;
+
 import java.util.Map;
 
 public interface SupperSearchService<T> {
@@ -11,5 +13,5 @@ public interface SupperSearchService<T> {
      * @param params 查询信息
      * @return 查询条件
      */
-    Map<String,Object> getBaseSearch(T t,Map<String,String> params);
+    JSONObject supperSearch(T t,Map<String,String> params);
 }

@@ -1,11 +1,7 @@
 package parkingos.com.bolink.service.impl;
 
-import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.zld.common_dao.dao.CommonDao;
-import com.zld.common_dao.qo.PageOrderConfig;
-import com.zld.common_dao.qo.SearchBean;
-import com.zld.common_dao.util.OrmUtil;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -13,8 +9,6 @@ import parkingos.com.bolink.models.OrderTb;
 import parkingos.com.bolink.service.OrderService;
 import parkingos.com.bolink.service.SupperSearchService;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Map;
 
 @Service
@@ -29,9 +23,9 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     public JSONObject selectResultByConditions(Map<String, String> reqmap) {
-
+        JSONObject result = supperSearchService.supperSearch(new OrderTb(),reqmap);
         String str = "{\"total\":12,\"page\":1,\"parkinfo\":\"场内停车52辆,临停车52辆,空车位:948辆\",\"rows\":[]}";
-        JSONObject result = JSONObject.parseObject(str);
+        /*JSONObject result = JSONObject.parseObject(str);
 
 
         int count =0;
@@ -79,7 +73,7 @@ public class OrderServiceImpl implements OrderService {
 //            }
 //        }
         result.put("total",count);
-        result.put("page",Integer.parseInt(reqmap.get("page")));
+        result.put("page",Integer.parseInt(reqmap.get("page")));*/
         return result;
     }
 
