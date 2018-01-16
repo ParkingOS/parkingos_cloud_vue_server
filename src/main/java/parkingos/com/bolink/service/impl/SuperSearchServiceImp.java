@@ -2,20 +2,15 @@ package parkingos.com.bolink.service.impl;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
-import com.zld.common_dao.dao.CommonDao;
-import com.zld.common_dao.enums.FieldOperator;
-import com.zld.common_dao.qo.PageOrderConfig;
-import com.zld.common_dao.qo.SearchBean;
-import com.zld.common_dao.util.OrmUtil;
-import com.zld.common_dao.util.StringUtil;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import parkingos.com.bolink.dao.spring.CommonDao;
+import parkingos.com.bolink.enums.FieldOperator;
+import parkingos.com.bolink.qo.PageOrderConfig;
+import parkingos.com.bolink.qo.SearchBean;
 import parkingos.com.bolink.service.SupperSearchService;
-import parkingos.com.bolink.utils.Check;
-import parkingos.com.bolink.utils.FieldOperateTypes;
-import parkingos.com.bolink.utils.FieldTypes;
-import parkingos.com.bolink.utils.GetPojoFieldType;
+import parkingos.com.bolink.utils.*;
 
 import java.lang.reflect.Field;
 import java.math.BigDecimal;
@@ -246,7 +241,7 @@ public class SuperSearchServiceImp<T> implements SupperSearchService<T> {
                     value = params.get(f+"_start");
                 }
                 if(!Check.isEmpty(value)){
-                    Field field = t.getClass().getDeclaredField(StringUtil.underline2Camel(f));
+                    Field field = t.getClass().getDeclaredField(StringUtils.underline2Camel(f));
                     String type = field.getType().toString();
                     field.setAccessible(true);
 

@@ -1,0 +1,385 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="parkingos.com.bolink.dao.mybatis.mapper.CardRenewTbMapper" >
+  <resultMap id="BaseResultMap" type="parkingos.com.bolink.models.CardRenewTb" >
+    <id column="id" property="id" jdbcType="INTEGER" />
+    <result column="trade_no" property="tradeNo" jdbcType="VARCHAR" />
+    <result column="card_id" property="cardId" jdbcType="VARCHAR" />
+    <result column="pay_time" property="payTime" jdbcType="INTEGER" />
+    <result column="amount_receivable" property="amountReceivable" jdbcType="VARCHAR" />
+    <result column="amount_pay" property="amountPay" jdbcType="VARCHAR" />
+    <result column="collector" property="collector" jdbcType="VARCHAR" />
+    <result column="pay_type" property="payType" jdbcType="VARCHAR" />
+    <result column="car_number" property="carNumber" jdbcType="VARCHAR" />
+    <result column="user_id" property="userId" jdbcType="VARCHAR" />
+    <result column="resume" property="resume" jdbcType="VARCHAR" />
+    <result column="buy_month" property="buyMonth" jdbcType="INTEGER" />
+    <result column="comid" property="comid" jdbcType="VARCHAR" />
+    <result column="create_time" property="createTime" jdbcType="INTEGER" />
+    <result column="update_time" property="updateTime" jdbcType="INTEGER" />
+    <result column="limit_time" property="limitTime" jdbcType="BIGINT" />
+  </resultMap>
+  <sql id="Example_Where_Clause" >
+    <where >
+      <foreach collection="oredCriteria" item="criteria" separator="or" >
+        <if test="criteria.valid" >
+          <trim prefix="(" suffix=")" prefixOverrides="and" >
+            <foreach collection="criteria.criteria" item="criterion" >
+              <choose >
+                <when test="criterion.noValue" >
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue" >
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue" >
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue" >
+                  and ${criterion.condition}
+                  <foreach collection="criterion.value" item="listItem" open="(" close=")" separator="," >
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Update_By_Example_Where_Clause" >
+    <where >
+      <foreach collection="example.oredCriteria" item="criteria" separator="or" >
+        <if test="criteria.valid" >
+          <trim prefix="(" suffix=")" prefixOverrides="and" >
+            <foreach collection="criteria.criteria" item="criterion" >
+              <choose >
+                <when test="criterion.noValue" >
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue" >
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue" >
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue" >
+                  and ${criterion.condition}
+                  <foreach collection="criterion.value" item="listItem" open="(" close=")" separator="," >
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Base_Column_List" >
+    id, trade_no, card_id, pay_time, amount_receivable, amount_pay, collector, pay_type, 
+    car_number, user_id, resume, buy_month, comid, create_time, update_time, limit_time
+  </sql>
+  <select id="selectByExample" resultMap="BaseResultMap" parameterType="parkingos.com.bolink.dao.mybatis.CardRenewTbExample" >
+    select
+    <if test="distinct" >
+      distinct
+    </if>
+    <include refid="Base_Column_List" />
+    from card_renew_tb
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+    <if test="orderByClause != null" >
+      order by ${orderByClause}
+    </if>
+  </select>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    select 
+    <include refid="Base_Column_List" />
+    from card_renew_tb
+    where id = #{id,jdbcType=INTEGER}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >
+    delete from card_renew_tb
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+  <delete id="deleteByExample" parameterType="parkingos.com.bolink.dao.mybatis.CardRenewTbExample" >
+    delete from card_renew_tb
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+  </delete>
+  <insert id="insert" parameterType="parkingos.com.bolink.models.CardRenewTb" >
+    insert into card_renew_tb (id, trade_no, card_id, 
+      pay_time, amount_receivable, amount_pay, 
+      collector, pay_type, car_number, 
+      user_id, resume, buy_month, 
+      comid, create_time, update_time, 
+      limit_time)
+    values (#{id,jdbcType=INTEGER}, #{tradeNo,jdbcType=VARCHAR}, #{cardId,jdbcType=VARCHAR}, 
+      #{payTime,jdbcType=INTEGER}, #{amountReceivable,jdbcType=VARCHAR}, #{amountPay,jdbcType=VARCHAR}, 
+      #{collector,jdbcType=VARCHAR}, #{payType,jdbcType=VARCHAR}, #{carNumber,jdbcType=VARCHAR}, 
+      #{userId,jdbcType=VARCHAR}, #{resume,jdbcType=VARCHAR}, #{buyMonth,jdbcType=INTEGER}, 
+      #{comid,jdbcType=VARCHAR}, #{createTime,jdbcType=INTEGER}, #{updateTime,jdbcType=INTEGER}, 
+      #{limitTime,jdbcType=BIGINT})
+  </insert>
+  <insert id="insertSelective" parameterType="parkingos.com.bolink.models.CardRenewTb" >
+    insert into card_renew_tb
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        id,
+      </if>
+      <if test="tradeNo != null" >
+        trade_no,
+      </if>
+      <if test="cardId != null" >
+        card_id,
+      </if>
+      <if test="payTime != null" >
+        pay_time,
+      </if>
+      <if test="amountReceivable != null" >
+        amount_receivable,
+      </if>
+      <if test="amountPay != null" >
+        amount_pay,
+      </if>
+      <if test="collector != null" >
+        collector,
+      </if>
+      <if test="payType != null" >
+        pay_type,
+      </if>
+      <if test="carNumber != null" >
+        car_number,
+      </if>
+      <if test="userId != null" >
+        user_id,
+      </if>
+      <if test="resume != null" >
+        resume,
+      </if>
+      <if test="buyMonth != null" >
+        buy_month,
+      </if>
+      <if test="comid != null" >
+        comid,
+      </if>
+      <if test="createTime != null" >
+        create_time,
+      </if>
+      <if test="updateTime != null" >
+        update_time,
+      </if>
+      <if test="limitTime != null" >
+        limit_time,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        #{id,jdbcType=INTEGER},
+      </if>
+      <if test="tradeNo != null" >
+        #{tradeNo,jdbcType=VARCHAR},
+      </if>
+      <if test="cardId != null" >
+        #{cardId,jdbcType=VARCHAR},
+      </if>
+      <if test="payTime != null" >
+        #{payTime,jdbcType=INTEGER},
+      </if>
+      <if test="amountReceivable != null" >
+        #{amountReceivable,jdbcType=VARCHAR},
+      </if>
+      <if test="amountPay != null" >
+        #{amountPay,jdbcType=VARCHAR},
+      </if>
+      <if test="collector != null" >
+        #{collector,jdbcType=VARCHAR},
+      </if>
+      <if test="payType != null" >
+        #{payType,jdbcType=VARCHAR},
+      </if>
+      <if test="carNumber != null" >
+        #{carNumber,jdbcType=VARCHAR},
+      </if>
+      <if test="userId != null" >
+        #{userId,jdbcType=VARCHAR},
+      </if>
+      <if test="resume != null" >
+        #{resume,jdbcType=VARCHAR},
+      </if>
+      <if test="buyMonth != null" >
+        #{buyMonth,jdbcType=INTEGER},
+      </if>
+      <if test="comid != null" >
+        #{comid,jdbcType=VARCHAR},
+      </if>
+      <if test="createTime != null" >
+        #{createTime,jdbcType=INTEGER},
+      </if>
+      <if test="updateTime != null" >
+        #{updateTime,jdbcType=INTEGER},
+      </if>
+      <if test="limitTime != null" >
+        #{limitTime,jdbcType=BIGINT},
+      </if>
+    </trim>
+  </insert>
+  <select id="countByExample" parameterType="parkingos.com.bolink.dao.mybatis.CardRenewTbExample" resultType="java.lang.Integer" >
+    select count(*) from card_renew_tb
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+  </select>
+  <update id="updateByExampleSelective" parameterType="map" >
+    update card_renew_tb
+    <set >
+      <if test="record.id != null" >
+        id = #{record.id,jdbcType=INTEGER},
+      </if>
+      <if test="record.tradeNo != null" >
+        trade_no = #{record.tradeNo,jdbcType=VARCHAR},
+      </if>
+      <if test="record.cardId != null" >
+        card_id = #{record.cardId,jdbcType=VARCHAR},
+      </if>
+      <if test="record.payTime != null" >
+        pay_time = #{record.payTime,jdbcType=INTEGER},
+      </if>
+      <if test="record.amountReceivable != null" >
+        amount_receivable = #{record.amountReceivable,jdbcType=VARCHAR},
+      </if>
+      <if test="record.amountPay != null" >
+        amount_pay = #{record.amountPay,jdbcType=VARCHAR},
+      </if>
+      <if test="record.collector != null" >
+        collector = #{record.collector,jdbcType=VARCHAR},
+      </if>
+      <if test="record.payType != null" >
+        pay_type = #{record.payType,jdbcType=VARCHAR},
+      </if>
+      <if test="record.carNumber != null" >
+        car_number = #{record.carNumber,jdbcType=VARCHAR},
+      </if>
+      <if test="record.userId != null" >
+        user_id = #{record.userId,jdbcType=VARCHAR},
+      </if>
+      <if test="record.resume != null" >
+        resume = #{record.resume,jdbcType=VARCHAR},
+      </if>
+      <if test="record.buyMonth != null" >
+        buy_month = #{record.buyMonth,jdbcType=INTEGER},
+      </if>
+      <if test="record.comid != null" >
+        comid = #{record.comid,jdbcType=VARCHAR},
+      </if>
+      <if test="record.createTime != null" >
+        create_time = #{record.createTime,jdbcType=INTEGER},
+      </if>
+      <if test="record.updateTime != null" >
+        update_time = #{record.updateTime,jdbcType=INTEGER},
+      </if>
+      <if test="record.limitTime != null" >
+        limit_time = #{record.limitTime,jdbcType=BIGINT},
+      </if>
+    </set>
+    <if test="_parameter != null" >
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  <update id="updateByExample" parameterType="map" >
+    update card_renew_tb
+    set id = #{record.id,jdbcType=INTEGER},
+      trade_no = #{record.tradeNo,jdbcType=VARCHAR},
+      card_id = #{record.cardId,jdbcType=VARCHAR},
+      pay_time = #{record.payTime,jdbcType=INTEGER},
+      amount_receivable = #{record.amountReceivable,jdbcType=VARCHAR},
+      amount_pay = #{record.amountPay,jdbcType=VARCHAR},
+      collector = #{record.collector,jdbcType=VARCHAR},
+      pay_type = #{record.payType,jdbcType=VARCHAR},
+      car_number = #{record.carNumber,jdbcType=VARCHAR},
+      user_id = #{record.userId,jdbcType=VARCHAR},
+      resume = #{record.resume,jdbcType=VARCHAR},
+      buy_month = #{record.buyMonth,jdbcType=INTEGER},
+      comid = #{record.comid,jdbcType=VARCHAR},
+      create_time = #{record.createTime,jdbcType=INTEGER},
+      update_time = #{record.updateTime,jdbcType=INTEGER},
+      limit_time = #{record.limitTime,jdbcType=BIGINT}
+    <if test="_parameter != null" >
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  <update id="updateByPrimaryKeySelective" parameterType="parkingos.com.bolink.models.CardRenewTb" >
+    update card_renew_tb
+    <set >
+      <if test="tradeNo != null" >
+        trade_no = #{tradeNo,jdbcType=VARCHAR},
+      </if>
+      <if test="cardId != null" >
+        card_id = #{cardId,jdbcType=VARCHAR},
+      </if>
+      <if test="payTime != null" >
+        pay_time = #{payTime,jdbcType=INTEGER},
+      </if>
+      <if test="amountReceivable != null" >
+        amount_receivable = #{amountReceivable,jdbcType=VARCHAR},
+      </if>
+      <if test="amountPay != null" >
+        amount_pay = #{amountPay,jdbcType=VARCHAR},
+      </if>
+      <if test="collector != null" >
+        collector = #{collector,jdbcType=VARCHAR},
+      </if>
+      <if test="payType != null" >
+        pay_type = #{payType,jdbcType=VARCHAR},
+      </if>
+      <if test="carNumber != null" >
+        car_number = #{carNumber,jdbcType=VARCHAR},
+      </if>
+      <if test="userId != null" >
+        user_id = #{userId,jdbcType=VARCHAR},
+      </if>
+      <if test="resume != null" >
+        resume = #{resume,jdbcType=VARCHAR},
+      </if>
+      <if test="buyMonth != null" >
+        buy_month = #{buyMonth,jdbcType=INTEGER},
+      </if>
+      <if test="comid != null" >
+        comid = #{comid,jdbcType=VARCHAR},
+      </if>
+      <if test="createTime != null" >
+        create_time = #{createTime,jdbcType=INTEGER},
+      </if>
+      <if test="updateTime != null" >
+        update_time = #{updateTime,jdbcType=INTEGER},
+      </if>
+      <if test="limitTime != null" >
+        limit_time = #{limitTime,jdbcType=BIGINT},
+      </if>
+    </set>
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="parkingos.com.bolink.models.CardRenewTb" >
+    update card_renew_tb
+    set trade_no = #{tradeNo,jdbcType=VARCHAR},
+      card_id = #{cardId,jdbcType=VARCHAR},
+      pay_time = #{payTime,jdbcType=INTEGER},
+      amount_receivable = #{amountReceivable,jdbcType=VARCHAR},
+      amount_pay = #{amountPay,jdbcType=VARCHAR},
+      collector = #{collector,jdbcType=VARCHAR},
+      pay_type = #{payType,jdbcType=VARCHAR},
+      car_number = #{carNumber,jdbcType=VARCHAR},
+      user_id = #{userId,jdbcType=VARCHAR},
+      resume = #{resume,jdbcType=VARCHAR},
+      buy_month = #{buyMonth,jdbcType=INTEGER},
+      comid = #{comid,jdbcType=VARCHAR},
+      create_time = #{createTime,jdbcType=INTEGER},
+      update_time = #{updateTime,jdbcType=INTEGER},
+      limit_time = #{limitTime,jdbcType=BIGINT}
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+</mapper>

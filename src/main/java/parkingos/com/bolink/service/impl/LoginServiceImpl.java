@@ -1,10 +1,10 @@
 package parkingos.com.bolink.service.impl;
 
 import com.alibaba.fastjson.JSONObject;
-import com.zld.common_dao.dao.CommonDao;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import parkingos.com.bolink.dao.spring.CommonDao;
 import parkingos.com.bolink.models.*;
 import parkingos.com.bolink.service.LoginService;
 import parkingos.com.bolink.utils.Check;
