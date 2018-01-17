@@ -6,32 +6,29 @@
     </artifacts-to-build>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="1e1907b4-ad75-4369-9213-b3ef8e3b24b9" name="Default" comment="设备管理模块，因为对应的数据库表没找到，所以只写了页面框架，请求链没有调通">
-      <change type="DELETED" beforePath="$PROJECT_DIR$/.idea/libraries/Maven__avalon_framework_avalon_framework_api_4_3.xml" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/.idea/libraries/Maven__avalon_logkit_avalon_logkit_2_1.xml" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/.idea/libraries/Maven__club_bolink_commondao_1_0_1.xml" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/.idea/libraries/Maven__geronimo_spec_geronimo_spec_javamail_1_3_1_rc3.xml" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/.idea/libraries/Maven__geronimo_spec_geronimo_spec_jms_1_1_rc4.xml" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/.idea/libraries/Maven__javax_servlet_servlet_api_2_3.xml" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/postgres/commondao-1.0.3.jar" afterPath="" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../parkingos_cloud_vue/.idea/misc.xml" afterPath="$PROJECT_DIR$/../parkingos_cloud_vue/.idea/misc.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../parkingos_cloud_vue/src/api/api.js" afterPath="$PROJECT_DIR$/../parkingos_cloud_vue/src/api/api.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../parkingos_cloud_vue/src/components/CommonTable.vue" afterPath="$PROJECT_DIR$/../parkingos_cloud_vue/src/components/CommonTable.vue" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../parkingos_cloud_vue/src/pages/LoginCloud.vue" afterPath="$PROJECT_DIR$/../parkingos_cloud_vue/src/pages/LoginCloud.vue" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../parkingos_cloud_vue/src/pages/park/EquipmentManage_Camera.vue" afterPath="$PROJECT_DIR$/../parkingos_cloud_vue/src/pages/park/EquipmentManage_Camera.vue" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../parkingos_cloud_vue/src/pages/park/EquipmentManage_Channel.vue" afterPath="$PROJECT_DIR$/../parkingos_cloud_vue/src/pages/park/EquipmentManage_Channel.vue" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../parkingos_cloud_vue/src/pages/park/EquipmentManage_Intercom.vue" afterPath="$PROJECT_DIR$/../parkingos_cloud_vue/src/pages/park/EquipmentManage_Intercom.vue" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../parkingos_cloud_vue/src/pages/park/EquipmentManage_LED.vue" afterPath="$PROJECT_DIR$/../parkingos_cloud_vue/src/pages/park/EquipmentManage_LED.vue" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../parkingos_cloud_vue/src/pages/park/EquipmentManage_Monitor.vue" afterPath="$PROJECT_DIR$/../parkingos_cloud_vue/src/pages/park/EquipmentManage_Monitor.vue" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../parkingos_cloud_vue/src/pages/park/EquipmentManage_WorkStation.vue" afterPath="$PROJECT_DIR$/../parkingos_cloud_vue/src/pages/park/EquipmentManage_WorkStation.vue" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/artifacts/parkingoscloud_Web_exploded.xml" afterPath="$PROJECT_DIR$/.idea/artifacts/parkingoscloud_Web_exploded.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/encodings.xml" afterPath="$PROJECT_DIR$/.idea/encodings.xml" />
+    <list default="true" id="1e1907b4-ad75-4369-9213-b3ef8e3b24b9" name="Default" comment="">
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/postgres/commondao-1.0.4.jar" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/.idea/dictionaries/Administrator.xml" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/.idea/libraries/Maven__club_bolink_commondao_1_0_4.xml" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/.idea/uiDesigner.xml" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/.idea/vcs.xml" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/main/java/parkingos/com/bolink/actions/EquipmentManageCameraAction.java" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/main/java/parkingos/com/bolink/actions/EquipmentManageChannelAction.java" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/main/java/parkingos/com/bolink/actions/EquipmentManageLEDAction.java" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/main/java/parkingos/com/bolink/actions/EquipmentManageWorkSiteAction.java" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/main/java/parkingos/com/bolink/models/ComCameraTb.java" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/main/java/parkingos/com/bolink/models/ComLedTb.java" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/main/java/parkingos/com/bolink/models/ComPassTb.java" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/main/java/parkingos/com/bolink/models/ComWorksiteTb.java" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/main/java/parkingos/com/bolink/service/EquipmentManageCameraService.java" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/main/java/parkingos/com/bolink/service/EquipmentManageChannelService.java" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/main/java/parkingos/com/bolink/service/EquipmentManageLEDService.java" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/main/java/parkingos/com/bolink/service/EquipmentManageWorkSiteService.java" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/main/java/parkingos/com/bolink/service/impl/EquipmentManageCameraServiceImpl.java" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/main/java/parkingos/com/bolink/service/impl/EquipmentManageChannelServiceImpl.java" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/main/java/parkingos/com/bolink/service/impl/EquipmentManageLEDServiceImpl.java" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/main/java/parkingos/com/bolink/service/impl/EquipmentManageWorkSiteServiceImpl.java" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/parkingoscloud.iml" afterPath="$PROJECT_DIR$/parkingoscloud.iml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/pom.xml" afterPath="$PROJECT_DIR$/pom.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/java/parkingos/com/bolink/actions/LoginAction.java" afterPath="$PROJECT_DIR$/src/main/java/parkingos/com/bolink/actions/LoginAction.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/java/parkingos/com/bolink/service/impl/LoginServiceImpl.java" afterPath="$PROJECT_DIR$/src/main/java/parkingos/com/bolink/service/impl/LoginServiceImpl.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/resources/proxool.xml" afterPath="$PROJECT_DIR$/src/main/resources/proxool.xml" />
     </list>
     <ignored path="$PROJECT_DIR$/out/" />
     <ignored path="$PROJECT_DIR$/target/" />
@@ -90,8 +87,8 @@
       <file leaf-file-name="CommonTable.vue" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/../parkingos_cloud_vue/src/components/CommonTable.vue">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="336">
-              <caret line="809" column="47" lean-forward="true" selection-start-line="809" selection-start-column="47" selection-end-line="809" selection-end-column="47" />
+            <state relative-caret-position="147">
+              <caret line="802" column="4" lean-forward="false" selection-start-line="802" selection-start-column="4" selection-end-line="802" selection-end-column="4" />
               <folding />
             </state>
           </provider>
@@ -187,6 +184,9 @@
       </list>
     </option>
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$/../parkingos_cloud_vue" />
+    <option name="PUSH_TAGS">
+      <GitPushTagMode />
+    </option>
   </component>
   <component name="GradleLocalSettings">
     <option name="externalProjectsViewState">
@@ -626,7 +626,7 @@
       <workItem from="1515977136202" duration="507000" />
       <workItem from="1515978043920" duration="28191000" />
       <workItem from="1516062950481" duration="28769000" />
-      <workItem from="1516149166853" duration="7068000" />
+      <workItem from="1516149166853" duration="7720000" />
     </task>
     <task id="LOCAL-00001" summary="设备管理模块，因为对应的数据库表没找到，所以只写了页面框架，请求链没有调通">
       <created>1515664608265</created>
@@ -656,17 +656,31 @@
       <option name="project" value="LOCAL" />
       <updated>1515665384213</updated>
     </task>
-    <option name="localTasksCounter" value="5" />
+    <task id="LOCAL-00005" summary="设备管理模块">
+      <created>1516157469767</created>
+      <option name="number" value="00005" />
+      <option name="presentableId" value="LOCAL-00005" />
+      <option name="project" value="LOCAL" />
+      <updated>1516157469767</updated>
+    </task>
+    <task id="LOCAL-00006" summary="设备管理模块">
+      <created>1516157570562</created>
+      <option name="number" value="00006" />
+      <option name="presentableId" value="LOCAL-00006" />
+      <option name="project" value="LOCAL" />
+      <updated>1516157570562</updated>
+    </task>
+    <option name="localTasksCounter" value="7" />
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="127498000" />
+    <option name="totallyTimeSpent" value="128150000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="-8" y="-8" width="1456" height="876" extended-state="6" />
     <layout>
       <window_info id="Palette" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="5" side_tool="false" content_ui="tabs" />
-      <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.44125327" sideWeight="0.50277776" order="0" side_tool="true" content_ui="tabs" />
+      <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.44125327" sideWeight="0.50277776" order="0" side_tool="true" content_ui="tabs" />
       <window_info id="Application Servers" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Maven Projects" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.3298611" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
       <window_info id="Capture Tool" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="5" side_tool="false" content_ui="tabs" />
@@ -732,7 +746,8 @@
   </component>
   <component name="VcsManagerConfiguration">
     <MESSAGE value="设备管理模块，因为对应的数据库表没找到，所以只写了页面框架，请求链没有调通" />
-    <option name="LAST_COMMIT_MESSAGE" value="设备管理模块，因为对应的数据库表没找到，所以只写了页面框架，请求链没有调通" />
+    <MESSAGE value="设备管理模块" />
+    <option name="LAST_COMMIT_MESSAGE" value="设备管理模块" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -742,12 +757,6 @@
           <line>44</line>
           <properties />
           <option name="timeStamp" value="31" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="javascript">
-          <url>file://$PROJECT_DIR$/../parkingos_cloud_vue/src/components/CommonTable.vue</url>
-          <line>808</line>
-          <properties />
-          <option name="timeStamp" value="32" />
         </line-breakpoint>
       </breakpoints>
       <option name="time" value="33" />
@@ -1160,8 +1169,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/../parkingos_cloud_vue/src/components/CommonTable.vue">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="336">
-          <caret line="809" column="47" lean-forward="true" selection-start-line="809" selection-start-column="47" selection-end-line="809" selection-end-column="47" />
+        <state relative-caret-position="147">
+          <caret line="802" column="4" lean-forward="false" selection-start-line="802" selection-start-column="4" selection-end-line="802" selection-end-column="4" />
           <folding />
         </state>
       </provider>
