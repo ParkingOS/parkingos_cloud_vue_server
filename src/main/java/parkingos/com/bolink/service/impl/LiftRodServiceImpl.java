@@ -29,7 +29,9 @@ public class LiftRodServiceImpl implements LiftRodService {
 
     @Override
     public JSONObject selectResultByConditions(Map<String, String> reqmap) {
-        JSONObject result = supperSearchService.supperSearch(new LiftRodTb(),reqmap);
+        LiftRodTb liftRodTb = new LiftRodTb();
+        liftRodTb.setComid(Long.parseLong(reqmap.get("comid")));
+        JSONObject result = supperSearchService.supperSearch(liftRodTb,reqmap);
         /*String str = "{\"total\":12,\"page\":1,\"rows\":[]}";
         JSONObject result = JSONObject.parseObject(str);
 

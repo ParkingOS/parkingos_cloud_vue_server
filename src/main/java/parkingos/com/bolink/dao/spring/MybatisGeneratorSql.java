@@ -109,7 +109,7 @@ public class MybatisGeneratorSql {
                 if(i==0){
                     fields.append("("+key);
                     vs.append("(?");
-                }else if(i!=params.size()){
+                }else if(i!=params.size()-1){
                     fields.append(","+key);
                     vs.append(",?");
                 }else {
@@ -118,14 +118,14 @@ public class MybatisGeneratorSql {
                         vs.append(")");
                     }else{
                         fields.append(","+key+")");
-                        fields.append(",?)");
+                        vs.append(",?)");
                     }
                 }
                 values.add(params.get(key));
                 i++;
             }
             Map<String,Object> result = new HashMap<>();
-            result.put("sql",sql.toString()+" values "+vs.toString());
+            result.put("sql",sql.toString()+fields.toString()+" values "+vs.toString());
             result.put("values",values);
             return result;
         }
@@ -202,7 +202,7 @@ public class MybatisGeneratorSql {
     }
 
     public String selectSequence(String seqName){
-        String sql = "SELECT nextval("+seqName+"::REGCLASS)";
+        String sql = "SELECT nextval('"+seqName+"'::REGCLASS)";
         return sql;
     }
 
