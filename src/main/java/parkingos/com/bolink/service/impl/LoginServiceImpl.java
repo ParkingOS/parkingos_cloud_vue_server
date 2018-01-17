@@ -161,7 +161,10 @@ public class LoginServiceImpl implements LoginService {
                 AuthTb authTb = new AuthTb();
                 authTb.setOid(userRoleTb.getOid());
                 authTb.setState(0);
-                authList = commonDao.selectListByConditions(authTb);
+                String sql = "select actions,id auth_id,nname,pid,url,sort,sub_auth childauths from " +
+                        "auth_tb where oid= "+userRoleTb.getOid()+" and state=0 ";
+                authList = commonDao.getObjectBySql(sql);
+                //authList = commonDao.selectListByConditions(authTb);
                 if (authList != null) {
                     for (Map<String, Object> map : authList) {
                         if (map.get("childauths") != null) {

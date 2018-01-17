@@ -12,7 +12,6 @@
           <element id="library" level="project" name="Maven: avalon-framework:avalon-framework-api:4.3" />
           <element id="library" level="project" name="Maven: avalon-logkit:avalon-logkit:2.1" />
           <element id="library" level="project" name="Maven: cglib:cglib-nodep:3.2.4" />
-          <element id="library" level="project" name="Maven: club.bolink:commondao:1.0.1" />
           <element id="library" level="project" name="Maven: com.alibaba:fastjson:1.2.37" />
           <element id="library" level="project" name="Maven: com.cloudhopper.proxool:proxool-cglib:0.9.1" />
           <element id="library" level="project" name="Maven: com.cloudhopper.proxool:proxool:0.9.1" />
@@ -52,6 +51,7 @@
           <element id="library" level="project" name="Maven: org.springframework:spring-tx:4.1.1.RELEASE" />
           <element id="library" level="project" name="Maven: org.springframework:spring-web:4.1.1.RELEASE" />
           <element id="library" level="project" name="Maven: org.springframework:spring-webmvc:4.1.1.RELEASE" />
+          <element id="library" level="project" name="Maven: club.bolink:commondao:1.0.4" />
         </element>
       </element>
     </root>

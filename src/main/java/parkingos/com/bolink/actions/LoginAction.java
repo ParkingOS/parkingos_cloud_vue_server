@@ -30,10 +30,10 @@ public class LoginAction {
 
 		String userId = req.getParameter("username");
 		String cpasswd = req.getParameter("password");
-		String passwd = Encryption.decryptToAESPKCS5(cpasswd, Encryption.KEY);
+	    String passwd = Encryption.decryptToAESPKCS5(cpasswd, Encryption.KEY);
 
 		//返回result
-		JSONObject result = loginService.getResultByUserNameAndPass(userId,passwd);
+	JSONObject result = loginService.getResultByUserNameAndPass(userId,passwd);
 
 
 
@@ -44,7 +44,7 @@ public class LoginAction {
 //		JSONObject user = JSONObject.parseObject("{}");
 //		user.put("comid",1222);
 //		user.put("nickname","liu");
-//		user.put("roleid",4);
+//		user.put("roleid",30);
 //		user.put("userid",userId);
 //		user.put("lastlogin",System.currentTimeMillis()/1000);
 //		user.put("parkid",21879);
