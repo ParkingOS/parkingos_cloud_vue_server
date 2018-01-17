@@ -1,17 +1,17 @@
 package parkingos.com.bolink.service.impl;
 
 import com.alibaba.fastjson.JSONObject;
-import com.zld.common_dao.dao.CommonDao;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import parkingos.com.bolink.dao.spring.CommonDao;
 import parkingos.com.bolink.models.OrderTb;
 import parkingos.com.bolink.service.OrderService;
 import parkingos.com.bolink.service.SupperSearchService;
 
 import java.util.Map;
 
-@Service
+@Service("spring")
 public class OrderServiceImpl implements OrderService {
 
     Logger logger = Logger.getLogger(OrderServiceImpl.class);
@@ -21,9 +21,16 @@ public class OrderServiceImpl implements OrderService {
     @Autowired
     private SupperSearchService<OrderTb> supperSearchService;
 
+
+    @Override
+    public int selectCountByConditions(OrderTb orderTb) {
+        return 0;
+    }
     @Override
     public JSONObject selectResultByConditions(Map<String, String> reqmap) {
-        JSONObject result = supperSearchService.supperSearch(new OrderTb(),reqmap);
+        OrderTb orderTb = new OrderTb();
+        orderTb.setComid(21782L);
+        JSONObject result = supperSearchService.supperSearch(orderTb,reqmap);
         String str = "{\"total\":12,\"page\":1,\"parkinfo\":\"场内停车52辆,临停车52辆,空车位:948辆\",\"rows\":[]}";
         /*JSONObject result = JSONObject.parseObject(str);
 

@@ -33,10 +33,11 @@ public class CarRenewAction {
 
 		JSONObject result = carRenewService.selectResultByConditions(reqParameterMap);
 
-
-
 		logger.info(result);
+
 		StringUtils.ajaxOutput(response,result.toJSONString());
+
 		return null;
+
 	}
 }

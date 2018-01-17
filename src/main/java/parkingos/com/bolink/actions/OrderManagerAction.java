@@ -10,6 +10,7 @@ import parkingos.com.bolink.service.OrderService;
 import parkingos.com.bolink.utils.RequestUtil;
 import parkingos.com.bolink.utils.StringUtils;
 
+import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.util.Map;
@@ -21,6 +22,7 @@ public class OrderManagerAction {
     Logger logger = Logger.getLogger(OrderManagerAction.class);
 
     @Autowired
+    @Resource(name="mybatis")
     private OrderService orderService;
 
     @RequestMapping(value = "/query")
@@ -29,6 +31,7 @@ public class OrderManagerAction {
         Map<String, String> reqParameterMap = RequestUtil.readBodyFormRequset(request);
 
         JSONObject result = orderService.selectResultByConditions(reqParameterMap);
+        logger.info(result);
         //把结果返回页面
         StringUtils.ajaxOutput(resp,result.toJSONString());
         return null;

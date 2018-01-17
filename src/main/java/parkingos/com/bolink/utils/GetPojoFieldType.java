@@ -1,6 +1,6 @@
 package parkingos.com.bolink.utils;
 
-import com.zld.common_dao.util.StringUtil;
+
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Type;
@@ -20,7 +20,7 @@ public class GetPojoFieldType<T> {
             for(int i$ = 0; i$ < arr$.length; ++i$) {
                 Field field = arr$[i$];
                 Type type = field.getGenericType();
-                String fieldName = StringUtil.camel2Underline(field.getName());
+                String fieldName = OrmUtil.camel2Underline(field.getName());
                 if(isSelectField(tableName,fieldName)){
                     resutlMap.put(fieldName,FieldTypes.SELECT);
                 }else if(fieldName.contains("time")){
