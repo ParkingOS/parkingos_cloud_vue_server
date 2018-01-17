@@ -7,27 +7,6 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="1e1907b4-ad75-4369-9213-b3ef8e3b24b9" name="Default" comment="">
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/postgres/commondao-1.0.4.jar" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/.idea/dictionaries/Administrator.xml" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/.idea/libraries/Maven__club_bolink_commondao_1_0_4.xml" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/.idea/uiDesigner.xml" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/.idea/vcs.xml" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/main/java/parkingos/com/bolink/actions/EquipmentManageCameraAction.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/main/java/parkingos/com/bolink/actions/EquipmentManageChannelAction.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/main/java/parkingos/com/bolink/actions/EquipmentManageLEDAction.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/main/java/parkingos/com/bolink/actions/EquipmentManageWorkSiteAction.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/main/java/parkingos/com/bolink/models/ComCameraTb.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/main/java/parkingos/com/bolink/models/ComLedTb.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/main/java/parkingos/com/bolink/models/ComPassTb.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/main/java/parkingos/com/bolink/models/ComWorksiteTb.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/main/java/parkingos/com/bolink/service/EquipmentManageCameraService.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/main/java/parkingos/com/bolink/service/EquipmentManageChannelService.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/main/java/parkingos/com/bolink/service/EquipmentManageLEDService.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/main/java/parkingos/com/bolink/service/EquipmentManageWorkSiteService.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/main/java/parkingos/com/bolink/service/impl/EquipmentManageCameraServiceImpl.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/main/java/parkingos/com/bolink/service/impl/EquipmentManageChannelServiceImpl.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/main/java/parkingos/com/bolink/service/impl/EquipmentManageLEDServiceImpl.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/main/java/parkingos/com/bolink/service/impl/EquipmentManageWorkSiteServiceImpl.java" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
     </list>
     <ignored path="$PROJECT_DIR$/out/" />
@@ -626,7 +605,7 @@
       <workItem from="1515977136202" duration="507000" />
       <workItem from="1515978043920" duration="28191000" />
       <workItem from="1516062950481" duration="28769000" />
-      <workItem from="1516149166853" duration="7720000" />
+      <workItem from="1516149166853" duration="7774000" />
     </task>
     <task id="LOCAL-00001" summary="设备管理模块，因为对应的数据库表没找到，所以只写了页面框架，请求链没有调通">
       <created>1515664608265</created>
@@ -670,11 +649,18 @@
       <option name="project" value="LOCAL" />
       <updated>1516157570562</updated>
     </task>
-    <option name="localTasksCounter" value="7" />
+    <task id="LOCAL-00007" summary="设备管理模块">
+      <created>1516157864726</created>
+      <option name="number" value="00007" />
+      <option name="presentableId" value="LOCAL-00007" />
+      <option name="project" value="LOCAL" />
+      <updated>1516157864726</updated>
+    </task>
+    <option name="localTasksCounter" value="8" />
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="128150000" />
+    <option name="totallyTimeSpent" value="128204000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="-8" y="-8" width="1456" height="876" extended-state="6" />
@@ -841,6 +827,7 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="54">
           <caret line="2" column="0" lean-forward="false" selection-start-line="2" selection-start-column="0" selection-end-line="2" selection-end-column="0" />
+          <folding />
         </state>
       </provider>
     </entry>
@@ -883,6 +870,7 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="266">
           <caret line="65" column="0" lean-forward="true" selection-start-line="65" selection-start-column="0" selection-end-line="65" selection-end-column="0" />
+          <folding />
         </state>
       </provider>
     </entry>
@@ -922,6 +910,7 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="428">
           <caret line="36" column="0" lean-forward="true" selection-start-line="36" selection-start-column="0" selection-end-line="36" selection-end-column="0" />
+          <folding />
         </state>
       </provider>
     </entry>
