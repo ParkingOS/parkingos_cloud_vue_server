@@ -4,7 +4,7 @@ public class ComPassTb {
 
     private Long id;
 
-    private Integer worksite_id;
+    private Long worksiteId;
 
     private String passname;
 
@@ -16,11 +16,11 @@ public class ComPassTb {
 
     private Integer state;
 
-    private Integer month_set;
+    private Integer monthSet;
 
-    private Integer month2_set;
+    private Integer month2Set;
 
-    private String channel_id;
+    private String channelId;
 
     public Long getId() {
         return id;
@@ -30,12 +30,12 @@ public class ComPassTb {
         this.id = id;
     }
 
-    public Integer getWorksite_id() {
-        return worksite_id;
+    public Long getWorksiteId() {
+        return worksiteId;
     }
 
-    public void setWorksite_id(Integer worksite_id) {
-        this.worksite_id = worksite_id;
+    public void setWorksiteId(Long worksiteId) {
+        this.worksiteId = worksiteId;
     }
 
     public String getPassname() {
@@ -78,27 +78,27 @@ public class ComPassTb {
         this.state = state;
     }
 
-    public Integer getMonth_set() {
-        return month_set;
+    public Integer getMonthSet() {
+        return monthSet;
     }
 
-    public void setMonth_set(Integer month_set) {
-        this.month_set = month_set;
+    public void setMonthSet(Integer monthSet) {
+        this.monthSet = monthSet;
     }
 
-    public Integer getMonth2_set() {
-        return month2_set;
+    public Integer getMonth2Set() {
+        return month2Set;
     }
 
-    public void setMonth2_set(Integer month2_set) {
-        this.month2_set = month2_set;
+    public void setMonth2Set(Integer month2Set) {
+        this.month2Set = month2Set;
     }
 
-    public String getChannel_id() {
-        return channel_id;
+    public String getChannelId() {
+        return channelId;
     }
 
-    public void setChannel_id(String channel_id) {
-        this.channel_id = channel_id;
+    public void setChannelId(String channelId) {
+        this.channelId = channelId;
     }
 }

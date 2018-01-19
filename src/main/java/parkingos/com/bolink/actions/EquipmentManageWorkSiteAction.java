@@ -6,7 +6,8 @@ import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
-import parkingos.com.bolink.service.EquipmentManageLEDService;
+import parkingos.com.bolink.models.ComLedTb;
+import parkingos.com.bolink.models.ComWorksiteTb;
 import parkingos.com.bolink.service.EquipmentManageWorkSiteService;
 import parkingos.com.bolink.utils.RequestUtil;
 import parkingos.com.bolink.utils.StringUtils;
@@ -42,14 +43,58 @@ public class EquipmentManageWorkSiteAction {
 	@RequestMapping(value = "/add")
 	public String add(HttpServletRequest request, HttpServletResponse response) {
 
-		Map<String, String> reqParameterMap = RequestUtil.readBodyFormRequset(request);
+		String worksiteName = RequestUtil.processParams(request,"worksite_name");
+		String description = RequestUtil.processParams(request,"description");
+		Integer netType = RequestUtil.getInteger(request,"net_type",0);
+		Long id = RequestUtil.getLong(request,"id",-1L);
+		Long comid = RequestUtil.getLong(request,"oid",-1L);
 
-		logger.info(reqParameterMap);
+		ComWorksiteTb comWorksiteTb = new ComWorksiteTb();
+		comWorksiteTb.setWorksiteName(worksiteName);
+		comWorksiteTb.setDescription(description);
+		comWorksiteTb.setNetType(netType);
+		comWorksiteTb.setId(id);
+		comWorksiteTb.setComid(comid);
 
-		Integer result = equipmentManageWorkSiteService.insertResultByConditions(reqParameterMap);
+		String result = equipmentManageWorkSiteService.insertResultByConditions(comWorksiteTb).toString();
 
-		logger.info(result);
-		StringUtils.ajaxOutput(response,result.toString());
+		StringUtils.ajaxOutput(response,result);
+
+		return null;
+	}
+
+	@RequestMapping(value = "/edit")
+	public String update(HttpServletRequest request, HttpServletResponse response) {
+
+		String worksiteName = RequestUtil.processParams(request,"worksite_name");
+		String description = RequestUtil.processParams(request,"description");
+		Integer netType = RequestUtil.getInteger(request,"net_type",0);
+		Long id = RequestUtil.getLong(request,"oid",-1L);
+		Long comid = RequestUtil.getLong(request,"oid",-1L);
+
+		ComWorksiteTb comWorksiteTb = new ComWorksiteTb();
+		comWorksiteTb.setWorksiteName(worksiteName);
+		comWorksiteTb.setDescription(description);
+		comWorksiteTb.setNetType(netType);
+		comWorksiteTb.setId(id);
+		comWorksiteTb.setComid(comid);
+
+		String result = equipmentManageWorkSiteService.updateResultByConditions(comWorksiteTb).toString();
+		StringUtils.ajaxOutput(response,result);
+		return null;
+	}
+
+	@RequestMapping("/remove")
+	public String remove(HttpServletRequest request,HttpServletResponse response){
+		Long id = RequestUtil.getLong(request,"id",null);
+
+		ComWorksiteTb comWorksiteTb = new ComWorksiteTb();
+		comWorksiteTb.setId(id);
+		comWorksiteTb.setState(1);
+
+		String result = equipmentManageWorkSiteService.removeResultByConditions(comWorksiteTb).toString();
+
+		StringUtils.ajaxOutput(response,result);
 		return null;
 	}
 }

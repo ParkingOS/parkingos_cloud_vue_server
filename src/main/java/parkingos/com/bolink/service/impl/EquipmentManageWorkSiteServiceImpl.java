@@ -1,10 +1,11 @@
 package parkingos.com.bolink.service.impl;
 
 import com.alibaba.fastjson.JSONObject;
-import com.zld.common_dao.dao.CommonDao;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import parkingos.com.bolink.dao.spring.CommonDao;
 import parkingos.com.bolink.models.ComWorksiteTb;
 import parkingos.com.bolink.models.ZldBlackTb;
 import parkingos.com.bolink.service.EquipmentManageLEDService;
@@ -18,10 +19,11 @@ public class EquipmentManageWorkSiteServiceImpl implements EquipmentManageWorkSi
 
     Logger logger = Logger.getLogger(EquipmentManageWorkSiteServiceImpl.class);
 
-    @Autowired
-    private CommonDao commonDao;
+
     @Autowired
     private SupperSearchService<ComWorksiteTb> supperSearchService;
+    @Autowired
+    private CommonDao commonDao;
 
     @Override
     public JSONObject selectResultByConditions(Map<String, String> reqmap) {
@@ -63,9 +65,24 @@ public class EquipmentManageWorkSiteServiceImpl implements EquipmentManageWorkSi
     }
 
     @Override
-    public Integer insertResultByConditions(Map<String, String> map) {
-        Integer result = commonDao.insert(new ComWorksiteTb());
+    @Transactional
+    public Integer insertResultByConditions(ComWorksiteTb comWorksiteTb) {
 
+        Integer result = commonDao.insert(comWorksiteTb);
+        return result;
+    }
+
+    @Override
+    @Transactional
+    public Integer updateResultByConditions(ComWorksiteTb comWorksiteTb) {
+        Integer result = commonDao.updateByPrimaryKey(comWorksiteTb);
+        return result;
+    }
+
+    @Override
+    @Transactional
+    public Integer removeResultByConditions(ComWorksiteTb comWorksiteTb) {
+        Integer result = commonDao.updateByPrimaryKey(comWorksiteTb);
         return result;
     }
 

@@ -283,11 +283,11 @@
       <version>2.13.0-rc2</version>
     </dependency>
 
-    <dependency>
+    <!--<dependency>
       <groupId>club.bolink</groupId>
       <artifactId>commondao</artifactId>
       <version>1.0.4</version>
-    </dependency>
+    </dependency>-->
     <dependency>
       <groupId>javax.servlet</groupId>
       <artifactId>javax.servlet-api</artifactId>
@@ -330,6 +330,16 @@
       <artifactId>junit</artifactId>
       <version>3.8.1</version>
       <scope>test</scope>
+    </dependency>
+      <dependency>
+          <groupId>commons-beanutils</groupId>
+          <artifactId>commons-beanutils</artifactId>
+          <version>1.7.0</version>
+      </dependency>
+    <dependency>
+      <groupId>commons-beanutils</groupId>
+      <artifactId>commons-beanutils</artifactId>
+      <version>1.7.0</version>
     </dependency>
   </dependencies>
 </project>

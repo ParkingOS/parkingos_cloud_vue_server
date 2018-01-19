@@ -1,13 +1,12 @@
 package parkingos.com.bolink.service.impl;
 
 import com.alibaba.fastjson.JSONObject;
-import com.zld.common_dao.dao.CommonDao;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import parkingos.com.bolink.dao.spring.CommonDao;
 import parkingos.com.bolink.models.ComPassTb;
-import parkingos.com.bolink.models.ZldBlackTb;
-import parkingos.com.bolink.service.EquipmentManageCameraService;
 import parkingos.com.bolink.service.EquipmentManageChannelService;
 import parkingos.com.bolink.service.SupperSearchService;
 
@@ -18,10 +17,11 @@ public class EquipmentManageChannelServiceImpl implements EquipmentManageChannel
 
     Logger logger = Logger.getLogger(EquipmentManageChannelServiceImpl.class);
 
-    @Autowired
-    private CommonDao commonDao;
+
     @Autowired
     private SupperSearchService<ComPassTb> supperSearchService;
+    @Autowired
+    private CommonDao commonDao;
 
     @Override
     public JSONObject selectResultByConditions(Map<String, String> reqmap) {
@@ -59,6 +59,27 @@ public class EquipmentManageChannelServiceImpl implements EquipmentManageChannel
         }
         result.put("total",count);
         result.put("page",Integer.parseInt(reqmap.get("page")));*/
+        return result;
+    }
+
+    @Override
+    @Transactional
+    public Integer insertResultByConditions(ComPassTb comPassTb) {
+        Integer result = commonDao.insert(comPassTb);
+        return result;
+    }
+
+    @Override
+    @Transactional
+    public Integer updateResultByConditions(ComPassTb comPassTb) {
+        Integer result = commonDao.updateByPrimaryKey(comPassTb);
+        return result;
+    }
+
+    @Override
+    @Transactional
+    public Integer removeResultByConditions(ComPassTb comPassTb) {
+        Integer result = commonDao.updateByPrimaryKey(comPassTb);
         return result;
     }
 

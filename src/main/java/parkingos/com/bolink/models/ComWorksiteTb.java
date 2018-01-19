@@ -6,11 +6,11 @@ public class ComWorksiteTb {
 
     private Long comid;
 
-    private String worksite_name;
+    private String worksiteName;
 
     private String description;
 
-    private Integer net_type;
+    private Integer netType;
 
     private String host_name;
 
@@ -38,12 +38,12 @@ public class ComWorksiteTb {
         this.comid = comid;
     }
 
-    public String getWorksite_name() {
-        return worksite_name;
+    public String getWorksiteName() {
+        return worksiteName;
     }
 
-    public void setWorksite_name(String worksite_name) {
-        this.worksite_name = worksite_name;
+    public void setWorksiteName(String worksiteName) {
+        this.worksiteName = worksiteName;
     }
 
     public String getDescription() {
@@ -54,12 +54,12 @@ public class ComWorksiteTb {
         this.description = description;
     }
 
-    public Integer getNet_type() {
-        return net_type;
+    public Integer getNetType() {
+        return netType;
     }
 
-    public void setNet_type(Integer net_type) {
-        this.net_type = net_type;
+    public void setNetType(Integer netType) {
+        this.netType = netType;
     }
 
     public String getHost_name() {

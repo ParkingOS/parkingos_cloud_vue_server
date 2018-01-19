@@ -37,7 +37,7 @@ public class ComLedTb {
 
     private Integer state;
 
-    private Integer upload_time;
+    private Integer uploadTime;
 
     private Long comid;
 
@@ -177,12 +177,12 @@ public class ComLedTb {
         this.state = state;
     }
 
-    public Integer getUpload_time() {
-        return upload_time;
+    public Integer getUploadTime() {
+        return uploadTime;
     }
 
-    public void setUpload_time(Integer upload_time) {
-        this.upload_time = upload_time;
+    public void setUploadTime(Integer uploadTime) {
+        this.uploadTime = uploadTime;
     }
 
     public Long getComid() {

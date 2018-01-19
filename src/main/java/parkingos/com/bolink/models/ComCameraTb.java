@@ -4,7 +4,7 @@ public class ComCameraTb {
 
     private Long id;
 
-    private String camera_name;
+    private String cameraName;
 
     private String ip;
 
@@ -20,7 +20,7 @@ public class ComCameraTb {
 
     private Integer state;
 
-    private Integer upload_time;
+    private Integer uploadTime;
 
     private Long comid;
 
@@ -32,12 +32,12 @@ public class ComCameraTb {
         this.id = id;
     }
 
-    public String getCamera_name() {
-        return camera_name;
+    public String getCameraName() {
+        return cameraName;
     }
 
-    public void setCamera_name(String camera_name) {
-        this.camera_name = camera_name;
+    public void setCameraName(String cameraName) {
+        this.cameraName = cameraName;
     }
 
     public String getIp() {
@@ -96,12 +96,12 @@ public class ComCameraTb {
         this.state = state;
     }
 
-    public Integer getUpload_time() {
-        return upload_time;
+    public Integer getUploadTime() {
+        return uploadTime;
     }
 
-    public void setUpload_time(Integer upload_time) {
-        this.upload_time = upload_time;
+    public void setUploadTime(Integer uploadTime) {
+        this.uploadTime = uploadTime;
     }
 
     public Long getComid() {

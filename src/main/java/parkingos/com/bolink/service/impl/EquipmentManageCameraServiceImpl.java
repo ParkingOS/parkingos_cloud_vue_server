@@ -1,10 +1,10 @@
 package parkingos.com.bolink.service.impl;
 
 import com.alibaba.fastjson.JSONObject;
-import com.zld.common_dao.dao.CommonDao;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import parkingos.com.bolink.dao.spring.CommonDao;
 import parkingos.com.bolink.models.ComCameraTb;
 import parkingos.com.bolink.service.EquipmentManageCameraService;
 import parkingos.com.bolink.service.SupperSearchService;
@@ -17,9 +17,9 @@ public class EquipmentManageCameraServiceImpl implements EquipmentManageCameraSe
     Logger logger = Logger.getLogger(EquipmentManageCameraServiceImpl.class);
 
     @Autowired
-    private CommonDao commonDao;
-    @Autowired
     private SupperSearchService<ComCameraTb> supperSearchService;
+    @Autowired
+    private CommonDao commonDao;
 
     @Override
     public JSONObject selectResultByConditions(Map<String, String> reqmap) {
@@ -57,6 +57,24 @@ public class EquipmentManageCameraServiceImpl implements EquipmentManageCameraSe
         }
         result.put("total",count);
         result.put("page",Integer.parseInt(reqmap.get("page")));*/
+        return result;
+    }
+
+    @Override
+    public Integer insertResultByConditions(ComCameraTb comCameraTb) {
+        Integer result = commonDao.insert(comCameraTb);
+        return result;
+    }
+
+    @Override
+    public Integer updateResultByConditions(ComCameraTb comCameraTb) {
+        Integer result = commonDao.updateByPrimaryKey(comCameraTb);
+        return result;
+    }
+
+    @Override
+    public Integer removeResultByConditions(ComCameraTb comCameraTb) {
+        Integer result = commonDao.updateByPrimaryKey(comCameraTb);
         return result;
     }
 
