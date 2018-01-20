@@ -1,7 +1,5 @@
 package parkingos.com.bolink.utils;
 
-import org.springframework.beans.BeanUtils;
-
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.util.HashMap;
