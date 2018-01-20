@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSONObject;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import parkingos.com.bolink.dao.spring.CommonDao;
 import parkingos.com.bolink.models.ComCameraTb;
 import parkingos.com.bolink.service.EquipmentManageCameraService;
@@ -61,18 +62,21 @@ public class EquipmentManageCameraServiceImpl implements EquipmentManageCameraSe
     }
 
     @Override
+    @Transactional
     public Integer insertResultByConditions(ComCameraTb comCameraTb) {
         Integer result = commonDao.insert(comCameraTb);
         return result;
     }
 
     @Override
+    @Transactional
     public Integer updateResultByConditions(ComCameraTb comCameraTb) {
         Integer result = commonDao.updateByPrimaryKey(comCameraTb);
         return result;
     }
 
     @Override
+    @Transactional
     public Integer removeResultByConditions(ComCameraTb comCameraTb) {
         Integer result = commonDao.updateByPrimaryKey(comCameraTb);
         return result;
