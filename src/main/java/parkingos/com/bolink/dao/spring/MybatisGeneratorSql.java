@@ -109,7 +109,9 @@ public class MybatisGeneratorSql {
                 if(i==0){
                     fields.append("("+key);
                     vs.append("(?");
+
                 }else if(i<params.size()-1){
+
                     fields.append(","+key);
                     vs.append(",?");
                 }else {
@@ -186,7 +188,6 @@ public class MybatisGeneratorSql {
                     if(i==0){
                         sql.append(key +"= ?");
                     }else{
-                        //sql.append(" AND "+key +"= ?");
                         sql.append(" , "+key +"= ?");
                     }
                     values.add(params.get(key));
@@ -301,6 +302,7 @@ public class MybatisGeneratorSql {
                         values.add(o);
                         i++;
                     }
+                    sql.append(")");
                     break;
             }
 

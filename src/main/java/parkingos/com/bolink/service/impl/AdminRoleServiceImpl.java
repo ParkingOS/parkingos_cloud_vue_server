@@ -23,41 +23,91 @@ public class AdminRoleServiceImpl implements AdminRoleService {
 
     @Override
     public JSONObject selectResultByConditions(Map<String, String> reqmap) {
-        JSONObject result = supperSearchService.supperSearch(new UserRoleTb(),reqmap);
-        /*String str = "{\"total\":12,\"page\":1,\"rows\":[]}";
-        JSONObject result = JSONObject.parseObject(str);
 
-
-        int count =0;
-        List<UserRoleTb> list =null;
-        List<Map<String, Object>> resList =new ArrayList<>();
-        Map searchMap = supperSearchService.getBaseSearch(new UserRoleTb(),reqmap);
-        logger.info(searchMap);
-        if(searchMap!=null&&!searchMap.isEmpty()){
-            UserRoleTb baseQuery =(UserRoleTb)searchMap.get("base");
-            List<SearchBean> supperQuery = null;
-            if(searchMap.containsKey("supper"))
-                supperQuery = (List<SearchBean>)searchMap.get("supper");
-            PageOrderConfig config = null;
-            if(searchMap.containsKey("config"))
-                config = (PageOrderConfig)searchMap.get("config");
-            count = commonDao.selectCountByConditions(baseQuery,supperQuery);
-            if(count>0){
-                list = commonDao.selectListByConditions(baseQuery,supperQuery,config);
-
-                if (list != null && !list.isEmpty()) {
-                    for (UserRoleTb product : list) {
-                        OrmUtil<UserRoleTb> otm = new OrmUtil<>();
-                        Map<String, Object> map = otm.pojoToMap(product);
-                        resList.add(map);
-                    }
-                    result.put("rows", JSON.toJSON(resList));
-                }
-            }
-        }
-        result.put("total",count);
-        result.put("page",Integer.parseInt(reqmap.get("page")));*/
+        Long uin = Long.parseLong(reqmap.get("loginuin"));
+        UserRoleTb userRoleTb = new UserRoleTb();
+        userRoleTb.setAdminid(uin);
+        userRoleTb.setState(0);
+        JSONObject result = supperSearchService.supperSearch(userRoleTb,reqmap);
         return result;
     }
 
+    @Override
+    public JSONObject addRole(UserRoleTb userRoleTb, Integer func) {
+        String str = "{\"state\":0,\"msg\":\"保存失败\"}";
+        JSONObject result = JSONObject.parseObject(str);
+
+        int is_inspect = 0;
+        int is_collector = 0;
+        int is_opencard = 0;
+        switch (func) {
+            case 1:
+                is_collector = 1;
+                break;
+            case 2:
+                is_inspect = 1;
+                break;
+            case 3:
+                is_opencard = 1;
+                break;
+            default:
+                break;
+        }
+        userRoleTb.setIsCollector(is_collector);
+        userRoleTb.setIsInspect(is_inspect);
+        userRoleTb.setIsOpencard(is_opencard);
+        logger.error("=======>>>>>"+userRoleTb);
+        int ret = commonDao.insert(userRoleTb);
+        if(ret==1){
+            result.put("msg","保存成功");
+        }
+        result.put("state",ret);
+        return result;
+    }
+
+    @Override
+    public JSONObject deleteRole(UserRoleTb userRoleTb) {
+        String str = "{\"state\":0,\"msg\":\"删除失败\"}";
+        JSONObject result = JSONObject.parseObject(str);
+
+        int ret = commonDao.updateByPrimaryKey(userRoleTb);
+        if(ret==1){
+            result.put("state",1);
+            result.put("msg","删除成功");
+        }
+        return result;
+    }
+
+    @Override
+    public JSONObject updateRole(UserRoleTb userRoleTb, Integer func) {
+
+        String str = "{\"state\":0,\"msg\":\"修改失败\"}";
+        JSONObject result = JSONObject.parseObject(str);
+        int is_inspect = 0;
+        int is_collector = 0;
+        int is_opencard = 0;
+        switch (func) {
+            case 1:
+                is_collector = 1;
+                break;
+            case 2:
+                is_inspect = 1;
+                break;
+            case 3:
+                is_opencard = 1;
+                break;
+            default:
+                break;
+        }
+        userRoleTb.setIsCollector(is_collector);
+        userRoleTb.setIsInspect(is_inspect);
+        userRoleTb.setIsOpencard(is_opencard);
+
+        int ret = commonDao.updateByPrimaryKey(userRoleTb);
+        if(ret==1){
+            result.put("state",1);
+            result.put("msg","修改成功");
+        }
+        return result;
+    }
 }

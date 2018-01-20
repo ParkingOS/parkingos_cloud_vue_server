@@ -5,8 +5,10 @@ import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import parkingos.com.bolink.dao.spring.CommonDao;
+import parkingos.com.bolink.models.OrderTb;
 import parkingos.com.bolink.models.UserInfoTb;
 import parkingos.com.bolink.service.ParkOrderAnlysisService;
+import parkingos.com.bolink.service.SupperSearchService;
 import parkingos.com.bolink.utils.StringUtils;
 import parkingos.com.bolink.utils.TimeTools;
 
@@ -24,15 +26,19 @@ public class ParkOrderanlysisServiceImpl implements ParkOrderAnlysisService {
     @Autowired
     private CommonDao commonDao;
 
+    @Autowired
+    private SupperSearchService<OrderTb> supperSearchService;
+
     @Override
     public JSONObject selectResultByConditions(Map<String, String> reqmap) {
 
         String str = "{\"total\":12,\"page\":1,\"rows\":[]}";
         JSONObject result = JSONObject.parseObject(str);
 
+
         SimpleDateFormat df2 = new SimpleDateFormat("yyyy-MM-dd");
         String nowtime= df2.format(System.currentTimeMillis());
-        String type = reqmap.get("type");
+        String type = "";//reqmap.get("type");
         String sql = "select count(*) scount,sum(amount_receivable) amount_receivable, " +
                 "sum(total) total , sum(cash_pay) cash_pay,sum(cash_prepay) cash_prepay, sum(electronic_pay) electronic_pay,sum(electronic_prepay) electronic_prepay, " +
                 "sum(reduce_amount) reduce_pay, out_uid,comid from order_tb  ";
@@ -40,19 +46,21 @@ public class ParkOrderanlysisServiceImpl implements ParkOrderAnlysisService {
         String fieldsstr = reqmap.get("fieldsstr");//RequestUtil.processParams(request, "fieldsstr");
         String btime = reqmap.get("btime");//RequestUtil.processParams(request, "btime");
         String etime = reqmap.get("etime");//RequestUtil.processParams(request, "etime");
-        Long comid = Long.parseLong(reqmap.get("comid"));
+        Long comid = Long.parseLong(reqmap.get("comid"));//Long.parseLong(searchMap.get("comid")+"");
+        if (btime==null){
+            btime="";
+        }
+        if(etime==null){
+            etime="";
+        }
         if(btime.equals(""))
             btime = nowtime + " 00:00:00";
         if(etime.equals(""))
             etime = nowtime;
-        //SqlInfo sqlInfo =null;
-        //List<Object> params = null;
         Long b = TimeTools.getToDayBeginTime();
         Long e = System.currentTimeMillis()/1000;
         String dstr = btime+"-"+etime;
         if(type.equals("today")){
-//            sqlInfo =new SqlInfo(" end_time between ? and ? ",
-//                    new Object[]{b,e});
             sql += " where end_time between "+ b + " and "+e;
             free_sql += " where end_time between "+ b + " and "+e;
             dstr = "今天";
@@ -184,36 +192,5 @@ public class ParkOrderanlysisServiceImpl implements ParkOrderAnlysisService {
         result.put("money",money);
         result.put("page",1);
         return result;
-//        int count =0;
-//        List<UserRoleTb> list =null;
-//        List<Map<String, Object>> resList =new ArrayList<>();
-//        Map searchMap = supperSearchService.getBaseSearch(new UserRoleTb(),reqmap);
-//        logger.info(searchMap);
-//        if(searchMap!=null&&!searchMap.isEmpty()){
-//            UserRoleTb baseQuery =(UserRoleTb)searchMap.get("base");
-//            List<SearchBean> supperQuery = null;
-//            if(searchMap.containsKey("supper"))
-//                supperQuery = (List<SearchBean>)searchMap.get("supper");
-//            PageOrderConfig config = null;
-//            if(searchMap.containsKey("config"))
-//                config = (PageOrderConfig)searchMap.get("config");
-//            count = commonDao.selectCountByConditions(baseQuery,supperQuery);
-//            if(count>0){
-//                list = commonDao.selectListByConditions(baseQuery,supperQuery,config);
-//
-//                if (list != null && !list.isEmpty()) {
-//                    for (UserRoleTb product : list) {
-//                        OrmUtil<UserRoleTb> otm = new OrmUtil<>();
-//                        Map<String, Object> map = otm.pojoToMap(product);
-//                        resList.add(map);
-//                    }
-//                    result.put("rows", JSON.toJSON(resList));
-//                }
-//            }
-//        }
-//        result.put("total",count);
-//        result.put("page",Integer.parseInt(reqmap.get("page")));
-//        return result;
-//        return  null;
     }
 }
