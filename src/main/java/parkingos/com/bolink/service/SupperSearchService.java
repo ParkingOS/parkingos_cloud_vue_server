@@ -14,4 +14,6 @@ public interface SupperSearchService<T> {
      * @return 查询条件
      */
     JSONObject supperSearch(T t,Map<String,String> params);
+
+    Map<String,Object> getBaseSearch(T t, Map<String, String> params);
 }
