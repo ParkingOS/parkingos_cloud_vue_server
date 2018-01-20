@@ -33,4 +33,15 @@ public class BindCarTypeAction {
         StringUtils.ajaxOutput(resp,result.toJSONString());
         return null;
     }
+
+    @RequestMapping(value = "/add")
+    public String add(HttpServletRequest request, HttpServletResponse resp){
+
+        Map<String, String> reqParameterMap = RequestUtil.readBodyFormRequset(request);
+
+        JSONObject result = bindCarTypeService.bindCarType(reqParameterMap);
+        //把结果返回页面
+        StringUtils.ajaxOutput(resp,result.toJSONString());
+        return null;
+    }
 }

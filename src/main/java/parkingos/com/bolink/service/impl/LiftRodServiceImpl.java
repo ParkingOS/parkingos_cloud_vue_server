@@ -32,74 +32,6 @@ public class LiftRodServiceImpl implements LiftRodService {
         LiftRodTb liftRodTb = new LiftRodTb();
         liftRodTb.setComid(Long.parseLong(reqmap.get("comid")));
         JSONObject result = supperSearchService.supperSearch(liftRodTb,reqmap);
-        /*String str = "{\"total\":12,\"page\":1,\"rows\":[]}";
-        JSONObject result = JSONObject.parseObject(str);
-
-        int count = 0;
-        List<LiftRodTb> list = null;
-        List<Map<String, Object>> resList = new ArrayList<>();
-        Map searchMap = supperSearchService.getBaseSearch(new LiftRodTb(), reqmap);
-        logger.info(searchMap);
-        if (searchMap != null && !searchMap.isEmpty()) {
-            LiftRodTb baseQuery = (LiftRodTb) searchMap.get("base");
-            List<SearchBean> supperQuery = null;
-            if (searchMap.containsKey("supper"))
-                supperQuery = (List<SearchBean>) searchMap.get("supper");
-            PageOrderConfig config = null;
-            if (searchMap.containsKey("config"))
-                config = (PageOrderConfig) searchMap.get("config");
-            count = commonDao.selectCountByConditions(baseQuery, supperQuery);
-            if (count > 0) {
-                list = commonDao.selectListByConditions(baseQuery, supperQuery, config);
-
-                if (list != null && !list.isEmpty()) {
-                    for (LiftRodTb product : list) {
-                        OrmUtil<LiftRodTb> otm = new OrmUtil<>();
-                        Map<String, Object> map = otm.pojoToMap(product);
-                        UserInfoTb userInfoTb = new UserInfoTb();
-                        if (map.get("uin") != null && !"".equals(map.get("uin"))) {
-                            Long uin = Long.parseLong(map.get("uin") + "");
-                            userInfoTb.setId(uin);
-                            userInfoTb = (UserInfoTb) commonDao.selectObjectByConditions(userInfoTb);
-                            if (userInfoTb != null && userInfoTb.getNickname() != null) {
-                                map.put("uin", userInfoTb.getNickname());
-                            }
-                        }
-                        resList.add(map);
-                    }
-                    result.put("rows", JSON.toJSON(resList));
-                }
-            }
-        }*/
-
-//        LiftRodTb liftRodTb = new LiftRodTb();
-//        liftRodTb.setComid(21782L);
-//        int count = commonDao.selectCountByConditions(liftRodTb);
-//        if(count>0){
-//            PageOrderConfig config = new PageOrderConfig();
-//            config.setPageInfo(Integer.parseInt(reqmap.get("page")[0]), Integer.parseInt(reqmap.get("rp")[0]));
-//            List<LiftRodTb> list = commonDao.selectListByConditions(liftRodTb, config);
-//            List<Map<String, Object>> resList = new ArrayList<>();
-//            if (list != null && !list.isEmpty()) {
-//                for (LiftRodTb liftRod : list) {
-//                    OrmUtil<LiftRodTb> otm = new OrmUtil<>();
-//                    Map<String, Object> map = otm.pojoToMap(liftRod);
-//                    UserInfoTb userInfoTb = new UserInfoTb();
-//                    if(map.get("uin")!=null&&!"".equals(map.get("uin"))){
-//                        Long uin = Long.parseLong(map.get("uin")+"");
-//                        userInfoTb.setId(uin);
-//                        userInfoTb =(UserInfoTb)commonDao.selectObjectByConditions(userInfoTb);
-//                        if(userInfoTb!=null&&userInfoTb.getNickname()!=null){
-//                            map.put("uin",userInfoTb.getNickname());
-//                        }
-//                    }
-//                    resList.add(map);
-//                }
-//                result.put("rows", JSON.toJSON(resList));
-//            }
-//        }
-//        result.put("total", count);
-//        result.put("page", Integer.parseInt(reqmap.get("page")));
         return result;
     }
 
@@ -127,6 +59,7 @@ public class LiftRodServiceImpl implements LiftRodService {
                 DBObject obj  = collection.findOne(document);
                 if(obj == null){
                     logger.error("取图片错误.....");
+                    return new byte[0];
                 }
                 byte[] content = (byte[])obj.get("content");
                 logger.error("取图片成功.....大小:"+content.length);

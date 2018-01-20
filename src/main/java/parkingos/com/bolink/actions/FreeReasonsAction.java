@@ -33,4 +33,16 @@ public class FreeReasonsAction {
         StringUtils.ajaxOutput(resp,result.toJSONString());
         return null;
     }
+
+    @RequestMapping(value = "/add")
+    public String addReason(HttpServletRequest request, HttpServletResponse resp){
+
+        String name = StringUtils.decodeUTF8(RequestUtil.getString(request, "name"));
+        Integer sort = RequestUtil.getInteger(request, "sort", 0);
+
+        JSONObject result = freeReasonsService.createFreeReason(name,sort);
+        //把结果返回页面
+        StringUtils.ajaxOutput(resp,result.toJSONString());
+        return null;
+    }
 }

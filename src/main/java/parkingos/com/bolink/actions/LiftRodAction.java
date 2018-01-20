@@ -37,17 +37,19 @@ public class LiftRodAction {
 
 
     @RequestMapping(value = "/getLiftRodPicture")
-    public void getLiftRodPicture(HttpServletRequest request, HttpServletResponse response) throws Exception {
+    public String getLiftRodPicture(HttpServletRequest request, HttpServletResponse response) throws Exception {
         String comid = RequestUtil.getString(request, "comid");
         String liftrodId = RequestUtil.getString(request, "liftrodid");
 
-        logger.error(liftrodId);
-        logger.error(comid);
+        logger.error("==========>>>>获取图片"+liftrodId);
+        logger.error("==========>>>>获取图片"+comid);
 
         byte[] content = liftRodService.getLiftRodPicture(comid, liftrodId);
 
         if (content.length == 0) {
-            response.sendRedirect("images/nopic.jpg");
+            //测试用  之后读配置文件
+            response.sendRedirect("http://192.168.199.205:12305/images/nopic.jpg");
+            return null;
         } else {
             response.setDateHeader("Expires", System.currentTimeMillis() + 12 * 60 * 60 * 1000);
             response.setContentLength(content.length);
@@ -57,5 +59,8 @@ public class LiftRodAction {
             o.flush();
             o.close();
         }
+        return null;
     }
+
+
 }

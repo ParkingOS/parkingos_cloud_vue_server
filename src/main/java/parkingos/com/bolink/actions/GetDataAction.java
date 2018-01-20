@@ -21,6 +21,11 @@ public class GetDataAction {
     @Autowired
     private GetDataService getDataService;
 
+    /*
+    *
+    * 获得收费员nickname
+    *
+    * */
     @RequestMapping(value = "/nickname")
     public String getNicknameById(HttpServletRequest request, HttpServletResponse resp){
         Long id = RequestUtil.getLong(request, "id", -1L);
@@ -29,13 +34,46 @@ public class GetDataAction {
         return null;
     }
 
+    /*
+    * 获得车辆型号
+    *
+    * */
+    @RequestMapping(value = "/getcartype")
+    public String getCarType(HttpServletRequest request, HttpServletResponse resp){
 
-    @RequestMapping(value = "/cartype")
-    public String getCarTypeById(HttpServletRequest request, HttpServletResponse resp){
-
-        Long id =RequestUtil.getLong(request, "id", -1L);
-        String result = getDataService.getCarTypeById(id);
+        Long comid = RequestUtil.getLong(request,"comid",-1L);
+        Long groupid = RequestUtil.getLong(request,"groupid",-1L);
+        String result = getDataService.getCarType(comid,groupid);
         StringUtils.ajaxOutput(resp,result);
         return null;
     }
+
+    /*
+    * 获得总金额   month*price
+    *
+    * */
+    @RequestMapping(value = "/getprodsum")
+    public String getprodsum(HttpServletRequest request, HttpServletResponse resp){
+
+        Long prodId = RequestUtil.getLong(request, "p_name", -1L);
+        logger.error("=====>>>>+prodId"+prodId);
+        Integer months = RequestUtil.getInteger(request, "months", 0);
+        logger.error("=====>>>"+months);
+
+        String result = getDataService.getprodsum(prodId,months);
+        StringUtils.ajaxOutput(resp,result);
+        return null;
+    }
+
+    /*
+    * 获得所有月卡套餐
+    * */
+    @RequestMapping(value = "/getpname")
+    public String getpname(HttpServletRequest request, HttpServletResponse resp){
+        Long comid = RequestUtil.getLong(request, "comid", -1L);
+        String result = getDataService.getpname(comid);
+        StringUtils.ajaxOutput(resp,result);
+        return null;
+    }
+
 }

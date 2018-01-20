@@ -29,6 +29,7 @@ public class MemberServiceImpl implements MemberService {
     public JSONObject selectResultByConditions(Map<String, String> reqmap) {
         UserInfoTb userInfoTb = new UserInfoTb();
         userInfoTb.setComid(Long.parseLong(reqmap.get("comid")));
+        userInfoTb.setState(0);
         JSONObject result = supperSearchService.supperSearch(userInfoTb,reqmap);
         return result;
     }
@@ -193,11 +194,13 @@ public class MemberServiceImpl implements MemberService {
 
         int ret = commonDao.updateByPrimaryKey(userInfoTb);
         if(ret==1){
+            UserInfoTb condition = new UserInfoTb();
+            condition.setId(userInfoTb.getId());
+            userInfoTb = (UserInfoTb)commonDao.selectObjectByConditions(condition);
+            insertSysn(userInfoTb,1);
             result.put("state",1);
             result.put("msg","修改成功");
-            insertSysn(userInfoTb,1);
         }
-
         return result;
     }
 
@@ -250,12 +253,14 @@ public class MemberServiceImpl implements MemberService {
         String str = "{\"state\":0,\"msg\":\"删除失败\"}";
         JSONObject result = JSONObject.parseObject(str);
 
-        Long id = Long.parseLong(reqParameterMap.get("selids"));
+        Long id = Long.parseLong(reqParameterMap.get("id"));
         UserInfoTb userInfoTb = new UserInfoTb();
         userInfoTb.setId(id);
         userInfoTb.setState(1);
         int ret = commonDao.updateByPrimaryKey(userInfoTb);
         if(ret==1){
+            result.put("state",1);
+            result.put("msg","删除成功");
             userInfoTb =(UserInfoTb)commonDao.selectObjectByConditions(userInfoTb);
             insertSysn(userInfoTb,1);
 

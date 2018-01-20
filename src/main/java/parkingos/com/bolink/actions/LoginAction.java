@@ -32,8 +32,8 @@ public class LoginAction {
 		String cpasswd = req.getParameter("password");
 	    String passwd = Encryption.decryptToAESPKCS5(cpasswd, Encryption.KEY);
 
-		//返回result
-	JSONObject result = loginService.getResultByUserNameAndPass(userId,passwd);
+		//根据用户名查询用户返回result
+		JSONObject result = loginService.getResultByUserNameAndPass(userId,passwd);
 
 
 
@@ -49,7 +49,7 @@ public class LoginAction {
 //		user.put("lastlogin",System.currentTimeMillis()/1000);
 //		user.put("parkid",21879);
 //		result.put("user",user);
-		//根据用户名查询用户
+
 		logger.info(result);
 		StringUtils.ajaxOutput(resp,result.toJSONString());
 		return null;

@@ -101,4 +101,19 @@ public class OrderServiceMybatisImpl implements OrderService {
         return result;
     }
 
+    @Override
+    public JSONObject getPicResult(Long orderid, Long comid) {
+        return null;
+    }
+
+    @Override
+    public byte[] getCarPics(Long orderid, Long comid, String type, Integer currentnum) {
+        return new byte[0];
+    }
+
+    @Override
+    public List<List<String>> exportExcel(Map<String, String> reqParameterMap) {
+        return null;
+    }
+
 }

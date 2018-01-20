@@ -7,4 +7,5 @@ import java.util.Map;
 public interface BindCarTypeService {
     public JSONObject selectResultByConditions(Map<String, String> map);
 
+    JSONObject bindCarType(Map<String, String> reqParameterMap);
 }
