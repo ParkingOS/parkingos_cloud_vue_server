@@ -2,16 +2,12 @@ package parkingos.com.bolink.actions;
 
 
 import com.alibaba.fastjson.JSONObject;
-import org.apache.http.HttpRequest;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.RequestMapping;
 import parkingos.com.bolink.models.ComCameraTb;
-import parkingos.com.bolink.models.ComPassTb;
 import parkingos.com.bolink.service.EquipmentManageCameraService;
-import parkingos.com.bolink.service.EquipmentManageLEDService;
 import parkingos.com.bolink.utils.RequestUtil;
 import parkingos.com.bolink.utils.StringUtils;
 

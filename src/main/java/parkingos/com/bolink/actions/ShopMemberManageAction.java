@@ -4,62 +4,51 @@ import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
-import parkingos.com.bolink.service.ShopManageService;
+import parkingos.com.bolink.service.ShopMemberManageService;
 import parkingos.com.bolink.utils.StringUtils;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 @Controller
-@RequestMapping("/shop")
-public class ShopManageAction {
+@RequestMapping("/shopmember")
+public class ShopMemberManageAction {
 
     Logger logger = Logger.getLogger( ShopManageAction.class );
 
     @Autowired
-    private ShopManageService shopManageService;
+    private ShopMemberManageService shopMemberManageService;
 
-    /**
-     * 续费
-     */
-    @RequestMapping("/addmoney")
-    public String addMoney(HttpServletRequest request, HttpServletResponse resp) {
-        String result = shopManageService.addMoney(request,resp);
+
+    @RequestMapping(value = "/editpass")
+    public String editpass(HttpServletRequest req, HttpServletResponse resp) {
+
+        String result = shopMemberManageService.editpass(req,resp);
         StringUtils.ajaxOutput( resp, result );
         return null;
     }
 
-    /**
-     * 添加商户
-     */
-    @RequestMapping("/create")
-    public String create(HttpServletRequest request, HttpServletResponse resp) {
+    @RequestMapping(value = "/delete")
+    public String delete(HttpServletRequest req, HttpServletResponse resp) {
 
-        String result = shopManageService.create(request,resp);
+        String result = shopMemberManageService.delete(req,resp);
         StringUtils.ajaxOutput( resp, result );
         return null;
     }
 
 
-    /**
-     * 商户查询
-     */
     @RequestMapping(value = "/quickquery")
     public String query(HttpServletRequest req, HttpServletResponse resp) {
 
-        String result = shopManageService.quickquery(req,resp);
+        String result = shopMemberManageService.quickquery(req,resp);
         StringUtils.ajaxOutput( resp, result );
         return null;
     }
 
-    /**
-     * 删除
-     */
-    @RequestMapping("/delete")
-    public String delete(HttpServletRequest request, HttpServletResponse resp) {
-        String result = shopManageService.delete(request, resp);
+    @RequestMapping(value="/create")
+    public String create(HttpServletRequest req,HttpServletResponse resp){
+        String result = shopMemberManageService.create(req,resp);
         StringUtils.ajaxOutput( resp, result );
         return null;
     }
-
 }

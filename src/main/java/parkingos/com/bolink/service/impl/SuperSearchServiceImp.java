@@ -181,8 +181,8 @@ public class SuperSearchServiceImp<T> implements SupperSearchService<T> {
                             bean.setStartValue(Long.valueOf(params.get(key+"_start")));
                             bean.setEndValue(params.get(key+"_end"));
                         }else if(fieldType==FieldTypes.DOUBLE){
-                            bean.setStartValue(params.get(key+"_start"));
-                            bean.setEndValue(params.get(key+"_end"));
+                            bean.setStartValue(Double.valueOf( params.get(key+"_start") ));
+                            bean.setEndValue(Double.valueOf( params.get(key+"_end") ));
                         }else if(fieldType==FieldTypes.DATE){
                             bean.setStartValue(Long.valueOf(start)/1000);
                             bean.setEndValue(Long.valueOf(end)/1000);
@@ -197,13 +197,13 @@ public class SuperSearchServiceImp<T> implements SupperSearchService<T> {
                             continue;
                         }
                         if(fieldType==FieldTypes.INT){
-                            bean.setStartValue(start);
+                            bean.setStartValue(Long.valueOf( start ));
                         }else if(fieldType==FieldTypes.DOUBLE){
-                            bean.setStartValue(start);
+                            bean.setStartValue(Double.valueOf( start ));
                         }else if(fieldType==FieldTypes.DATE){
                             bean.setStartValue(Long.valueOf(start)/1000);
                         }
-                        bean.setStartValue(params.get(key+"_start"));
+                        //bean.setStartValue(params.get(key+"_start"));
                         resultList.add(bean);
                     }else if(operate.equals(FieldOperateTypes.LESS_THAN_OR_EQUAL)){
                         bean.setOperator(FieldOperator.LESS_THAN_AND_EQUAL);
@@ -213,9 +213,9 @@ public class SuperSearchServiceImp<T> implements SupperSearchService<T> {
                             continue;
                         }
                         if(fieldType==FieldTypes.INT){
-                            bean.setEndValue(end);
+                            bean.setEndValue(Long.valueOf( end ));
                         }else if(fieldType==FieldTypes.DOUBLE){
-                            bean.setEndValue(end);
+                            bean.setEndValue(Double.valueOf( end ));
                         }else if(fieldType==FieldTypes.DATE){
                             bean.setStartValue(Long.valueOf(end)/1000);
                         }

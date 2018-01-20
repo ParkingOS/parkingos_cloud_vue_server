@@ -26,7 +26,7 @@ public class LiftRodAction {
 
     @RequestMapping(value = "/query")
     public String query(HttpServletRequest request, HttpServletResponse resp) {
-
+        logger.error("======================");
         Map<String, String> reqParameterMap = RequestUtil.readBodyFormRequset(request);
 
         JSONObject result = liftRodService.selectResultByConditions(reqParameterMap);
@@ -36,10 +36,13 @@ public class LiftRodAction {
     }
 
 
-    @RequestMapping(value = "getLiftRodPicture")
+    @RequestMapping(value = "/getLiftRodPicture")
     public void getLiftRodPicture(HttpServletRequest request, HttpServletResponse response) throws Exception {
         String comid = RequestUtil.getString(request, "comid");
         String liftrodId = RequestUtil.getString(request, "liftrodid");
+
+        logger.error(liftrodId);
+        logger.error(comid);
 
         byte[] content = liftRodService.getLiftRodPicture(comid, liftrodId);
 
