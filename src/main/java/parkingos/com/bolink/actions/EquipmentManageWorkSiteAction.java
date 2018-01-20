@@ -6,7 +6,6 @@ import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
-import parkingos.com.bolink.models.ComLedTb;
 import parkingos.com.bolink.models.ComWorksiteTb;
 import parkingos.com.bolink.service.EquipmentManageWorkSiteService;
 import parkingos.com.bolink.utils.RequestUtil;

@@ -7,8 +7,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import parkingos.com.bolink.dao.spring.CommonDao;
 import parkingos.com.bolink.models.ComLedTb;
-import parkingos.com.bolink.models.ZldBlackTb;
-import parkingos.com.bolink.service.BlackUserService;
 import parkingos.com.bolink.service.EquipmentManageLEDService;
 import parkingos.com.bolink.service.SupperSearchService;
 
