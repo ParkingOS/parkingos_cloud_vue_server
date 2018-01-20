@@ -158,8 +158,17 @@ public class LoginServiceImpl implements LoginService {
             }
             List<Map<String, Object>> authList = null;
             if (roleId == 0) {//总管理员拥有所有权限
+
+               // AuthTb authTb = new AuthTb();
+               // authTb.setOid(userRoleTb.getOid());
+               // authTb.setState(0);
+               // String sql = "select actions,id auth_id,nname,pid,url,sort,sub_auth childauths from " +
+               //         "auth_tb where oid= "+userRoleTb.getOid()+" and state=0 ";
+               // authList = commonDao.getObjectBySql(sql);
+
                 String sql = "select actions,id auth_id,nname,pid,url,sort,sub_auth childauths from auth_tb where oid= "+userRoleTb.getOid()+" and state=0 ";
                 authList = commonDao.getObjectBySql(sql);//commonDao.selectListByConditions(authTb);
+
                 if (authList != null) {
                     for (Map<String, Object> map : authList) {
                         if (map.get("childauths") != null) {
