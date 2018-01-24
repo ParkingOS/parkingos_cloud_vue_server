@@ -13,5 +13,5 @@ public interface CarRenewService {
 
 	JSONObject selectResultByConditions(Map<String, String> map);
 
-    List<List<String>> exportExcel(Map<String, String> reqParameterMap);
+    List<List<Object>> exportExcel(Map<String, String> reqParameterMap);
 }

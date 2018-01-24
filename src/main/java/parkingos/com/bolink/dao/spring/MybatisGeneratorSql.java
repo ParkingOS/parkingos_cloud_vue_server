@@ -250,17 +250,23 @@ public class MybatisGeneratorSql {
     }
 
     private Map<String,Object> createSupperSql(List<SearchBean> searchBeans){
+//        System.out.println("========>>MybatisGeneratorSql"+searchBeans.size());
         StringBuffer sql = new StringBuffer();
         List<Object> values = new ArrayList<>();
         Map<String,Object> result= new HashMap<>();
         if(searchBeans==null||searchBeans.isEmpty()){
             return null;
         }
-
+        int j =0;
         for(SearchBean bean:searchBeans){
             Object baseValue = bean.getBasicValue();
             String valueType = baseValue instanceof  List ? "list":"string";
-            sql.append(bean.getFieldName());
+            if(j==0){
+                sql.append(bean.getFieldName());
+            }else{
+                sql.append(" AND "+bean.getFieldName());
+            }
+
             switch (bean.getOperator()){
                 case "ge":
                     sql.append(" > ?");
@@ -305,10 +311,10 @@ public class MybatisGeneratorSql {
                     sql.append(")");
                     break;
             }
-
-            result.put("sql",sql.toString());
-            result.put("values",values);
-            return result;
+            j++;
+//            result.put("sql",sql.toString());
+//            result.put("values",values);
+//            return result;
 
         }
         /**
@@ -328,7 +334,9 @@ public class MybatisGeneratorSql {
          return "equal";
          }
          */
-        return null;
+        result.put("sql",sql.toString());
+        result.put("values",values);
+        return result;
     }
 
     private String getPageLimitSql(PageOrderConfig pageOrderConfig){

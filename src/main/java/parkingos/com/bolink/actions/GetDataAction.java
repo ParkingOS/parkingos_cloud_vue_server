@@ -76,4 +76,16 @@ public class GetDataAction {
         return null;
     }
 
+    /*
+    * 获得所有的user 收费员
+    *
+    * */
+    @RequestMapping(value = "/getalluser")
+    public String getalluser(HttpServletRequest request, HttpServletResponse resp){
+        Long comid = RequestUtil.getLong(request, "comid", -1L);
+        Long groupid = RequestUtil.getLong(request,"groupid",-1L);
+        String result = getDataService.getalluser(comid,groupid);
+        StringUtils.ajaxOutput(resp,result);
+        return null;
+    }
 }

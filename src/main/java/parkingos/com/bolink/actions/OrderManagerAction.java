@@ -7,16 +7,16 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import parkingos.com.bolink.service.OrderService;
-import parkingos.com.bolink.utils.ExportExcelUtil;
+import parkingos.com.bolink.utils.ExportDataExcel;
 import parkingos.com.bolink.utils.RequestUtil;
 import parkingos.com.bolink.utils.StringUtils;
-import parkingos.com.bolink.utils.TimeTools;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.text.ParseException;
 import java.util.List;
 import java.util.Map;
 
@@ -47,7 +47,7 @@ public class OrderManagerAction {
     public String getOrderPicture(HttpServletRequest request, HttpServletResponse resp) {
         Long orderid = RequestUtil.getLong(request, "orderid", -1L);
         Long comid = RequestUtil.getLong(request, "comid", -1L);
-        logger.error("==========>>>>获取图片" + orderid+"=="+comid);
+        logger.error("==========>>>>获取图片..orderid..comid==>" + orderid+"==>"+comid);
         JSONObject result = orderService.getPicResult(orderid, comid);
         StringUtils.ajaxOutput(resp, result.toJSONString());
         return null;
@@ -80,24 +80,38 @@ public class OrderManagerAction {
     public String exportExcel(HttpServletRequest request, HttpServletResponse response) {
         Map<String, String> reqParameterMap = RequestUtil.readBodyFormRequset(request);
 
-        List<List<String>> bodyList = orderService.exportExcel(reqParameterMap);
-        String[] heards = new String[]{"编号","包月产品名称","车主手机"/*,"车主账户"*/,"名字","车牌号码","购买时间","开始时间","结束时间","金额","车型类型","单双日限行","备注"};
-
-        String fname = "会员数据" + TimeTools.getDate_YY_MM_DD();
+//        List<List<String>> bodyList = orderService.exportExcel(reqParameterMap);
+//        String[] heards =  new String[]{"编号","进场方式","车牌号","进场时间","出场时间","时长","支付方式","应收金额","实收金额","电子预付金额","现金预付金额","电子结算金额","现金结算金额","减免金额","优惠原因","入场收费员","收款人","状态 ","进场通道 ","出场通道 "};
+        List<List<Object>> bodyList = orderService.exportExcel(reqParameterMap);
+        String [][] heards = new String[][]{{"编号","STR"},{"进场方式","STR"},{"车牌号","STR"},{"进场时间","STR"},{"出场时间","STR"},{"时长","STR"},{"支付方式","STR"},{"应收金额","STR"},{"实收金额","STR"},{"电子预付金额","STR"},{"现金预付金额","STR"},{"电子结算金额","STR"},{"现金结算金额","STR"},{"减免金额","STR"},{"优惠原因","STR"},{"入场收费员","STR"},{"收款人","STR"},{"状态","STR"},{"进场通道","STR"},{"出场通道","STR"}};
+        ExportDataExcel excel = new ExportDataExcel("订单数据", heards, "sheet1");
+        String fname = "订单数据";
         fname = StringUtils.encodingFileName(fname);
-        java.io.OutputStream os;
         try {
+            OutputStream os = response.getOutputStream();
             response.reset();
-            response.setHeader("Content-disposition", "attachment; filename="
-                    + fname + ".xls");
-            response.setContentType("application/x-download");
-            os = response.getOutputStream();
-            ExportExcelUtil importExcel = new ExportExcelUtil("会员数据",
-                    heards, bodyList);
-            importExcel.createExcelFile(os);
+            response.setHeader("Content-disposition", "attachment; filename="+fname+".xls");
+            excel.PoiWriteExcel_To2007(bodyList, os);
         } catch (IOException e) {
             e.printStackTrace();
+        } catch (ParseException e) {
+            e.printStackTrace();
         }
+//        String fname = "订单数据" + TimeTools.getDate_YY_MM_DD();
+//        fname = StringUtils.encodingFileName(fname);
+//        java.io.OutputStream os;
+//        try {
+//            response.reset();
+//            response.setHeader("Content-disposition", "attachment; filename="
+//                    + fname + ".xls");
+//            response.setContentType("application/x-download");
+//            os = response.getOutputStream();
+//            ExportExcelUtil importExcel = new ExportExcelUtil("订单数据",
+//                    heards, bodyList);
+//            importExcel.createExcelFile(os);
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//        }
         return null;
     }
 }

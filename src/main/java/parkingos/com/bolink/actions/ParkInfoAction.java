@@ -12,7 +12,6 @@ import parkingos.com.bolink.utils.StringUtils;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.util.Map;
 
 @Controller
 @RequestMapping("/park")
@@ -26,11 +25,22 @@ public class ParkInfoAction {
     @RequestMapping(value = "/query")
     public String query(HttpServletRequest request, HttpServletResponse resp){
 
-        Map<String, String> reqParameterMap = RequestUtil.readBodyFormRequset(request);
+        Long comid = RequestUtil.getLong(request,"comid",-1L);
+        String result = parkInfoService.getResultByComid(comid);
 
-        JSONObject result = parkInfoService.selectResultByConditions(reqParameterMap);
         //把结果返回页面
+        StringUtils.ajaxOutput(resp,result);
+        return null;
+    }
+
+
+    @RequestMapping(value = "/edit")
+    public String edit(HttpServletRequest request, HttpServletResponse resp){
+
+        JSONObject result = parkInfoService.updateComInfo(request);
+
         StringUtils.ajaxOutput(resp,result.toJSONString());
         return null;
     }
+
 }

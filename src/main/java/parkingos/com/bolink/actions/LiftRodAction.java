@@ -7,12 +7,16 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import parkingos.com.bolink.service.LiftRodService;
+import parkingos.com.bolink.utils.ExportDataExcel;
 import parkingos.com.bolink.utils.RequestUtil;
 import parkingos.com.bolink.utils.StringUtils;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
 import java.io.OutputStream;
+import java.text.ParseException;
+import java.util.List;
 import java.util.Map;
 
 @Controller
@@ -61,6 +65,44 @@ public class LiftRodAction {
         }
         return null;
     }
+    @RequestMapping(value = "/exportExcel")
+    public String exportExcel(HttpServletRequest request, HttpServletResponse response) {
+        Map<String, String> reqParameterMap = RequestUtil.readBodyFormRequset(request);
 
+//        String [] heards = new String[]{"编号","抬杆编号","时间","收费员","通道","原因","备注"};
+        String [][] heards = new String[][]{{"编号","STR"},{"抬杆编号","STR"},{"时间","STR"},{"收费员","STR"},{"通道","STR"},{"原因","STR"},{"备注","STR"}};
+        //获取要到处的数据
+//        List<List<String>> bodyList = liftRodService.exportExcel(reqParameterMap);
+        List<List<Object>> bodyList = liftRodService.exportExcel(reqParameterMap);
 
+        ExportDataExcel excel = new ExportDataExcel("抬杆记录", heards, "sheet1");
+        String fname = "抬杆记录";
+        fname = StringUtils.encodingFileName(fname);
+        try {
+            OutputStream os = response.getOutputStream();
+            response.reset();
+            response.setHeader("Content-disposition", "attachment; filename="+fname+".xls");
+            excel.PoiWriteExcel_To2007(bodyList, os);
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+//        String fname = "抬杆记录" + TimeTools.getDate_YY_MM_DD();
+//        fname = StringUtils.encodingFileName(fname);
+//        java.io.OutputStream os;
+//        try {
+//            response.reset();
+//            response.setHeader("Content-disposition", "attachment; filename="
+//                    + fname + ".xls");
+//            response.setContentType("application/x-download");
+//            os = response.getOutputStream();
+//            ExportExcelUtil importExcel = new ExportExcelUtil("抬杆记录",
+//                    heards, bodyList);
+//            importExcel.createExcelFile(os);
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//        }
+        return null;
+    }
 }

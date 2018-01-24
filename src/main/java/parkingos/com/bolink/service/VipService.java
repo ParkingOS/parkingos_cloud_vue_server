@@ -5,6 +5,7 @@ import com.alibaba.fastjson.JSONObject;
 import parkingos.com.bolink.models.CarowerProduct;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.List;
 import java.util.Map;
 
 public interface VipService {
@@ -21,4 +22,6 @@ public interface VipService {
     JSONObject editCarNum(Long id, String carNumber, Long comid);
 
     JSONObject renewProduct(HttpServletRequest req);
+
+    List<List<String>> exportExcel(Map<String, String> reqParameterMap);
 }

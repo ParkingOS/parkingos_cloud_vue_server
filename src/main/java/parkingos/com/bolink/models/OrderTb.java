@@ -65,7 +65,7 @@ public class OrderTb {
 
     private String freereasonsLocal;
 
-    private Short islocked;
+    private Integer islocked;
 
     private String lockKey;
 
@@ -345,11 +345,11 @@ public class OrderTb {
         this.freereasonsLocal = freereasonsLocal == null ? null : freereasonsLocal.trim();
     }
 
-    public Short getIslocked() {
+    public Integer getIslocked() {
         return islocked;
     }
 
-    public void setIslocked(Short islocked) {
+    public void setIslocked(Integer islocked) {
         this.islocked = islocked;
     }
 

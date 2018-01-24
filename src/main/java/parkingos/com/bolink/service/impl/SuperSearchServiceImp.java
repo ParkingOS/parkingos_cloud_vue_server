@@ -106,18 +106,27 @@ public class SuperSearchServiceImp<T> implements SupperSearchService<T> {
         List<T> list =null;
         List<Map<String, Object>> resList =new ArrayList<>();
         Map searchMap = getBaseSearch(t,params);
-        logger.info(searchMap);
+        logger.info("=====>>>>>>查询条件:"+searchMap);
         if(searchMap!=null&&!searchMap.isEmpty()){
             T t1 =(T)searchMap.get("base");
             List<SearchBean> supperQuery = null;
             if(searchMap.containsKey("supper"))
                 supperQuery = (List<SearchBean>)searchMap.get("supper");
+            if(supperQuery!=null){
+                logger.error("====>>>高级查询supperQuery:"+supperQuery.size()+"===>>>"+(supperQuery.get(0).getBasicValue() instanceof String));
+            }
             PageOrderConfig config = null;
             if(searchMap.containsKey("config"))
                 config = (PageOrderConfig)searchMap.get("config");
             count = commonDao.selectCountByConditions(t1,supperQuery);
+            logger.error("======>>>>>"+count);
             if(count>0){
-                list  = commonDao.selectListByConditions(t1,supperQuery,config);
+                if(config==null){
+                    config = new PageOrderConfig();
+                    config.setPageInfo(1,Integer.MAX_VALUE);
+                }
+                list = commonDao.selectListByConditions(t1,supperQuery,config);
+
                 if (list != null && !list.isEmpty()) {
                     for (T t2 : list) {
                         OrmUtil<T> otm = new OrmUtil<>();
@@ -129,7 +138,9 @@ public class SuperSearchServiceImp<T> implements SupperSearchService<T> {
             }
         }
         result.put("total",count);
-        result.put("page",Integer.parseInt(params.get("page")));
+        if(params.get("page")!=null){
+            result.put("page",Integer.parseInt(params.get("page")));
+        }
         return result;
     }
 

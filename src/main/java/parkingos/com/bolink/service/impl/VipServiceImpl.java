@@ -1,5 +1,6 @@
 package parkingos.com.bolink.service.impl;
 
+import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -9,16 +10,14 @@ import parkingos.com.bolink.models.*;
 import parkingos.com.bolink.service.GetDataService;
 import parkingos.com.bolink.service.SupperSearchService;
 import parkingos.com.bolink.service.VipService;
+import parkingos.com.bolink.utils.OrmUtil;
 import parkingos.com.bolink.utils.RequestUtil;
 import parkingos.com.bolink.utils.StringUtils;
 import parkingos.com.bolink.utils.TimeTools;
 
 import javax.servlet.http.HttpServletRequest;
 import java.math.BigDecimal;
-import java.util.Calendar;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 
 @Service
@@ -532,4 +531,88 @@ public class VipServiceImpl implements VipService {
         }
         return false;
     }
+
+    @Override
+    public List<List<String>> exportExcel(Map<String, String> reqParameterMap) {
+        JSONObject result = selectResultByConditions(reqParameterMap);
+        List<CarowerProduct> orderlist = JSON.parseArray(result.get("rows").toString(),CarowerProduct.class);
+
+        logger.error("=========>>>>>>.导出订单" + orderlist.size());
+
+        List<List<String>> bodyList = new ArrayList<List<String>>();
+        if(orderlist!=null&&orderlist.size()>0){
+//            mongoDbUtils.saveLogs( request,0, 5, "导出会员数量："+list.size());
+            String [] f = new String[]{"id","p_name","mobile"/*,"uin"*/,"name","car_number","create_time","b_time","e_time","total","car_type_id","limit_day_type","remark"};
+            for(CarowerProduct carowerProduct : orderlist){
+                List<String> values = new ArrayList<String>();
+                OrmUtil<CarowerProduct> otm = new OrmUtil<>();
+                Map map = otm.pojoToMap(carowerProduct);
+                for(String field : f){
+                    if("p_name".equals(field)){
+                        if(map.get("pid")!= null) {
+                            ProductPackageTb productPackageTb = getProduct(Long.parseLong(map.get("pid") + ""));
+                            if(productPackageTb!=null){
+                                values.add(productPackageTb.getpName());
+                            }else{
+                                values.add("");
+                            }
+                        }else{
+                            values.add("");
+                        }
+                    }else if("car_type_id".equals(field)){
+                        if(map.get("car_type_id")!= null){
+                            CarTypeTb carTypeTb = null;
+                            try{
+                                carTypeTb = getCarType(Long.parseLong(map.get("car_type_id") + ""));
+                            }catch (Exception e){
+                                values.add(map.get("car_type_id")+"");
+                            }
+                            if(carTypeTb!=null){
+                                values.add(carTypeTb.getName());
+                            }else{
+                                values.add("");
+                            }
+                        }else{
+                            values.add("");
+                        }
+                    }else if("limit_day_type".equals(field)){
+                        if(map.get("limit_day_type")!=null){
+                            if((Integer)map.get("limit_day_type")==0){
+                                values.add("不限行");
+                            }else if((Integer)map.get("limit_day_type")==1){
+                                values.add("限行");
+                            }
+                        }else{
+                            values.add("");
+                        }
+                    } else{
+                        if("create_time".equals(field)||"b_time".equals(field)||"e_time".equals(field)){
+                            if(map.get(field)!=null){
+                                values.add(TimeTools.getTime_yyyyMMdd_HHmmss(Long.valueOf((map.get(field)+""))*1000));
+                            }else {
+                                values.add("");
+                            }
+                        }else{
+                            values.add(map.get(field)+"");
+                        }
+                    }
+                }
+                bodyList.add(values);
+            }
+        }
+        return bodyList;
+    }
+
+    private CarTypeTb getCarType(long car_type_id) {
+        CarTypeTb carTypeTb = new CarTypeTb();
+        carTypeTb.setId(car_type_id);
+        return (CarTypeTb)commonDao.selectObjectByConditions(carTypeTb);
+    }
+
+    private ProductPackageTb getProduct(long pid) {
+        ProductPackageTb productPackageTb = new ProductPackageTb();
+        productPackageTb.setId(pid);
+        return (ProductPackageTb)commonDao.selectObjectByConditions(productPackageTb);
+    }
+
 }

@@ -193,7 +193,7 @@ public class LoginServiceImpl implements LoginService {
                 String sql = "select a.actions,auth_id,nname,a.pid,a.url,a.sort,a.sub_auth " +
                         "from auth_role_tb ar left join" +
                         " auth_tb a on ar.auth_id=a.id" +
-                        " where role_id= " + roleId +" order by  a.sort ";
+                        " where role_id= " + roleId +" and a.state=0 order by  a.sort ";
                 authList = commonDao.getObjectBySql(sql);
             }
             user.put("ishdorder", userInfoTb.getOrderHid());

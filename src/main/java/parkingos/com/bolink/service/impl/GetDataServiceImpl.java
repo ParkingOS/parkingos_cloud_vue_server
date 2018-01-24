@@ -9,6 +9,7 @@ import parkingos.com.bolink.models.ComInfoTb;
 import parkingos.com.bolink.models.ProductPackageTb;
 import parkingos.com.bolink.models.UserInfoTb;
 import parkingos.com.bolink.service.GetDataService;
+import parkingos.com.bolink.utils.StringUtils;
 
 import java.util.List;
 import java.util.Map;
@@ -41,7 +42,8 @@ public class GetDataServiceImpl implements GetDataService {
 
     @Override
     public String getCarType(Long comid, Long groupid) {
-        String result = "[{\"value_no\":\"-1\",\"value_name\":\"请选择\"}";
+//        String result = "[{\"value_no\":\"-1\",\"value_name\":\"请选择\"}";
+        String result = "[";
 
         List<Map<String,Object>> tradsList =null;
 
@@ -54,18 +56,27 @@ public class GetDataServiceImpl implements GetDataService {
         }
 
         if(tradsList!=null&&tradsList.size()>0){
-            for(Map map : tradsList){
-                result+=",{\"value_no\":\""+map.get("id")+"\",\"value_name\":\""+map.get("name")+"\"}";
+            for(int i = 0;i<tradsList.size();i++){
+                Map map= tradsList.get(i);
+                if(i==0){
+                    result+="{\"value_no\":\""+map.get("id")+"\",\"value_name\":\""+map.get("name")+"\"}";
+                }else{
+                    result+=",{\"value_no\":\""+map.get("id")+"\",\"value_name\":\""+map.get("name")+"\"}";
+                }
             }
         }
+
+//        if(tradsList!=null&&tradsList.size()>0){
+//            for(Map map : tradsList){
+//                result+=",{\"value_no\":\""+map.get("id")+"\",\"value_name\":\""+map.get("name")+"\"}";
+//            }
+//        }
         result+="]";
         return result;
     }
 
     @Override
     public String getprodsum(Long prodId, Integer months) {
-//        String str = "{\"total\":0.0}";
-//        JSONObject result = JSONObject.parseObject(str);
 
         Double total = 0d;
         if(prodId != null && prodId > 0 && months != null && months > 0){
@@ -78,14 +89,13 @@ public class GetDataServiceImpl implements GetDataService {
             }
             total = months*price;
         }
-//        result.put("total",total);
-//        return result.toJSONString();
         return total+"";
     }
 
     @Override
     public String getpname(Long comid) {
-        String result = "[{\"value_no\":\"-1\",\"value_name\":\"请选择\"}";
+//        String result = "[{\"value_no\":\"-1\",\"value_name\":\"请选择\"}";
+        String result = "[";
         logger.error("=========>>>>>comid"+comid);
         if(comid!=-1){
             logger.error("开始获取套餐");
@@ -104,11 +114,61 @@ public class GetDataServiceImpl implements GetDataService {
             logger.error("======>>>>>>获取月卡套餐"+sql);
             pList = commonDao.getObjectBySql(sql +") and is_delete=0 ");
             if(pList!=null&&pList.size()>0){
-                for(Map map : pList){
-                    result+=",{\"value_no\":\""+map.get("id")+"\",\"value_name\":\""+map.get("p_name")+"\"}";
+                for(int i = 0;i<pList.size();i++){
+                    Map map = pList.get(i);
+                    if(i==0){
+                        result+="{\"value_no\":\""+map.get("id")+"\",\"value_name\":\""+map.get("p_name")+"\"}";
+                    }else{
+                        result+=",{\"value_no\":\""+map.get("id")+"\",\"value_name\":\""+map.get("p_name")+"\"}";
+                    }
+                }
+            }
+//            if(pList!=null&&pList.size()>0){
+//                for(Map map : pList){
+//                    result+=",{\"value_no\":\""+map.get("id")+"\",\"value_name\":\""+map.get("p_name")+"\"}";
+//                }
+//            }
+        }
+        result+="]";
+        return result;
+    }
+
+    @Override
+    public String getalluser(Long comid, Long groupid) {
+        String sql = "";
+        if(groupid!=-1&&comid!=-1){
+            sql = "select id,nickname from user_info_tb where (comid="+comid+" or groupid="+groupid+") and state=0 and auth_flag in(1,2)";
+        }else if(comid!=-1){
+            sql = "select id,nickname from user_info_tb where comid="+comid+" and state=0 and auth_flag in(1,2)";
+        }
+
+        List<Map<String, Object>> tradsList =commonDao.getObjectBySql(sql);
+//        String result = "[{\"value_no\":\"-1\",\"value_name\":\"全部\"}";
+        String result = "[";
+        if(tradsList!=null&&tradsList.size()>0){
+            for(int i = 0;i<tradsList.size();i++){
+                Map map= tradsList.get(i);
+                String nickname = (String)map.get("nickname");
+                if(StringUtils.isEmpty(nickname) || "null".equals(nickname)){
+                    nickname = "无";
+                }
+                if(i==0){
+                    result+="{\"value_no\":\""+map.get("id")+"\",\"value_name\":\""+nickname+"\"}";
+                }else{
+                    result+=",{\"value_no\":\""+map.get("id")+"\",\"value_name\":\""+nickname+"\"}";
                 }
             }
         }
+
+//        if(tradsList!=null&&tradsList.size()>0){
+//            for(Map map : tradsList){
+//                String nickname = (String)map.get("nickname");
+//                if(StringUtils.isEmpty(nickname) || "null".equals(nickname)){
+//                    nickname = "无";
+//                }
+//                result+=",{\"value_no\":\""+map.get("id")+"\",\"value_name\":\""+map.get("nickname")+"\"}";
+//            }
+//        }
         result+="]";
         return result;
     }

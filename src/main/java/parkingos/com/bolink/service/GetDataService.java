@@ -9,4 +9,6 @@ public interface GetDataService {
     String getprodsum(Long prodId, Integer months);
 
     String getpname(Long comid);
+
+    String getalluser(Long comid, Long groupid);
 }

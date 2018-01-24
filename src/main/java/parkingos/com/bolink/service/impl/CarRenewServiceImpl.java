@@ -12,6 +12,7 @@ import parkingos.com.bolink.service.CarRenewService;
 import parkingos.com.bolink.service.SupperSearchService;
 import parkingos.com.bolink.utils.Check;
 import parkingos.com.bolink.utils.OrmUtil;
+import parkingos.com.bolink.utils.StringUtils;
 import parkingos.com.bolink.utils.TimeTools;
 
 import java.util.ArrayList;
@@ -42,6 +43,25 @@ public class CarRenewServiceImpl implements CarRenewService {
 		cardRenewTb.setComid(reqmap.get("comid"));
 		JSONObject result = supperSearchService.supperSearch(cardRenewTb,reqmap);
 
+
+		//获得所有的数据得到 所有应收实收  不需要分页  查询所有  没有这两个属性后面就没有分页
+		reqmap.remove("orderfield");
+		reqmap.remove("orderby");
+
+		JSONObject newResult = supperSearchService.supperSearch(cardRenewTb,reqmap);
+		List<CardRenewTb> cardRenewList = JSON.parseArray(newResult.get("rows").toString(), CardRenewTb.class);
+		logger.error("======>>>>.月卡续费"+cardRenewList.size());
+		Double amountReceivable  = 0.0;
+		Double actReceivable = 0.0;
+		if(cardRenewList!=null&&cardRenewList.size()>0) {
+			for (CardRenewTb cardRenew : cardRenewList) {
+				amountReceivable += Double.parseDouble(cardRenew.getAmountReceivable());
+				actReceivable += Double.parseDouble(cardRenew.getAmountPay());
+			}
+		}
+		result.put("amountReceivable",StringUtils.formatDouble(amountReceivable));
+		result.put("actReceivable",StringUtils.formatDouble(actReceivable));
+
 		return result;
 	}
 
@@ -57,19 +77,20 @@ public class CarRenewServiceImpl implements CarRenewService {
 	}
 
 	@Override
-	public List<List<String>> exportExcel(Map<String, String> reqParameterMap) {
+	public List<List<Object>> exportExcel(Map<String, String> reqParameterMap) {
 		//获取要到处的数据
 		JSONObject result = selectResultByConditions(reqParameterMap);
 		List<CardRenewTb> cardRenewList = JSON.parseArray(result.get("rows").toString(), CardRenewTb.class);
 
 		logger.error("=========>>>>>>.导出月卡续费" + cardRenewList.size());
 
-		List<List<String>> bodyList = new ArrayList<List<String>>();
+		List<List<Object>> bodyList = new ArrayList<List<Object>>();
 		if (cardRenewList != null && cardRenewList.size() > 0) {
 			String[] f = new String[]{"id", "trade_no", "card_id", "pay_time", "amount_receivable", "amount_pay", "collector", "pay_type", "car_number", "user_id", "limit_time", "resume"};
 			for (CardRenewTb cardRenewTb : cardRenewList) {
 				//javabean转map取参数
-				List<String> values = new ArrayList<String>();
+//				List<String> values = new ArrayList<String>();
+				List<Object> values = new ArrayList<Object>();
 				OrmUtil<CardRenewTb> otm = new OrmUtil<>();
 				Map map = otm.pojoToMap(cardRenewTb);
 				//判断各种字段 组装导出数据

@@ -1,5 +1,6 @@
 package parkingos.com.bolink.service.impl;
 
+import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -56,7 +57,7 @@ public class ParkOrderanlysisServiceImpl implements ParkOrderAnlysisService {
         if(btime.equals(""))
             btime = nowtime + " 00:00:00";
         if(etime.equals(""))
-            etime = nowtime;
+            etime = nowtime + " 23:59:59";
         Long b = TimeTools.getToDayBeginTime();
         Long e = System.currentTimeMillis()/1000;
         String dstr = btime+"-"+etime;
@@ -83,7 +84,7 @@ public class ParkOrderanlysisServiceImpl implements ParkOrderAnlysisService {
 //            dstr="本月";
         }else if(!btime.equals("")&&!etime.equals("")){
             b = TimeTools.getLongMilliSecondFrom_HHMMDDHHmmss(btime);
-            e =  TimeTools.getLongMilliSecondFrom_HHMMDDHHmmss(etime+" 23:59:59");
+            e =  TimeTools.getLongMilliSecondFrom_HHMMDDHHmmss(etime);
             sql += " where end_time between "+ b + " and "+e;
             free_sql += " where end_time between "+ b + " and "+e;
         }
@@ -185,9 +186,11 @@ public class ParkOrderanlysisServiceImpl implements ParkOrderAnlysisService {
                 backList.add(totalOrder);
             }
         }
+
         String money = "总订单数："+totalCount+",月卡订单数:"+monthCount+",订单金额:"+StringUtils.formatDouble(totalMoney)+"元," +
                 "现金结算:"+StringUtils.formatDouble(cashpay)+"现金预付:"+StringUtils.formatDouble(cashprepay)+"元,电子支付 :"+StringUtils.formatDouble(elecMoney)+"元," +
                 "免费金额:"+StringUtils.formatDouble(freeMoney)+"元,减免劵支付:"+StringUtils.formatDouble(reduce_amount)+"元";
+        result.put("rows",JSON.toJSON(backList));
         result.put("total",backList.size());
         result.put("money",money);
         result.put("page",1);
