@@ -25,7 +25,9 @@ public class EquipmentManageWorkSiteServiceImpl implements EquipmentManageWorkSi
 
     @Override
     public JSONObject selectResultByConditions(Map<String, String> reqmap) {
-        JSONObject result = supperSearchService.supperSearch(new ComWorksiteTb(),reqmap);
+        ComWorksiteTb comWorksiteTb = new ComWorksiteTb();
+        comWorksiteTb.setState(0);
+        JSONObject result = supperSearchService.supperSearch(comWorksiteTb,reqmap);
         /*String str = "{\"total\":12,\"page\":1,\"rows\":[]}";
         JSONObject result = JSONObject.parseObject(str);
 
