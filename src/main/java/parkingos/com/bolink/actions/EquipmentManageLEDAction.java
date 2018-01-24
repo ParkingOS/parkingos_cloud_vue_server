@@ -24,7 +24,12 @@ public class EquipmentManageLEDAction {
 
 	@Autowired
 	private EquipmentManageLEDService equipmentManageLEDService;
-
+	/**
+	 *
+	 * @param request
+	 * @param response
+	 * @return
+	 */
 	@RequestMapping(value = "/query")
 	public String query(HttpServletRequest request, HttpServletResponse response) {
 
@@ -40,7 +45,12 @@ public class EquipmentManageLEDAction {
 		StringUtils.ajaxOutput(response,result.toJSONString());
 		return null;
 	}
-
+	/**
+	 *
+	 * @param request
+	 * @param response
+	 * @return
+	 */
 	@RequestMapping(value = "/add")
 	public String update(HttpServletRequest request, HttpServletResponse response) {
 
@@ -85,7 +95,12 @@ public class EquipmentManageLEDAction {
 		StringUtils.ajaxOutput(response,result);
 		return null;
 	}
-
+	/**
+	 *
+	 * @param request
+	 * @param response
+	 * @return
+	 */
 	@RequestMapping(value = "/edit")
 	public String edit(HttpServletRequest request, HttpServletResponse response) {
 
@@ -132,7 +147,12 @@ public class EquipmentManageLEDAction {
 		StringUtils.ajaxOutput(response,result);
 		return null;
 	}
-
+	/**
+	 *
+	 * @param request
+	 * @param response
+	 * @return
+	 */
 	@RequestMapping("/remove")
 	public String remove(HttpServletRequest request,HttpServletResponse response){
 		Long id = RequestUtil.getLong(request,"id",null);

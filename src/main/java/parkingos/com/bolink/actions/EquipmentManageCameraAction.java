@@ -25,6 +25,12 @@ public class EquipmentManageCameraAction {
 	@Autowired
 	private EquipmentManageCameraService equipmentManageCameraService;
 
+	/**
+	 *
+	 * @param request
+	 * @param response
+	 * @return
+	 */
 	@RequestMapping(value = "/query")
 	public String query(HttpServletRequest request, HttpServletResponse response) {
 
@@ -35,13 +41,17 @@ public class EquipmentManageCameraAction {
 		System.out.println(reqParameterMap);
 		JSONObject result = equipmentManageCameraService.selectResultByConditions(reqParameterMap);
 
-
-
 		logger.info(result);
 		StringUtils.ajaxOutput(response,result.toJSONString());
 		return null;
 	}
 
+	/**
+	 *
+	 * @param request
+	 * @param response
+	 * @return
+	 */
 	@RequestMapping(value = "/add")
 	public String add(HttpServletRequest request, HttpServletResponse response) {
 
@@ -70,6 +80,12 @@ public class EquipmentManageCameraAction {
 		return null;
 	}
 
+	/**
+	 *
+	 * @param request
+	 * @param response
+	 * @return
+	 */
 	@RequestMapping(value = "/edit")
 	public String update(HttpServletRequest request, HttpServletResponse response) {
 
@@ -98,9 +114,16 @@ public class EquipmentManageCameraAction {
 		return null;
 	}
 
+	/**
+	 *
+	 * @param request
+	 * @param response
+	 * @return
+	 */
 	@RequestMapping("/remove")
 	public String remove(HttpServletRequest request,HttpServletResponse response){
 		Long id = RequestUtil.getLong(request,"id",null);
+		//Integer state = RequestUtil.getInteger(request,"state",null);
 
 		ComCameraTb comCameraTb = new ComCameraTb();
 		comCameraTb.setId(id);

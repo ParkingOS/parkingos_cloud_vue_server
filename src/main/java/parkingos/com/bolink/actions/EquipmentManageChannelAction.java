@@ -24,7 +24,12 @@ public class EquipmentManageChannelAction {
 
 	@Autowired
 	private EquipmentManageChannelService equipmentManageChannelService;
-
+	/**
+	 *
+	 * @param request
+	 * @param response
+	 * @return
+	 */
 	@RequestMapping(value = "/query")
 	public String query(HttpServletRequest request, HttpServletResponse response) {
 
@@ -40,7 +45,12 @@ public class EquipmentManageChannelAction {
 		StringUtils.ajaxOutput(response,result.toJSONString());
 		return null;
 	}
-
+	/**
+	 *
+	 * @param request
+	 * @param response
+	 * @return
+	 */
 	@RequestMapping(value = "/add")
 	public String add(HttpServletRequest request, HttpServletResponse response) {
 
@@ -67,7 +77,12 @@ public class EquipmentManageChannelAction {
 
 		return null;
 	}
-
+	/**
+	 *
+	 * @param request
+	 * @param response
+	 * @return
+	 */
 	@RequestMapping(value = "/edit")
 	public String update(HttpServletRequest request, HttpServletResponse response) {
 
@@ -94,6 +109,13 @@ public class EquipmentManageChannelAction {
 
 		return null;
 	}
+
+	/**
+	 *
+	 * @param request
+	 * @param response
+	 * @return
+	 */
 	@RequestMapping("/remove")
 	public String remove(HttpServletRequest request,HttpServletResponse response){
 		Long id = RequestUtil.getLong(request,"id",null);
