@@ -37,7 +37,7 @@
         <entry file="file://$PROJECT_DIR$/src/main/java/parkingos/com/bolink/actions/EquipmentManageLEDAction.java">
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="467">
-              <caret line="95" column="23" lean-forward="true" selection-start-line="95" selection-start-column="23" selection-end-line="95" selection-end-column="23" />
+              <caret line="95" column="23" lean-forward="false" selection-start-line="95" selection-start-column="23" selection-end-line="95" selection-end-column="23" />
               <folding />
             </state>
           </provider>
@@ -47,7 +47,7 @@
         <entry file="file://$PROJECT_DIR$/../parkingos_cloud_vue/src/pages/park/EquipmentManage_Intercom.vue">
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="2511">
-              <caret line="139" column="45" lean-forward="true" selection-start-line="139" selection-start-column="45" selection-end-line="139" selection-end-column="45" />
+              <caret line="139" column="45" lean-forward="false" selection-start-line="139" selection-start-column="45" selection-end-line="139" selection-end-column="45" />
               <folding />
             </state>
           </provider>
@@ -56,8 +56,8 @@
       <file leaf-file-name="EquipmentManage_Monitor.vue" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/../parkingos_cloud_vue/src/pages/park/EquipmentManage_Monitor.vue">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="594">
-              <caret line="169" column="10" lean-forward="true" selection-start-line="169" selection-start-column="10" selection-end-line="169" selection-end-column="10" />
+            <state relative-caret-position="351">
+              <caret line="160" column="9" lean-forward="false" selection-start-line="160" selection-start-column="9" selection-end-line="160" selection-end-column="9" />
               <folding />
             </state>
           </provider>
@@ -77,7 +77,7 @@
         <entry file="file://$PROJECT_DIR$/src/main/java/parkingos/com/bolink/models/ComLedTb.java">
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="270">
-              <caret line="10" column="0" lean-forward="true" selection-start-line="10" selection-start-column="0" selection-end-line="10" selection-end-column="0" />
+              <caret line="10" column="0" lean-forward="false" selection-start-line="10" selection-start-column="0" selection-end-line="10" selection-end-column="0" />
               <folding />
             </state>
           </provider>
@@ -87,7 +87,7 @@
         <entry file="file://$PROJECT_DIR$/../parkingos_cloud_vue/src/pages/HomeCloud.vue">
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="291">
-              <caret line="418" column="40" lean-forward="true" selection-start-line="418" selection-start-column="40" selection-end-line="418" selection-end-column="40" />
+              <caret line="418" column="40" lean-forward="false" selection-start-line="418" selection-start-column="40" selection-end-line="418" selection-end-column="40" />
               <folding />
             </state>
           </provider>
@@ -97,7 +97,7 @@
         <entry file="file://$PROJECT_DIR$/src/main/java/parkingos/com/bolink/service/impl/EquipmentManageCameraServiceImpl.java">
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="467">
-              <caret line="38" column="0" lean-forward="true" selection-start-line="38" selection-start-column="0" selection-end-line="38" selection-end-column="0" />
+              <caret line="38" column="0" lean-forward="false" selection-start-line="38" selection-start-column="0" selection-end-line="38" selection-end-column="0" />
               <folding />
             </state>
           </provider>
@@ -688,7 +688,7 @@
       <workItem from="1516772790953" duration="309000" />
       <workItem from="1516777904151" duration="3338000" />
       <workItem from="1516781833232" duration="602000" />
-      <workItem from="1516783365990" duration="4812000" />
+      <workItem from="1516783365990" duration="5062000" />
     </task>
     <task id="LOCAL-00001" summary="设备管理模块，因为对应的数据库表没找到，所以只写了页面框架，请求链没有调通">
       <created>1515664608265</created>
@@ -753,11 +753,18 @@
       <option name="project" value="LOCAL" />
       <updated>1516787980506</updated>
     </task>
-    <option name="localTasksCounter" value="10" />
+    <task id="LOCAL-00010" summary="设备管理模块4">
+      <created>1516788326566</created>
+      <option name="number" value="00010" />
+      <option name="presentableId" value="LOCAL-00010" />
+      <option name="project" value="LOCAL" />
+      <updated>1516788326566</updated>
+    </task>
+    <option name="localTasksCounter" value="11" />
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="188390000" />
+    <option name="totallyTimeSpent" value="188640000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="-8" y="-8" width="1456" height="876" extended-state="6" />
@@ -1202,7 +1209,7 @@
     <entry file="file://$PROJECT_DIR$/../parkingos_cloud_vue/src/pages/HomeCloud.vue">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="291">
-          <caret line="418" column="40" lean-forward="true" selection-start-line="418" selection-start-column="40" selection-end-line="418" selection-end-column="40" />
+          <caret line="418" column="40" lean-forward="false" selection-start-line="418" selection-start-column="40" selection-end-line="418" selection-end-column="40" />
           <folding />
         </state>
       </provider>
@@ -1210,7 +1217,7 @@
     <entry file="file://$PROJECT_DIR$/src/main/java/parkingos/com/bolink/service/impl/EquipmentManageCameraServiceImpl.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="467">
-          <caret line="38" column="0" lean-forward="true" selection-start-line="38" selection-start-column="0" selection-end-line="38" selection-end-column="0" />
+          <caret line="38" column="0" lean-forward="false" selection-start-line="38" selection-start-column="0" selection-end-line="38" selection-end-column="0" />
           <folding />
         </state>
       </provider>
@@ -1218,7 +1225,7 @@
     <entry file="file://$PROJECT_DIR$/src/main/java/parkingos/com/bolink/models/ComLedTb.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="270">
-          <caret line="10" column="0" lean-forward="true" selection-start-line="10" selection-start-column="0" selection-end-line="10" selection-end-column="0" />
+          <caret line="10" column="0" lean-forward="false" selection-start-line="10" selection-start-column="0" selection-end-line="10" selection-end-column="0" />
           <folding />
         </state>
       </provider>
@@ -1242,7 +1249,7 @@
     <entry file="file://$PROJECT_DIR$/src/main/java/parkingos/com/bolink/actions/EquipmentManageLEDAction.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="467">
-          <caret line="95" column="23" lean-forward="true" selection-start-line="95" selection-start-column="23" selection-end-line="95" selection-end-column="23" />
+          <caret line="95" column="23" lean-forward="false" selection-start-line="95" selection-start-column="23" selection-end-line="95" selection-end-column="23" />
           <folding />
         </state>
       </provider>
@@ -1258,15 +1265,15 @@
     <entry file="file://$PROJECT_DIR$/../parkingos_cloud_vue/src/pages/park/EquipmentManage_Intercom.vue">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="2511">
-          <caret line="139" column="45" lean-forward="true" selection-start-line="139" selection-start-column="45" selection-end-line="139" selection-end-column="45" />
+          <caret line="139" column="45" lean-forward="false" selection-start-line="139" selection-start-column="45" selection-end-line="139" selection-end-column="45" />
           <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/../parkingos_cloud_vue/src/pages/park/EquipmentManage_Monitor.vue">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="594">
-          <caret line="169" column="10" lean-forward="true" selection-start-line="169" selection-start-column="10" selection-end-line="169" selection-end-column="10" />
+        <state relative-caret-position="351">
+          <caret line="160" column="9" lean-forward="false" selection-start-line="160" selection-start-column="9" selection-end-line="160" selection-end-column="9" />
           <folding />
         </state>
       </provider>
