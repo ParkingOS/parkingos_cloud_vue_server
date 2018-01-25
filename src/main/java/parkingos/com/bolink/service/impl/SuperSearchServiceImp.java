@@ -49,8 +49,9 @@ public class SuperSearchServiceImp<T> implements SupperSearchService<T> {
         //需要查询的字段
         String fields = params.get("fieldsstr");
         logger.info(fields);
-        //没有查询字段，返回
+        //没有查询字段，返回   返回时带着基本条件
         if(fields==null||"".equals(fields.trim())){
+            result.put("base",t);
             return result;
         }
         //需要查询的字段数组
@@ -58,7 +59,7 @@ public class SuperSearchServiceImp<T> implements SupperSearchService<T> {
 
         GetPojoFieldType<T> getFieldTypeTool = new GetPojoFieldType<>();
         //取出所有字段的类型
-        Map<String ,Integer> fieldTypes = getFieldTypeTool.getFieldTypes(t);
+        Map<String ,Integer> fieldTypes = getFieldTypeTool.getFieldTypes(t,params);
         //复杂查询字段
 
         List<String> supperQueryFields = new ArrayList<>();
@@ -152,6 +153,8 @@ public class SuperSearchServiceImp<T> implements SupperSearchService<T> {
     public List<SearchBean> getSearchBeans(List<String> supperQeuryFields,Map<String,
             Integer> fieldTypes,List<String> baseFields,Map<String,String> params){
         List<SearchBean> resultList = new ArrayList<>();
+        System.out.println("========>>>>>>>>类型"+fieldTypes.get("out_uid"));
+        System.out.println("=============值"+params.get("out_uid"));
         for(String key : supperQeuryFields){
             Integer fieldType = fieldTypes.get(key);
 
@@ -219,7 +222,8 @@ public class SuperSearchServiceImp<T> implements SupperSearchService<T> {
                     }else if(operate.equals(FieldOperateTypes.LESS_THAN_OR_EQUAL)){
                         bean.setOperator(FieldOperator.LESS_THAN_AND_EQUAL);
                         bean.setFieldName(key);
-                        String end = params.get(key+"_end");
+//                        String end = params.get(key+"_end");
+                        String end = params.get(key+"_start");
                         if(Check.isEmpty(end)){
                             continue;
                         }

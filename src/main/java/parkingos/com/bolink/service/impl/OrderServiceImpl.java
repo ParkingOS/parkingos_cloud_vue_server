@@ -41,10 +41,12 @@ public class OrderServiceImpl implements OrderService {
         logger.error("======>>...订单comid:"+Long.parseLong(reqmap.get("comid")));
 
         //查询在场订单数量  车辆数量  空闲车位
+        Map<String,String> newReqmap = new HashMap<>();
         OrderTb newOrder = new OrderTb();
         newOrder.setComid(Long.parseLong(reqmap.get("comid")));
         newOrder.setState(0);
-        JSONObject newResult = supperSearchService.supperSearch(newOrder, reqmap);
+        //不用高级查询条件 只需要基本条件  新建map
+        JSONObject newResult = supperSearchService.supperSearch(newOrder, newReqmap);
         Integer total = (Integer) JSON.parse(newResult.get("total")+"");
         logger.error("=======>>>在场车辆"+total);
 
@@ -86,6 +88,7 @@ public class OrderServiceImpl implements OrderService {
         }
         String createTime = reqmap.get("create_time");
         logger.error("===>>>createTime"+createTime);
+        //组装 一个月 参数
         if(createTime==null||"undefined".equals(createTime)||"".equals(createTime)){
             reqmap.put("create_time","1");
             reqmap.put("create_time_start",(System.currentTimeMillis()-30*86400*1000L)+"");
@@ -101,7 +104,7 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
-    public JSONObject getPicResult(Long orderid, Long comid) {
+    public JSONObject getPicResult(String orderid, Long comid) {
 
         String str = "{\"in\":[],\"out\":[]}";
         JSONObject result = JSONObject.parseObject(str);
@@ -118,8 +121,8 @@ public class OrderServiceImpl implements OrderService {
             collectionName = orderTb.getCarpicTableName();
         }
         logger.error("====>>获得订单图片..collectionName" + collectionName);
-//        DBCollection collection = db.getCollection("collectionName");
-        DBCollection collection = db.getCollection(collectionName);
+        DBCollection collection = db.getCollection("collectionName");
+//        DBCollection collection = db.getCollection(collectionName);
         logger.error("======>>>>.获取订单图片...collection" + collection);
 
         List<String> inlist = new ArrayList<>();
@@ -154,7 +157,7 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
-    public byte[] getCarPics(Long orderid, Long comid, String type, Integer currentnum) {
+    public byte[] getCarPics(String orderid, Long comid, String type, Integer currentnum) {
         logger.error("getcarPic from mongodb file:orderid=" + orderid + "type=" + type + ",comid:" + comid + ",currentnum=" + currentnum);
         if (orderid != null && type != null) {
             DB db = MongoClientFactory.getInstance().getMongoDBBuilder("zld");//
@@ -219,7 +222,7 @@ public class OrderServiceImpl implements OrderService {
         List<List<Object>> bodyList = new ArrayList<List<Object>>();
 //        List<List<String>> bodyList = new ArrayList<List<String>>();
         if (orderlist != null && orderlist.size() > 0) {
-            String[] f = new String[]{"id", "c_type", "car_number", "create_time", "end_time", "duration", "pay_type", "amount_receivable", "total", "electronic_prepay", "cash_prepay", "electronic_pay", "cash_pay", "reduce_amount", "freereasons", "uid", "out_uid", "state", "in_passid", "out_passid"};
+            String[] f = new String[]{"id", "c_type", "car_number","car_type", "create_time", "end_time", "duration", "pay_type", "freereasons","amount_receivable", "total", "electronic_prepay", "cash_prepay", "electronic_pay", "cash_pay", "reduce_amount", "uid", "out_uid", "state", "in_passid", "out_passid","order_id_local"};
             Map<Long, String> uinNameMap = new HashMap<Long, String>();
             Map<Integer, String> passNameMap = new HashMap<Integer, String>();
             for (OrderTb orderTb : orderlist) {

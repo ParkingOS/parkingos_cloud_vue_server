@@ -268,8 +268,12 @@ public class MybatisGeneratorSql {
             }
 
             switch (bean.getOperator()){
-                case "ge":
+                case "gt":
                     sql.append(" > ?");
+                    values.add(bean.getStartValue()==null?bean.getBasicValue():bean.getStartValue());
+                    break;
+                case "ge":
+                    sql.append(" >= ?");
                     values.add(bean.getStartValue()==null?bean.getBasicValue():bean.getStartValue());
                     break;
                 case "lt" :
@@ -295,6 +299,20 @@ public class MybatisGeneratorSql {
                 case "equal":
                     sql.append(" = ? ");
                     values.add(bean.getBasicValue());
+                    break;
+                case "not":
+                    sql.append(" not in(");
+                    List<Object> value =(List<Object>)bean.getBasicValue();
+                    int index =0;
+                    for(Object o : value){
+                        if(index==0)
+                            sql.append(" ? ");
+                        else
+                            sql.append(",?");
+                        values.add(o);
+                        index++;
+                    }
+                    sql.append(")");
                     break;
                 case "in":
                     sql.append(" IN( ");
