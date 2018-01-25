@@ -12,13 +12,13 @@ public class ComWorksiteTb {
 
     private Integer netType;
 
-    private String host_name;
+    private String hostName;
 
-    private String host_memory;
+    private String hostMemory;
 
-    private String host_internal;
+    private String hostInternal;
 
-    private Integer upload_time;
+    private Integer uploadTime;
 
     private Integer state;
 
@@ -62,36 +62,36 @@ public class ComWorksiteTb {
         this.netType = netType;
     }
 
-    public String getHost_name() {
-        return host_name;
+    public String getHostName() {
+        return hostName;
     }
 
-    public void setHost_name(String host_name) {
-        this.host_name = host_name;
+    public void setHostName(String hostName) {
+        this.hostName = hostName;
     }
 
-    public String getHost_memory() {
-        return host_memory;
+    public String getHostMemory() {
+        return hostMemory;
     }
 
-    public void setHost_memory(String host_memory) {
-        this.host_memory = host_memory;
+    public void setHostMemory(String hostMemory) {
+        this.hostMemory = hostMemory;
     }
 
-    public String getHost_internal() {
-        return host_internal;
+    public String getHostInternal() {
+        return hostInternal;
     }
 
-    public void setHost_internal(String host_internal) {
-        this.host_internal = host_internal;
+    public void setHostInternal(String hostInternal) {
+        this.hostInternal = hostInternal;
     }
 
-    public Integer getUpload_time() {
-        return upload_time;
+    public Integer getUploadTime() {
+        return uploadTime;
     }
 
-    public void setUpload_time(Integer upload_time) {
-        this.upload_time = upload_time;
+    public void setUploadTime(Integer uploadTime) {
+        this.uploadTime = uploadTime;
     }
 
     public Integer getState() {

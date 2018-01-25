@@ -3,10 +3,10 @@
   <proxool>
 		<alias>master</alias>
 	    <!--<driver-url>jdbc:postgresql://zlddb.tq.cn:54389/zldetc</driver-url>-->
-		<driver-url>jdbc:postgresql://localhost:5432/postgres</driver-url>
+		<driver-url>jdbc:postgresql://localhost:5432/zldetc</driver-url>
 		<driver-class>org.postgresql.Driver</driver-class>
 		<driver-properties>
-			<property name="user" value="postgres" /> 
+			<property name="user" value="postgres" />
 			<property name="password" value="tracq123" />
 		</driver-properties>
 		<maximum-connection-count>100</maximum-connection-count>

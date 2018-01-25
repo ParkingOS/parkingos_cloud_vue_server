@@ -79,22 +79,22 @@ public class EquipmentManageWorkSiteAction {
 	 */
 	@RequestMapping(value = "/edit")
 	public String update(HttpServletRequest request, HttpServletResponse response) {
-
+		Long id = RequestUtil.getLong(request,"id",null);
+		Long comid = RequestUtil.getLong(request,"comid",-1L);
 		String worksiteName = RequestUtil.processParams(request,"worksite_name");
 		String description = RequestUtil.processParams(request,"description");
 		Integer netType = RequestUtil.getInteger(request,"net_type",0);
-		Long id = RequestUtil.getLong(request,"oid",-1L);
-		Long comid = RequestUtil.getLong(request,"oid",-1L);
 
 		ComWorksiteTb comWorksiteTb = new ComWorksiteTb();
+		comWorksiteTb.setId(id);
+		comWorksiteTb.setComid(comid);
 		comWorksiteTb.setWorksiteName(worksiteName);
 		comWorksiteTb.setDescription(description);
 		comWorksiteTb.setNetType(netType);
-		comWorksiteTb.setId(id);
-		comWorksiteTb.setComid(comid);
 
 		String result = equipmentManageWorkSiteService.updateResultByConditions(comWorksiteTb).toString();
 		StringUtils.ajaxOutput(response,result);
+
 		return null;
 	}
 	/**
