@@ -23,7 +23,7 @@ import java.util.Map;
 @Service
 public class ShopAccountServiceImpl implements ShopAcccountService {
 
-    Logger logger = Logger.getLogger( OrderServiceImpl.class );
+    Logger logger = Logger.getLogger( ShopAccountServiceImpl.class );
 
     @Autowired
     private CommonDao commonDao;
@@ -40,54 +40,53 @@ public class ShopAccountServiceImpl implements ShopAcccountService {
         List<ShopAccountTb> list = null;
         List<Map<String, Object>> resList = new ArrayList<>();
 
-        Map searchMap = supperSearchService.getBaseSearch( new ShopAccountTb(), reqmap );
+        ShopAccountTb shopAccountTb = new ShopAccountTb();
+        //登陆停车场
+        shopAccountTb.setParkId( Long.valueOf( reqmap.get( "comid" ) ) );
+        //流水类型
+        if (reqmap.get( "operate_type" ) != null && !reqmap.get( "operate_type" ).equals( "" )) {
+            Integer operate_type = Integer.valueOf( reqmap.get( "operate_type" ) );
+            if (operate_type != 0) {
+                shopAccountTb.setOperateType( operate_type );
+            }
+        }
 
-
+        Map searchMap = supperSearchService.getBaseSearch( shopAccountTb, reqmap );
         if (searchMap != null && !searchMap.isEmpty()) {
-            ShopAccountTb baseQuery = (ShopAccountTb) searchMap.get( "base" );
-            //绑定登陆停车场
-            if(baseQuery==null){
-                baseQuery=new ShopAccountTb();
-            }
-            baseQuery.setParkId( Long.valueOf( reqmap.get( "comid" ) ));
-            //流水类型
-            if (reqmap.get( "operate_type" ) != null && !reqmap.get( "operate_type" ).equals( "" )) {
-                Integer operate_type = Integer.valueOf( reqmap.get( "operSystem.outte_type" ) );
-                if (operate_type != 0) {
-                    baseQuery.setOperateType( operate_type );
-                }
-            }
-
             List<SearchBean> supperQuery = null;
             if (searchMap.containsKey( "supper" )) {
                 supperQuery = (List<SearchBean>) searchMap.get( "supper" );
             }
-
             //操作人名模糊查询
             String nickname = reqmap.get( "nickname" );
+
             if (nickname != null && !nickname.equals( "" )) {
                 List<SearchBean> nameList = new ArrayList<>();
                 SearchBean searchBean = new SearchBean();
                 searchBean.setFieldName( "nickname" );
                 searchBean.setOperator( FieldOperator.LIKE );
-                searchBean.setBasicValue( "%" + nickname + "%" );
-                nameList.add( searchBean );
-                List<UserInfoTb> searchUser = commonDao.selectListByConditions( new UserInfoTb(), nameList );
+                searchBean.setBasicValue(  nickname  );
 
-                if (searchUser != null && !searchUser.isEmpty()) {
+                nameList.add( searchBean );
+                UserInfoTb userInfoTb = new UserInfoTb();
+                userInfoTb.setComid( Long.valueOf( reqmap.get( "comid" ) ) );
+                List<UserInfoTb> searchUsers = commonDao.selectListByConditions( userInfoTb, nameList );
+
+                if (searchUsers != null && !searchUsers.isEmpty()) {
                     searchBean.setOperator( FieldOperator.CONTAINS );
                     searchBean.setFieldName( "operator" );
                     List<Long> idList = new ArrayList<Long>();
-                    for (UserInfoTb u : searchUser) {
+                    for (UserInfoTb u : searchUsers) {
                         idList.add( u.getId() );
                     }
                     searchBean.setBasicValue( idList );
+
                     if (supperQuery == null) {
                         supperQuery = new ArrayList<>();
-                        supperQuery.add( searchBean );
-                    } else {
-                        supperQuery.add( searchBean );
                     }
+
+                    supperQuery.add( searchBean );
+
                 } else {
                     //没有查询结果
                     result.put( "total", 0 );
@@ -97,6 +96,7 @@ public class ShopAccountServiceImpl implements ShopAcccountService {
                 }
             }
             logger.info( searchMap );
+            ShopAccountTb baseQuery = (ShopAccountTb) searchMap.get( "base" );
             PageOrderConfig config = null;
             if (searchMap.containsKey( "config" ))
                 config = (PageOrderConfig) searchMap.get( "config" );
@@ -108,9 +108,9 @@ public class ShopAccountServiceImpl implements ShopAcccountService {
                 Map<Long, String> nameMap = new HashMap<>();
                 List<Long> idList = new ArrayList<>();
 
-                for (ShopAccountTb shopAccountTb : list) {
-                    if (!idList.contains( shopAccountTb.getOperator() ))
-                        idList.add( shopAccountTb.getOperator() );
+                for (ShopAccountTb s : list) {
+                    if (!idList.contains( s.getOperator() ))
+                        idList.add( s.getOperator() );
                 }
 
                 SearchBean searchBean = new SearchBean();

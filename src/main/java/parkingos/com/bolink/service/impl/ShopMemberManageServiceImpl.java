@@ -2,6 +2,7 @@ package parkingos.com.bolink.service.impl;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
+import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import parkingos.com.bolink.dao.spring.CommonDao;
@@ -12,26 +13,20 @@ import parkingos.com.bolink.utils.OrmUtil;
 import parkingos.com.bolink.utils.RequestUtil;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
 @Service
-public class ShopMemberManageServiceImpl implements ShopMemberManageService{
+public class ShopMemberManageServiceImpl implements ShopMemberManageService {
+
+    Logger logger = Logger.getLogger( ShopMemberManageServiceImpl.class );
+
     @Autowired
     private CommonDao commonDao;
 
     @Override
-    public String quickquery(HttpServletRequest req, HttpServletResponse resp) {
-
-        /*String fieldsstr = RequestUtil.processParams(request, "fieldsstr");
-        Integer pageNum = RequestUtil.getInteger(request, "page", 1);
-        Integer pageSize = RequestUtil.getInteger(request, "rp", 20);
-        List<Map<String, Object>> list = new ArrayList<Map<String,Object>>();
-        List<Object> params = new ArrayList<Object>();
-        String sql = "select * from user_info_tb where state=? and shop_id=? ";
-        String sqlcount = "select count(*) from user_info_tb where state=? and shop_id=? ";*/
+    public String quickquery(HttpServletRequest req) {
 
         Integer pageNum = RequestUtil.getInteger( req, "page", 1 );
         Integer pageSize = RequestUtil.getInteger( req, "rp", 10 );
@@ -70,9 +65,9 @@ public class ShopMemberManageServiceImpl implements ShopMemberManageService{
     }
 
     @Override
-    public String editpass(HttpServletRequest request, HttpServletResponse resp) {
+    public String editpass(HttpServletRequest request) {
 
-        String uin =RequestUtil.processParams(request, "id");
+        String uin = RequestUtil.processParams(request, "id");
         String newPass = RequestUtil.processParams(request, "newpass");
         String confirmPass = RequestUtil.processParams(request, "confirmpass");
 
@@ -89,14 +84,14 @@ public class ShopMemberManageServiceImpl implements ShopMemberManageService{
 
 
     @Override
-    public String create(HttpServletRequest request, HttpServletResponse resp) {
+    public String create(HttpServletRequest request) {
 
         String strid = "";
-        String nickname =RequestUtil.processParams( request,"nickname" );
-        String phone =RequestUtil.processParams(request, "phone");
-        String mobile =RequestUtil.processParams(request, "mobile");
+        String nickname = RequestUtil.processParams( request,"nickname" );
+        String phone = RequestUtil.processParams(request, "phone");
+        String mobile = RequestUtil.processParams(request, "mobile");
         Long comid = Long.valueOf( RequestUtil.processParams(request, "comid") );
-        Long role =RequestUtil.getLong(request, "auth_flag", 15L);//14:负责人 15：工作人员
+        Long role = RequestUtil.getLong(request, "auth_flag", 15L);//14:负责人 15：工作人员
         Long shop_id = RequestUtil.getLong( request,"shop_id",-1L );
         if(nickname.equals("")) nickname=null;
         if(phone.equals("")) phone=null;
@@ -126,13 +121,11 @@ public class ShopMemberManageServiceImpl implements ShopMemberManageService{
             userInfoTb.setId( userid );
             count = commonDao.updateByPrimaryKey( userInfoTb );
         }
-
-
         return "{\"state\":"+count+"}";
     }
 
     @Override
-    public String delete(HttpServletRequest req, HttpServletResponse resp) {
+    public String delete(HttpServletRequest req) {
         Long id = RequestUtil.getLong( req, "id", -1L );
         int delete = 0;
         if (id > 0) {
@@ -142,7 +135,6 @@ public class ShopMemberManageServiceImpl implements ShopMemberManageService{
             //删除操作将state状态修改为1
             delete = commonDao.updateByPrimaryKey( userInfoTb );
         }
-
         return "{\"state\":"+delete+"}";
     }
 }

@@ -32,43 +32,44 @@ public class TicketServiceImpl implements TicketService {
 
     @Override
     public JSONObject selectResultByConditions(Map<String, String> reqmap) {
-        String str = "{\"total\":0,\"page\":1,\"rows\":[]}";
+         String str = "{\"total\":0,\"page\":1,\"rows\":[]}";
         JSONObject result = JSONObject.parseObject( str );
 
         int count = 0;
         List<TicketTb> list = null;
         List<Map<String, Object>> resList = new ArrayList<>();
-        Map searchMap = supperSearchService.supperSearch( new TicketTb(), reqmap );
 
+        TicketTb ticketTb = new TicketTb();
+       //停车场编号
+        ticketTb.setComid( Long.valueOf( reqmap.get( "comid" ) ) );
+        //绑定优惠类型,0为默认查询全部，1为时长减免，2为金额减免
+        Integer type = 0;
+        String strType = reqmap.get( "type" );
+        if (strType != null && !strType.equals( "" )) {
+            type = Integer.valueOf( strType );
+        }
+        if (type == 1) {
+            ticketTb.setType( 3 );
+        }else if(type==2){
+            ticketTb.setType( 5 );
+        }
+        //绑定状态  0-未使用,1-已使用，2-回收作废   -1为查询全部
+        String strState = reqmap.get( "state" );
+        Integer state = -1;
+        if (strState != null && !strState.equals( "" )) {
+            state = Integer.valueOf( strState );
+        }
+        if (state != -1) {
+            ticketTb.setState( state );
+        }
 
+        Map searchMap = supperSearchService.getBaseSearch( ticketTb, reqmap );
         if (searchMap != null && !searchMap.isEmpty()) {
             List<SearchBean> supperQuery = null;
             TicketTb baseQuery = (TicketTb) searchMap.get( "base" );
             if (searchMap.containsKey( "supper" ))
                 supperQuery = (List<SearchBean>) searchMap.get( "supper" );
-            //绑定停车场
-            if(baseQuery==null)
-                baseQuery=new TicketTb();
-            baseQuery.setComid( Long.valueOf( reqmap.get( "comid" ) )  );
 
-            //绑定优惠类型,0为默认查询全部，1为时长减免，2为金额减免
-            Integer type = 0;
-            String strType = reqmap.get( "type" );
-            if (strType != null && !strType.equals( "" )) {
-                type = Integer.valueOf( strType );
-            }
-            if (type != 0) {
-                baseQuery.setType( type );
-            }
-            //绑定状态  0-未使用,1-已使用，2-回收作废   -1未查询全部
-            String strState = reqmap.get( "state" );
-            Integer state = -1;
-            if (strState != null && !strState.equals( "" )) {
-                state = Integer.valueOf( strState );
-            }
-            if (state != -1) {
-                baseQuery.setState( state );
-            }
             //shop_name模糊查询
             String shopName = reqmap.get( "shop_name" );
             if (shopName != null && !shopName.equals( "" )) {
@@ -78,7 +79,7 @@ public class TicketServiceImpl implements TicketService {
                 SearchBean searchBean = new SearchBean();
                 searchBean.setFieldName( "name" );
                 searchBean.setOperator( FieldOperator.LIKE );
-                searchBean.setBasicValue( "%" + shopName + "%" );
+                searchBean.setBasicValue(  shopName );
                 List<SearchBean> searchList = new ArrayList<>();
                 searchList.add( searchBean );
                 List<ShopTb> shopList = commonDao.selectListByConditions( shopTb, searchList );
@@ -103,7 +104,6 @@ public class TicketServiceImpl implements TicketService {
                     return result;
                 }
             }
-
             logger.info( searchMap );
 
             PageOrderConfig config = null;
@@ -119,9 +119,9 @@ public class TicketServiceImpl implements TicketService {
                     Map<Long, String> nameMap = new HashMap<>();
                     List<Long> idList = new ArrayList<>();
 
-                    for (TicketTb ticketTb : list) {
-                        if (!idList.contains( ticketTb.getShopId() ))
-                            idList.add( ticketTb.getShopId() );
+                    for (TicketTb t : list) {
+                        if (!idList.contains( t.getShopId() ))
+                            idList.add( t.getShopId() );
                     }
 
                     SearchBean searchBean = new SearchBean();
@@ -153,7 +153,6 @@ public class TicketServiceImpl implements TicketService {
 
         result.put( "total", count );
         result.put( "page", Integer.parseInt( reqmap.get( "page" ) ) );
-        logger.info( result );
         return result;
     }
 }

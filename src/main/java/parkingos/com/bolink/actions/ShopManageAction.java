@@ -24,7 +24,8 @@ public class ShopManageAction {
      */
     @RequestMapping("/addmoney")
     public String addMoney(HttpServletRequest request, HttpServletResponse resp) {
-        String result = shopManageService.addMoney(request,resp);
+        String result = shopManageService.addMoney(request);
+        logger.info( result );
         StringUtils.ajaxOutput( resp, result );
         return null;
     }
@@ -35,7 +36,8 @@ public class ShopManageAction {
     @RequestMapping("/create")
     public String create(HttpServletRequest request, HttpServletResponse resp) {
 
-        String result = shopManageService.create(request,resp);
+        String result = shopManageService.create(request);
+        logger.info( result );
         StringUtils.ajaxOutput( resp, result );
         return null;
     }
@@ -47,7 +49,8 @@ public class ShopManageAction {
     @RequestMapping(value = "/quickquery")
     public String query(HttpServletRequest req, HttpServletResponse resp) {
 
-        String result = shopManageService.quickquery(req,resp);
+        String result = shopManageService.quickquery(req);
+        logger.info( result );
         StringUtils.ajaxOutput( resp, result );
         return null;
     }
@@ -57,7 +60,8 @@ public class ShopManageAction {
      */
     @RequestMapping("/delete")
     public String delete(HttpServletRequest request, HttpServletResponse resp) {
-        String result = shopManageService.delete(request, resp);
+        String result = shopManageService.delete(request);
+        logger.info( result );
         StringUtils.ajaxOutput( resp, result );
         return null;
     }

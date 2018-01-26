@@ -16,7 +16,7 @@ import java.util.Map;
 @Controller
 @RequestMapping("/shopticket")
 public class ShopTicketAction {
-    Logger logger = Logger.getLogger( ShopManageAction.class );
+    Logger logger = Logger.getLogger( ShopTicketAction.class );
     @Autowired
     private TicketService ticketService;
 
@@ -24,9 +24,9 @@ public class ShopTicketAction {
     public String addMoney(HttpServletRequest request, HttpServletResponse resp) {
 
         Map<String, String> reqParameterMap = RequestUtil.readBodyFormRequset( request );
-
+        logger.info( reqParameterMap );
         JSONObject result = ticketService.selectResultByConditions( reqParameterMap );
-        //把结果返回页面
+        logger.info( result );
         StringUtils.ajaxOutput( resp, result.toJSONString() );
         return null;
     }
