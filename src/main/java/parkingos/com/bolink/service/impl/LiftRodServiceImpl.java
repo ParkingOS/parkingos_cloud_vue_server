@@ -126,15 +126,48 @@ public class LiftRodServiceImpl implements LiftRodService {
         return bodyList;
     }
 
-    private Object getLiftReason(int type) {
+//    @Override
+//    public String getLiftReason() {
+//        String reason = CustomDefind.getValue("LIFTRODREASON");
+////        if(type==0){
+//            String ret = "[{value_no:-1,value_name:\"\"},{value_no:100,value_name:\"原因未选\"}";
+//            if(reason!=null){
+//                String res[] = reason.split("\\|");
+//                for(int i=0;i<res.length;i++){
+//                    ret+=",{value_no:"+i+",value_name:\""+res[i]+"\"}";
+//                }
+//            }
+//            ret +="]";
+//            return ret;
+////        }else {
+////        Map<Integer, String> reasonMap = new HashMap<Integer, String>();
+////        if(reason!=null){
+////            String res[] = reason.split("\\|");
+////            for(int i=0;i<res.length;i++){
+////                reasonMap.put(i, res[i]);
+////            }
+////        }
+////            return reasonMap;
+////        }
+//
+////        return reasonMap;
+//    }
+
+
+    /*
+    * 读取配置文件 获得抬杆原因 两种形式返回
+    *
+    * */
+    @Override
+    public Object getLiftReason(int type) {
         String reason = CustomDefind.getValue("LIFTRODREASON");
         logger.error("lift>>>,reason:"+reason);
         if(type==0){
-            String ret = "[{value_no:-1,value_name:\"\"},{value_no:100,value_name:\"原因未选\"}";
+            String ret = "[{\"value_no\":\"-1\",\"value_name\":\"\"},{\"value_no\":\"100\",\"value_name\":\"原因未选\"}";
             if(reason!=null){
                 String res[] = reason.split("\\|");
                 for(int i=0;i<res.length;i++){
-                    ret+=",{value_no:"+i+",value_name:\""+res[i]+"\"}";
+                    ret+=",{\"value_no\":\""+i+"\",\"value_name\":\""+res[i]+"\"}";
                 }
             }
             ret +="]";

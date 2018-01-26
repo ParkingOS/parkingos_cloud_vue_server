@@ -59,7 +59,7 @@ public class OrderTb {
 
     private String orderIdLocal;
 
-    private Long duration;
+    private String duration;
 
     private String payTypeEn;
 
@@ -321,11 +321,11 @@ public class OrderTb {
         this.orderIdLocal = orderIdLocal == null ? null : orderIdLocal.trim();
     }
 
-    public Long getDuration() {
+    public String getDuration() {
         return duration;
     }
 
-    public void setDuration(Long duration) {
+    public void setDuration(String duration) {
         this.duration = duration;
     }
 

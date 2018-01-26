@@ -96,10 +96,47 @@ public class OrderServiceImpl implements OrderService {
         }
         JSONObject result = supperSearchService.supperSearch(orderTb, reqmap);
 
+        //时长重新处理  收款人和收费员重新处理
+        List<OrderTb> orderList = JSON.parseArray(result.get("rows").toString(), OrderTb.class);
+        List<Map<String, Object>> resList =new ArrayList<>();
+        for(OrderTb order : orderList){
+            OrmUtil<OrderTb> om = new OrmUtil<>();
+            Map map = om.pojoToMap(order);
+            Long start = (Long) map.get("create_time");
+            Long end = (Long) map.get("end_time");
+            if (start != null && end != null) {
+                map.put("duration",StringUtils.getTimeString(start, end));
+            } else {
+                map.put("duration","");
+            }
+            try{
+                Long uid = (Long)map.get("uid");
+                if(uid==-1){
+                    map.put("uid","无");
+                }
+            }
+            catch (Exception e){
+                map.put("uid",map.get("uid"));
+            }
+            try{
+                Long uid = (Long)map.get("out_uid");
+                if(uid==-1){
+                    map.put("out_uid","无");
+                }
+            }
+            catch (Exception e){
+                map.put("out_uid",map.get("out_uid"));
+            }
+
+            resList.add(map);
+        }
+        result.remove("rows");
+        result.put("rows",JSON.toJSON(resList));
         //车位数据
         result.put("parktotal",total);
         result.put("blank",blank);
 
+        logger.error("============>>>>>返回数据"+result);
         return result;
     }
 
@@ -312,10 +349,10 @@ public class OrderServiceImpl implements OrderService {
                     } else if ("state".equals(field)) {
                         switch (Integer.valueOf(v + "")) {//0:NFC,1:IBeacon,2:照牌   3通道照牌 4直付 5月卡用户
                             case 0:
-                                values.add("未支付 ");
+                                values.add("未结算 ");
                                 break;
                             case 1:
-                                values.add("已支付 ");
+                                values.add("已结算 ");
                                 break;
                             case 2:
                                 values.add("逃单 ");
