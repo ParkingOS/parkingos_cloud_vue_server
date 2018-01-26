@@ -42,7 +42,7 @@ public class TicketServiceImpl implements TicketService {
         TicketTb ticketTb = new TicketTb();
        //停车场编号
         ticketTb.setComid( Long.valueOf( reqmap.get( "comid" ) ) );
-        //绑定优惠类型,0为默认查询全部，1为时长减免，2为金额减免
+        //绑定优惠类型,0为默认查询全部，3为时长减免，5为金额减免
         Integer type = 0;
         String strType = reqmap.get( "type" );
         if (strType != null && !strType.equals( "" )) {
