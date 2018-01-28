@@ -78,6 +78,11 @@ public class CarRenewServiceImpl implements CarRenewService {
 
 	@Override
 	public List<List<Object>> exportExcel(Map<String, String> reqParameterMap) {
+
+		//删除分页条件  查询该条件下所有  不然为一页数据
+		reqParameterMap.remove("orderfield");
+		reqParameterMap.remove("orderby");
+
 		//获取要到处的数据
 		JSONObject result = selectResultByConditions(reqParameterMap);
 		List<CardRenewTb> cardRenewList = JSON.parseArray(result.get("rows").toString(), CardRenewTb.class);

@@ -109,24 +109,24 @@ public class OrderServiceImpl implements OrderService {
             } else {
                 map.put("duration","");
             }
-            try{
-                Long uid = (Long)map.get("uid");
-                if(uid==-1){
-                    map.put("uid","无");
-                }
-            }
-            catch (Exception e){
-                map.put("uid",map.get("uid"));
-            }
-            try{
-                Long uid = (Long)map.get("out_uid");
-                if(uid==-1){
-                    map.put("out_uid","无");
-                }
-            }
-            catch (Exception e){
-                map.put("out_uid",map.get("out_uid"));
-            }
+//            try{
+//                Long uid = (Long)map.get("uid");
+//                if(uid==-1){
+//                    map.put("uid","无");
+//                }
+//            }
+//            catch (Exception e){
+//                map.put("uid",map.get("uid"));
+//            }
+//            try{
+//                Long uid = (Long)map.get("out_uid");
+//                if(uid==-1){
+//                    map.put("out_uid","无");
+//                }
+//            }
+//            catch (Exception e){
+//                map.put("out_uid",map.get("out_uid"));
+//            }
 
             resList.add(map);
         }
@@ -249,6 +249,12 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     public List<List<Object>> exportExcel(Map<String, String> reqParameterMap) {
+
+        //删除分页条件  查询该条件下所有  不然为一页数据
+        reqParameterMap.remove("orderfield");
+        reqParameterMap.remove("orderby");
+
+        //获得要导出的结果
         JSONObject result = selectResultByConditions(reqParameterMap);
 
         Long comid = Long.parseLong(reqParameterMap.get("comid"));
@@ -354,9 +360,9 @@ public class OrderServiceImpl implements OrderService {
                             case 1:
                                 values.add("已结算 ");
                                 break;
-                            case 2:
-                                values.add("逃单 ");
-                                break;
+//                            case 2:
+//                                values.add("逃单 ");
+//                                break;
                             default:
                                 values.add("");
                         }

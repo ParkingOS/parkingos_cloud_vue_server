@@ -86,6 +86,11 @@ public class LiftRodServiceImpl implements LiftRodService {
 
     @Override
     public List<List<Object>> exportExcel(Map<String, String> reqParameterMap) {
+
+        //删除分页条件  查询该条件下所有  不然为一页数据
+        reqParameterMap.remove("orderfield");
+        reqParameterMap.remove("orderby");
+
         JSONObject result = selectResultByConditions(reqParameterMap);
         List<LiftRodTb> liftRodList = JSON.parseArray(result.get("rows").toString(), LiftRodTb.class);
         List<List<Object>> bodyList = new ArrayList<List<Object>>();

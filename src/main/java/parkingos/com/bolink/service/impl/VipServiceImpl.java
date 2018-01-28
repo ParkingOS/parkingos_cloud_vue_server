@@ -251,7 +251,8 @@ public class VipServiceImpl implements VipService {
         //******添加月卡消费记录*******
         Integer renewId = (commonDao.selectSequence(CardRenewTb.class)).intValue();
         String tradeNo  = TimeTools.getTimeYYYYMMDDHHMMSS()+""+comid;
-        String operater = RequestUtil.getString(req,"nickname");
+        //对于字符串类型 最好都要进行编码解码处理  防止中文乱码
+        String operater = StringUtils.decodeUTF8(RequestUtil.getString(req,"nickname"));
         //组装插入月卡消费记录数据
         CardRenewTb cardRenewTb = new CardRenewTb();
         cardRenewTb.setId(renewId);
@@ -267,8 +268,8 @@ public class VipServiceImpl implements VipService {
         cardRenewTb.setResume(remark);
         cardRenewTb.setBuyMonth(months);
         cardRenewTb.setComid(comid+"");
-//        cardRenewTb.setCreateTime(ntime.intValue());
-//        cardRenewTb.setUpdateTime(ntime.intValue());
+        cardRenewTb.setCreateTime(ntime.intValue());
+        cardRenewTb.setUpdateTime(ntime.intValue());
         int renew = commonDao.insert(cardRenewTb);
 
         if(ret==1&&renew==1){
@@ -412,7 +413,7 @@ public class VipServiceImpl implements VipService {
         Long pid = RequestUtil.getLong(req, "p_name", -1L);
         String name = StringUtils.decodeUTF8(RequestUtil.processParams(req, "name").trim());
         //起始时间
-        String b_time = RequestUtil.processParams(req, "b_time");
+//        String b_time = RequestUtil.processParams(req, "b_time");
         //购买月数
         Integer months = RequestUtil.getInteger(req, "months", 1);
 
@@ -468,7 +469,7 @@ public class VipServiceImpl implements VipService {
             //******添加月卡消费记录*******
             Integer renewId = (commonDao.selectSequence(CardRenewTb.class)).intValue();
             String tradeNo  = TimeTools.getTimeYYYYMMDDHHMMSS()+""+comid;
-            String operater = RequestUtil.getString(req,"nickname");
+            String operater = StringUtils.decodeUTF8(RequestUtil.getString(req,"nickname"));
             //组装插入月卡消费记录数据
             CardRenewTb cardRenewTb = new CardRenewTb();
             cardRenewTb.setId(renewId);
@@ -484,8 +485,8 @@ public class VipServiceImpl implements VipService {
             cardRenewTb.setResume(remark);
             cardRenewTb.setBuyMonth(months);
             cardRenewTb.setComid(comid+"");
-//            cardRenewTb.setCreateTime(ntime.intValue());
-//            cardRenewTb.setUpdateTime(ntime.intValue());
+            cardRenewTb.setCreateTime(ntime.intValue());
+            cardRenewTb.setUpdateTime(ntime.intValue());
             cardRenewTb.setLimitTime(etime);
             int renew = commonDao.insert(cardRenewTb);
 
@@ -547,6 +548,11 @@ public class VipServiceImpl implements VipService {
 
     @Override
     public List<List<String>> exportExcel(Map<String, String> reqParameterMap) {
+
+        //删除分页条件  查询该条件下所有  不然为一页数据
+        reqParameterMap.remove("orderfield");
+        reqParameterMap.remove("orderby");
+
         JSONObject result = selectResultByConditions(reqParameterMap);
         List<CarowerProduct> orderlist = JSON.parseArray(result.get("rows").toString(),CarowerProduct.class);
 
