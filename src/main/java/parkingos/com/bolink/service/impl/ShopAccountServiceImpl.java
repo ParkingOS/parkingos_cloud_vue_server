@@ -52,60 +52,68 @@ public class ShopAccountServiceImpl implements ShopAcccountService {
         }
 
         Map searchMap = supperSearchService.getBaseSearch( shopAccountTb, reqmap );
+        List<SearchBean> supperQuery = null;
+        ShopAccountTb baseQuery = null;
+        PageOrderConfig config = null;
+
         if (searchMap != null && !searchMap.isEmpty()) {
-            List<SearchBean> supperQuery = null;
+            baseQuery = (ShopAccountTb) searchMap.get( "base" );
             if (searchMap.containsKey( "supper" )) {
                 supperQuery = (List<SearchBean>) searchMap.get( "supper" );
             }
-            //操作人名模糊查询
-            String nickname = reqmap.get( "nickname" );
-
-            if (nickname != null && !nickname.equals( "" )) {
-                List<SearchBean> nameList = new ArrayList<>();
-                SearchBean searchBean = new SearchBean();
-                searchBean.setFieldName( "nickname" );
-                searchBean.setOperator( FieldOperator.LIKE );
-                searchBean.setBasicValue(  nickname  );
-
-                nameList.add( searchBean );
-                UserInfoTb userInfoTb = new UserInfoTb();
-                userInfoTb.setComid( Long.valueOf( reqmap.get( "comid" ) ) );
-                List<UserInfoTb> searchUsers = commonDao.selectListByConditions( userInfoTb, nameList );
-
-                if (searchUsers != null && !searchUsers.isEmpty()) {
-                    searchBean.setOperator( FieldOperator.CONTAINS );
-                    searchBean.setFieldName( "operator" );
-                    List<Long> idList = new ArrayList<Long>();
-                    for (UserInfoTb u : searchUsers) {
-                        idList.add( u.getId() );
-                    }
-                    searchBean.setBasicValue( idList );
-
-                    if (supperQuery == null) {
-                        supperQuery = new ArrayList<>();
-                    }
-
-                    supperQuery.add( searchBean );
-
-                } else {
-                    //没有查询结果
-                    result.put( "total", 0 );
-                    result.put( "total", "" );
-                    result.put( "page", Integer.parseInt( reqmap.get( "page" ) ) );
-                    return result;
-                }
-            }
-            logger.info( searchMap );
-            ShopAccountTb baseQuery = (ShopAccountTb) searchMap.get( "base" );
-            PageOrderConfig config = null;
             if (searchMap.containsKey( "config" ))
                 config = (PageOrderConfig) searchMap.get( "config" );
-            count = commonDao.selectCountByConditions( baseQuery, supperQuery );
-            if (count > 0) {
-                list = commonDao.selectListByConditions( baseQuery, supperQuery, config );
+        }
 
+        List<SearchBean> nameList = new ArrayList<>();
+        SearchBean searchBean = new SearchBean();
+        nameList.add( searchBean );
+        Map<Long, String> names = null;
+        UserInfoTb userInfoTb = new UserInfoTb();
+        userInfoTb.setComid( Long.valueOf( reqmap.get( "comid" ) ) );
+        //操作人名模糊查询
+        String nickname = reqmap.get( "nickname" );
+
+        if (nickname != null && !nickname.equals( "" )) {
+            searchBean.setFieldName( "nickname" );
+            searchBean.setOperator( FieldOperator.LIKE );
+            searchBean.setBasicValue( nickname );
+
+            List<UserInfoTb> searchUsers = commonDao.selectListByConditions( userInfoTb, nameList );
+
+            if (searchUsers != null && !searchUsers.isEmpty()) {
+                searchBean.setOperator( FieldOperator.CONTAINS );
+                searchBean.setFieldName( "operator" );
+                List<Long> idList = new ArrayList<Long>();
+                names = new HashMap<>();
+                for (UserInfoTb u : searchUsers) {
+                    idList.add( u.getId() );
+                    names.put( u.getId(), u.getNickname() );
+                }
+                searchBean.setBasicValue( idList );
+
+                if (supperQuery == null) {
+                    supperQuery = new ArrayList<>();
+                }
+                supperQuery.add( searchBean );
+
+            } else {
+                //没有查询结果
+                result.put( "total", 0 );
+                result.put( "total", "" );
+                result.put( "page", Integer.parseInt( reqmap.get( "page" ) ) );
+                return result;
+            }
+        }
+        logger.info( searchMap );
+
+        count = commonDao.selectCountByConditions( baseQuery, supperQuery );
+        if (count > 0) {
+            list = commonDao.selectListByConditions( baseQuery, supperQuery, config );
+
+            if (names == null) {
+                names = new HashMap<>();
                 //查询名称
-                Map<Long, String> nameMap = new HashMap<>();
                 List<Long> idList = new ArrayList<>();
 
                 for (ShopAccountTb s : list) {
@@ -113,32 +121,28 @@ public class ShopAccountServiceImpl implements ShopAcccountService {
                         idList.add( s.getOperator() );
                 }
 
-                SearchBean searchBean = new SearchBean();
                 searchBean.setFieldName( "id" );
                 searchBean.setOperator( FieldOperator.CONTAINS );
                 searchBean.setBasicValue( idList );
-                List<SearchBean> searchBeans = new ArrayList<>();
-                searchBeans.add( searchBean );
-                UserInfoTb userInfo = new UserInfoTb();
-                userInfo.setComid( Long.valueOf( reqmap.get( "comid" ) ) );
 
-                List<UserInfoTb> users = commonDao.selectListByConditions( userInfo, searchBeans );
+                List<UserInfoTb> users = commonDao.selectListByConditions( userInfoTb, nameList );
                 if (users != null && !users.isEmpty()) {
                     for (UserInfoTb u : users) {
-                        nameMap.put( u.getId(), u.getNickname() );
+                        names.put( u.getId(), u.getNickname() );
                     }
-                }
-
-                if (list != null && !list.isEmpty()) {
-                    for (ShopAccountTb product : list) {
-                        OrmUtil<ShopAccountTb> otm = new OrmUtil<>();
-                        Map<String, Object> map = otm.pojoToMap( product );
-                        map.put( "nickname", nameMap.get( product.getOperator() ) );
-                        resList.add( map );
-                    }
-                    result.put( "rows", JSON.toJSON( resList ) );
                 }
             }
+
+            if (list != null && !list.isEmpty()) {
+                for (ShopAccountTb product : list) {
+                    OrmUtil<ShopAccountTb> otm = new OrmUtil<>();
+                    Map<String, Object> map = otm.pojoToMap( product );
+                    map.put( "nickname", names.get( product.getOperator() ) );
+                    resList.add( map );
+                }
+                result.put( "rows", JSON.toJSON( resList ) );
+            }
+
         }
         result.put( "total", count );
         result.put( "page", Integer.parseInt( reqmap.get( "page" ) ) );

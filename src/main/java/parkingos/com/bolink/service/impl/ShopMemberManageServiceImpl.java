@@ -13,6 +13,7 @@ import parkingos.com.bolink.utils.OrmUtil;
 import parkingos.com.bolink.utils.RequestUtil;
 
 import javax.servlet.http.HttpServletRequest;
+import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -33,7 +34,7 @@ public class ShopMemberManageServiceImpl implements ShopMemberManageService {
         String str = "{\"total\":0,\"page\":1,\"rows\":[]}";
         JSONObject result = JSONObject.parseObject( str );
 
-        Long shop_id = RequestUtil.getLong( req,"shop_id" ,-1L);
+        Long shop_id = RequestUtil.getLong( req, "shop_id", -1L );
 
         UserInfoTb userInfoTb = new UserInfoTb();
         userInfoTb.setShopId( shop_id );
@@ -67,19 +68,19 @@ public class ShopMemberManageServiceImpl implements ShopMemberManageService {
     @Override
     public String editpass(HttpServletRequest request) {
 
-        String uin = RequestUtil.processParams(request, "id");
-        String newPass = RequestUtil.processParams(request, "newpass");
-        String confirmPass = RequestUtil.processParams(request, "confirmpass");
+        String uin = RequestUtil.processParams( request, "id" );
+        String newPass = RequestUtil.processParams( request, "newpass" );
+        String confirmPass = RequestUtil.processParams( request, "confirmpass" );
 
-        UserInfoTb userInfoTb=new UserInfoTb();
+        UserInfoTb userInfoTb = new UserInfoTb();
         userInfoTb.setId( Long.valueOf( uin ) );
         userInfoTb.setPassword( newPass );
 
         int update = 0;
-        if(newPass.length()>5&&newPass.equals(confirmPass)){
-           update =commonDao.updateByPrimaryKey( userInfoTb );
+        if (newPass.length() > 5 && newPass.equals( confirmPass )) {
+            update = commonDao.updateByPrimaryKey( userInfoTb );
         }
-        return "{\"state\":"+update+"}";
+        return "{\"state\":" + update + "}";
     }
 
 
@@ -87,19 +88,25 @@ public class ShopMemberManageServiceImpl implements ShopMemberManageService {
     public String create(HttpServletRequest request) {
 
         String strid = "";
-        String nickname = RequestUtil.processParams( request,"nickname" );
-        String phone = RequestUtil.processParams(request, "phone");
-        String mobile = RequestUtil.processParams(request, "mobile");
-        Long comid = Long.valueOf( RequestUtil.processParams(request, "comid") );
-        Long role = RequestUtil.getLong(request, "auth_flag", 15L);//14:负责人 15：工作人员
-        Long shop_id = RequestUtil.getLong( request,"shop_id",-1L );
-        if(nickname.equals("")) nickname=null;
-        if(phone.equals("")) phone=null;
-        if(mobile.equals("")) mobile=null;
-        Long time = System.currentTimeMillis()/1000;
+        String nickname = RequestUtil.processParams( request, "nickname" );
+        System.out.println( nickname );
+        try {
+            nickname = new String( nickname.getBytes( "ISO-8859-1" ), "UTF-8" );
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        }
+        String phone = RequestUtil.processParams( request, "phone" );
+        String mobile = RequestUtil.processParams( request, "mobile" );
+        Long comid = Long.valueOf( RequestUtil.processParams( request, "comid" ) );
+        Long role = RequestUtil.getLong( request, "auth_flag", 15L );//14:负责人 15：工作人员
+        Long shop_id = RequestUtil.getLong( request, "shop_id", -1L );
+        if (nickname.equals( "" )) nickname = null;
+        if (phone.equals( "" )) phone = null;
+        if (mobile.equals( "" )) mobile = null;
+        Long time = System.currentTimeMillis() / 1000;
 
         //用户id 判断是做添加还是做修改
-        Long userid = RequestUtil.getLong( request,"userId",-1L );
+        Long userid = RequestUtil.getLong( request, "userId", -1L );
 
         UserInfoTb userInfoTb = new UserInfoTb();
         userInfoTb.setComid( comid );
@@ -110,18 +117,18 @@ public class ShopMemberManageServiceImpl implements ShopMemberManageService {
         userInfoTb.setAuthFlag( role );
         userInfoTb.setPassword( "123456" );
         int count = 0;
-        if(userid==-1){
+        if (userid == -1) {
             //添加操作
             Long squen = commonDao.selectSequence( UserInfoTb.class );
-            userInfoTb.setStrid( "test"+squen );
+            userInfoTb.setStrid( "test" + squen );
             userInfoTb.setRegTime( time );
             count = commonDao.insert( userInfoTb );
-        }else{
+        } else {
             //修改操作
             userInfoTb.setId( userid );
             count = commonDao.updateByPrimaryKey( userInfoTb );
         }
-        return "{\"state\":"+count+"}";
+        return "{\"state\":" + count + "}";
     }
 
     @Override
@@ -135,6 +142,6 @@ public class ShopMemberManageServiceImpl implements ShopMemberManageService {
             //删除操作将state状态修改为1
             delete = commonDao.updateByPrimaryKey( userInfoTb );
         }
-        return "{\"state\":"+delete+"}";
+        return "{\"state\":" + delete + "}";
     }
 }

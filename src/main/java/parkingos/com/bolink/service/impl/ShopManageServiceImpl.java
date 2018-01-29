@@ -14,6 +14,7 @@ import parkingos.com.bolink.utils.OrmUtil;
 import parkingos.com.bolink.utils.RequestUtil;
 
 import javax.servlet.http.HttpServletRequest;
+import java.io.UnsupportedEncodingException;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
@@ -58,7 +59,7 @@ public class ShopManageServiceImpl implements ShopManageService {
                 return "{\"state\":0}";
             }
         }
-        Integer ticket_limit = RequestUtil.getInteger( request,"ticket_time",0 );
+        Integer ticket_limit = RequestUtil.getInteger( request, "ticket_time", 0 );
         Integer ticketfree_limit = 0;
 
         shopTb.setTicketLimit( shopTb.getTicketLimit() + ticket_limit );
@@ -75,12 +76,12 @@ public class ShopManageServiceImpl implements ShopManageService {
         shopAccountTb.setAddMoney( new BigDecimal( addmoney ) );
         shopAccountTb.setOperateTime( System.currentTimeMillis() / 1000 );
         shopAccountTb.setOperateType( 1 );
-        shopAccountTb.setParkId( RequestUtil.getLong( request,"parkid",-1L )  );
+        shopAccountTb.setParkId( RequestUtil.getLong( request, "parkid", -1L ) );
         shopAccountTb.setStrid( "IST_test" );
-        shopAccountTb.setOperator( RequestUtil.getLong( request,"operator",-1L ) );
+        shopAccountTb.setOperator( RequestUtil.getLong( request, "operator", -1L ) );
         int insert = commonDao.insert( shopAccountTb );
 
-        return "{\"state\":"+insert+"}";
+        return "{\"state\":" + insert + "}";
     }
 
     @Override
@@ -95,7 +96,7 @@ public class ShopManageServiceImpl implements ShopManageService {
             delete = commonDao.updateByPrimaryKey( shopTb );
         }
 
-        return "{\"state\":"+delete+"}";
+        return "{\"state\":" + delete + "}";
     }
 
     @Override
@@ -106,7 +107,7 @@ public class ShopManageServiceImpl implements ShopManageService {
         JSONObject result = JSONObject.parseObject( str );
 
         ShopTb shopTb = new ShopTb();
-        shopTb.setComid( Long.valueOf( RequestUtil.processParams( req,"comid" ) ) );
+        shopTb.setComid( Long.valueOf( RequestUtil.processParams( req, "comid" ) ) );
         //state状态 0为正常使用 1为删除状态
         shopTb.setState( 0 );
 
@@ -159,7 +160,7 @@ public class ShopManageServiceImpl implements ShopManageService {
         shopTb.setValiditeTime( validite_time );
 
         shopTb.setComid( RequestUtil.getLong( request, "comid", -1L ) );
-        int update=0;
+        int update = 0;
         if (id < 0) {
             //添加操作
             Long create_time = System.currentTimeMillis() / 1000;
@@ -171,6 +172,6 @@ public class ShopManageServiceImpl implements ShopManageService {
             update = commonDao.updateByPrimaryKey( shopTb );
         }
 
-        return "{\"state\":"+update+"}";
+        return "{\"state\":" + update + "}";
     }
 }
