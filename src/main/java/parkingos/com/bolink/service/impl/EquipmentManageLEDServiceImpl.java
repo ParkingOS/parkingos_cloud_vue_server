@@ -24,8 +24,10 @@ public class EquipmentManageLEDServiceImpl implements EquipmentManageLEDService 
 
     @Override
     public JSONObject selectResultByConditions(Map<String, String> reqmap) {
+        Long comid = Long.valueOf(Integer.valueOf(reqmap.get("comid")));
         ComLedTb comLedTb = new ComLedTb();
         comLedTb.setState(-1);
+        comLedTb.setComid(comid);
         JSONObject result = supperSearchService.supperSearch(comLedTb,reqmap);
 
         return result;

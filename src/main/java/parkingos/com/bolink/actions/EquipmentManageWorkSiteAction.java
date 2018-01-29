@@ -56,7 +56,8 @@ public class EquipmentManageWorkSiteAction {
 		String description = RequestUtil.processParams(request,"description");
 		Integer netType = RequestUtil.getInteger(request,"net_type",0);
 		Long id = RequestUtil.getLong(request,"id",-1L);
-		Long comid = RequestUtil.getLong(request,"oid",-1L);
+		Map<String, String> reqParameterMap = RequestUtil.readBodyFormRequset(request);
+		Long comid = Long.valueOf(Integer.valueOf(reqParameterMap.get("comid")));
 
 		ComWorksiteTb comWorksiteTb = new ComWorksiteTb();
 		comWorksiteTb.setWorksiteName(worksiteName);
@@ -64,6 +65,7 @@ public class EquipmentManageWorkSiteAction {
 		comWorksiteTb.setNetType(netType);
 		comWorksiteTb.setId(id);
 		comWorksiteTb.setComid(comid);
+		comWorksiteTb.setState(0);
 
 		String result = equipmentManageWorkSiteService.insertResultByConditions(comWorksiteTb).toString();
 

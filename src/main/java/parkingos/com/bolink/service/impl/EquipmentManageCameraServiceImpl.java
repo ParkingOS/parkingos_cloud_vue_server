@@ -24,8 +24,10 @@ public class EquipmentManageCameraServiceImpl implements EquipmentManageCameraSe
 
     @Override
     public JSONObject selectResultByConditions(Map<String, String> reqmap) {
+        Long comid = Long.valueOf(Integer.valueOf(reqmap.get("comid")));
         ComCameraTb comCameraTb = new ComCameraTb();
-        comCameraTb.setState(-1);
+        comCameraTb.setState(1);
+        comCameraTb.setComid(comid);
         JSONObject result = supperSearchService.supperSearch(comCameraTb,reqmap);
         return result;
     }

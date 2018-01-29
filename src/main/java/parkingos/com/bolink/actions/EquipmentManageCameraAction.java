@@ -62,6 +62,8 @@ public class EquipmentManageCameraAction {
 		String cusername = RequestUtil.processParams(request,"cusername");
 		String manufacturer = RequestUtil.processParams(request,"manufacturer");
 		Long passid = RequestUtil.getLong(request,"passid",-1l);
+		Map<String,String> reqParamterMap = RequestUtil.readBodyFormRequset(request);
+		Long comid = Long.valueOf(Integer.valueOf(reqParamterMap.get("comid")));
 
 		ComCameraTb comCameraTb = new ComCameraTb();
 		comCameraTb.setId(id);
@@ -71,6 +73,8 @@ public class EquipmentManageCameraAction {
 		comCameraTb.setCusername(cusername);
 		comCameraTb.setManufacturer(manufacturer);
 		comCameraTb.setPassid(passid);
+		comCameraTb.setState(1);
+		comCameraTb.setComid(comid);
 
 
 		String result = equipmentManageCameraService.insertResultByConditions(comCameraTb).toString();
@@ -127,7 +131,7 @@ public class EquipmentManageCameraAction {
 
 		ComCameraTb comCameraTb = new ComCameraTb();
 		comCameraTb.setId(id);
-		comCameraTb.setState(1);
+		comCameraTb.setState(0);
 
 		String result = equipmentManageCameraService.removeResultByConditions(comCameraTb).toString();
 

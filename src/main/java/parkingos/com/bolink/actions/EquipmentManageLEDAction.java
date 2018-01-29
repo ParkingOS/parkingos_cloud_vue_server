@@ -69,9 +69,11 @@ public class EquipmentManageLEDAction {
 		Integer height = RequestUtil.getInteger(request,"height",32);
 		Integer type = RequestUtil.getInteger(request,"type",0);
 		Integer rsport = RequestUtil.getInteger(request,"rsport",1);
-		Integer state = RequestUtil.getInteger(request,"state",-1);
-//		String worksiteName = RequestUtil.processParams(request,"worksite_name");
-//		String passid = RequestUtil.processParams(request,"passid");
+		Long passid = RequestUtil.getLong(request,"passid",null);
+
+		Map<String, String> reqParameterMap = RequestUtil.readBodyFormRequset(request);
+		Long comid = Long.valueOf(Integer.valueOf(reqParameterMap.get("comid")));
+
 
 		ComLedTb comLedTb = new ComLedTb();
 		comLedTb.setLedip(ledip);
@@ -89,7 +91,9 @@ public class EquipmentManageLEDAction {
 		comLedTb.setHeight(height);
 		comLedTb.setType(type);
 		comLedTb.setRsport(rsport);
-		comLedTb.setState(state);
+		comLedTb.setState(-1);
+		comLedTb.setComid(comid);
+		comLedTb.setPassid(passid);
 
 		String result = equipmentManageLEDService.insertResultByConditions(comLedTb).toString();
 		StringUtils.ajaxOutput(response,result);
@@ -120,9 +124,7 @@ public class EquipmentManageLEDAction {
 		Integer height = RequestUtil.getInteger(request,"height",32);
 		Integer type = RequestUtil.getInteger(request,"type",0);
 		Integer rsport = RequestUtil.getInteger(request,"rsport",1);
-		Integer state = RequestUtil.getInteger(request,"state",-1);
-//		String worksiteName = RequestUtil.processParams(request,"worksite_name");
-//		String passid = RequestUtil.processParams(request,"passid");
+		Long passid = RequestUtil.getLong(request,"passid",null);
 
 		ComLedTb comLedTb = new ComLedTb();
 		comLedTb.setId(id);
@@ -141,7 +143,7 @@ public class EquipmentManageLEDAction {
 		comLedTb.setHeight(height);
 		comLedTb.setType(type);
 		comLedTb.setRsport(rsport);
-		comLedTb.setState(state);
+		comLedTb.setPassid(passid);
 
 		String result = equipmentManageLEDService.updateResultByConditions(comLedTb).toString();
 		StringUtils.ajaxOutput(response,result);

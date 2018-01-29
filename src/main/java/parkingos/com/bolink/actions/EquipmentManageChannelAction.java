@@ -62,6 +62,9 @@ public class EquipmentManageChannelAction {
 		Long worksiteId = RequestUtil.getLong(request,"worksite_id",-1L);
 		String description = RequestUtil.processParams(request,"description");
 
+		Map<String, String> reqParameterMap = RequestUtil.readBodyFormRequset(request);
+		Long comid = Long.valueOf(Integer.valueOf(reqParameterMap.get("comid")));
+
 		ComPassTb comPassTb = new ComPassTb();
 		comPassTb.setId(id);
 		comPassTb.setPassname(passname);
@@ -70,6 +73,8 @@ public class EquipmentManageChannelAction {
 		comPassTb.setMonth2Set(month2Set);
 		comPassTb.setWorksiteId(worksiteId);
 		comPassTb.setDescription(description);
+		comPassTb.setComid(comid);
+		comPassTb.setState(0);
 
 		String result = equipmentManageChannelService.insertResultByConditions(comPassTb).toString();
 

@@ -25,8 +25,10 @@ public class EquipmentManageChannelServiceImpl implements EquipmentManageChannel
 
     @Override
     public JSONObject selectResultByConditions(Map<String, String> reqmap) {
+        Long comid = Long.valueOf(Integer.valueOf(reqmap.get("comid")));
         ComPassTb comPassTb = new ComPassTb();
         comPassTb.setState(0);
+        comPassTb.setComid(comid);
         JSONObject result = supperSearchService.supperSearch(comPassTb,reqmap);
 
         return result;
