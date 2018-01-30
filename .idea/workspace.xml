@@ -5,6 +5,7 @@
       <artifact name="parkingoscloud:war exploded" />
     </artifacts-to-build>
   </component>
+  
   <component name="ChangeListManager">
     <list default="true" id="1e1907b4-ad75-4369-9213-b3ef8e3b24b9" name="Default" comment="gitignore">
       <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/.gitignore" />
