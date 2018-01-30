@@ -48,8 +48,9 @@ public class SuperSearchServiceImp<T> implements SupperSearchService<T> {
         //需要查询的字段
         String fields = params.get("fieldsstr");
         logger.info(fields);
-        //没有查询字段，返回
+        //没有查询字段，返回   带着基本条件
         if(fields==null||"".equals(fields.trim())){
+            result.put("base",t);
             return result;
         }
         //需要查询的字段数组
