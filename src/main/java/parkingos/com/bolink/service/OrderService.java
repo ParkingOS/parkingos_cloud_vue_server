@@ -12,9 +12,9 @@ public interface OrderService {
 
     public JSONObject selectResultByConditions(Map<String,String> map);
 
-    JSONObject getPicResult(Long orderid, Long comid);
+    JSONObject getPicResult(String orderid, Long comid);
 
-    byte[] getCarPics(Long orderid, Long comid, String type, Integer currentnum);
+    byte[] getCarPics(String orderid, Long comid, String type, Integer currentnum);
 
     List<List<Object>> exportExcel(Map<String, String> reqParameterMap);
 }

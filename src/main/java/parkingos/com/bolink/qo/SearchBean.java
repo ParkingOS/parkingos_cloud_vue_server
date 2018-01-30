@@ -81,6 +81,7 @@ public class SearchBean {
          * bt between and
          * like like
          * in in
+         * not not in
          */
 	private String getFieldOperator(FieldOperator operate){
 		switch (operate) {
@@ -98,6 +99,8 @@ public class SearchBean {
 			return "like";
 		case BETWEEN:
 			return "bt";
+		case NOT:
+			return "not";
 		default:
 			return "equal";
 		}

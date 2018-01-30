@@ -105,4 +105,12 @@ public class LiftRodAction {
 //        }
         return null;
     }
+
+    @RequestMapping(value = "/getLiftReason")
+    public String getLiftReason(HttpServletRequest request, HttpServletResponse response) throws Exception {
+
+        String result = (String)liftRodService.getLiftReason(0);
+        StringUtils.ajaxOutput(response, result);
+        return null;
+    }
 }

@@ -41,10 +41,12 @@ public class OrderServiceImpl implements OrderService {
         logger.error("======>>...订单comid:"+Long.parseLong(reqmap.get("comid")));
 
         //查询在场订单数量  车辆数量  空闲车位
+        Map<String,String> newReqmap = new HashMap<>();
         OrderTb newOrder = new OrderTb();
         newOrder.setComid(Long.parseLong(reqmap.get("comid")));
         newOrder.setState(0);
-        JSONObject newResult = supperSearchService.supperSearch(newOrder, reqmap);
+        //不用高级查询条件 只需要基本条件  新建map
+        JSONObject newResult = supperSearchService.supperSearch(newOrder, newReqmap);
         Integer total = (Integer) JSON.parse(newResult.get("total")+"");
         logger.error("=======>>>在场车辆"+total);
 
@@ -86,6 +88,7 @@ public class OrderServiceImpl implements OrderService {
         }
         String createTime = reqmap.get("create_time");
         logger.error("===>>>createTime"+createTime);
+        //组装 一个月 参数
         if(createTime==null||"undefined".equals(createTime)||"".equals(createTime)){
             reqmap.put("create_time","1");
             reqmap.put("create_time_start",(System.currentTimeMillis()-30*86400*1000L)+"");
@@ -93,15 +96,52 @@ public class OrderServiceImpl implements OrderService {
         }
         JSONObject result = supperSearchService.supperSearch(orderTb, reqmap);
 
+        //时长重新处理  收款人和收费员重新处理
+        List<OrderTb> orderList = JSON.parseArray(result.get("rows").toString(), OrderTb.class);
+        List<Map<String, Object>> resList =new ArrayList<>();
+        for(OrderTb order : orderList){
+            OrmUtil<OrderTb> om = new OrmUtil<>();
+            Map map = om.pojoToMap(order);
+            Long start = (Long) map.get("create_time");
+            Long end = (Long) map.get("end_time");
+            if (start != null && end != null) {
+                map.put("duration",StringUtils.getTimeString(start, end));
+            } else {
+                map.put("duration","");
+            }
+//            try{
+//                Long uid = (Long)map.get("uid");
+//                if(uid==-1){
+//                    map.put("uid","无");
+//                }
+//            }
+//            catch (Exception e){
+//                map.put("uid",map.get("uid"));
+//            }
+//            try{
+//                Long uid = (Long)map.get("out_uid");
+//                if(uid==-1){
+//                    map.put("out_uid","无");
+//                }
+//            }
+//            catch (Exception e){
+//                map.put("out_uid",map.get("out_uid"));
+//            }
+
+            resList.add(map);
+        }
+        result.remove("rows");
+        result.put("rows",JSON.toJSON(resList));
         //车位数据
         result.put("parktotal",total);
         result.put("blank",blank);
 
+        logger.error("============>>>>>返回数据"+result);
         return result;
     }
 
     @Override
-    public JSONObject getPicResult(Long orderid, Long comid) {
+    public JSONObject getPicResult(String orderid, Long comid) {
 
         String str = "{\"in\":[],\"out\":[]}";
         JSONObject result = JSONObject.parseObject(str);
@@ -118,8 +158,8 @@ public class OrderServiceImpl implements OrderService {
             collectionName = orderTb.getCarpicTableName();
         }
         logger.error("====>>获得订单图片..collectionName" + collectionName);
-//        DBCollection collection = db.getCollection("collectionName");
-        DBCollection collection = db.getCollection(collectionName);
+        DBCollection collection = db.getCollection("collectionName");
+//        DBCollection collection = db.getCollection(collectionName);
         logger.error("======>>>>.获取订单图片...collection" + collection);
 
         List<String> inlist = new ArrayList<>();
@@ -154,7 +194,7 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
-    public byte[] getCarPics(Long orderid, Long comid, String type, Integer currentnum) {
+    public byte[] getCarPics(String orderid, Long comid, String type, Integer currentnum) {
         logger.error("getcarPic from mongodb file:orderid=" + orderid + "type=" + type + ",comid:" + comid + ",currentnum=" + currentnum);
         if (orderid != null && type != null) {
             DB db = MongoClientFactory.getInstance().getMongoDBBuilder("zld");//
@@ -209,6 +249,12 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     public List<List<Object>> exportExcel(Map<String, String> reqParameterMap) {
+
+        //删除分页条件  查询该条件下所有  不然为一页数据
+        reqParameterMap.remove("orderfield");
+        reqParameterMap.remove("orderby");
+
+        //获得要导出的结果
         JSONObject result = selectResultByConditions(reqParameterMap);
 
         Long comid = Long.parseLong(reqParameterMap.get("comid"));
@@ -219,7 +265,7 @@ public class OrderServiceImpl implements OrderService {
         List<List<Object>> bodyList = new ArrayList<List<Object>>();
 //        List<List<String>> bodyList = new ArrayList<List<String>>();
         if (orderlist != null && orderlist.size() > 0) {
-            String[] f = new String[]{"id", "c_type", "car_number", "create_time", "end_time", "duration", "pay_type", "amount_receivable", "total", "electronic_prepay", "cash_prepay", "electronic_pay", "cash_pay", "reduce_amount", "freereasons", "uid", "out_uid", "state", "in_passid", "out_passid"};
+            String[] f = new String[]{"id", "c_type", "car_number","car_type", "create_time", "end_time", "duration", "pay_type", "freereasons","amount_receivable", "total", "electronic_prepay", "cash_prepay", "electronic_pay", "cash_pay", "reduce_amount", "uid", "out_uid", "state", "in_passid", "out_passid","order_id_local"};
             Map<Long, String> uinNameMap = new HashMap<Long, String>();
             Map<Integer, String> passNameMap = new HashMap<Integer, String>();
             for (OrderTb orderTb : orderlist) {
@@ -309,14 +355,14 @@ public class OrderServiceImpl implements OrderService {
                     } else if ("state".equals(field)) {
                         switch (Integer.valueOf(v + "")) {//0:NFC,1:IBeacon,2:照牌   3通道照牌 4直付 5月卡用户
                             case 0:
-                                values.add("未支付 ");
+                                values.add("未结算 ");
                                 break;
                             case 1:
-                                values.add("已支付 ");
+                                values.add("已结算 ");
                                 break;
-                            case 2:
-                                values.add("逃单 ");
-                                break;
+//                            case 2:
+//                                values.add("逃单 ");
+//                                break;
                             default:
                                 values.add("");
                         }

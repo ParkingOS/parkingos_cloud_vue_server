@@ -139,7 +139,12 @@ public class VipServiceImpl implements VipService {
 
         Double act_total = total;
         if (!acttotal.equals("")) {
-            act_total = StringUtils.formatDouble(Double.valueOf(acttotal));
+            try{
+                act_total = StringUtils.formatDouble(Double.valueOf(acttotal));
+            }catch (Exception e){
+                result.put("msg","请正确填写实收金额");
+                return result;
+            }
         }
         logger.error("=======>>>>>act_total"+act_total);
 
@@ -180,7 +185,7 @@ public class VipServiceImpl implements VipService {
                                 logger.error("====>>>>>>pidMonth"+pidMonth);
                                 logger.error("====>>>>>>carNumUnique"+carNumUnique);
                                 if (pidMonth != null && pidMonth != -1) {
-                                    String isMonthUsersql = "select p.b_time,p.e_time,p.type from product_package_tb p,carower_product c where c.pid=p.id and p.comid=" + comid + " and c.car_number=" + carNumUnique + " order by c.id desc ";
+                                    String isMonthUsersql = "select p.b_time,p.e_time,p.type from product_package_tb p,carower_product c where c.pid=p.id and p.comid=" + comid + " and c.car_number='" + carNumUnique + "' order by c.id desc ";
                                     List<Map<String, Object>> list = commonDao.getObjectBySql(isMonthUsersql);
                                     if (list != null && list.size() > 0) {
                                         isMonthUser = true;
@@ -246,7 +251,8 @@ public class VipServiceImpl implements VipService {
         //******添加月卡消费记录*******
         Integer renewId = (commonDao.selectSequence(CardRenewTb.class)).intValue();
         String tradeNo  = TimeTools.getTimeYYYYMMDDHHMMSS()+""+comid;
-        String operater = RequestUtil.getString(req,"nickname");
+        //对于字符串类型 最好都要进行编码解码处理  防止中文乱码
+        String operater = StringUtils.decodeUTF8(RequestUtil.getString(req,"nickname"));
         //组装插入月卡消费记录数据
         CardRenewTb cardRenewTb = new CardRenewTb();
         cardRenewTb.setId(renewId);
@@ -307,7 +313,7 @@ public class VipServiceImpl implements VipService {
                         if (StringUtils.checkPlate(strNum)) {
                             CarInfoTb carInfoTb = new CarInfoTb();
                             carInfoTb.setCarNumber(strNum);
-                            carInfoTb = (CarInfoTb) commonDao.selectListByConditions(carInfoTb);
+                            carInfoTb = (CarInfoTb) commonDao.selectObjectByConditions(carInfoTb);
                             if (carInfoTb != null && carInfoTb.getId() != null) {
                                 uin = carInfoTb.getUin();
                             }
@@ -316,7 +322,7 @@ public class VipServiceImpl implements VipService {
                             }
                             //修改或添加车牌时查询此车牌是否已经对应有月卡会员记录
                             String subCar = strNum.startsWith("无") ? strNum : "%" + strNum.substring(1) + "%";
-                            String sql = "select pid, car_number from  carower_product where com_id=" + comid + " and is_delete=0 and car_number like " + subCar;
+                            String sql = "select pid, car_number from  carower_product where com_id=" + comid + " and is_delete=0 and car_number like '" + subCar +"'";
                             List<Map> carinfoList = commonDao.getObjectBySql(sql);
                             Long pid = -1L;
                             boolean isMonthUser = false;
@@ -330,7 +336,7 @@ public class VipServiceImpl implements VipService {
                                     carNumUnique = String.valueOf(uinmap.get("car_number"));
                                     if (pid != null && pid != -1) {
                                         String isMonthUsersql = "select p.b_time,p.e_time,p.type from product_package_tb p," +
-                                                "carower_product c where c.pid=p.id and p.comid=" + comid + " and c.car_number=" + carNumUnique + " order by c.id desc ";
+                                                "carower_product c where c.pid=p.id and p.comid=" + comid + " and c.car_number='" + carNumUnique + "' order by c.id desc ";
                                         List<Map<String, Object>> list = commonDao.getObjectBySql(isMonthUsersql);
                                         if (list != null && list.size() > 0) {
                                             isMonthUser = true;
@@ -363,10 +369,11 @@ public class VipServiceImpl implements VipService {
                     ret = commonDao.updateByPrimaryKey(carowerProduct1);
                 }
                 if (ret > 0) {
-
+                    result.put("state",1);
+                    result.put("msg","修改车牌成功");
                     int r = insertSysn(carowerProduct1, 1, comid);
                     logger.error("parkadmin or admin:" + carowerProduct1 + " add comid:" + comid + " vipuser ,add sync ret:" + r);
-                    String allSql = "select * from carower_product where car_number=" + carNumberBefore + " and com_id=" + comid + " and is_delete=0";
+                    String allSql = "select * from carower_product where car_number= '" + carNumberBefore + "' and com_id=" + comid + " and is_delete=0";
                     List<Map> list = commonDao.getObjectBySql(allSql);
                     for (Iterator iterator = list.iterator(); iterator.hasNext(); ) {
                         Map uinmap = (Map) iterator.next();
@@ -406,7 +413,7 @@ public class VipServiceImpl implements VipService {
         Long pid = RequestUtil.getLong(req, "p_name", -1L);
         String name = StringUtils.decodeUTF8(RequestUtil.processParams(req, "name").trim());
         //起始时间
-        String b_time = RequestUtil.processParams(req, "b_time");
+//        String b_time = RequestUtil.processParams(req, "b_time");
         //购买月数
         Integer months = RequestUtil.getInteger(req, "months", 1);
 
@@ -418,7 +425,8 @@ public class VipServiceImpl implements VipService {
         String acttotal = RequestUtil.processParams(req, "act_total");
 
         Long ntime = System.currentTimeMillis()/1000;
-        Long btime = TimeTools.getLongMilliSecondFrom_HHMMDD(b_time)/1000+86400;
+//        Long btime = TimeTools.getLongMilliSecondFrom_HHMMDD(b_time)/1000+86400;
+        Long btime = RequestUtil.getLong(req,"b_time",ntime);
         Calendar calendar = Calendar.getInstance();
         calendar.setTimeInMillis(btime*1000);
         calendar.set(Calendar.MONTH, calendar.get(Calendar.MONTH)+months);
@@ -442,7 +450,13 @@ public class VipServiceImpl implements VipService {
 
         Double act_total = total;
         if (!acttotal.equals("")) {
-            act_total = StringUtils.formatDouble(Double.valueOf(acttotal));
+            try{
+                act_total = StringUtils.formatDouble(Double.valueOf(acttotal));
+            }catch (Exception e){
+                result.put("msg","请正确填写金额");
+                return result;
+            }
+
         }
 
         CarowerProduct carowerProduct = new CarowerProduct();
@@ -455,7 +469,7 @@ public class VipServiceImpl implements VipService {
             //******添加月卡消费记录*******
             Integer renewId = (commonDao.selectSequence(CardRenewTb.class)).intValue();
             String tradeNo  = TimeTools.getTimeYYYYMMDDHHMMSS()+""+comid;
-            String operater = RequestUtil.getString(req,"nickname");
+            String operater = StringUtils.decodeUTF8(RequestUtil.getString(req,"nickname"));
             //组装插入月卡消费记录数据
             CardRenewTb cardRenewTb = new CardRenewTb();
             cardRenewTb.setId(renewId);
@@ -534,6 +548,11 @@ public class VipServiceImpl implements VipService {
 
     @Override
     public List<List<String>> exportExcel(Map<String, String> reqParameterMap) {
+
+        //删除分页条件  查询该条件下所有  不然为一页数据
+        reqParameterMap.remove("orderfield");
+        reqParameterMap.remove("orderby");
+
         JSONObject result = selectResultByConditions(reqParameterMap);
         List<CarowerProduct> orderlist = JSON.parseArray(result.get("rows").toString(),CarowerProduct.class);
 

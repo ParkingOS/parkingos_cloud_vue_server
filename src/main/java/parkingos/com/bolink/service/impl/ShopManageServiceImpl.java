@@ -2,6 +2,7 @@ package parkingos.com.bolink.service.impl;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
+import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import parkingos.com.bolink.dao.spring.CommonDao;
@@ -11,10 +12,9 @@ import parkingos.com.bolink.qo.PageOrderConfig;
 import parkingos.com.bolink.service.ShopManageService;
 import parkingos.com.bolink.utils.OrmUtil;
 import parkingos.com.bolink.utils.RequestUtil;
-import parkingos.com.bolink.utils.StringUtils;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import java.io.UnsupportedEncodingException;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
@@ -22,16 +22,18 @@ import java.util.Map;
 
 @Service
 public class ShopManageServiceImpl implements ShopManageService {
+
+    Logger logger = Logger.getLogger( ShopManageServiceImpl.class );
+
     @Autowired
     private CommonDao commonDao;
 
     @Override
-    public String addMoney(HttpServletRequest request, HttpServletResponse resp) {
+    public String addMoney(HttpServletRequest request) {
         Long shoppingmarket_id = RequestUtil.getLong( request, "shop_id", -1L );
 
         if (shoppingmarket_id == -1) {
-            StringUtils.ajaxOutput( resp, "-1" );
-            return null;
+            return "{\"state\":0}";
         }
         ShopTb queryShopTb = new ShopTb();
         queryShopTb.setId( shoppingmarket_id );
@@ -43,6 +45,9 @@ public class ShopManageServiceImpl implements ShopManageService {
         double addmoney = RequestUtil.getDouble( request, "addmoney", 0.00 );
         //减免类型
         Integer ticket_type = Integer.parseInt( shopTb.getTicketType() + "" );
+        System.out.println( ticket_type );
+        System.out.println( ticket_time );
+        System.out.println( ticket_money );
         if (ticket_type == 1) {
             if (0 >= ticket_time) {
                 //StringUtils.ajaxOutput( resp, "减免小时必须输入正整数" );
@@ -54,7 +59,7 @@ public class ShopManageServiceImpl implements ShopManageService {
                 return "{\"state\":0}";
             }
         }
-        Integer ticket_limit = 0;
+        Integer ticket_limit = RequestUtil.getInteger( request, "ticket_time", 0 );
         Integer ticketfree_limit = 0;
 
         shopTb.setTicketLimit( shopTb.getTicketLimit() + ticket_limit );
@@ -71,19 +76,16 @@ public class ShopManageServiceImpl implements ShopManageService {
         shopAccountTb.setAddMoney( new BigDecimal( addmoney ) );
         shopAccountTb.setOperateTime( System.currentTimeMillis() / 1000 );
         shopAccountTb.setOperateType( 1 );
-        shopAccountTb.setParkId( RequestUtil.getLong( request,"parkid",-1L )  );
+        shopAccountTb.setParkId( RequestUtil.getLong( request, "parkid", -1L ) );
         shopAccountTb.setStrid( "IST_test" );
-        shopAccountTb.setOperator( RequestUtil.getLong( request,"operator",-1L ) );
+        shopAccountTb.setOperator( RequestUtil.getLong( request, "operator", -1L ) );
         int insert = commonDao.insert( shopAccountTb );
 
-        if(insert>0){
-            return "{\"state\":1}";
-        }
-        return "{\"state\":0}";
+        return "{\"state\":" + insert + "}";
     }
 
     @Override
-    public String delete(HttpServletRequest request, HttpServletResponse resp) {
+    public String delete(HttpServletRequest request) {
         Long id = RequestUtil.getLong( request, "id", -1L );
         int delete = 0;
         if (id > 0) {
@@ -93,21 +95,19 @@ public class ShopManageServiceImpl implements ShopManageService {
             //删除操作将state状态修改为1
             delete = commonDao.updateByPrimaryKey( shopTb );
         }
-        if(delete>0){
-            return "{\"state\":1}";
-        }
-        return "{\"state\":0}";
+
+        return "{\"state\":" + delete + "}";
     }
 
     @Override
-    public String quickquery(HttpServletRequest req, HttpServletResponse resp) {
+    public String quickquery(HttpServletRequest req) {
         Integer pageNum = RequestUtil.getInteger( req, "page", 1 );
         Integer pageSize = RequestUtil.getInteger( req, "rp", 20 );
         String str = "{\"total\":12,\"page\":1,\"rows\":[]}";
         JSONObject result = JSONObject.parseObject( str );
 
         ShopTb shopTb = new ShopTb();
-        shopTb.setComid( Long.valueOf( RequestUtil.processParams( req,"comid" ) ) );
+        shopTb.setComid( Long.valueOf( RequestUtil.processParams( req, "comid" ) ) );
         //state状态 0为正常使用 1为删除状态
         shopTb.setState( 0 );
 
@@ -134,7 +134,7 @@ public class ShopManageServiceImpl implements ShopManageService {
     }
 
     @Override
-    public String create(HttpServletRequest request, HttpServletResponse resp) {
+    public String create(HttpServletRequest request) {
         //接收参数
         Long id = RequestUtil.getLong( request, "id", -1L );
         String name = RequestUtil.processParams( request, "name" );
@@ -146,7 +146,6 @@ public class ShopManageServiceImpl implements ShopManageService {
         double discount_percent = RequestUtil.getDouble( request, "discount_percent", 100.00 );//商户折扣/%
         double discount_money = RequestUtil.getDouble( request, "discount_money", 1.00 );//商户折扣---每小时/元
         Integer validite_time = RequestUtil.getInteger( request, "validite_time", 0 );//有效期/小时
-
 
         //封装
         ShopTb shopTb = new ShopTb();
@@ -161,7 +160,7 @@ public class ShopManageServiceImpl implements ShopManageService {
         shopTb.setValiditeTime( validite_time );
 
         shopTb.setComid( RequestUtil.getLong( request, "comid", -1L ) );
-        int update=0;
+        int update = 0;
         if (id < 0) {
             //添加操作
             Long create_time = System.currentTimeMillis() / 1000;
@@ -172,9 +171,7 @@ public class ShopManageServiceImpl implements ShopManageService {
             shopTb.setId( id );
             update = commonDao.updateByPrimaryKey( shopTb );
         }
-        if(update>0){
-            return "{\"state\":1}";
-        }
-        return "{\"state\":0}";
+
+        return "{\"state\":" + update + "}";
     }
 }

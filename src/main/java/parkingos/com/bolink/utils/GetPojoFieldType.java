@@ -9,7 +9,7 @@ import java.util.Map;
 
 public class GetPojoFieldType<T> {
 
-    public  Map<String, Integer> getFieldTypes(T t) {
+    public  Map<String, Integer> getFieldTypes(T t,Map<String,String> params) {
         Map<String,Integer> resutlMap = new HashMap<>();
         if (t == null) {
             return null;
@@ -21,7 +21,7 @@ public class GetPojoFieldType<T> {
                 Field field = arr$[i$];
                 Type type = field.getGenericType();
                 String fieldName = OrmUtil.camel2Underline(field.getName());
-                if(isSelectField(tableName,fieldName)){
+                if(isSelectField(tableName,fieldName,params)){
                     resutlMap.put(fieldName,FieldTypes.SELECT);
                 }else if(fieldName.contains("time")){
                     resutlMap.put(fieldName,FieldTypes.DATE);
@@ -58,11 +58,19 @@ public class GetPojoFieldType<T> {
      * @param field 字段名
      * @return 是否是选择字段
      */
-    private boolean isSelectField(String tableName,String field){
+    private boolean isSelectField(String tableName,String field,Map<String,String> params){
         /*if(tableName.contains("CardRenewTb")){
             if(field.equals("pay_type"))
                 return true;
         }*/
+        //是否是下拉框选项
+        if(!params.containsKey(field+"_end")){
+            if(params.get(field)!=null&&params.get(field+"_start")!=null){
+                if(params.get(field).equals(params.get(field+"_start"))){
+                    return true;
+                }
+            }
+        }
         return false;
     }
 

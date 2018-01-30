@@ -27,9 +27,9 @@ public class ParkuserWorkRecordTb {
 
     private String outLog;
 
-    private Short logonState;
+    private Integer logonState;
 
-    private Short logoffState;
+    private Integer logoffState;
 
     private Long parkId;
 
@@ -129,19 +129,19 @@ public class ParkuserWorkRecordTb {
         this.outLog = outLog == null ? null : outLog.trim();
     }
 
-    public Short getLogonState() {
+    public Integer getLogonState() {
         return logonState;
     }
 
-    public void setLogonState(Short logonState) {
+    public void setLogonState(Integer logonState) {
         this.logonState = logonState;
     }
 
-    public Short getLogoffState() {
+    public Integer getLogoffState() {
         return logoffState;
     }
 
-    public void setLogoffState(Short logoffState) {
+    public void setLogoffState(Integer logoffState) {
         this.logoffState = logoffState;
     }
 

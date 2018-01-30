@@ -11,4 +11,6 @@ public interface LiftRodService {
     byte[] getLiftRodPicture(String comid, String liftrodId);
 
     List<List<Object>> exportExcel(Map<String, String> reqParameterMap);
+
+    Object getLiftReason(int type);
 }
