@@ -116,6 +116,10 @@ public class SuperSearchServiceImp<T> implements SupperSearchService<T> {
                 config = (PageOrderConfig)searchMap.get("config");
             count = commonDao.selectCountByConditions(t1,supperQuery);
             if(count>0){
+                if (config == null) {
+                    config = new PageOrderConfig();
+                    config.setPageInfo(1, Integer.MAX_VALUE);
+                }
                 list  = commonDao.selectListByConditions(t1,supperQuery,config);
                 if (list != null && !list.isEmpty()) {
                     for (T t2 : list) {
