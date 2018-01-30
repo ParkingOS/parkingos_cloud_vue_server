@@ -17,7 +17,7 @@ import java.util.Map;
 @RequestMapping("/shopaccount")
 public class ShopAccountAction {
 
-    Logger logger = Logger.getLogger( ShopManageAction.class );
+    Logger logger = Logger.getLogger( ShopAccountAction.class );
     @Autowired
     private ShopAcccountService shopAcccountService;
 
@@ -25,9 +25,9 @@ public class ShopAccountAction {
     public String addMoney(HttpServletRequest request, HttpServletResponse resp) {
 
         Map<String, String> reqParameterMap = RequestUtil.readBodyFormRequset( request );
-
+        logger.info( reqParameterMap );
         JSONObject result = shopAcccountService.selectResultByConditions( reqParameterMap );
-
+        logger.info( result );
         StringUtils.ajaxOutput( resp, result.toString() );
 
         return null;
