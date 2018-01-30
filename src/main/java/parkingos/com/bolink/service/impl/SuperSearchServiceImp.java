@@ -128,7 +128,10 @@ public class SuperSearchServiceImp<T> implements SupperSearchService<T> {
             }
         }
         result.put("total",count);
-        result.put("page",Integer.parseInt(params.get("page")));
+        //result.put("page",Integer.parseInt(params.get("page")));
+         if(params.get("page")!=null){
+            result.put("page",Integer.parseInt(params.get("page")));
+        }
         return result;
     }
 
