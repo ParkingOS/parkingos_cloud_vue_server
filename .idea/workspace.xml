@@ -302,6 +302,7 @@
     <sorting>DEFINITION_ORDER</sorting>
   </component>
   <component name="LogFilters">
+    
     <option name="FILTER_ERRORS" value="false" />
     <option name="FILTER_WARNINGS" value="false" />
     <option name="FILTER_INFO" value="true" />
