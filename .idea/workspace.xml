@@ -687,7 +687,7 @@
       <workItem from="1517013436702" duration="20230000" />
       <workItem from="1517185968467" duration="19982000" />
       <workItem from="1517211853365" duration="8302000" />
-      <workItem from="1517272432934" duration="15228000" />
+      <workItem from="1517272432934" duration="15321000" />
     </task>
     <task id="LOCAL-00001" summary="设备管理模块，因为对应的数据库表没找到，所以只写了页面框架，请求链没有调通">
       <created>1515664608265</created>
@@ -815,11 +815,18 @@
       <option name="project" value="LOCAL" />
       <updated>1517294531536</updated>
     </task>
-    <option name="localTasksCounter" value="19" />
+    <task id="LOCAL-00019" summary="gitignore">
+      <created>1517294674734</created>
+      <option name="number" value="00019" />
+      <option name="presentableId" value="LOCAL-00019" />
+      <option name="project" value="LOCAL" />
+      <updated>1517294674734</updated>
+    </task>
+    <option name="localTasksCounter" value="20" />
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="314581000" />
+    <option name="totallyTimeSpent" value="314674000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="-8" y="-8" width="1456" height="876" extended-state="6" />
