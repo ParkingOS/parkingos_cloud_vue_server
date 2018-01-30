@@ -139,6 +139,8 @@ public class SuperSearchServiceImp<T> implements SupperSearchService<T> {
     public List<SearchBean> getSearchBeans(List<String> supperQeuryFields, Map<String,
             Integer> fieldTypes, List<String> baseFields, Map<String,String> params){
         List<SearchBean> resultList = new ArrayList<>();
+
+   
         for(String key : supperQeuryFields){
             Integer fieldType = fieldTypes.get(key);
 
@@ -214,8 +216,11 @@ public class SuperSearchServiceImp<T> implements SupperSearchService<T> {
                             bean.setEndValue(Long.valueOf( end ));
                         }else if(fieldType== FieldTypes.DOUBLE){
                             bean.setEndValue(Double.valueOf( end ));
-                        }else if(fieldType== FieldTypes.DATE){
-                            bean.setStartValue(Long.valueOf(end)/1000);
+
+                        }else if(fieldType==FieldTypes.DATE){
+//                            bean.setStartValue(Long.valueOf(end)/1000);
+                            bean.setEndValue(Long.valueOf(end)/1000);
+
                         }
                         resultList.add(bean);
                     }else if(operate.equals( FieldOperateTypes.EQUAL)){
@@ -243,11 +248,26 @@ public class SuperSearchServiceImp<T> implements SupperSearchService<T> {
                     String type = field.getType().toString();
                     field.setAccessible(true);
 
-                    if(type.contains( FieldTypes._INTEGER)){
-                        field.set(t,Integer.valueOf(value));
-                    }else if(type.contains( FieldTypes._LONG)){
-                        field.set(t,Long.valueOf(value));
-                    }else if(type.contains( FieldTypes._STRING)){
+                    logger.info(f+":=====>>>>>>"+type);
+                    logger.info(f+":=====>>>>>>"+value);
+                    //时间类型不确定  前台页面传的值有可能是s,有可能是ms
+                    if(type.contains(FieldTypes._INTEGER)){
+                        if(value.length()>10){
+                            field.set(t,Integer.valueOf(value.substring(0,10)));
+                        }else{
+                            field.set(t,Integer.valueOf(value));
+                        }
+//                        field.set(t,Integer.valueOf(value));
+                    // 时间类型不确定  前台页面传的值有可能是s,有可能是ms
+                    }else if(type.contains(FieldTypes._LONG)){
+//                        field.set(t,Long.valueOf(value));
+                        if(value.length()>10){
+                            field.set(t,Long.valueOf(value)/1000);
+                        }else{
+                            field.set(t,Long.valueOf(value));
+                        }
+                    }else if(type.contains(FieldTypes._STRING)){
+
                         field.set(t,value);
                     }else if(type.contains( FieldTypes._BIGDECIMAL)){
                         field.set(t, BigDecimal.valueOf(Double.valueOf(value)));
