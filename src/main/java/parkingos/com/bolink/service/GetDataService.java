@@ -11,4 +11,10 @@ public interface GetDataService {
     String getpname(Long comid);
 
     String getalluser(Long comid, Long groupid);
+
+    String getMonitorName(String comid);
+
+    String getChannelType(String comid);
+
+    String getWorkSiteId(String comid);
 }

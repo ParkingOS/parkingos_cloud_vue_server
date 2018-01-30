@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import parkingos.com.bolink.dao.spring.CommonDao;
 import parkingos.com.bolink.models.ComInfoTb;
+import parkingos.com.bolink.models.PhoneInfoTb;
 import parkingos.com.bolink.models.ProductPackageTb;
 import parkingos.com.bolink.models.UserInfoTb;
 import parkingos.com.bolink.service.GetDataService;
@@ -169,6 +170,79 @@ public class GetDataServiceImpl implements GetDataService {
 //                result+=",{\"value_no\":\""+map.get("id")+"\",\"value_name\":\""+map.get("nickname")+"\"}";
 //            }
 //        }
+        result+="]";
+        return result;
+    }
+
+    @Override
+    public String getMonitorName(String comid) {
+       // String result = "[{\"value_no\":\"-1\",\"value_name\":\"请选择\"}";
+        String result = "[";
+        logger.error("=========>>>>>comid="+comid);
+        if(!comid.equals("-1")){
+            String sql = "select id,name from monitor_info_tb where state = 1 and comid = "+"\'"+comid+"\'";
+            List<Map<String,Object>>  pList = null;
+            logger.error(sql);
+            pList = commonDao.getObjectBySql(sql);
+            if(pList!=null&&pList.size()>0){
+                for(int i = 0;i<pList.size();i++){
+                    Map map = pList.get(i);
+                    if(i==0){
+                        result+="{\"value_no\":\""+map.get("id")+"\",\"value_name\":\""+map.get("name")+"\"}";
+                    }else{
+                        result+=",{\"value_no\":\""+map.get("id")+"\",\"value_name\":\""+map.get("name")+"\"}";
+                    }
+                }
+            }
+        }
+        result+="]";
+        return result;
+    }
+
+    @Override
+    public String getChannelType(String comid) {
+        String result = "[";
+        logger.error("=========>>>>>comid="+comid);
+        if(!comid.equals("-1")){
+            String sql = "select id,passname from com_pass_tb where state = 0 and comid = "+"\'"+comid+"\'";
+            List<Map<String,Object>>  pList = null;
+            logger.error(sql);
+            pList = commonDao.getObjectBySql(sql);
+            if(pList!=null&&pList.size()>0){
+                for(int i = 0;i<pList.size();i++){
+                    Map map = pList.get(i);
+                    if(i==0){
+                        result+="{\"value_no\":\""+map.get("id")+"\",\"value_name\":\""+map.get("passname")+"\"}";
+                    }else{
+                        result+=",{\"value_no\":\""+map.get("id")+"\",\"value_name\":\""+map.get("passname")+"\"}";
+                    }
+                }
+            }
+        }
+        result+="]";
+        return result;
+    }
+
+    @Override
+    public String getWorkSiteId(String comid) {
+        String result = "[";
+        logger.error("=========>>>>>comid="+comid);
+        if(!comid.equals("-1")){
+            String sql = "select id,worksite_name from com_worksite_tb where state = 0 and comid = "+"\'"+comid+"\'";
+            List<Map<String,Object>>  pList = null;
+            logger.error(sql);
+            pList = commonDao.getObjectBySql(sql);
+            if(pList!=null&&pList.size()>0){
+                for(int i = 0;i<pList.size();i++){
+                    Map map = pList.get(i);
+                    if(i==0){
+                        result+="{\"value_no\":\""+map.get("id")+"\",\"value_name\":\""+map.get("worksite_name")+"\"}";
+                    }else{
+                        result+=",{\"value_no\":\""+map.get("id")+"\",\"value_name\":\""+map.get("worksite_name")+"\"}";
+                    }
+                }
+            }
+        }
         result+="]";
         return result;
     }

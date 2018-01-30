@@ -88,4 +88,38 @@ public class GetDataAction {
         StringUtils.ajaxOutput(resp,result);
         return null;
     }
+
+    /*
+    * 获得监控名称
+    *
+    * */
+    @RequestMapping(value = "/getMonitorName")
+    public String getMonitorName(HttpServletRequest request, HttpServletResponse resp){
+        String comid = RequestUtil.processParams(request, "comid");
+        String result = getDataService.getMonitorName(comid);
+        StringUtils.ajaxOutput(resp,result);
+        return null;
+    }
+    /*
+    * 获得通道类型
+    *
+    * */
+    @RequestMapping(value = "/getChannelType")
+    public String getChannelType(HttpServletRequest request, HttpServletResponse resp){
+        String comid = RequestUtil.processParams(request, "comid");
+        String result = getDataService.getChannelType(comid);
+        StringUtils.ajaxOutput(resp,result);
+        return null;
+    }
+    /*
+    * 获得工作站点
+    *
+    * */
+    @RequestMapping(value = "/getWorkSiteId")
+    public String getWorkSiteId(HttpServletRequest request, HttpServletResponse resp){
+        String comid = RequestUtil.processParams(request, "comid");
+        String result = getDataService.getWorkSiteId(comid);
+        StringUtils.ajaxOutput(resp,result);
+        return null;
+    }
 }

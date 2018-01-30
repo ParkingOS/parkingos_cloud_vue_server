@@ -24,7 +24,12 @@ public class EquipmentManageChannelAction {
 
 	@Autowired
 	private EquipmentManageChannelService equipmentManageChannelService;
-
+	/**
+	 *
+	 * @param request
+	 * @param response
+	 * @return
+	 */
 	@RequestMapping(value = "/query")
 	public String query(HttpServletRequest request, HttpServletResponse response) {
 
@@ -40,7 +45,12 @@ public class EquipmentManageChannelAction {
 		StringUtils.ajaxOutput(response,result.toJSONString());
 		return null;
 	}
-
+	/**
+	 *
+	 * @param request
+	 * @param response
+	 * @return
+	 */
 	@RequestMapping(value = "/add")
 	public String add(HttpServletRequest request, HttpServletResponse response) {
 
@@ -52,6 +62,9 @@ public class EquipmentManageChannelAction {
 		Long worksiteId = RequestUtil.getLong(request,"worksite_id",-1L);
 		String description = RequestUtil.processParams(request,"description");
 
+		Map<String, String> reqParameterMap = RequestUtil.readBodyFormRequset(request);
+		Long comid = Long.valueOf(Integer.valueOf(reqParameterMap.get("comid")));
+
 		ComPassTb comPassTb = new ComPassTb();
 		comPassTb.setId(id);
 		comPassTb.setPassname(passname);
@@ -60,6 +73,8 @@ public class EquipmentManageChannelAction {
 		comPassTb.setMonth2Set(month2Set);
 		comPassTb.setWorksiteId(worksiteId);
 		comPassTb.setDescription(description);
+		comPassTb.setComid(comid);
+		comPassTb.setState(0);
 
 		String result = equipmentManageChannelService.insertResultByConditions(comPassTb).toString();
 
@@ -67,7 +82,12 @@ public class EquipmentManageChannelAction {
 
 		return null;
 	}
-
+	/**
+	 *
+	 * @param request
+	 * @param response
+	 * @return
+	 */
 	@RequestMapping(value = "/edit")
 	public String update(HttpServletRequest request, HttpServletResponse response) {
 
@@ -94,6 +114,13 @@ public class EquipmentManageChannelAction {
 
 		return null;
 	}
+
+	/**
+	 *
+	 * @param request
+	 * @param response
+	 * @return
+	 */
 	@RequestMapping("/remove")
 	public String remove(HttpServletRequest request,HttpServletResponse response){
 		Long id = RequestUtil.getLong(request,"id",null);
