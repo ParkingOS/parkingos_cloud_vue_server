@@ -25,6 +25,12 @@ public class EquipmentManageCameraAction {
 	@Autowired
 	private EquipmentManageCameraService equipmentManageCameraService;
 
+	/**
+	 *
+	 * @param request
+	 * @param response
+	 * @return
+	 */
 	@RequestMapping(value = "/query")
 	public String query(HttpServletRequest request, HttpServletResponse response) {
 
@@ -35,13 +41,17 @@ public class EquipmentManageCameraAction {
 		System.out.println(reqParameterMap);
 		JSONObject result = equipmentManageCameraService.selectResultByConditions(reqParameterMap);
 
-
-
 		logger.info(result);
 		StringUtils.ajaxOutput(response,result.toJSONString());
 		return null;
 	}
 
+	/**
+	 *
+	 * @param request
+	 * @param response
+	 * @return
+	 */
 	@RequestMapping(value = "/add")
 	public String add(HttpServletRequest request, HttpServletResponse response) {
 
@@ -52,6 +62,8 @@ public class EquipmentManageCameraAction {
 		String cusername = RequestUtil.processParams(request,"cusername");
 		String manufacturer = RequestUtil.processParams(request,"manufacturer");
 		Long passid = RequestUtil.getLong(request,"passid",-1l);
+		Map<String,String> reqParamterMap = RequestUtil.readBodyFormRequset(request);
+		Long comid = Long.valueOf(Integer.valueOf(reqParamterMap.get("comid")));
 
 		ComCameraTb comCameraTb = new ComCameraTb();
 		comCameraTb.setId(id);
@@ -61,6 +73,8 @@ public class EquipmentManageCameraAction {
 		comCameraTb.setCusername(cusername);
 		comCameraTb.setManufacturer(manufacturer);
 		comCameraTb.setPassid(passid);
+		comCameraTb.setState(1);
+		comCameraTb.setComid(comid);
 
 
 		String result = equipmentManageCameraService.insertResultByConditions(comCameraTb).toString();
@@ -70,6 +84,12 @@ public class EquipmentManageCameraAction {
 		return null;
 	}
 
+	/**
+	 *
+	 * @param request
+	 * @param response
+	 * @return
+	 */
 	@RequestMapping(value = "/edit")
 	public String update(HttpServletRequest request, HttpServletResponse response) {
 
@@ -98,13 +118,20 @@ public class EquipmentManageCameraAction {
 		return null;
 	}
 
+	/**
+	 *
+	 * @param request
+	 * @param response
+	 * @return
+	 */
 	@RequestMapping("/remove")
 	public String remove(HttpServletRequest request,HttpServletResponse response){
 		Long id = RequestUtil.getLong(request,"id",null);
+		//Integer state = RequestUtil.getInteger(request,"state",null);
 
 		ComCameraTb comCameraTb = new ComCameraTb();
 		comCameraTb.setId(id);
-		comCameraTb.setState(1);
+		comCameraTb.setState(0);
 
 		String result = equipmentManageCameraService.removeResultByConditions(comCameraTb).toString();
 

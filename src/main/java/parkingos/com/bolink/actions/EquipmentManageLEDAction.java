@@ -24,7 +24,12 @@ public class EquipmentManageLEDAction {
 
 	@Autowired
 	private EquipmentManageLEDService equipmentManageLEDService;
-
+	/**
+	 *
+	 * @param request
+	 * @param response
+	 * @return
+	 */
 	@RequestMapping(value = "/query")
 	public String query(HttpServletRequest request, HttpServletResponse response) {
 
@@ -40,7 +45,12 @@ public class EquipmentManageLEDAction {
 		StringUtils.ajaxOutput(response,result.toJSONString());
 		return null;
 	}
-
+	/**
+	 *
+	 * @param request
+	 * @param response
+	 * @return
+	 */
 	@RequestMapping(value = "/add")
 	public String update(HttpServletRequest request, HttpServletResponse response) {
 
@@ -59,9 +69,11 @@ public class EquipmentManageLEDAction {
 		Integer height = RequestUtil.getInteger(request,"height",32);
 		Integer type = RequestUtil.getInteger(request,"type",0);
 		Integer rsport = RequestUtil.getInteger(request,"rsport",1);
-		Integer state = RequestUtil.getInteger(request,"state",-1);
-//		String worksiteName = RequestUtil.processParams(request,"worksite_name");
-//		String passid = RequestUtil.processParams(request,"passid");
+		Long passid = RequestUtil.getLong(request,"passid",null);
+
+		Map<String, String> reqParameterMap = RequestUtil.readBodyFormRequset(request);
+		Long comid = Long.valueOf(Integer.valueOf(reqParameterMap.get("comid")));
+
 
 		ComLedTb comLedTb = new ComLedTb();
 		comLedTb.setLedip(ledip);
@@ -79,13 +91,20 @@ public class EquipmentManageLEDAction {
 		comLedTb.setHeight(height);
 		comLedTb.setType(type);
 		comLedTb.setRsport(rsport);
-		comLedTb.setState(state);
+		comLedTb.setState(-1);
+		comLedTb.setComid(comid);
+		comLedTb.setPassid(passid);
 
 		String result = equipmentManageLEDService.insertResultByConditions(comLedTb).toString();
 		StringUtils.ajaxOutput(response,result);
 		return null;
 	}
-
+	/**
+	 *
+	 * @param request
+	 * @param response
+	 * @return
+	 */
 	@RequestMapping(value = "/edit")
 	public String edit(HttpServletRequest request, HttpServletResponse response) {
 
@@ -105,9 +124,7 @@ public class EquipmentManageLEDAction {
 		Integer height = RequestUtil.getInteger(request,"height",32);
 		Integer type = RequestUtil.getInteger(request,"type",0);
 		Integer rsport = RequestUtil.getInteger(request,"rsport",1);
-		Integer state = RequestUtil.getInteger(request,"state",-1);
-//		String worksiteName = RequestUtil.processParams(request,"worksite_name");
-//		String passid = RequestUtil.processParams(request,"passid");
+		Long passid = RequestUtil.getLong(request,"passid",null);
 
 		ComLedTb comLedTb = new ComLedTb();
 		comLedTb.setId(id);
@@ -126,13 +143,18 @@ public class EquipmentManageLEDAction {
 		comLedTb.setHeight(height);
 		comLedTb.setType(type);
 		comLedTb.setRsport(rsport);
-		comLedTb.setState(state);
+		comLedTb.setPassid(passid);
 
 		String result = equipmentManageLEDService.updateResultByConditions(comLedTb).toString();
 		StringUtils.ajaxOutput(response,result);
 		return null;
 	}
-
+	/**
+	 *
+	 * @param request
+	 * @param response
+	 * @return
+	 */
 	@RequestMapping("/remove")
 	public String remove(HttpServletRequest request,HttpServletResponse response){
 		Long id = RequestUtil.getLong(request,"id",null);

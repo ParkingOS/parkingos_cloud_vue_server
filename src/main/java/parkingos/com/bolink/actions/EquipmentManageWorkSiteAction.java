@@ -24,7 +24,12 @@ public class EquipmentManageWorkSiteAction {
 
 	@Autowired
 	private EquipmentManageWorkSiteService equipmentManageWorkSiteService;
-
+	/**
+	 *
+	 * @param request
+	 * @param response
+	 * @return
+	 */
 	@RequestMapping(value = "/query")
 	public String query(HttpServletRequest request, HttpServletResponse response) {
 
@@ -38,7 +43,12 @@ public class EquipmentManageWorkSiteAction {
 		StringUtils.ajaxOutput(response,result.toJSONString());
 		return null;
 	}
-
+	/**
+	 *
+	 * @param request
+	 * @param response
+	 * @return
+	 */
 	@RequestMapping(value = "/add")
 	public String add(HttpServletRequest request, HttpServletResponse response) {
 
@@ -46,7 +56,8 @@ public class EquipmentManageWorkSiteAction {
 		String description = RequestUtil.processParams(request,"description");
 		Integer netType = RequestUtil.getInteger(request,"net_type",0);
 		Long id = RequestUtil.getLong(request,"id",-1L);
-		Long comid = RequestUtil.getLong(request,"oid",-1L);
+		Map<String, String> reqParameterMap = RequestUtil.readBodyFormRequset(request);
+		Long comid = Long.valueOf(Integer.valueOf(reqParameterMap.get("comid")));
 
 		ComWorksiteTb comWorksiteTb = new ComWorksiteTb();
 		comWorksiteTb.setWorksiteName(worksiteName);
@@ -54,6 +65,7 @@ public class EquipmentManageWorkSiteAction {
 		comWorksiteTb.setNetType(netType);
 		comWorksiteTb.setId(id);
 		comWorksiteTb.setComid(comid);
+		comWorksiteTb.setState(0);
 
 		String result = equipmentManageWorkSiteService.insertResultByConditions(comWorksiteTb).toString();
 
@@ -61,28 +73,38 @@ public class EquipmentManageWorkSiteAction {
 
 		return null;
 	}
-
+	/**
+	 *
+	 * @param request
+	 * @param response
+	 * @return
+	 */
 	@RequestMapping(value = "/edit")
 	public String update(HttpServletRequest request, HttpServletResponse response) {
-
+		Long id = RequestUtil.getLong(request,"id",null);
+		Long comid = RequestUtil.getLong(request,"comid",-1L);
 		String worksiteName = RequestUtil.processParams(request,"worksite_name");
 		String description = RequestUtil.processParams(request,"description");
 		Integer netType = RequestUtil.getInteger(request,"net_type",0);
-		Long id = RequestUtil.getLong(request,"oid",-1L);
-		Long comid = RequestUtil.getLong(request,"oid",-1L);
 
 		ComWorksiteTb comWorksiteTb = new ComWorksiteTb();
+		comWorksiteTb.setId(id);
+		comWorksiteTb.setComid(comid);
 		comWorksiteTb.setWorksiteName(worksiteName);
 		comWorksiteTb.setDescription(description);
 		comWorksiteTb.setNetType(netType);
-		comWorksiteTb.setId(id);
-		comWorksiteTb.setComid(comid);
 
 		String result = equipmentManageWorkSiteService.updateResultByConditions(comWorksiteTb).toString();
 		StringUtils.ajaxOutput(response,result);
+
 		return null;
 	}
-
+	/**
+	 *
+	 * @param request
+	 * @param response
+	 * @return
+	 */
 	@RequestMapping("/remove")
 	public String remove(HttpServletRequest request,HttpServletResponse response){
 		Long id = RequestUtil.getLong(request,"id",null);
