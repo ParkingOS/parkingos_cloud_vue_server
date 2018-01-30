@@ -13,9 +13,7 @@
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../parkingos_cloud_vue/src/pages/HomeCloud.vue" afterPath="$PROJECT_DIR$/../parkingos_cloud_vue/src/pages/HomeCloud.vue" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../parkingos_cloud_vue/src/pages/LoginCloud.vue" afterPath="$PROJECT_DIR$/../parkingos_cloud_vue/src/pages/LoginCloud.vue" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../parkingos_cloud_vue/src/routes.js" afterPath="$PROJECT_DIR$/../parkingos_cloud_vue/src/routes.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/misc.xml" afterPath="$PROJECT_DIR$/.idea/misc.xml" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/parkingoscloud.iml" afterPath="$PROJECT_DIR$/parkingoscloud.iml" />
     </list>
     <ignored path="$PROJECT_DIR$/out/" />
     <ignored path="$PROJECT_DIR$/target/" />
@@ -689,7 +687,7 @@
       <workItem from="1517013436702" duration="20230000" />
       <workItem from="1517185968467" duration="19982000" />
       <workItem from="1517211853365" duration="8302000" />
-      <workItem from="1517272432934" duration="14803000" />
+      <workItem from="1517272432934" duration="15161000" />
     </task>
     <task id="LOCAL-00001" summary="设备管理模块，因为对应的数据库表没找到，所以只写了页面框架，请求链没有调通">
       <created>1515664608265</created>
@@ -803,11 +801,18 @@
       <option name="project" value="LOCAL" />
       <updated>1517293850506</updated>
     </task>
-    <option name="localTasksCounter" value="17" />
+    <task id="LOCAL-00017" summary="gitignore">
+      <created>1517294177965</created>
+      <option name="number" value="00017" />
+      <option name="presentableId" value="LOCAL-00017" />
+      <option name="project" value="LOCAL" />
+      <updated>1517294177965</updated>
+    </task>
+    <option name="localTasksCounter" value="18" />
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="314156000" />
+    <option name="totallyTimeSpent" value="314514000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="-8" y="-8" width="1456" height="876" extended-state="6" />
