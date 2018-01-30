@@ -6,7 +6,7 @@
     </artifacts-to-build>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="1e1907b4-ad75-4369-9213-b3ef8e3b24b9" name="Default" comment="">
+    <list default="true" id="1e1907b4-ad75-4369-9213-b3ef8e3b24b9" name="Default" comment="gitignore">
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../parkingos_cloud_vue/src/api/api.js" afterPath="$PROJECT_DIR$/../parkingos_cloud_vue/src/api/api.js" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../parkingos_cloud_vue/src/common/js/common.js" afterPath="$PROJECT_DIR$/../parkingos_cloud_vue/src/common/js/common.js" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../parkingos_cloud_vue/src/common/js/const.js" afterPath="$PROJECT_DIR$/../parkingos_cloud_vue/src/common/js/const.js" />
@@ -687,7 +687,7 @@
       <workItem from="1517013436702" duration="20230000" />
       <workItem from="1517185968467" duration="19982000" />
       <workItem from="1517211853365" duration="8302000" />
-      <workItem from="1517272432934" duration="15161000" />
+      <workItem from="1517272432934" duration="15228000" />
     </task>
     <task id="LOCAL-00001" summary="设备管理模块，因为对应的数据库表没找到，所以只写了页面框架，请求链没有调通">
       <created>1515664608265</created>
@@ -808,11 +808,18 @@
       <option name="project" value="LOCAL" />
       <updated>1517294177965</updated>
     </task>
-    <option name="localTasksCounter" value="18" />
+    <task id="LOCAL-00018" summary="gitignore">
+      <created>1517294531536</created>
+      <option name="number" value="00018" />
+      <option name="presentableId" value="LOCAL-00018" />
+      <option name="project" value="LOCAL" />
+      <updated>1517294531536</updated>
+    </task>
+    <option name="localTasksCounter" value="19" />
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="314514000" />
+    <option name="totallyTimeSpent" value="314581000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="-8" y="-8" width="1456" height="876" extended-state="6" />
@@ -943,14 +950,6 @@
     <watches-manager />
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/src/main/java/parkingos/com/bolink/dao/spring/impl/CommonDaoSpringImpl.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="237">
-          <caret line="62" column="17" lean-forward="false" selection-start-line="62" selection-start-column="16" selection-end-line="62" selection-end-column="17" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/main/java/parkingos/com/bolink/dao/spring/CommonDao.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="245">
@@ -1363,6 +1362,14 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="-408">
           <caret line="19" column="13" lean-forward="false" selection-start-line="19" selection-start-column="13" selection-end-line="19" selection-end-column="13" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/.idea/workspace.xml">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="0">
+          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
           <folding />
         </state>
       </provider>
