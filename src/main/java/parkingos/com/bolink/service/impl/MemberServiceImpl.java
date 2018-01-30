@@ -1,17 +1,23 @@
 package parkingos.com.bolink.service.impl;
 
+import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import parkingos.com.bolink.dao.spring.CommonDao;
+import parkingos.com.bolink.enums.FieldOperator;
 import parkingos.com.bolink.models.ComInfoTb;
 import parkingos.com.bolink.models.SyncInfoPoolTb;
 import parkingos.com.bolink.models.UserInfoTb;
+import parkingos.com.bolink.qo.PageOrderConfig;
+import parkingos.com.bolink.qo.SearchBean;
 import parkingos.com.bolink.service.MemberService;
 import parkingos.com.bolink.service.SupperSearchService;
+import parkingos.com.bolink.utils.OrmUtil;
 import parkingos.com.bolink.utils.StringUtils;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -27,10 +33,77 @@ public class MemberServiceImpl implements MemberService {
 
     @Override
     public JSONObject selectResultByConditions(Map<String, String> reqmap) {
+
+        String str = "{\"total\":12,\"page\":1,\"rows\":[]}";
+        JSONObject result = JSONObject.parseObject(str);
+
         UserInfoTb userInfoTb = new UserInfoTb();
         userInfoTb.setComid(Long.parseLong(reqmap.get("comid")));
         userInfoTb.setState(0);
-        JSONObject result = supperSearchService.supperSearch(userInfoTb,reqmap);
+
+
+        Map<String,Object> searchMap = supperSearchService.getBaseSearch(userInfoTb,reqmap);
+        int count =0;
+        List<UserInfoTb> list =null;
+        List<Map<String, Object>> resList =new ArrayList<>();
+        if(searchMap!=null&&!searchMap.isEmpty()){
+            List<SearchBean> supperQuery = null;
+            if(searchMap.containsKey("supper"))
+                supperQuery = (List<SearchBean>)searchMap.get("supper");
+
+            //组装查询bean   FieldOperator.NOT = not in;  auth_flag 不等于14,15
+            SearchBean bean = new SearchBean();
+            bean.setOperator(FieldOperator.NOT);
+            bean.setFieldName("auth_flag");
+            //参数集合形式
+            List<Integer> paramList = new ArrayList<>();
+            paramList.add(14);
+            paramList.add(15);
+            bean.setBasicValue(paramList);
+
+            // auth_flag >0
+            SearchBean searchBean = new SearchBean();
+            searchBean.setFieldName("auth_flag");
+            searchBean.setStartValue(0);
+            searchBean.setOperator(FieldOperator.GREATER_THAN);
+
+
+            //把bean对象放到高级查询中
+            if(supperQuery==null){
+                supperQuery = new ArrayList<>();
+            }
+            supperQuery.add(bean);
+            supperQuery.add(searchBean);
+
+            PageOrderConfig config = null;
+            if(searchMap.containsKey("config"))
+                config = (PageOrderConfig)searchMap.get("config");
+            count = commonDao.selectCountByConditions(userInfoTb,supperQuery);
+            logger.error("======>>>>>"+count);
+            if(count>0){
+                if(config==null){
+                    config = new PageOrderConfig();
+                    config.setPageInfo(1,Integer.MAX_VALUE);
+                }
+                list = commonDao.selectListByConditions(userInfoTb,supperQuery,config);
+
+                if (list != null && !list.isEmpty()) {
+                    for (UserInfoTb user : list) {
+                        OrmUtil<UserInfoTb> otm = new OrmUtil<>();
+                        Map<String, Object> map = otm.pojoToMap(user);
+                        resList.add(map);
+                    }
+                    result.put("rows", JSON.toJSON(resList));
+                }
+            }
+        }
+
+//        JSONObject result = supperSearchService.supperSearch(userInfoTb,reqmap);
+//        return result;
+        result.put("total",count);
+        if(reqmap.get("page")!=null){
+            result.put("page",Integer.parseInt(reqmap.get("page")));
+        }
         return result;
     }
 

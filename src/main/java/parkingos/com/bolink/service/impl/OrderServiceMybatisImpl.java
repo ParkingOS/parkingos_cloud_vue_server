@@ -102,12 +102,12 @@ public class OrderServiceMybatisImpl implements OrderService {
     }
 
     @Override
-    public JSONObject getPicResult(Long orderid, Long comid) {
+    public JSONObject getPicResult(String orderid, Long comid) {
         return null;
     }
 
     @Override
-    public byte[] getCarPics(Long orderid, Long comid, String type, Integer currentnum) {
+    public byte[] getCarPics(String orderid, Long comid, String type, Integer currentnum) {
         return new byte[0];
     }
 

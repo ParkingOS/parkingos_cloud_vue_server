@@ -129,4 +129,12 @@ public class AdminRoleAction {
 //        StringUtils.ajaxOutput(resp,result.toJSONString());
         return null;
     }
+
+    @RequestMapping(value = "/editroleauth")
+    public String editRoleAuth(HttpServletRequest request, HttpServletResponse resp){
+        Long loginRoleId = RequestUtil.getLong(request,"loginroleid",-1L);
+        Long id = RequestUtil.getLong(request,"id",1L);
+
+        return null;
+    }
 }

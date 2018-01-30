@@ -774,11 +774,17 @@ public class StringUtils {
 				return false;
 			}
 		}
-		String check = "^[A-Z]{1}[A-Z_0-9]{5}$";
-		if (province.equals("使")) {
+//		String check = "^[A-Z]{1}[A-Z_0-9]{5}$";
+//		if (province.equals("使")) {
+//			check = "^[A-Z_0-9]{6}$";
+//		}
+		String check = "";
+		plate = plate.substring(1);
+		if(plate.length() == 7){
+			check = "^[A-Z_0-9]{7}$";
+		}else if(plate.length() == 6){
 			check = "^[A-Z_0-9]{6}$";
 		}
-		plate = plate.substring(1);
 		Pattern p = Pattern.compile(check);
 		Matcher m = p.matcher(plate);
 		return m.matches();

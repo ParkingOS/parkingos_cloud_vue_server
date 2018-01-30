@@ -1,14 +1,13 @@
 package parkingos.com.bolink.service;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 
 public interface ShopManageService {
-    String create(HttpServletRequest request, HttpServletResponse resp);
+    String create(HttpServletRequest request);
 
-    String delete(HttpServletRequest request, HttpServletResponse resp);
+    String delete(HttpServletRequest request);
 
-    String quickquery(HttpServletRequest req, HttpServletResponse resp);
+    String quickquery(HttpServletRequest req);
 
-    String addMoney(HttpServletRequest request, HttpServletResponse resp);
+    String addMoney(HttpServletRequest request);
 }
