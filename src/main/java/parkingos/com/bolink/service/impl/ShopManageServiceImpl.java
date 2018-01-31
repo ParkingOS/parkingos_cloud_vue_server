@@ -169,6 +169,15 @@ public class ShopManageServiceImpl implements ShopManageService {
         } else {
             //修改操作
             shopTb.setId( id );
+            if(discount_percent==100){
+                shopTb.setDiscountPercent( null );
+            }
+            if(discount_money==1){
+                shopTb.setDiscountMoney( null );
+            }
+            if(validite_time==0){
+                shopTb.setValiditeTime( null );
+            }
             update = commonDao.updateByPrimaryKey( shopTb );
         }
 
