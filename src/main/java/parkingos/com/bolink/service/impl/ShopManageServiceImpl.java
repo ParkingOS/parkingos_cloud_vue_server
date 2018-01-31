@@ -45,9 +45,7 @@ public class ShopManageServiceImpl implements ShopManageService {
         double addmoney = RequestUtil.getDouble( request, "addmoney", 0.00 );
         //减免类型
         Integer ticket_type = Integer.parseInt( shopTb.getTicketType() + "" );
-        System.out.println( ticket_type );
-        System.out.println( ticket_time );
-        System.out.println( ticket_money );
+
         if (ticket_type == 1) {
             if (0 >= ticket_time) {
                 //StringUtils.ajaxOutput( resp, "减免小时必须输入正整数" );

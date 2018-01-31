@@ -186,8 +186,17 @@ public class SuperSearchServiceImp<T> implements SupperSearchService<T> {
                             continue;
                         }
                         if(fieldType== FieldTypes.INT){
-                            bean.setStartValue(Long.valueOf(params.get(key+"_start")));
-                            bean.setEndValue(params.get(key+"_end"));
+                            //时间类型不确定  前台页面传的值有可能是s,有可能是ms
+                            if (start.length() > 10) {
+                                bean.setStartValue(Long.valueOf(start)/1000);
+                            } else {
+                                bean.setStartValue(Long.valueOf(start));
+                            }
+                            if (end.length() > 10) {
+                                bean.setEndValue(Long.valueOf(end)/1000);
+                            } else {
+                                bean.setEndValue(Long.valueOf(end));
+                            }
                         }else if(fieldType== FieldTypes.DOUBLE){
                             bean.setStartValue(Double.valueOf( params.get(key+"_start") ));
                             bean.setEndValue(Double.valueOf( params.get(key+"_end") ));
