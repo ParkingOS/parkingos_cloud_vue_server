@@ -45,9 +45,7 @@ public class ShopManageServiceImpl implements ShopManageService {
         double addmoney = RequestUtil.getDouble( request, "addmoney", 0.00 );
         //减免类型
         Integer ticket_type = Integer.parseInt( shopTb.getTicketType() + "" );
-        System.out.println( ticket_type );
-        System.out.println( ticket_time );
-        System.out.println( ticket_money );
+
         if (ticket_type == 1) {
             if (0 >= ticket_time) {
                 //StringUtils.ajaxOutput( resp, "减免小时必须输入正整数" );
@@ -169,15 +167,6 @@ public class ShopManageServiceImpl implements ShopManageService {
         } else {
             //修改操作
             shopTb.setId( id );
-            if(discount_percent==100){
-                shopTb.setDiscountPercent( null );
-            }
-            if(discount_money==1){
-                shopTb.setDiscountMoney( null );
-            }
-            if(validite_time==0){
-                shopTb.setValiditeTime( null );
-            }
             update = commonDao.updateByPrimaryKey( shopTb );
         }
 
