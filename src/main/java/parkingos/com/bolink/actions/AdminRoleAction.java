@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import parkingos.com.bolink.models.CollectorSetTb;
 import parkingos.com.bolink.models.UserRoleTb;
 import parkingos.com.bolink.service.AdminRoleService;
+import parkingos.com.bolink.utils.MongoDbUtils;
 import parkingos.com.bolink.utils.RequestUtil;
 import parkingos.com.bolink.utils.StringUtils;
 
@@ -25,6 +26,9 @@ public class AdminRoleAction {
     @Autowired
     private AdminRoleService adminRoleService;
 
+    @Autowired
+    private MongoDbUtils mongoDbUtils;
+
     @RequestMapping(value = "/query")
     public String query(HttpServletRequest request, HttpServletResponse resp){
 
@@ -37,6 +41,10 @@ public class AdminRoleAction {
         return null;
     }
 
+    /**
+     *
+     * 增加角色
+     */
     @RequestMapping(value = "/addrole")
     public String addRole(HttpServletRequest request, HttpServletResponse resp){
 
@@ -56,10 +64,19 @@ public class AdminRoleAction {
 
         JSONObject result = adminRoleService.addRole(userRoleTb,func);
 
+        logger.error("=========>>>"+((Integer)result.get("state")==1));
+        if(((Integer)result.get("state"))==1){
+            mongoDbUtils.saveLogs(request, 0, 2, "添加了角色："+name);
+        }
         StringUtils.ajaxOutput(resp,result.toJSONString());
         return null;
     }
 
+    /*
+    *
+    * 编辑角色
+    *
+    * */
     @RequestMapping(value = "/editrole")
     public String editRole(HttpServletRequest request, HttpServletResponse resp){
         Long id = RequestUtil.getLong(request,"id",-1L);
@@ -72,6 +89,14 @@ public class AdminRoleAction {
         userRoleTb.setResume(resume);
 
         JSONObject result = adminRoleService.updateRole(userRoleTb,func);
+
+        logger.error("=========>>>edit:"+((Integer)result.get("state")==1));
+
+        if((Integer)result.get("state")==1){
+            logger.error("====修改角色日志");
+            mongoDbUtils.saveLogs(request, 0, 3, "修改了角色："+name);
+        }
+
         StringUtils.ajaxOutput(resp,result.toJSONString());
         return null;
     }
@@ -84,10 +109,19 @@ public class AdminRoleAction {
         userRoleTb.setId(id);
         userRoleTb.setState(1);
         JSONObject result = adminRoleService.deleteRole(userRoleTb);
+
+        if((Integer)result.get("state")==1){
+            mongoDbUtils.saveLogs(request, 0, 4, "删除了角色："+id);
+        }
+
         StringUtils.ajaxOutput(resp,result.toJSONString());
         return null;
     }
 
+    /*
+    * 云平台接口  暂时不用
+    *
+    * */
     @RequestMapping(value = "/precollectset")
     public String precollectset(HttpServletRequest request, HttpServletResponse resp){
         Long roleid = RequestUtil.getLong(request, "roleid", -1L);
@@ -98,42 +132,41 @@ public class AdminRoleAction {
         return null;
     }
 
-    @RequestMapping(value = "/collectset")
-    public String collectset(HttpServletRequest request, HttpServletResponse resp){
 
-        Long id = RequestUtil.getLong(request, "role_id", -1L);
-        Long roleId = RequestUtil.getLong(request, "roleid", -1L);
-        Integer photoset1 = RequestUtil.getInteger(request, "photoset1", 0);
-        Integer photoset2 = RequestUtil.getInteger(request, "photoset2", 0);
-        Integer photoset3 = RequestUtil.getInteger(request, "photoset3", 0);
-        String prepayset1=RequestUtil.getString(request, "prepayset1");
-        String prepayset2=RequestUtil.getString(request, "prepayset2");
-        String prepayset3=RequestUtil.getString(request, "prepayset3");
-        String print_sign1=StringUtils.decodeUTF8(RequestUtil.getString(request, "print_sign1"));
-        String print_sign2=StringUtils.decodeUTF8(RequestUtil.getString(request, "print_sign2"));
-        String print_sign3=StringUtils.decodeUTF8(RequestUtil.getString(request, "print_sign3"));
-        String print_sign4=StringUtils.decodeUTF8(RequestUtil.getString(request, "print_sign4"));
-        Integer changePrePay = RequestUtil.getInteger(request, "change_prepay", 0);
-        Integer view_plot = RequestUtil.getInteger(request, "view_plot", 0);
-        Integer isprepay = RequestUtil.getInteger(request, "isprepay", 0);
-        Integer hidedetail = RequestUtil.getInteger(request, "hidedetail", 0);
-        Integer is_sensortime = RequestUtil.getInteger(request, "is_sensortime", 0);
-        String collpwd = RequestUtil.processParams(request, "collpwd");
-        String signpwd = RequestUtil.processParams(request, "signpwd");
-        Integer signout_valid = RequestUtil.getInteger(request, "signout_valid", 0);
-        Integer is_show_card = RequestUtil.getInteger(request, "is_show_card", 0);
-        Integer print_order_place2 = RequestUtil.getInteger(request, "print_order_place2", 0);
-        Integer is_duplicate_order = RequestUtil.getInteger(request, "is_duplicate_order", 1);
-        Integer is_print_name = RequestUtil.getInteger(request, "is_print_name", 1);
-//        JSONObject result = adminRoleService.precollectset(collectorSetTb);
-//        StringUtils.ajaxOutput(resp,result.toJSONString());
+    /*
+    * 获得所有权限并回显
+    *
+    * */
+    @RequestMapping(value = "/getroleauth")
+    public String getroleauth(HttpServletRequest request, HttpServletResponse resp){
+        Long loginRoleId = RequestUtil.getLong(request,"loginroleid",-1L);
+        Long id = RequestUtil.getLong(request,"id",1L);
+
+        String result = adminRoleService.getAuth(loginRoleId,id);
+
+        StringUtils.ajaxOutput(resp,result);
         return null;
     }
 
+    /*
+    * 从前台获取权限 编辑角色权限
+    *
+    * */
     @RequestMapping(value = "/editroleauth")
     public String editRoleAuth(HttpServletRequest request, HttpServletResponse resp){
-        Long loginRoleId = RequestUtil.getLong(request,"loginroleid",-1L);
-        Long id = RequestUtil.getLong(request,"id",1L);
+        System.out.println("========进入方法");
+        Long id = RequestUtil.getLong(request,"id",-1L);
+
+        String auths = StringUtils.decodeUTF8(RequestUtil.getString(request,"auths"));
+        System.out.println("======更改权限id:"+id);
+        System.out.println("======更改权限auths:"+auths);
+
+        JSONObject result = adminRoleService.editRoleAuth(id,auths);
+
+        if((Integer)result.get("state")==1){
+            mongoDbUtils.saveLogs(request, 0, 3, "修改了角色权限:"+id);
+        }
+        StringUtils.ajaxOutput(resp,result.toJSONString());
 
         return null;
     }

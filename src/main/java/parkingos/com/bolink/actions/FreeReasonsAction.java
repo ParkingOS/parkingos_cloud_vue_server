@@ -39,8 +39,9 @@ public class FreeReasonsAction {
 
         String name = StringUtils.decodeUTF8(RequestUtil.getString(request, "name"));
         Integer sort = RequestUtil.getInteger(request, "sort", 0);
+        Long comid = RequestUtil.getLong(request,"comid",-1L);
 
-        JSONObject result = freeReasonsService.createFreeReason(name,sort);
+        JSONObject result = freeReasonsService.createFreeReason(name,sort,comid);
         //把结果返回页面
         StringUtils.ajaxOutput(resp,result.toJSONString());
         return null;

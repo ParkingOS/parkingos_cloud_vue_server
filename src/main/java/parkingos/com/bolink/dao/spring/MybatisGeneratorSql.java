@@ -88,8 +88,10 @@ public class MybatisGeneratorSql {
         sql.append(bsql);
         List<Object> values = (List<Object>)baseSql.get("values");
         Map<String,Object> supperSql = createSupperSql(searchBeans);
-        List<Object> suppervalues = (List<Object>)supperSql.get("values");
-        values.addAll(suppervalues);
+        if(supperSql!=null){
+            List<Object> suppervalues = (List<Object>)supperSql.get("values");
+            values.addAll(suppervalues);
+        }
         if(values.isEmpty()){
             return null;
         }

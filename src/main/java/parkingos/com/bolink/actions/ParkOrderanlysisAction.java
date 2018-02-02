@@ -41,7 +41,7 @@ public class ParkOrderanlysisAction {
 
 
     /*
-    * 点击收费员统计信息
+    * 点击收费员统计信息  暂时不用
     *
     * */
     @RequestMapping(value = "/workdetail")
@@ -63,7 +63,7 @@ public class ParkOrderanlysisAction {
     }
 
     /*
-    * 点击订单总数统计
+    * 点击订单总数统计  暂时不用
     *
     * */
     @RequestMapping(value = "/orderdetail")

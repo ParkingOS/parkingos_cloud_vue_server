@@ -16,4 +16,8 @@ public interface AdminRoleService {
     JSONObject updateRole(UserRoleTb userRoleTb, Integer func);
 
     JSONObject precollectset(CollectorSetTb collectorSetTb);
+
+    String getAuth(Long loginRoleId, Long id);
+
+    JSONObject editRoleAuth(Long id, String auths);
 }

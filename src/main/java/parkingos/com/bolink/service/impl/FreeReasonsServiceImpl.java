@@ -31,7 +31,7 @@ public class FreeReasonsServiceImpl implements FreeReasonsService {
     }
 
     @Override
-    public JSONObject createFreeReason(String name, Integer sort) {
+    public JSONObject createFreeReason(String name, Integer sort, Long comid) {
         String str = "{\"state\":0,\"msg\":\"添加失败\"}";
         JSONObject result = JSONObject.parseObject(str);
         Long id = commonDao.selectSequence(FreeReasonsTb.class);
@@ -40,6 +40,7 @@ public class FreeReasonsServiceImpl implements FreeReasonsService {
         freeReasonsTb.setName(name);
         freeReasonsTb.setSort(sort);
         freeReasonsTb.setId(id);
+        freeReasonsTb.setComid(comid);
         int ret = commonDao.insert(freeReasonsTb);
         if(ret==1){
             result.put("state",1);

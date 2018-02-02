@@ -225,7 +225,9 @@ public class SuperSearchServiceImp<T> implements SupperSearchService<T> {
                     }else if(operate.equals( FieldOperateTypes.LESS_THAN_OR_EQUAL)){
                         bean.setOperator( FieldOperator.LESS_THAN_AND_EQUAL);
                         bean.setFieldName(key);
-                        String end = params.get(key+"_end");
+//                        String end = params.get(key+"_end");
+                        //id:2    id_start:92   id_end:
+                        String end = params.get(key+"_start");
                         if(Check.isEmpty(end)){
                             continue;
                         }
