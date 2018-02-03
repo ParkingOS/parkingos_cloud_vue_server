@@ -46,7 +46,8 @@ public class ParkOrderanlysisServiceImpl implements ParkOrderAnlysisService {
         Long comid = Long.parseLong(reqmap.get("comid"));
 
         Long outuid = -1L;
-        if(reqmap.get("out_uid")!=null&&!"undefined".equals(reqmap.get("out_uid"))){
+        logger.error("======>>>>>>>>"+reqmap.get("out_uid"));
+        if(reqmap.get("out_uid")!=null&&!"undefined".equals(reqmap.get("out_uid"))&&!"".equals(reqmap.get("out_uid"))){
             outuid = Long.parseLong(reqmap.get("out_uid"));
         }
 
@@ -138,7 +139,7 @@ public class ParkOrderanlysisServiceImpl implements ParkOrderAnlysisService {
                 elecMoney += StringUtils.formatDouble(totalOrder.get("electronic_pay")) + StringUtils.formatDouble(totalOrder.get("electronic_prepay"));
                 totalOrder.put("electronic_pay", String.format("%.2f", StringUtils.formatDouble(totalOrder.get("electronic_pay")) + StringUtils.formatDouble(totalOrder.get("electronic_prepay"))));
                 //每一行的合计 = 现金支付+电子支付
-                totalOrder.put("act_total",Double.parseDouble(totalOrder.get("cash_pay")+"")+Double.parseDouble(totalOrder.get("electronic_pay")+""));
+                totalOrder.put("act_total",StringUtils.formatDouble(Double.parseDouble(totalOrder.get("cash_pay")+"")+Double.parseDouble(totalOrder.get("electronic_pay")+"")));
 
                 //免费支付
                 totalOrder.put("free_pay", 0.0);
@@ -151,6 +152,7 @@ public class ParkOrderanlysisServiceImpl implements ParkOrderAnlysisService {
                             double actFreePay = freePay+reduceAmount;
                             totalOrder.put("free_pay",StringUtils.formatDouble(actFreePay));
                             actFreeMoney+=actFreePay;
+
                         }
                     }
                 }
@@ -161,7 +163,7 @@ public class ParkOrderanlysisServiceImpl implements ParkOrderAnlysisService {
         if(backList.size()>0){
             Map sumMap = new HashMap();
             sumMap.put("name","合计");
-            sumMap.put("scount",backList.size());
+            sumMap.put("scount",totalCount);
             sumMap.put("amount_receivable",StringUtils.formatDouble(totalMoney));
             sumMap.put("cash_pay",StringUtils.formatDouble(cashMoney));
             sumMap.put("electronic_pay",StringUtils.formatDouble(elecMoney));
