@@ -44,13 +44,13 @@ public class ProductPackageAction {
         Long createTime = System.currentTimeMillis()/1000;
         //车场编号
         Long comid = RequestUtil.getLong(request, "comid", -1L);
-        String period = StringUtils.decodeUTF8(RequestUtil.getString(request, "period"));
+        String period = RequestUtil.getString(request, "period");
         String carTypeId = RequestUtil.getString(request,"car_type_id");
         Double price = RequestUtil.getDouble(request, "price", 0.0);
         //月卡名称
-        String p_name = StringUtils.decodeUTF8(RequestUtil.processParams(request, "p_name"));
+        String p_name = RequestUtil.processParams(request, "p_name");
         //月卡描述
-        String describe =StringUtils.decodeUTF8(RequestUtil.getString(request, "describe"));
+        String describe =RequestUtil.getString(request, "describe");
         //生成唯一主键
         Long id = productPackageService.getId();
 
@@ -61,6 +61,7 @@ public class ProductPackageAction {
         productPackageTb.setId(id);
         productPackageTb.setIsDelete(0L);
         productPackageTb.setPeriod(period);
+        productPackageTb.setCardId(id+"");
         productPackageTb.setCarTypeId(carTypeId);
         productPackageTb.setPrice(bigDecimal);
         productPackageTb.setpName(p_name);

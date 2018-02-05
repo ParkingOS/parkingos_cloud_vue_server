@@ -151,15 +151,26 @@ public class SuperSearchServiceImp<T> implements SupperSearchService<T> {
    
         for(String key : supperQeuryFields){
             Integer fieldType = fieldTypes.get(key);
-
             if(fieldType== FieldTypes.STRING){
                 String value = params.get(key);
+
                 if(Check.isEmpty(value))
                     continue;
+
+
+                //高级查询如果查询 带% 或者_ 这种通配符
+                if(value.indexOf("%")!=-1){
+                    String newvalue = value.replace("%","\\"+"%");
+                    value = newvalue;
+                }
+                if(value.indexOf("_")!=-1){
+                    String newvalue = value.replace("_","\\"+"_");
+                    value = newvalue;
+                }
                 SearchBean bean = new SearchBean();
                 bean.setFieldName(key);
                 bean.setOperator( FieldOperator.LIKE);
-                bean.setBasicValue(params.get(key));
+                bean.setBasicValue(value);
                 resultList.add(bean);
             }
             /**

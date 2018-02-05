@@ -9,7 +9,6 @@ import parkingos.com.bolink.models.CarNumberTypeTb;
 import parkingos.com.bolink.models.SyncInfoPoolTb;
 import parkingos.com.bolink.service.BindCarTypeService;
 import parkingos.com.bolink.service.SupperSearchService;
-import parkingos.com.bolink.utils.StringUtils;
 
 import java.util.Map;
 
@@ -39,7 +38,7 @@ public class BindCarTypeServiceImpl implements BindCarTypeService {
 
         String car_number = "";
         if (reqParameterMap.get("car_number") != null && !"".equals(reqParameterMap.get("car_number"))) {
-            car_number = StringUtils.decodeUTF8(reqParameterMap.get("car_number")).toUpperCase();
+            car_number = reqParameterMap.get("car_number").toUpperCase();
         } else {
             result.put("msg", "请输入车牌号");
             return result;

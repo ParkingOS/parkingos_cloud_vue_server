@@ -10,7 +10,6 @@ import parkingos.com.bolink.models.ProductPackageTb;
 import parkingos.com.bolink.models.SyncInfoPoolTb;
 import parkingos.com.bolink.service.ProductPackageService;
 import parkingos.com.bolink.service.SupperSearchService;
-import parkingos.com.bolink.utils.StringUtils;
 
 import java.math.BigDecimal;
 import java.util.Map;
@@ -101,15 +100,15 @@ public class ProductPackageServiceImpl implements ProductPackageService {
         //月卡套餐描述
         String describe = "";
         if(reqParameterMap.get("describe")!=null&&!"undefined".equals(reqParameterMap.get("describe"))){
-            describe =StringUtils.decodeUTF8(reqParameterMap.get("describe"));
+            describe =reqParameterMap.get("describe");
         }
         String p_name ="";
         if(reqParameterMap.get("p_name")!=null&&!"undefined".equals(reqParameterMap.get("p_name"))){
-            p_name =StringUtils.decodeUTF8(reqParameterMap.get("p_name"));
+            p_name =reqParameterMap.get("p_name");
         }
         String period = "";
         if(reqParameterMap.get("period")!=null&&!"undefined".equals(reqParameterMap.get("period"))){
-            period =StringUtils.decodeUTF8(reqParameterMap.get("period"));
+            period =reqParameterMap.get("period");
         }
         Long carTypeId =-1L;
         if(reqParameterMap.get("car_type_id")!=null){

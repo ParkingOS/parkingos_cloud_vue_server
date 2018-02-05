@@ -61,8 +61,7 @@ public class MemberManagerAction {
     @RequestMapping(value = "/editmember")
     public String editMember(HttpServletRequest request, HttpServletResponse resp){
 
-        String nickname =StringUtils.decodeUTF8(RequestUtil.processParams(request, "nickname"));
-        String strid =StringUtils.decodeUTF8(RequestUtil.processParams(request, "strid"));
+        String nickname =RequestUtil.processParams(request, "nickname");
         String phone =RequestUtil.processParams(request, "phone");
         String mobile =RequestUtil.processParams(request, "mobile");
         if(mobile.equals("")){
@@ -70,6 +69,7 @@ public class MemberManagerAction {
         }
         Long role_id = RequestUtil.getLong(request, "role_id", -1L);
         Integer isview = RequestUtil.getInteger(request, "isview", -1);
+        Long sex = RequestUtil.getLong(request, "sex", -1L);
         //修改时间
         Long updateTimeLong = System.currentTimeMillis()/1000;
 
@@ -77,10 +77,10 @@ public class MemberManagerAction {
 
         UserInfoTb userInfoTb =new UserInfoTb();
         userInfoTb.setNickname(nickname);
-        userInfoTb.setStrid(strid);
         userInfoTb.setPhone(phone);
         userInfoTb.setMobile(mobile);
         userInfoTb.setRoleId(role_id);
+        userInfoTb.setSex(sex);
         userInfoTb.setIsview(isview);
         userInfoTb.setUpdateTime(updateTimeLong);
         userInfoTb.setId(id);

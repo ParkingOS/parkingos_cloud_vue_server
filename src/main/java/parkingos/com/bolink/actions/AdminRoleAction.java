@@ -50,9 +50,9 @@ public class AdminRoleAction {
 
         Long uin = RequestUtil.getLong(request, "loginuin", -1L);//(Long)request.getSession().getAttribute("loginuin");//登录的用户id
         Long oid = RequestUtil.getLong(request, "oid", -1L);//(Long)request.getSession().getAttribute("oid");//登录角色所属组织类型
-        String name = StringUtils.decodeUTF8(RequestUtil.getString(request, "role_name"));
+        String name = RequestUtil.getString(request, "role_name");
         Integer state = RequestUtil.getInteger(request, "state", 0);
-        String resume = StringUtils.decodeUTF8(RequestUtil.getString(request, "resume"));
+        String resume = RequestUtil.getString(request, "resume");
         Integer func = RequestUtil.getInteger(request, "func", -1);
         UserRoleTb userRoleTb = new UserRoleTb();
         userRoleTb.setRoleName(name);

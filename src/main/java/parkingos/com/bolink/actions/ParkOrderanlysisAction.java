@@ -47,7 +47,7 @@ public class ParkOrderanlysisAction {
     @RequestMapping(value = "/workdetail")
     public String workdetail(HttpServletRequest request, HttpServletResponse resp){
 
-        String bt = StringUtils.decodeUTF8(RequestUtil.processParams(request, "btime"));
+        String bt = RequestUtil.processParams(request, "btime");
         String et = RequestUtil.processParams(request, "etime");
         String fieldsstr = RequestUtil.processParams(request, "fieldsstr");
         String pay_type = RequestUtil.processParams(request, "pay_type");
@@ -70,7 +70,7 @@ public class ParkOrderanlysisAction {
     public String orderdetail(HttpServletRequest request, HttpServletResponse resp){
         Long uid = RequestUtil.getLong(request, "uid", -2L);
 //        String fieldsstr = RequestUtil.processParams(request, "fieldsstr");
-        String btime = StringUtils.decodeUTF8(RequestUtil.processParams(request, "btime"));
+        String btime = RequestUtil.processParams(request, "btime");
         String etime = RequestUtil.processParams(request, "etime");
         String type = RequestUtil.processParams(request, "otype");
         Long comid = RequestUtil.getLong(request,"comid",-1L);

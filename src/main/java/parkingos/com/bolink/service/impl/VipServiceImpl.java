@@ -81,10 +81,18 @@ public class VipServiceImpl implements VipService {
 
         Long comid = RequestUtil.getLong(req,"comid",-1L);
         Long pid = RequestUtil.getLong(req, "p_name", -1L);
+
+        Long carTypeId = RequestUtil.getLong(req,"car_type_id",-1L);
+
         //车主手机
-        String mobile = StringUtils.decodeUTF8(RequestUtil.processParams(req, "mobile").trim());
-        String name = StringUtils.decodeUTF8(RequestUtil.processParams(req, "name").trim());
-        String address = StringUtils.decodeUTF8(RequestUtil.processParams(req, "address").trim());
+        String mobile = RequestUtil.processParams(req, "mobile").trim();
+        String name = RequestUtil.processParams(req, "name").trim();
+        String address = RequestUtil.processParams(req, "address").trim();
+        //备注
+        String remark = RequestUtil.processParams(req, "remark");
+        String carNumber = RequestUtil.processParams(req, "car_number");
+        logger.error("=======>>>>>carNumber"+carNumber);
+
         //起始时间
         String b_time = RequestUtil.processParams(req, "b_time");
         //购买月数
@@ -94,12 +102,10 @@ public class VipServiceImpl implements VipService {
         String cardId = String.valueOf(nextid);
 
         Integer flag = RequestUtil.getInteger(req, "flag", -1);
-        //备注
-        String remark = StringUtils.decodeUTF8(RequestUtil.processParams(req, "remark"));
-        String carNumber = StringUtils.decodeUTF8(RequestUtil.processParams(req, "car_number"));
-        logger.error("=======>>>>>carNumber"+carNumber);
+
         //实收金额
-        String acttotal = RequestUtil.processParams(req, "act_total");
+//        String acttotal = RequestUtil.processParams(req, "act_total");
+        Double act_total = RequestUtil.getDouble(req,"act_total",0.0);
 
         Long ntime = System.currentTimeMillis() / 1000;
         Long btime = TimeTools.getLongMilliSecondFrom_HHMMDD(b_time) / 1000;
@@ -121,7 +127,7 @@ public class VipServiceImpl implements VipService {
         }
 
         //金额
-        Double total = Double.parseDouble(getDataService.getprodsum(pid, months));
+        Double total = RequestUtil.getDouble(req, "total",0.0);//Double.parseDouble(getDataService.getprodsum(pid, months));
         ProductPackageTb productPackageTb = new ProductPackageTb();
         productPackageTb.setId(pid);
         productPackageTb = (ProductPackageTb) commonDao.selectObjectByConditions(productPackageTb);
@@ -137,15 +143,16 @@ public class VipServiceImpl implements VipService {
             }
         }
 
-        Double act_total = total;
-        if (!acttotal.equals("")) {
-            try{
-                act_total = StringUtils.formatDouble(Double.valueOf(acttotal));
-            }catch (Exception e){
-                result.put("msg","请正确填写实收金额");
-                return result;
-            }
-        }
+//        Double act_total = 0.0d;
+//        if (!acttotal.equals("")) {
+//            try{
+//                act_total = StringUtils.formatDouble(Double.valueOf(acttotal));
+//            }catch (Exception e){
+//                result.put("msg","请正确填写实收金额");
+//                return result;
+//            }
+//        }
+
         logger.error("=======>>>>>act_total"+act_total);
 
         Long uin =-1L;
@@ -232,6 +239,7 @@ public class VipServiceImpl implements VipService {
         carowerProduct1.setId(nextid);
         carowerProduct1.setUin(uin);
         carowerProduct1.setPid(pid);
+        carowerProduct1.setCarTypeId(carTypeId);
         carowerProduct1.setCreateTime(ntime);
         carowerProduct1.setUpdateTime(ntime);
         carowerProduct1.setbTime(btime);
@@ -245,14 +253,14 @@ public class VipServiceImpl implements VipService {
         carowerProduct1.setCarNumber(carNumber);
         carowerProduct1.setCardId(nextid+"");
         carowerProduct1.setCarTypeId(cartypeId);
+        carowerProduct1.setMobile(mobile);
         carowerProduct1.setLimitDayType(limit_day_type);
         int ret = commonDao.insert(carowerProduct1);
 
         //******添加月卡消费记录*******
         Integer renewId = (commonDao.selectSequence(CardRenewTb.class)).intValue();
         String tradeNo  = TimeTools.getTimeYYYYMMDDHHMMSS()+""+comid;
-        //对于字符串类型 最好都要进行编码解码处理  防止中文乱码
-        String operater = StringUtils.decodeUTF8(RequestUtil.getString(req,"nickname"));
+        String operater = RequestUtil.getString(req,"nickname");
         //组装插入月卡消费记录数据
         CardRenewTb cardRenewTb = new CardRenewTb();
         cardRenewTb.setId(renewId);
@@ -271,6 +279,7 @@ public class VipServiceImpl implements VipService {
         cardRenewTb.setCreateTime(ntime.intValue());
         cardRenewTb.setUpdateTime(ntime.intValue());
         int renew = commonDao.insert(cardRenewTb);
+
 
         if(ret==1&&renew==1){
             result.put("state",1);
@@ -411,7 +420,7 @@ public class VipServiceImpl implements VipService {
 
         Long comid = RequestUtil.getLong(req,"comid",-1L);
         Long pid = RequestUtil.getLong(req, "p_name", -1L);
-        String name = StringUtils.decodeUTF8(RequestUtil.processParams(req, "name").trim());
+        String name = RequestUtil.processParams(req, "name").trim();
         //起始时间
 //        String b_time = RequestUtil.processParams(req, "b_time");
         //购买月数
@@ -420,7 +429,7 @@ public class VipServiceImpl implements VipService {
         Long id = RequestUtil.getLong(req, "id", -1L);
 
         //备注
-        String remark = StringUtils.decodeUTF8(RequestUtil.processParams(req, "remark"));
+        String remark = RequestUtil.processParams(req, "remark");
         //实收金额
         String acttotal = RequestUtil.processParams(req, "act_total");
 
@@ -469,7 +478,7 @@ public class VipServiceImpl implements VipService {
             //******添加月卡消费记录*******
             Integer renewId = (commonDao.selectSequence(CardRenewTb.class)).intValue();
             String tradeNo  = TimeTools.getTimeYYYYMMDDHHMMSS()+""+comid;
-            String operater = StringUtils.decodeUTF8(RequestUtil.getString(req,"nickname"));
+            String operater = RequestUtil.getString(req,"nickname");
             //组装插入月卡消费记录数据
             CardRenewTb cardRenewTb = new CardRenewTb();
             cardRenewTb.setId(renewId);
@@ -493,15 +502,30 @@ public class VipServiceImpl implements VipService {
             if(renew==1){
                 result.put("state",1);
                 result.put("msg","续费成功");
+                //下发 更新月卡信息
                 int ins = insertSysn(carowerProduct,1,comid);
+                //下发 月卡续费记录
+                int res = insertCardSysn(cardRenewTb,0,comid);
                 if(ins!=1){
                     logger.error("======>>>>插入同步表失败");
                 }
             }
 
+        }else{
+            logger.error("==>>>>没有这张月卡会员信息");
         }
 //            daService.update("insert into sync_info_pool_tb(comid,table_name,table_id,create_time,operate) values(?,?,?,?,?)", new Object[]{comid,"card_renew_tb",renewId,System.currentTimeMillis()/1000,0});
         return result;
+    }
+
+    private int insertCardSysn(CardRenewTb cardRenewTb, int operater, Long comid) {
+        SyncInfoPoolTb syncInfoPoolTb = new SyncInfoPoolTb();
+        syncInfoPoolTb.setComid(comid);
+        syncInfoPoolTb.setTableId((cardRenewTb.getId()).longValue());
+        syncInfoPoolTb.setTableName("carower_product");
+        syncInfoPoolTb.setCreateTime(System.currentTimeMillis() / 1000);
+        syncInfoPoolTb.setOperate(operater);
+        return commonDao.insert(syncInfoPoolTb);
     }
 
     private int insertSysn(CarowerProduct carowerProduct, Integer operater, Long comid) {
@@ -513,6 +537,8 @@ public class VipServiceImpl implements VipService {
         syncInfoPoolTb.setOperate(operater);
         return commonDao.insert(syncInfoPoolTb);
     }
+
+
 
     private boolean isCarNumberSame(String carNumber, String carNumberMonth) {
         int length1 = carNumber.length();

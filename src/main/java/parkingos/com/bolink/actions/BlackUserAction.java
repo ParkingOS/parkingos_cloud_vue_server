@@ -78,9 +78,9 @@ public class BlackUserAction {
 
     @RequestMapping(value = "/add")
     public String add(HttpServletRequest request, HttpServletResponse resp) {
-        String remark = StringUtils.decodeUTF8(RequestUtil.getString(request, "remark"));
-        String carNumber =  StringUtils.decodeUTF8(RequestUtil.getString(request, "car_number"));
-        String operator =  StringUtils.decodeUTF8(RequestUtil.getString(request, "operator"));
+        String remark = RequestUtil.getString(request, "remark");
+        String carNumber =  RequestUtil.getString(request, "car_number");
+        String operator = RequestUtil.getString(request, "operator");
         if("".equals(operator)){
             operator = RequestUtil.getString(request,"loginuin");
         }

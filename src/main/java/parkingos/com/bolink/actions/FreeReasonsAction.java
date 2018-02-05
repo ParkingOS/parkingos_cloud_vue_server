@@ -37,7 +37,7 @@ public class FreeReasonsAction {
     @RequestMapping(value = "/add")
     public String addReason(HttpServletRequest request, HttpServletResponse resp){
 
-        String name = StringUtils.decodeUTF8(RequestUtil.getString(request, "name"));
+        String name = RequestUtil.getString(request, "name");
         Integer sort = RequestUtil.getInteger(request, "sort", 0);
         Long comid = RequestUtil.getLong(request,"comid",-1L);
 

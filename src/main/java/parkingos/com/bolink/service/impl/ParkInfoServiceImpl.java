@@ -10,7 +10,6 @@ import parkingos.com.bolink.models.SyncInfoPoolTb;
 import parkingos.com.bolink.service.ParkInfoService;
 import parkingos.com.bolink.utils.OrmUtil;
 import parkingos.com.bolink.utils.RequestUtil;
-import parkingos.com.bolink.utils.StringUtils;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.Map;
@@ -56,11 +55,11 @@ public class ParkInfoServiceImpl implements ParkInfoService {
         JSONObject result = JSONObject.parseObject(str);
 
         Long comid = RequestUtil.getLong(request,"comid",-1L);
-        String company = StringUtils.decodeUTF8(RequestUtil.processParams(request, "company_name"));
-        String address =StringUtils.decodeUTF8(RequestUtil.processParams(request, "address"));
+        String company = RequestUtil.processParams(request, "company_name");
+        String address =RequestUtil.processParams(request, "address");
         String phone =RequestUtil.processParams(request, "phone");
         String mobile =RequestUtil.processParams(request, "mobile");
-        String property =StringUtils.decodeUTF8(RequestUtil.processParams(request, "property"));
+        String property =RequestUtil.processParams(request, "property");
         String id =RequestUtil.processParams(request, "id");
         Integer type = RequestUtil.getInteger(request, "type", 0);
         Integer parking_type = RequestUtil.getInteger(request, "parking_type", 0);

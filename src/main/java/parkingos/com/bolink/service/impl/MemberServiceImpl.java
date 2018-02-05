@@ -167,11 +167,9 @@ public class MemberServiceImpl implements MemberService {
         if(reqParameterMap.get("sex")!=null&&!"".equals(reqParameterMap.get("sex"))){
             sex = Long.parseLong(reqParameterMap.get("sex"));
         }
-        if(nickname.equals("")) nickname=null;
-        if(phone.equals("")) phone=null;
-        if(mobile.equals("")) mobile=null;
-//        Map adminMap = (Map) request.getSession().getAttribute("userinfo");
-
+        if("".equals(nickname)) nickname=null;
+        if("".equals(mobile)) mobile=null;
+        if("".equals(phone)) phone=null;
 
         Long time = System.currentTimeMillis()/1000;
         //用户表

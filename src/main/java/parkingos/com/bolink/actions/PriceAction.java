@@ -38,8 +38,8 @@ public class PriceAction {
     @RequestMapping(value = "/add")
     public String createPrice(HttpServletRequest request, HttpServletResponse resp){
         Long createTime = System.currentTimeMillis()/1000;
-        String describe =StringUtils.decodeUTF8(RequestUtil.getString(request,"describe"));
-        String carTypeZh =StringUtils.decodeUTF8(RequestUtil.getString(request,"car_type_zh"));
+        String describe =RequestUtil.getString(request,"describe");
+        String carTypeZh =RequestUtil.getString(request,"car_type_zh");
         Long comid = Long.valueOf(request.getParameter("comid"));
         Long id  = priceService.getId();
         PriceTb priceTb = new PriceTb();
@@ -59,8 +59,8 @@ public class PriceAction {
     @RequestMapping(value = "/edit")
     public String editPrice(HttpServletRequest request, HttpServletResponse resp){
         Long id = RequestUtil.getLong(request,"id",-1L);
-        String describe =StringUtils.decodeUTF8(RequestUtil.getString(request,"describe"));
-        String carTypeZh =StringUtils.decodeUTF8(RequestUtil.getString(request,"car_type_zh"));
+        String describe =RequestUtil.getString(request,"describe");
+        String carTypeZh =RequestUtil.getString(request,"car_type_zh");
         Long updateTime = System.currentTimeMillis()/1000;
 
         PriceTb priceTb = new PriceTb();

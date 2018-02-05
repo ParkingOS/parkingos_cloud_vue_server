@@ -40,7 +40,7 @@ public class CarTypeAction {
     @RequestMapping(value = "/add")
     public String add(HttpServletRequest request, HttpServletResponse resp){
         Long comid = RequestUtil.getLong(request,"comid",-1L);
-        String name = StringUtils.decodeUTF8(RequestUtil.getString(request, "name"));
+        String name =RequestUtil.getString(request, "name");
         Integer sort = RequestUtil.getInteger(request, "sort", 0);
         Long id = carTypeService.getId();
         String cartypeId = comid+""+new Random().nextInt(1000000);

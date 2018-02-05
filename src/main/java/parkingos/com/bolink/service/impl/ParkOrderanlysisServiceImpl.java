@@ -131,6 +131,8 @@ public class ParkOrderanlysisServiceImpl implements ParkOrderAnlysisService {
                     //收费员名称
                     totalOrder.put("name", worker.getNickname());
                 }
+                //格式化应收
+                totalOrder.put("amount_receivable",String.format("%.2f",StringUtils.formatDouble(Double.parseDouble(totalOrder.get("amount_receivable")+""))));
 
                 //现金支付
                 cashMoney +=StringUtils.formatDouble(totalOrder.get("cash_pay"))+StringUtils.formatDouble(totalOrder.get("cash_prepay"));
@@ -139,18 +141,21 @@ public class ParkOrderanlysisServiceImpl implements ParkOrderAnlysisService {
                 elecMoney += StringUtils.formatDouble(totalOrder.get("electronic_pay")) + StringUtils.formatDouble(totalOrder.get("electronic_prepay"));
                 totalOrder.put("electronic_pay", String.format("%.2f", StringUtils.formatDouble(totalOrder.get("electronic_pay")) + StringUtils.formatDouble(totalOrder.get("electronic_prepay"))));
                 //每一行的合计 = 现金支付+电子支付
-                totalOrder.put("act_total",StringUtils.formatDouble(Double.parseDouble(totalOrder.get("cash_pay")+"")+Double.parseDouble(totalOrder.get("electronic_pay")+"")));
+                totalOrder.put("act_total", String.format("%.2f",StringUtils.formatDouble(Double.parseDouble(totalOrder.get("cash_pay")+"")+Double.parseDouble(totalOrder.get("electronic_pay")+""))));
 
                 //免费支付
-                totalOrder.put("free_pay", 0.0);
+                totalOrder.put("free_pay",  String.format("%.2f",0.00));
                 //遍历免费集合
                 if (freeList != null && freeList.size() > 0) {
                     for (Map<String, Object> freeOrder : freeList) {
                         if (totalOrder.get("out_uid").equals(freeOrder.get("out_uid"))) {
-                            double freePay = Double.parseDouble((freeOrder.get("free_pay") == null ? "0" : freeOrder.get("free_pay") + ""));
-                            double reduceAmount = Double.parseDouble((totalOrder.get("reduce_pay") == null ? "0" : totalOrder.get("reduce_pay") + ""));
+                            double freePay = StringUtils.formatDouble(Double.parseDouble((freeOrder.get("free_pay") == null ? "0.00" : freeOrder.get("free_pay") + "")));
+                            double reduceAmount = StringUtils.formatDouble(Double.parseDouble((totalOrder.get("reduce_pay") == null ? "0.00" : totalOrder.get("reduce_pay") + "")));
+                            logger.error("========>>>>freePay"+freePay);
+                            logger.error("========>>>>reduceAmount"+reduceAmount);
                             double actFreePay = freePay+reduceAmount;
-                            totalOrder.put("free_pay",StringUtils.formatDouble(actFreePay));
+                            logger.error("========>>>>actFreePay"+actFreePay);
+                            totalOrder.put("free_pay",String.format("%.2f",StringUtils.formatDouble(actFreePay)));
                             actFreeMoney+=actFreePay;
 
                         }
@@ -164,11 +169,11 @@ public class ParkOrderanlysisServiceImpl implements ParkOrderAnlysisService {
             Map sumMap = new HashMap();
             sumMap.put("name","合计");
             sumMap.put("scount",totalCount);
-            sumMap.put("amount_receivable",StringUtils.formatDouble(totalMoney));
-            sumMap.put("cash_pay",StringUtils.formatDouble(cashMoney));
-            sumMap.put("electronic_pay",StringUtils.formatDouble(elecMoney));
-            sumMap.put("act_total",StringUtils.formatDouble((cashMoney+elecMoney)));
-            sumMap.put("free_pay",StringUtils.formatDouble(actFreeMoney));
+            sumMap.put("amount_receivable",String.format("%.2f",StringUtils.formatDouble(totalMoney)));
+            sumMap.put("cash_pay",String.format("%.2f",StringUtils.formatDouble(cashMoney)));
+            sumMap.put("electronic_pay",String.format("%.2f",StringUtils.formatDouble(elecMoney)));
+            sumMap.put("act_total",String.format("%.2f",StringUtils.formatDouble((cashMoney+elecMoney))));
+            sumMap.put("free_pay",String.format("%.2f",StringUtils.formatDouble(actFreeMoney)));
             backList.add(sumMap);
         }
 

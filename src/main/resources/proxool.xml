@@ -15,6 +15,6 @@
       <house-keeping-sleep-time>90000</house-keeping-sleep-time>
       <house-keeping-test-sql>select current_date</house-keeping-test-sql>
       <maximum-active-time>60000</maximum-active-time>
+	  
   </proxool>
-
 </proxool-config>
