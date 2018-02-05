@@ -144,18 +144,22 @@ public class ShopManageServiceImpl implements ShopManageService {
         double discount_percent = RequestUtil.getDouble( request, "discount_percent", 100.00 );//商户折扣/%
         double discount_money = RequestUtil.getDouble( request, "discount_money", 1.00 );//商户折扣---每小时/元
         Integer validite_time = RequestUtil.getInteger( request, "validite_time", 0 );//有效期/小时
+        Integer ticket_unit = RequestUtil.getInteger(request, "ticket_unit", 1);//单位
+        double free_money = RequestUtil.getDouble(request, "free_money",1.00);//全免劵单价---每张/元
 
         //封装
         ShopTb shopTb = new ShopTb();
         shopTb.setName( name );
         shopTb.setAddress( address );
         shopTb.setMobile( mobile );
+        shopTb.setTicketUnit( ticket_unit );
         //shopTb.setPhone( phone );
         shopTb.setTicketType( ticket_type );
         shopTb.setDefaultLimit( default_limit );
         shopTb.setDiscountMoney( new BigDecimal( discount_money ) );
         shopTb.setDiscountPercent( new BigDecimal( discount_percent ) );
         shopTb.setValiditeTime( validite_time );
+        shopTb.setFreeMoney( new BigDecimal( free_money ) );
 
         shopTb.setComid( RequestUtil.getLong( request, "comid", -1L ) );
         int update = 0;
