@@ -5,6 +5,10 @@ import java.math.BigDecimal;
 public class ShopTb {
     private Long id;
 
+    private  BigDecimal freeMoney;
+
+    private Integer ticketUnit;
+
     private String name;
 
     private String address;
@@ -117,10 +121,24 @@ public class ShopTb {
         this.createTime = createTime;
     }
 
+    public void setTicketUnit(Integer ticketUnit) {
+        this.ticketUnit = ticketUnit;
+    }
+
+    public BigDecimal getFreeMoney() {
+        return freeMoney;
+    }
+
+    public void setFreeMoney(BigDecimal freeMoney) {
+        this.freeMoney = freeMoney;
+    }
+
     @Override
     public String toString() {
         return "ShopTb{" +
                 "id=" + id +
+                ", freeMoney=" + freeMoney +
+                ", ticketUnit=" + ticketUnit +
                 ", name='" + name + '\'' +
                 ", address='" + address + '\'' +
                 ", mobile='" + mobile + '\'' +
@@ -138,6 +156,10 @@ public class ShopTb {
                 ", discountMoney=" + discountMoney +
                 ", validiteTime=" + validiteTime +
                 '}';
+    }
+
+    public Integer getTicketUnit() {
+        return ticketUnit;
     }
 
     public Integer getTicketfreeLimit() {

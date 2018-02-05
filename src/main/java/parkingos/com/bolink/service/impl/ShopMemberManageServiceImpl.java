@@ -89,7 +89,6 @@ public class ShopMemberManageServiceImpl implements ShopMemberManageService {
 
         String strid = "";
         String nickname = RequestUtil.processParams( request, "nickname" );
-        System.out.println( nickname );
         try {
             nickname = new String( nickname.getBytes( "ISO-8859-1" ), "UTF-8" );
         } catch (UnsupportedEncodingException e) {
@@ -122,6 +121,7 @@ public class ShopMemberManageServiceImpl implements ShopMemberManageService {
             Long squen = commonDao.selectSequence( UserInfoTb.class );
             userInfoTb.setStrid( "test" + squen );
             userInfoTb.setRegTime( time );
+            userInfoTb.setId( squen );
             count = commonDao.insert( userInfoTb );
         } else {
             //修改操作

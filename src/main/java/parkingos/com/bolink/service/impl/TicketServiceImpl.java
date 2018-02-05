@@ -208,6 +208,8 @@ public class TicketServiceImpl implements TicketService {
                     list.add( "时长减免" );
                 } else if (type == 5) {
                     list.add( "金额减免" );
+                } else if (type == 4) {
+                    list.add( "全免券" );
                 } else {
                     list.add( type );
                 }
