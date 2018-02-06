@@ -58,8 +58,7 @@ public class ShopManageServiceImpl implements ShopManageService {
             }
         }
         Integer ticket_limit = RequestUtil.getInteger( request, "ticket_time", 0 );
-        Integer ticketfree_limit = 0;
-
+        Integer ticketfree_limit = RequestUtil.getInteger( request, "ticketfree_limit", 0 );
         shopTb.setTicketLimit( shopTb.getTicketLimit() + ticket_limit );
         shopTb.setTicketfreeLimit( shopTb.getTicketfreeLimit() + ticketfree_limit );
         shopTb.setTicketMoney( shopTb.getTicketMoney() + ticket_money );

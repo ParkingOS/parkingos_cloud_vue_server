@@ -114,12 +114,13 @@ public class ShopMemberManageServiceImpl implements ShopMemberManageService {
         userInfoTb.setPhone( phone );
         userInfoTb.setMobile( mobile );
         userInfoTb.setAuthFlag( role );
-        userInfoTb.setPassword( "123456" );
+
         int count = 0;
         if (userid == -1) {
             //添加操作
             Long squen = commonDao.selectSequence( UserInfoTb.class );
             userInfoTb.setStrid( "test" + squen );
+            userInfoTb.setPassword( squen+"" );
             userInfoTb.setRegTime( time );
             userInfoTb.setId( squen );
             count = commonDao.insert( userInfoTb );
