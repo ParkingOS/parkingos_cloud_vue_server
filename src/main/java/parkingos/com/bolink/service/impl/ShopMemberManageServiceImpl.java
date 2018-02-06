@@ -9,8 +9,10 @@ import parkingos.com.bolink.dao.spring.CommonDao;
 import parkingos.com.bolink.models.UserInfoTb;
 import parkingos.com.bolink.qo.PageOrderConfig;
 import parkingos.com.bolink.service.ShopMemberManageService;
+import parkingos.com.bolink.utils.CustomDefind;
 import parkingos.com.bolink.utils.OrmUtil;
 import parkingos.com.bolink.utils.RequestUtil;
+import parkingos.com.bolink.utils.StringUtils;
 
 import javax.servlet.http.HttpServletRequest;
 import java.io.UnsupportedEncodingException;
@@ -78,6 +80,13 @@ public class ShopMemberManageServiceImpl implements ShopMemberManageService {
 
         int update = 0;
         if (newPass.length() > 5 && newPass.equals( confirmPass )) {
+            String md5Pass = "";
+            if(md5Pass.length()<32){
+                //md5密码 ，生成规则：原密码md5后，加上'zldtingchebao201410092009'再次md5
+                md5Pass = StringUtils.MD5(newPass);
+                md5Pass = StringUtils.MD5(md5Pass +"zldtingchebao201410092009");
+            }
+            userInfoTb.setMd5pass( md5Pass );
             update = commonDao.updateByPrimaryKey( userInfoTb );
         }
         return "{\"state\":" + update + "}";
@@ -87,7 +96,6 @@ public class ShopMemberManageServiceImpl implements ShopMemberManageService {
     @Override
     public String create(HttpServletRequest request) {
 
-        String strid = "";
         String nickname = RequestUtil.processParams( request, "nickname" );
         try {
             nickname = new String( nickname.getBytes( "ISO-8859-1" ), "UTF-8" );
@@ -123,6 +131,13 @@ public class ShopMemberManageServiceImpl implements ShopMemberManageService {
             userInfoTb.setPassword( squen+"" );
             userInfoTb.setRegTime( time );
             userInfoTb.setId( squen );
+            String md5Pass = "";
+            if(md5Pass.length()<32){
+                //md5密码 ，生成规则：原密码md5后，加上'zldtingchebao201410092009'再次md5
+                md5Pass = StringUtils.MD5(squen+"");
+                md5Pass = StringUtils.MD5(md5Pass +"zldtingchebao201410092009");
+            }
+            userInfoTb.setMd5pass( md5Pass );
             count = commonDao.insert( userInfoTb );
         } else {
             //修改操作
