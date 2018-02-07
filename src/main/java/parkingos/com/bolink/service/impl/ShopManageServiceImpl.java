@@ -45,21 +45,26 @@ public class ShopManageServiceImpl implements ShopManageService {
         double addmoney = RequestUtil.getDouble( request, "addmoney", 0.00 );
         //减免类型
         Integer ticket_type = Integer.parseInt( shopTb.getTicketType() + "" );
-
+        if(addmoney<=0){
+            //有可能全免券和优惠券都为0
+            return "{\"state\":0}";
+        }
         if (ticket_type == 1) {
-            if (0 >= ticket_time) {
+            if (0 > ticket_time) {
                 //StringUtils.ajaxOutput( resp, "减免小时必须输入正整数" );
                 return "{\"state\":0}";
             }
         } else {
-            if (0 >= ticket_money) {
+            if (0 > ticket_money) {
                 //StringUtils.ajaxOutput( resp, "减免劵必须输入正整数" );
                 return "{\"state\":0}";
             }
         }
-        Integer ticket_limit = RequestUtil.getInteger( request, "ticket_time", 0 );
         Integer ticketfree_limit = RequestUtil.getInteger( request, "ticketfree_limit", 0 );
-        shopTb.setTicketLimit( shopTb.getTicketLimit() + ticket_limit );
+        if(ticketfree_limit<0){
+            return "{\"state\":0}";
+        }
+        shopTb.setTicketLimit( shopTb.getTicketLimit() + ticket_time );
         shopTb.setTicketfreeLimit( shopTb.getTicketfreeLimit() + ticketfree_limit );
         shopTb.setTicketMoney( shopTb.getTicketMoney() + ticket_money );
         commonDao.updateByPrimaryKey( shopTb );
@@ -67,14 +72,14 @@ public class ShopManageServiceImpl implements ShopManageService {
         ShopAccountTb shopAccountTb = new ShopAccountTb();
         shopAccountTb.setShopId( Integer.parseInt( shopTb.getId() + "" ) );
         shopAccountTb.setShopName( shopTb.getName() );
-        shopAccountTb.setTicketLimit( ticket_limit );
+        shopAccountTb.setTicketLimit( ticket_time );
         shopAccountTb.setTicketfreeLimit( ticketfree_limit );
         shopAccountTb.setTicketMoney( ticket_money );
         shopAccountTb.setAddMoney( new BigDecimal( addmoney ) );
         shopAccountTb.setOperateTime( System.currentTimeMillis() / 1000 );
         shopAccountTb.setOperateType( 1 );
         shopAccountTb.setParkId( RequestUtil.getLong( request, "parkid", -1L ) );
-        shopAccountTb.setStrid( "IST_test" );
+        shopAccountTb.setStrid( "test" );
         shopAccountTb.setOperator( RequestUtil.getLong( request, "operator", -1L ) );
         int insert = commonDao.insert( shopAccountTb );
 
