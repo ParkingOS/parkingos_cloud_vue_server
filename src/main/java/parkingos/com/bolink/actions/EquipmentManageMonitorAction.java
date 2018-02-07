@@ -91,7 +91,7 @@ public class EquipmentManageMonitorAction {
 
 		Long id = RequestUtil.getLong(request,"id",null);
 		Long name = RequestUtil.getLong(request,"name",null);
-		Long monitorId = RequestUtil.getLong(request,"monitor_id",null);
+		//Long monitorId = RequestUtil.getLong(request,"monitor_id",null);
 		Long channelId = RequestUtil.getLong(request,"channel_id",null);
 		Integer netStatus = RequestUtil.getInteger(request,"net_status",null);
 		Integer isShow = RequestUtil.getInteger(request,"is_show",1);
