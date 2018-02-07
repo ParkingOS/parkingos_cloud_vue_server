@@ -6,13 +6,16 @@ import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import parkingos.com.bolink.dao.spring.CommonDao;
+import parkingos.com.bolink.enums.FieldOperator;
 import parkingos.com.bolink.models.AuthRoleTb;
 import parkingos.com.bolink.models.CollectorSetTb;
 import parkingos.com.bolink.models.UserInfoTb;
 import parkingos.com.bolink.models.UserRoleTb;
 import parkingos.com.bolink.qo.PageOrderConfig;
+import parkingos.com.bolink.qo.SearchBean;
 import parkingos.com.bolink.service.AdminRoleService;
 import parkingos.com.bolink.service.SupperSearchService;
+import parkingos.com.bolink.utils.OrmUtil;
 
 import java.util.*;
 
@@ -29,11 +32,72 @@ public class AdminRoleServiceImpl implements AdminRoleService {
     @Override
     public JSONObject selectResultByConditions(Map<String, String> reqmap) {
 
+
+        String str = "{\"total\":12,\"page\":1,\"money\":0.0,\"rows\":[]}";
+        JSONObject result = JSONObject.parseObject(str);
+
+        int count =0;
+        List<UserRoleTb> list =null;
+        List<Map<String, Object>> resList =new ArrayList<>();
+
         Long uin = Long.parseLong(reqmap.get("loginuin"));
         UserRoleTb userRoleTb = new UserRoleTb();
-        userRoleTb.setAdminid(uin);
         userRoleTb.setState(0);
-        JSONObject result = supperSearchService.supperSearch(userRoleTb, reqmap);
+
+        Map searchMap = supperSearchService.getBaseSearch(userRoleTb,reqmap);
+        logger.info(searchMap);
+        if(searchMap!=null&&!searchMap.isEmpty()){
+            UserRoleTb baseQuery =(UserRoleTb)searchMap.get("base");
+            List<SearchBean> supperQuery = null;
+            if(searchMap.containsKey("supper"))
+                supperQuery = (List<SearchBean>)searchMap.get("supper");
+            PageOrderConfig config = null;
+            if(searchMap.containsKey("config"))
+                config = (PageOrderConfig)searchMap.get("config");
+
+
+//            List<SearchBean> searchList = new ArrayList<>();
+//            searchList.add( searchBean );
+
+            String sql = "select id from user_info_tb where comid= "+reqmap.get("comid")+" and role_id="+reqmap.get("roleid");
+            List<Map> list1 = commonDao.getObjectBySql(sql);
+            List idList =new ArrayList();
+            for(Map map:list1){
+                idList.add(Long.parseLong(map.get("id")+""));
+            }
+
+            //封装searchbean  要求同一级账号登录员工可以看到相同的内容
+            SearchBean searchBean = new SearchBean();
+            searchBean.setOperator(FieldOperator.CONTAINS);
+            searchBean.setFieldName("adminid");
+            searchBean.setBasicValue(idList);
+
+            if (supperQuery == null) {
+                supperQuery = new ArrayList<>();
+            }
+            supperQuery.add( searchBean );
+
+            count = commonDao.selectCountByConditions(baseQuery,supperQuery);
+            if(count>0){
+                list = commonDao.selectListByConditions(baseQuery,supperQuery,config);
+                Double total = 0.0;
+                if (list != null && !list.isEmpty()) {
+                    for (UserRoleTb product : list) {
+                        OrmUtil<UserRoleTb> otm = new OrmUtil<>();
+                        Map<String, Object> map = otm.pojoToMap(product);
+                        if(map.get("amount")!=null){
+                            total += Double.parseDouble(map.get("amount")+"");
+                        }
+                        resList.add(map);
+                    }
+                    result.put("money",total);
+                    result.put("rows", JSON.toJSON(resList));
+                }
+            }
+        }
+        result.put("total",count);
+        result.put("page",Integer.parseInt(reqmap.get("page")));
+
         return result;
     }
 

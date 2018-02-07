@@ -80,6 +80,8 @@ public class LoginServiceImpl implements LoginService {
             } else {
                 user.put("oid", userRoleTb.getOid());
                 String orgname = zldOrgtypeTb.getName();
+                System.out.println("========组织类型:"+orgname);
+                user.put("orgname",orgname);
                 if (orgname.contains("车场")) {
                     ComInfoTb comInfoTb = new ComInfoTb();
                     comInfoTb.setId(userInfoTb.getComid());

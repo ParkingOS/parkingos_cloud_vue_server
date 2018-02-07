@@ -8,4 +8,8 @@ public interface FreeReasonsService {
     public JSONObject selectResultByConditions(Map<String, String> map);
 
     JSONObject createFreeReason(String name, Integer sort, Long comid);
+
+    JSONObject deleteFreeReason(Long id);
+
+    JSONObject editReason(Long id, String name, Integer sort);
 }

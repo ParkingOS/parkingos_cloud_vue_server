@@ -157,7 +157,7 @@ public class AdminRoleAction {
         System.out.println("========进入方法");
         Long id = RequestUtil.getLong(request,"id",-1L);
 
-        String auths = StringUtils.decodeUTF8(RequestUtil.getString(request,"auths"));
+        String auths = RequestUtil.getString(request,"auths");
         System.out.println("======更改权限id:"+id);
         System.out.println("======更改权限auths:"+auths);
 

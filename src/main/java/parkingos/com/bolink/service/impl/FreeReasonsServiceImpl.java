@@ -50,6 +50,46 @@ public class FreeReasonsServiceImpl implements FreeReasonsService {
         return result;
     }
 
+    @Override
+    public JSONObject deleteFreeReason(Long id) {
+        String str = "{\"state\":0,\"msg\":\"删除失败\"}";
+        JSONObject result = JSONObject.parseObject(str);
+
+        FreeReasonsTb freeReasonsTb = new FreeReasonsTb();
+        freeReasonsTb.setId(id);
+        int count = commonDao.selectCountByConditions(freeReasonsTb);
+        logger.info("======>>>>删除:"+count);
+        if(count==1){
+            freeReasonsTb = (FreeReasonsTb)commonDao.selectObjectByConditions(freeReasonsTb);
+            int res = commonDao.deleteByConditions(freeReasonsTb);
+            logger.info("======>>>>删除:"+res);
+            if(res==1){
+                result.put("state",1);
+                result.put("msg","删除成功");
+                insertSysn(freeReasonsTb,2);
+            }
+        }
+        return result;
+    }
+
+    @Override
+    public JSONObject editReason(Long id, String name, Integer sort) {
+        String str = "{\"state\":0,\"msg\":\"更新失败\"}";
+        JSONObject result = JSONObject.parseObject(str);
+        FreeReasonsTb freeReasonsTb = new FreeReasonsTb();
+        freeReasonsTb.setId(id);
+        freeReasonsTb.setName(name);
+        freeReasonsTb.setSort(sort);
+        int res = commonDao.updateByPrimaryKey(freeReasonsTb);
+        if(res==1){
+            result.put("state",1);
+            result.put("msg","更新成功");
+            insertSysn(freeReasonsTb,1);
+        }
+
+        return result;
+    }
+
     private void insertSysn(FreeReasonsTb freeReasonsTb, Integer operater){
         SyncInfoPoolTb syncInfoPoolTb = new SyncInfoPoolTb();
         syncInfoPoolTb.setComid(freeReasonsTb.getComid());

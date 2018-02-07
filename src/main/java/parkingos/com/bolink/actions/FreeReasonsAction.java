@@ -46,4 +46,28 @@ public class FreeReasonsAction {
         StringUtils.ajaxOutput(resp,result.toJSONString());
         return null;
     }
+
+    @RequestMapping(value = "/delete")
+    public String deleteReason(HttpServletRequest request, HttpServletResponse resp){
+
+        Long id = RequestUtil.getLong(request, "id", -1L);
+
+        JSONObject result = freeReasonsService.deleteFreeReason(id);
+        //把结果返回页面
+        StringUtils.ajaxOutput(resp,result.toJSONString());
+        return null;
+    }
+
+
+    @RequestMapping(value = "/edit")
+    public String editReason(HttpServletRequest request, HttpServletResponse resp){
+
+        Long id = RequestUtil.getLong(request, "id", -1L);
+        String name = RequestUtil.getString(request, "name");
+        Integer sort = RequestUtil.getInteger(request, "sort", 0);
+        JSONObject result = freeReasonsService.editReason(id,name,sort);
+        //把结果返回页面
+        StringUtils.ajaxOutput(resp,result.toJSONString());
+        return null;
+    }
 }
