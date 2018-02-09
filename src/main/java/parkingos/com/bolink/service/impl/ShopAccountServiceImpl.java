@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 import parkingos.com.bolink.dao.spring.CommonDao;
 import parkingos.com.bolink.enums.FieldOperator;
 import parkingos.com.bolink.models.ShopAccountTb;
+import parkingos.com.bolink.models.ShopTb;
 import parkingos.com.bolink.models.UserInfoTb;
 import parkingos.com.bolink.qo.PageOrderConfig;
 import parkingos.com.bolink.qo.SearchBean;
@@ -134,10 +135,25 @@ public class ShopAccountServiceImpl implements ShopAcccountService {
             }
 
             if (list != null && !list.isEmpty()) {
+                //查询商户额度类型
+                ShopTb shopTb = new ShopTb();
+                shopTb.setState( 0 );
+                shopTb.setComid(Long.valueOf( reqmap.get( "comid" ) )  );
+
+                List<ShopTb> shops = commonDao.selectListByConditions( shopTb );
+                Map<Long,Integer> shopUnits=new HashMap<>();
+
+                if(shops!=null&&!shops.isEmpty()){
+                    for(ShopTb shop:shops){
+                        shopUnits.put( shop.getId(),shop.getTicketUnit() );
+                    }
+                }
+
                 for (ShopAccountTb product : list) {
                     OrmUtil<ShopAccountTb> otm = new OrmUtil<>();
                     Map<String, Object> map = otm.pojoToMap( product );
                     map.put( "nickname", names.get( product.getOperator() ) );
+                    map.put( "ticket_unit",shopUnits.get(Long.valueOf( product.getShopId()) ) );
                     resList.add( map );
                 }
                 result.put( "rows", JSON.toJSON( resList ) );

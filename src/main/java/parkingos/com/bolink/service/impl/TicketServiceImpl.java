@@ -127,7 +127,8 @@ public class TicketServiceImpl implements TicketService {
 
             if (list != null && !list.isEmpty()) {
 
-                //查询停车场名称
+                //查询停车场名称 和ticket_unit
+                Map<Long,Integer> shopUnits = new HashMap<>();
                 if (shopNames == null) {
                     shopNames = new HashMap<>();
                     List<Long> idList = new ArrayList<>();
@@ -142,6 +143,7 @@ public class TicketServiceImpl implements TicketService {
                     if (shopTbs != null && !shopTbs.isEmpty()) {
                         for (ShopTb s : shopTbs) {
                             shopNames.put( s.getId(), s.getName() );
+                            shopUnits.put( s.getId(),s.getTicketUnit() );
                         }
                     }
                 }
@@ -150,6 +152,7 @@ public class TicketServiceImpl implements TicketService {
                     OrmUtil<TicketTb> otm = new OrmUtil<>();
                     Map<String, Object> map = otm.pojoToMap( product );
                     map.put( "shop_name", shopNames.get( product.getShopId() ) );
+                    map.put( "ticket_unit",shopUnits.get( product.getShopId() ) );
                     resList.add( map );
                 }
                 result.put( "rows", JSON.toJSON( resList ) );
