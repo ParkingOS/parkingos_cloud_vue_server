@@ -44,7 +44,7 @@ public class ShopTicketAction {
         Map<String, String> reqParameterMap = RequestUtil.readBodyFormRequset( request );
 
         List<List<Object>> bodyList = ticketService.exportExcel( reqParameterMap );
-        String[][] heards = new String[][]{{"编号", "STR"}, {"商户名称", "STR"}, {"优惠时长", "STR"}, {"优惠金额", "STR"}, {"到期时间", "STR"}, {"状态", "STR"}, {"车牌号", "STR"}, {"优惠类型", "STR"}};
+        String[][] heards = new String[][]{{"编号", "STR"}, {"商户名称", "STR"}, {"优惠时长(分钟)", "STR"}, {"优惠时长(小时)", "STR"}, {"优惠时长(天)", "STR"}, {"优惠金额", "STR"}, {"到期时间", "STR"}, {"状态", "STR"}, {"车牌号", "STR"}, {"优惠类型", "STR"}};
 
         ExportDataExcel excel = new ExportDataExcel( "优惠券数据", heards, "sheet1" );
         String fname = "优惠券数据";

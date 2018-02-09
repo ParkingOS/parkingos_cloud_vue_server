@@ -190,8 +190,32 @@ public class TicketServiceImpl implements TicketService {
                 List<Object> list = new ArrayList<>();
                 list.add( map.get( "id" ) );
                 list.add( map.get( "shop_name" ) );
-                list.add( map.get( "money" ) );
-                list.add( map.get( "umoney" ) );
+                //list.add( map.get( "money" ) );
+                //优惠时长
+                Object money = map.get( "money" );
+                if(map.get( "ticket_unit" )==1&&money!=0){
+                    list.add( map.get( "money" ) );
+                }else{
+                    list.add( "" );
+                }
+                if(map.get( "ticket_unit" )==2&&money!=0){
+                    list.add( map.get( "money" ) );
+                }else{
+                    list.add( "" );
+                }
+                if(map.get( "ticket_unit" )==3&&money!=0){
+                    list.add( map.get( "money" ) );
+                }else{
+                    list.add( "" );
+                }
+                Double umoney = Double.valueOf( map.get( "umoney" )+"" );
+                if(umoney>0){
+                    list.add(map.get( "umoney" ) );
+                }else{
+                    list.add( "" );
+                }
+
+
                 Long limit_day = Long.valueOf( map.get( "limit_day" ) + "" );
                 String date = new SimpleDateFormat( "yyyy-MM-DD HH:mm:ss" ).format( new Date( limit_day * 1000 ) );
                 list.add( date );
