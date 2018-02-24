@@ -143,24 +143,21 @@ public class ParkOrderanlysisServiceImpl implements ParkOrderAnlysisService {
                 //每一行的合计 = 现金支付+电子支付
                 totalOrder.put("act_total", String.format("%.2f",StringUtils.formatDouble(Double.parseDouble(totalOrder.get("cash_pay")+"")+Double.parseDouble(totalOrder.get("electronic_pay")+""))));
 
-                //免费支付
-                totalOrder.put("free_pay",  String.format("%.2f",0.00));
+                //减免支付
+                double reduceAmount = StringUtils.formatDouble(Double.parseDouble((totalOrder.get("reduce_pay") == null ? "0.00" : totalOrder.get("reduce_pay") + "")));
+                double actFreePay = reduceAmount;
                 //遍历免费集合
                 if (freeList != null && freeList.size() > 0) {
                     for (Map<String, Object> freeOrder : freeList) {
                         if (totalOrder.get("out_uid").equals(freeOrder.get("out_uid"))) {
                             double freePay = StringUtils.formatDouble(Double.parseDouble((freeOrder.get("free_pay") == null ? "0.00" : freeOrder.get("free_pay") + "")));
-                            double reduceAmount = StringUtils.formatDouble(Double.parseDouble((totalOrder.get("reduce_pay") == null ? "0.00" : totalOrder.get("reduce_pay") + "")));
-                            logger.error("========>>>>freePay"+freePay);
-                            logger.error("========>>>>reduceAmount"+reduceAmount);
-                            double actFreePay = freePay+reduceAmount;
+                            actFreePay = freePay+reduceAmount;
                             logger.error("========>>>>actFreePay"+actFreePay);
-                            totalOrder.put("free_pay",String.format("%.2f",StringUtils.formatDouble(actFreePay)));
-                            actFreeMoney+=actFreePay;
-
                         }
                     }
                 }
+                actFreeMoney+=actFreePay;
+                totalOrder.put("free_pay",  String.format("%.2f",actFreePay));
                 backList.add(totalOrder);
             }
         }

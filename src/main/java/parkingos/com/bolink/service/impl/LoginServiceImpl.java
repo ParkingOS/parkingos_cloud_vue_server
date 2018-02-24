@@ -80,7 +80,6 @@ public class LoginServiceImpl implements LoginService {
             } else {
                 user.put("oid", userRoleTb.getOid());
                 String orgname = zldOrgtypeTb.getName();
-                System.out.println("========组织类型:"+orgname);
                 user.put("orgname",orgname);
                 if (orgname.contains("车场")) {
                     ComInfoTb comInfoTb = new ComInfoTb();
@@ -159,6 +158,12 @@ public class LoginServiceImpl implements LoginService {
                 }
             }
             List<Map<String, Object>> authList = null;
+
+            //所有权限
+            String allsql = "select * from auth_tb where oid = "+userRoleTb.getOid()+"and state = 0";
+            List<Map> allAuthList = commonDao.getObjectBySql(allsql);
+            user.put("allauth", allAuthList);
+
             if (roleId == 0) {//总管理员拥有所有权限
 
                // AuthTb authTb = new AuthTb();
@@ -171,43 +176,69 @@ public class LoginServiceImpl implements LoginService {
                 String sql = "select actions,id auth_id,nname,pid,url,sort,sub_auth childauths from auth_tb where oid= "+userRoleTb.getOid()+" and state=0 ";
                 authList = commonDao.getObjectBySql(sql);//commonDao.selectListByConditions(authTb);
 
-                if (authList != null) {
-                    for (Map<String, Object> map : authList) {
-                        if (map.get("childauths") != null) {
-                            String childauths = (String) map.get("childauths");
-                            if (!childauths.equals("")) {
-                                String[] subs = childauths.split(",");
-                                String subauth = null;
-                                for (int i = 0; i < subs.length; i++) {
-                                    if (i == 0) {
-                                        subauth = "" + i;
-                                    } else {
-                                        subauth += "," + i;
+//                if (authList != null) {
+//                    for (Map<String, Object> map : authList) {
+//                        if (map.get("childauths") != null) {
+//                            String childauths = (String) map.get("childauths");
+//                            if (!childauths.equals("")) {
+//                                String[] subs = childauths.split(",");
+//                                String subauth = null;
+//                                for (int i = 0; i < subs.length; i++) {
+//                                    if (i == 0) {
+//                                        subauth = "" + i;
+//                                    } else {
+//                                        subauth += "," + i;
+//                                    }
+//                                }
+//                                map.put("sub_auth", subauth);
+//                            }
+//                        }
+//                    }
+//                }
+
+            } else {
+                //读取权限
+                String sql = "select a.actions,auth_id,nname,a.pid,a.url,a.sort,ar.sub_auth from auth_role_tb ar left join auth_tb a on ar.auth_id=a.id where role_id= "+roleId+" and a.state=0 order by  a.sort ";
+                authList = commonDao.getObjectBySql(sql);
+
+                for (Map<String, Object> map : authList) {
+                    Long autId = (Long) map.get("auth_id");
+                    String subAuth = (String) map.get("sub_auth");
+                    for (Map map1 : allAuthList) {
+                        Long aid = (Long)map1.get("id");
+                        String sub_auth = (String) map1.get("sub_auth");
+                        if (autId.equals(aid)) {
+                            if (subAuth != null && !subAuth.equals("")) {
+                                String s1[] = subAuth.split(",");
+                                String s2[] = sub_auth.split(",");
+                                String newSubAuth = "";
+                                if (s2.length > 0) {
+                                    for (String index : s1) {
+                                        if (!newSubAuth.equals("")) {
+                                            newSubAuth += ",";
+                                        }
+                                        Integer in = Integer.valueOf(index);
+                                        if (in > s2.length - 1) {
+//										if(s2.length>1)
+//											newSubAuth +=index;
+                                        } else {
+                                            newSubAuth += s2[in];
+                                        }
                                     }
                                 }
-                                map.put("sub_auth", subauth);
+                                map.put("sub_auth", newSubAuth);
+                                break;
                             }
                         }
                     }
                 }
-            } else {
-                //读取权限
-                String sql = "select a.actions,auth_id,nname,a.pid,a.url,a.sort,a.sub_auth " +
-                        "from auth_role_tb ar left join" +
-                        " auth_tb a on ar.auth_id=a.id" +
-                        " where role_id= " + roleId +" and a.state=0 order by  a.sort ";
-                authList = commonDao.getObjectBySql(sql);
             }
+
             user.put("ishdorder", userInfoTb.getOrderHid());
             user.put("authlist", authList);
             user.put("menuauthlist", StringUtils.createJson(authList));
 
-            AuthTb authTb = new AuthTb();
-            authTb.setOid(userRoleTb.getOid());
-            authTb.setState(0);
-            List<AuthTb> allAuthList = commonDao.selectListByConditions(authTb);
 
-            user.put("allauth", allAuthList);
         } else {
             //role: 0总管理员，1停车场后台管理员 ，2车场收费员，3财务，4车主  5市场专员 6录入员
             if (role.intValue() == ZLDType.ZLD_COLLECTOR_ROLE || role.intValue() == ZLDType.ZLD_CAROWER_ROLE || role.intValue() == ZLDType.ZLD_KEYMEN) {//车场收费员及车主不能登录后台

@@ -7,7 +7,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import parkingos.com.bolink.dao.spring.CommonDao;
 import parkingos.com.bolink.enums.FieldOperator;
-import parkingos.com.bolink.models.OrderTb;
 import parkingos.com.bolink.models.ShopTb;
 import parkingos.com.bolink.models.TicketTb;
 import parkingos.com.bolink.qo.PageOrderConfig;
@@ -15,10 +14,7 @@ import parkingos.com.bolink.qo.SearchBean;
 import parkingos.com.bolink.service.SupperSearchService;
 import parkingos.com.bolink.service.TicketService;
 import parkingos.com.bolink.utils.OrmUtil;
-import parkingos.com.bolink.utils.RequestUtil;
 
-import javax.sql.rowset.serial.SerialArray;
-import java.lang.reflect.Field;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
@@ -193,17 +189,18 @@ public class TicketServiceImpl implements TicketService {
                 //list.add( map.get( "money" ) );
                 //优惠时长
                 Object money = map.get( "money" );
-                if(map.get( "ticket_unit" )==1&&money!=0){
+                Integer ticketUnit = (Integer) map.get("ticket_unit");
+                if(ticketUnit==1&&!money.equals(0)){
                     list.add( map.get( "money" ) );
                 }else{
                     list.add( "" );
                 }
-                if(map.get( "ticket_unit" )==2&&money!=0){
+                if(ticketUnit==2&&!money.equals(0)){
                     list.add( map.get( "money" ) );
                 }else{
                     list.add( "" );
                 }
-                if(map.get( "ticket_unit" )==3&&money!=0){
+                if(ticketUnit==3&&!money.equals(0)){
                     list.add( map.get( "money" ) );
                 }else{
                     list.add( "" );

@@ -230,6 +230,7 @@ public class AdminRoleServiceImpl implements AdminRoleService {
             String subAuth = (String) map.get("sub_auth");
             for (Map<String, Object> amap : allAuthsList) {
                 Long aid = (Long) amap.get("id");
+
                 String sub_auth = (String) amap.get("sub_auth");
                 if (autId.equals(aid)) {
                     if (subAuth != null && !subAuth.equals("")) {
@@ -314,6 +315,7 @@ public class AdminRoleServiceImpl implements AdminRoleService {
                             if (!newMap2.get("id").equals(newMap3.get("pid"))) {
                                 i++;
                             } else {//车型设定  也有可能没有
+
                                 map3.put("subname", newMap3.get("name"));
                                 map3.put("ischeck", false);
                                 map3.put("ssid", newMap3.get("id"));
@@ -332,6 +334,7 @@ public class AdminRoleServiceImpl implements AdminRoleService {
                                         map4.put("subname", strArr[j]);
                                         map4.put("subid", stridArr[j]);
                                         map4.put("ischeck", false);
+                                        int mm=0;
                                         for (Map ownMap : ownAuthsList) {
                                             if (ownMap.get("auth_id").equals(newMap3.get("id"))) {
                                                 if (ownMap.get("sub_auth") != null) {
@@ -345,9 +348,13 @@ public class AdminRoleServiceImpl implements AdminRoleService {
                                                         }
                                                     }
                                                 }
+                                            }else{
+                                                mm++;
                                             }
                                         }
-                                        newList3.add(map4);
+                                        if (!"".equals(map4.get("subid"))){
+                                            newList3.add(map4);
+                                        }
                                     }
                                 }
                                 map3.put("subpermission", newList3);
@@ -380,7 +387,10 @@ public class AdminRoleServiceImpl implements AdminRoleService {
                                             }
                                         }
                                     }
-                                    newList2.add(map5);
+                                    if(!"".equals(map5.get("subid"))){
+                                        newList2.add(map5);
+                                    }
+
                                 }
                             }
                         }
@@ -397,7 +407,7 @@ public class AdminRoleServiceImpl implements AdminRoleService {
         allMap.put("allAuth", list);
 
         allMap.put("nickname", userRoleTb.getRoleName());
-
+        System.out.println(JSON.toJSON(allMap).toString());
         return JSON.toJSON(allMap).toString();
     }
 
@@ -426,12 +436,13 @@ public class AdminRoleServiceImpl implements AdminRoleService {
         List authlist =(List)jsonMap.get("allAuth");
 
         int res = 0;
+        int all = 0;
 
         for (int i = 0; i < authlist.size(); i++) {
             System.out.println("=======jsonMap:" +((Map)authlist.get(0) instanceof Map) );
 //            Map map = JSON.parseObject(authlist.get(i).toString(),Map.class);
             Map map = (Map)authlist.get(i);
-            System.out.println("=======是否为true:" + map.get("ischeck"));
+//            System.out.println("=======是否为true:" + map.get("ischeck"));
             if ("true".equals(map.get("ischeck").toString())) {
                 AuthRoleTb pauthRoleTb = new AuthRoleTb();
                 //对应auth_tb中的主键
@@ -454,15 +465,17 @@ public class AdminRoleServiceImpl implements AdminRoleService {
                             List sauthList = (List) map1.get("subpermission");
                             if (((Map) sauthList.get(0)).containsKey("subid")) {//证明已经是最后一级菜单
                                 String sub_auth ="";
+                                int kk = 0;
                                 for (int k = 0; k < sauthList.size(); k++) {
                                     Map map2 = (Map) sauthList.get(k);
                                     //拼装sub_auth参数
                                     if("true".equals(map2.get("ischeck").toString())){
-                                        if(k==0){
+                                        if(kk==0){
                                             sub_auth+=map2.get("subid");
                                         }else{
                                             sub_auth +=","+ map2.get("subid");
                                         }
+                                        kk++;
                                     }
                                 }
                                 AuthRoleTb sauthRoleTb = new AuthRoleTb();
@@ -487,14 +500,16 @@ public class AdminRoleServiceImpl implements AdminRoleService {
                                     if("true".equals(map3.get("ischeck").toString())){//被选中
                                         List subList =(List) map3.get("subpermission");
                                         String subauth = "";
+                                        int nn=0;
                                         for(int n=0;n<subList.size();n++){
                                             Map map4 = (Map) subList.get(n);
                                             if("true".equals(map4.get("ischeck"))){
-                                                if(n==0){
+                                                if(nn==0){
                                                     subauth+=map4.get("subid");
                                                 }else{
                                                     subauth +=","+ map4.get("subid");
                                                 }
+                                                nn++;
                                             }
                                         }
                                         AuthRoleTb subAuthRole = new AuthRoleTb();
@@ -511,11 +526,17 @@ public class AdminRoleServiceImpl implements AdminRoleService {
                         }
                     }
                 }
+            }else{
+                all++;
             }
         }
-        if(res!=0){
-            result.put("state",1);
-            result.put("msg","修改成功");
+
+        if(all==authlist.size()){//所有的都没有勾选
+            res=1;
+        }
+        if(res!=0) {
+            result.put("state", 1);
+            result.put("msg", "修改成功");
         }
         return result;
     }
