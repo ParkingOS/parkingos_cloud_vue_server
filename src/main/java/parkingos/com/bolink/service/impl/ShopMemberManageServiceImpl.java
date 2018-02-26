@@ -134,7 +134,7 @@ public class ShopMemberManageServiceImpl implements ShopMemberManageService {
             String md5Pass = "";
             if(md5Pass.length()<32){
                 //md5密码 ，生成规则：原密码md5后，加上'zldtingchebao201410092009'再次md5
-                md5Pass = StringUtils.MD5(squen+"");
+                md5Pass = StringUtils.MD5("test" + squen);
                 md5Pass = StringUtils.MD5(md5Pass +"zldtingchebao201410092009");
             }
             userInfoTb.setMd5pass( md5Pass );
