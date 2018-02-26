@@ -128,7 +128,7 @@ public class ShopMemberManageServiceImpl implements ShopMemberManageService {
             //添加操作
             Long squen = commonDao.selectSequence( UserInfoTb.class );
             userInfoTb.setStrid( "test" + squen );
-            userInfoTb.setPassword( squen+"" );
+            userInfoTb.setPassword( "test" + squen );
             userInfoTb.setRegTime( time );
             userInfoTb.setId( squen );
             String md5Pass = "";
