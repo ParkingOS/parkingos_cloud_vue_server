@@ -40,11 +40,11 @@ public class BlackUserAction {
     public String edit(HttpServletRequest request, HttpServletResponse resp) {
 
         Long id = RequestUtil.getLong(request, "id", -1L);
-        String remark = StringUtils.decodeUTF8(RequestUtil.getString(request, "remark"));
+        String remark = RequestUtil.getString(request, "remark");
         String carNumber = StringUtils.decodeUTF8(RequestUtil.getString(request, "car_number"));
         Long ntime = System.currentTimeMillis() / 1000;
         Integer state = RequestUtil.getInteger(request, "state", 0);
-        String operator = StringUtils.decodeUTF8(RequestUtil.getString(request, "operator"));
+        String operator = RequestUtil.getString(request, "operator");
         if ("".equals(operator)) {
             operator = RequestUtil.getString(request, "loginuin");
         }

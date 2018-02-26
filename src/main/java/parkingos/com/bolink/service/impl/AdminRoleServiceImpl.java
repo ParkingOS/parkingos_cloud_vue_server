@@ -494,20 +494,19 @@ public class AdminRoleServiceImpl implements AdminRoleService {
                                 ssauthRoleTb.setSubAuth("");
                                 int third = commonDao.insert(ssauthRoleTb);
                                 logger.info("====>>>插入次级权限:"+third);
-
+                                String subauth = "";
                                 for(int m =0;m<sauthList.size();m++){
                                     Map map3 = (Map)sauthList.get(m);
-                                    if("true".equals(map3.get("ischeck").toString())){//被选中
+                                    if("true".equals(map3.get("ischeck").toString())){
                                         List subList =(List) map3.get("subpermission");
-                                        String subauth = "";
                                         int nn=0;
                                         for(int n=0;n<subList.size();n++){
                                             Map map4 = (Map) subList.get(n);
-                                            if("true".equals(map4.get("ischeck"))){
+                                            if("true".equals(map4.get("ischeck").toString())){
                                                 if(nn==0){
                                                     subauth+=map4.get("subid");
                                                 }else{
-                                                    subauth +=","+ map4.get("subid");
+                                                    subauth+=","+ map4.get("subid");
                                                 }
                                                 nn++;
                                             }
