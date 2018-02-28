@@ -463,64 +463,72 @@ public class AdminRoleServiceImpl implements AdminRoleService {
                         if ("true".equals(map1.get("ischeck").toString())) {//证明肯定有子级
                             //判断是不是最后一级菜单  肯定有值
                             List sauthList = (List) map1.get("subpermission");
-                            if (((Map) sauthList.get(0)).containsKey("subid")) {//证明已经是最后一级菜单
-                                String sub_auth ="";
-                                int kk = 0;
-                                for (int k = 0; k < sauthList.size(); k++) {
-                                    Map map2 = (Map) sauthList.get(k);
-                                    //拼装sub_auth参数
-                                    if("true".equals(map2.get("ischeck").toString())){
-                                        if(kk==0){
-                                            sub_auth+=map2.get("subid");
-                                        }else{
-                                            sub_auth +=","+ map2.get("subid");
+                            if(sauthList.size()>0){
+                                if (((Map) sauthList.get(0)).containsKey("subid")) {//证明已经是最后一级菜单
+                                    String sub_auth ="";
+                                    int kk = 0;
+                                    for (int k = 0; k < sauthList.size(); k++) {
+                                        Map map2 = (Map) sauthList.get(k);
+                                        //拼装sub_auth参数
+                                        if("true".equals(map2.get("ischeck").toString())){
+                                            if(kk==0){
+                                                sub_auth+=map2.get("subid");
+                                            }else{
+                                                sub_auth +=","+ map2.get("subid");
+                                            }
+                                            kk++;
                                         }
-                                        kk++;
+                                    }
+                                    AuthRoleTb sauthRoleTb = new AuthRoleTb();
+                                    sauthRoleTb.setRoleId(id);
+                                    sauthRoleTb.setAuthId(((Integer)map1.get("sid")).longValue());
+                                    sauthRoleTb.setSubAuth(sub_auth);
+                                    int second =commonDao.insert(sauthRoleTb);
+                                    logger.info("====>>>插入子级权限:"+second);
+
+                                    res++;
+
+                                } else {//还有下一级菜单
+                                    AuthRoleTb ssauthRoleTb = new AuthRoleTb();
+                                    ssauthRoleTb.setRoleId(id);
+                                    ssauthRoleTb.setAuthId(((Integer)map1.get("sid")).longValue());
+                                    ssauthRoleTb.setSubAuth("");
+                                    int third = commonDao.insert(ssauthRoleTb);
+                                    logger.info("====>>>插入次级权限:"+third);
+                                    String subauth = "";
+                                    for(int m =0;m<sauthList.size();m++){
+                                        Map map3 = (Map)sauthList.get(m);
+                                        if("true".equals(map3.get("ischeck").toString())){
+                                            List subList =(List) map3.get("subpermission");
+                                            int nn=0;
+                                            for(int n=0;n<subList.size();n++){
+                                                Map map4 = (Map) subList.get(n);
+                                                if("true".equals(map4.get("ischeck").toString())){
+                                                    if(nn==0){
+                                                        subauth+=map4.get("subid");
+                                                    }else{
+                                                        subauth+=","+ map4.get("subid");
+                                                    }
+                                                    nn++;
+                                                }
+                                            }
+                                            AuthRoleTb subAuthRole = new AuthRoleTb();
+                                            subAuthRole.setRoleId(id);
+                                            subAuthRole.setSubAuth(subauth);
+                                            subAuthRole.setAuthId(((Integer)map3.get("ssid")).longValue());
+                                            int four =commonDao.insert(subAuthRole);
+                                            logger.error("========>>插入最终权限"+four);
+
+                                            res++;
+                                        }
                                     }
                                 }
+                            }else{//日报统计  和月报统计  没有下一级菜单
                                 AuthRoleTb sauthRoleTb = new AuthRoleTb();
                                 sauthRoleTb.setRoleId(id);
                                 sauthRoleTb.setAuthId(((Integer)map1.get("sid")).longValue());
-                                sauthRoleTb.setSubAuth(sub_auth);
+                                sauthRoleTb.setSubAuth("");
                                 int second =commonDao.insert(sauthRoleTb);
-                                logger.info("====>>>插入子级权限:"+second);
-
-                                res++;
-
-                            } else {//还有下一级菜单
-                                AuthRoleTb ssauthRoleTb = new AuthRoleTb();
-                                ssauthRoleTb.setRoleId(id);
-                                ssauthRoleTb.setAuthId(((Integer)map1.get("sid")).longValue());
-                                ssauthRoleTb.setSubAuth("");
-                                int third = commonDao.insert(ssauthRoleTb);
-                                logger.info("====>>>插入次级权限:"+third);
-                                String subauth = "";
-                                for(int m =0;m<sauthList.size();m++){
-                                    Map map3 = (Map)sauthList.get(m);
-                                    if("true".equals(map3.get("ischeck").toString())){
-                                        List subList =(List) map3.get("subpermission");
-                                        int nn=0;
-                                        for(int n=0;n<subList.size();n++){
-                                            Map map4 = (Map) subList.get(n);
-                                            if("true".equals(map4.get("ischeck").toString())){
-                                                if(nn==0){
-                                                    subauth+=map4.get("subid");
-                                                }else{
-                                                    subauth+=","+ map4.get("subid");
-                                                }
-                                                nn++;
-                                            }
-                                        }
-                                        AuthRoleTb subAuthRole = new AuthRoleTb();
-                                        subAuthRole.setRoleId(id);
-                                        subAuthRole.setSubAuth(subauth);
-                                        subAuthRole.setAuthId(((Integer)map3.get("ssid")).longValue());
-                                        int four =commonDao.insert(subAuthRole);
-                                        logger.error("========>>插入最终权限"+four);
-
-                                        res++;
-                                    }
-                                }
                             }
                         }
                     }
