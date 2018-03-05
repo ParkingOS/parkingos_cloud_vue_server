@@ -111,7 +111,7 @@ public class LoginServiceImpl implements LoginService {
                     user.put("isadmin", 1);
                     user.put("cloudname", "智慧停车云-渠道云 ");
                     user.put("chanid", userInfoTb.getChanid());
-                    user.put("comid", 0);
+//                    user.put("comid", -1);
                     OrgChannelTb orgChannelTb = new OrgChannelTb();
                     orgChannelTb.setId(userInfoTb.getChanid());
                     int chancount = commonDao.selectCountByConditions(orgChannelTb);
@@ -130,7 +130,7 @@ public class LoginServiceImpl implements LoginService {
                     user.put("isadmin", 1);
                     user.put("cloudname", "智慧城市云 ");
                     user.put("groupid", userInfoTb.getGroupid());
-                    user.put("comid", 0);
+//                    user.put("comid", -1);
                     OrgGroupTb orgGroupTb = new OrgGroupTb();
                     orgGroupTb.setId(userInfoTb.getGroupid());
                     orgGroupTb.setState(0);
@@ -145,7 +145,7 @@ public class LoginServiceImpl implements LoginService {
                     user.put("isadmin", 1);
                     user.put("cloudname", "智慧停车云-城市云 ");
                     user.put("cityid", userInfoTb.getCityid());
-                    user.put("comid", 0);
+//                    user.put("comid", -1);
                     OrgCityMerchants orgCityMerchants = new OrgCityMerchants();
                     orgCityMerchants.setId(userInfoTb.getGroupid());
                     orgCityMerchants.setState(0);
@@ -160,7 +160,7 @@ public class LoginServiceImpl implements LoginService {
             List<Map<String, Object>> authList = null;
 
             //所有权限
-            String allsql = "select * from auth_tb where oid = "+userRoleTb.getOid()+"and state = 0";
+            String allsql = "select * from auth_tb where oid = "+userRoleTb.getOid()+" and state = 0";
             List<Map> allAuthList = commonDao.getObjectBySql(allsql);
             user.put("allauth", allAuthList);
 

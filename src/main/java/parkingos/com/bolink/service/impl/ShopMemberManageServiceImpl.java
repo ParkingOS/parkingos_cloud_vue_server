@@ -9,7 +9,6 @@ import parkingos.com.bolink.dao.spring.CommonDao;
 import parkingos.com.bolink.models.UserInfoTb;
 import parkingos.com.bolink.qo.PageOrderConfig;
 import parkingos.com.bolink.service.ShopMemberManageService;
-import parkingos.com.bolink.utils.CustomDefind;
 import parkingos.com.bolink.utils.OrmUtil;
 import parkingos.com.bolink.utils.RequestUtil;
 import parkingos.com.bolink.utils.StringUtils;

@@ -11,6 +11,7 @@ import parkingos.com.bolink.models.UserInfoTb;
 import parkingos.com.bolink.service.GetDataService;
 import parkingos.com.bolink.utils.StringUtils;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -21,6 +22,8 @@ public class GetDataServiceImpl implements GetDataService {
 
     @Autowired
     private CommonDao commonDao;
+    @Autowired
+    private CommonMethods commonMethods;
 
 
     @Override
@@ -244,5 +247,153 @@ public class GetDataServiceImpl implements GetDataService {
         }
         result+="]";
         return result;
+    }
+
+    @Override
+    public String getAllParks(String groupid, String cityid) {
+
+        List<Map<String,Object>> list = new ArrayList<Map<String,Object>>();
+        String sql = "select id,company_name from com_info_tb ";
+        List<Object> parks = null;
+        if(cityid != null&&!"".equals(cityid)){
+            parks = commonMethods.getparks(Long.parseLong(cityid));
+        }else if(groupid !=null&&!"".equals(groupid)){
+            parks = commonMethods.getParks(Long.parseLong(groupid));
+        }
+        if(parks != null && !parks.isEmpty()){
+            String preParams  ="";
+            for(Object parkid : parks){
+                if(preParams.equals(""))
+                    preParams =parkid+"";
+                else
+                    preParams += ","+parkid;
+            }
+            sql += " where id in ("+preParams+") ";
+            list = commonDao.getObjectBySql(sql);
+        }
+//        String result = "[{\"value_no\":\"-1\",\"value_name\":\"请选择\"}";
+        String result = "[";
+        if(list != null && !list.isEmpty()){
+            int i = 1;
+            for(Map map : list){
+                if(i==1){
+                    result+="{\"value_no\":\""+map.get("id")+"\",\"value_name\":\""+map.get("company_name")+"\"}";
+                }else{
+                    result+=",{\"value_no\":\""+map.get("id")+"\",\"value_name\":\""+map.get("company_name")+"\"}";
+                }
+                i++;
+            }
+        }
+        result += "]";
+        return result;
+    }
+
+    @Override
+    public String getAllCollectors(String groupid, String cityid) {
+        List<Map<String, Object>> collList=null;
+        if(cityid!=null&&!"".equals(cityid)){
+            collList= getcollectors(Long.parseLong(cityid));
+        }else if(groupid!=null&&!"".equals(groupid)) {
+            collList= getgroupcollectors(Long.parseLong(groupid));
+        }
+
+//        String result = "[{\"value_no\":\"-1\",\"value_name\":\"请选择\"}";
+        String result = "[";
+        if(collList != null && !collList.isEmpty()){
+            int i = 1;
+            for(Map map : collList){
+                if(i==1){
+                    result += "{\"value_no\":\"" + map.get("id") + "\",\"value_name\":\"" + map.get("nickname") + "\"}";
+                }else {
+                    result += ",{\"value_no\":\"" + map.get("id") + "\",\"value_name\":\"" + map.get("nickname") + "\"}";
+                }
+                i++;
+            }
+        }
+        result += "]";
+        return result;
+    }
+
+    @Override
+    public String getAllPackage(String groupid,String cityid) {
+        List<Map<String,Object>>  pList = null;
+//        String result = "[{\"value_no\":\"-1\",\"value_name\":\"请选择\"}";
+        String result = "[";
+        if(groupid!=null&&!"".equals(groupid)){
+            String sql = "select id,p_name from product_package_tb where comid in(select id from com_info_tb " +
+                    "where groupid =  "+groupid;
+            pList = commonDao.getObjectBySql(sql +") and is_delete=0 ");
+
+        }else if(cityid!=null&&!"".equals(cityid)){
+            String sql = "select id,p_name from product_package_tb where comid in(select id from com_info_tb " ;
+            List<Object> groupList = commonMethods.getGroups(Long.parseLong(cityid));
+            if(groupList!=null&&groupList.size()>0){
+                String params = "";
+                for(Object id:groupList){
+                    if(params.equals(""))
+                        params =id+"";
+                    else
+                        params += ","+id;
+                }
+                sql += "where groupid in ("+params+")";
+                pList = commonDao.getObjectBySql(sql);
+            }
+        }
+        if(pList!=null&&pList.size()>0){
+            int i = 1;
+            for(Map map : pList){
+                if(i==1){
+                    result += "{\"value_no\":\"" + map.get("id") + "\",\"value_name\":\"" + map.get("p_name") + "\"}";
+                }else {
+                    result += ",{\"value_no\":\"" + map.get("id") + "\",\"value_name\":\"" + map.get("p_name") + "\"}";
+                }
+                i++;
+            }
+        }
+        result+="]";
+        return result;
+    }
+
+    private List<Map<String, Object>> getcollectors(Long cityid){
+        try {
+            if(cityid != null && cityid > 0){
+                List<Object> idList = commonMethods.getcollctors(cityid);
+                if(idList != null && !idList.isEmpty()){
+                    return getAllCollectorsByIdlist(idList);
+                }
+            }
+        } catch (Exception e) {
+            // TODO: handle exception
+            System.out.println("获得收费员列表"+e.getMessage());
+        }
+        return null;
+    }
+    private List<Map<String, Object>> getgroupcollectors(Long groupid){
+        try {
+            if(groupid != null && groupid > 0){
+                List<Object> idList = commonMethods.getCollctors(groupid);
+                if(idList != null && !idList.isEmpty()){
+                    return getAllCollectorsByIdlist(idList);
+                }
+            }
+        } catch (Exception e) {
+            // TODO: handle exception
+            System.out.println("获得收费员列表"+e.getMessage());
+        }
+        return null;
+    }
+
+    private List<Map<String,Object>> getAllCollectorsByIdlist(List<Object> idList){
+        String preParams  ="";
+        for(Object o : idList){
+            if(preParams.equals(""))
+                preParams =o+"";
+            else
+                preParams += ","+o;
+        }
+
+        List<Map<String, Object>> collList = commonDao.getObjectBySql("select id,nickname " +
+                " from user_info_tb where id in ("+preParams+")");
+        return collList;
     }
 }

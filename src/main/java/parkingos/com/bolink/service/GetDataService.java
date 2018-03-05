@@ -17,4 +17,10 @@ public interface GetDataService {
     String getChannelType(String comid);
 
     String getWorkSiteId(String comid);
+
+    String getAllParks(String groupid, String cityid);
+
+    String getAllCollectors(String groupid, String cityid);
+
+    String getAllPackage(String groupid,String cityid);
 }

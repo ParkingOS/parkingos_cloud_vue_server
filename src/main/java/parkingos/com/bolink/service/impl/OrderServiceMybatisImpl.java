@@ -32,6 +32,7 @@ public class OrderServiceMybatisImpl implements OrderService {
 
     @Override
     public JSONObject selectResultByConditions(Map<String, String> map) {
+        System.out.println("=====orderMybatis");
         OrderTbExample example = new OrderTbExample();
 //        List<OrderTbExample.Criteria> criterias = example.getOredCriteria();
 //

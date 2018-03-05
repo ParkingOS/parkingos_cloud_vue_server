@@ -114,7 +114,7 @@ public class VipServiceImpl implements VipService {
         Long etime = calendar.getTimeInMillis() / 1000 - 1;
 
         CarowerProduct carowerProduct = new CarowerProduct();
-        carowerProduct.setComId(21782L);
+        carowerProduct.setComId(comid);
         carowerProduct.setCardId(cardId);
         carowerProduct.setIsDelete(0L);
         int count = commonDao.selectCountByConditions(carowerProduct);
@@ -161,7 +161,7 @@ public class VipServiceImpl implements VipService {
             Long validuin = -1L;
             if(carNumStrings != null && carNumStrings.length>0){
                 for(String strNum :carNumStrings){
-                    strNum.toUpperCase();
+                    strNum = strNum.toUpperCase();
                     logger.error("==>>>.strNum"+strNum);
                     if(StringUtils.checkPlate(strNum)){
                         CarInfoTb carInfoTb = new CarInfoTb();
@@ -248,7 +248,7 @@ public class VipServiceImpl implements VipService {
         carowerProduct1.setAddress(address);
         carowerProduct1.setActTotal(new BigDecimal(act_total+""));
         carowerProduct1.setComId(comid);
-        carowerProduct1.setCarNumber(carNumber);
+        carowerProduct1.setCarNumber(carNumber.toUpperCase());
         carowerProduct1.setCardId(nextid+"");
         carowerProduct1.setMobile(mobile);
         carowerProduct1.setLimitDayType(limit_day_type);
@@ -269,7 +269,7 @@ public class VipServiceImpl implements VipService {
         cardRenewTb.setAmountPay(act_total+"");
         cardRenewTb.setCollector(operater);
         cardRenewTb.setPayType("现金");
-        cardRenewTb.setCarNumber(carNumber);
+        cardRenewTb.setCarNumber(carNumber.toUpperCase());
         cardRenewTb.setUserId(name);
         cardRenewTb.setResume(remark);
         cardRenewTb.setBuyMonth(months);
@@ -356,10 +356,10 @@ public class VipServiceImpl implements VipService {
                                         isMonthUser = false;
                                     }
                                 }
-                                if (isMonthUser) {
-                                    result.put("msg", "该车牌:" + carNumberBefore + "已注册为月卡会员,请修改车牌");
-                                    return result;
-                                }
+                            }
+                            if (isMonthUser) {
+                                result.put("msg", "该车牌:" + carNumberBefore + "已注册为月卡会员,请修改车牌");
+                                return result;
                             }
                         } else {
                             result.put("msg", "车牌号有误");
@@ -371,7 +371,7 @@ public class VipServiceImpl implements VipService {
                 CarowerProduct carowerProduct1 = new CarowerProduct();
                 if (id > 0 && carNumber.length() > 6) {
                     carowerProduct1.setId(id);
-                    carowerProduct1.setCarNumber(carNumber);
+                    carowerProduct1.setCarNumber(carNumber.toUpperCase());
                     carowerProduct1.setUin(uin);
                     ret = commonDao.updateByPrimaryKey(carowerProduct1);
                 }

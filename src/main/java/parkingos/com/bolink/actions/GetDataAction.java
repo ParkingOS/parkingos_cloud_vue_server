@@ -66,7 +66,7 @@ public class GetDataAction {
     }
 
     /*
-    * 获得所有月卡套餐
+    * 获得车场所有月卡套餐
     * */
     @RequestMapping(value = "/getpname")
     public String getpname(HttpServletRequest request, HttpServletResponse resp){
@@ -119,6 +119,48 @@ public class GetDataAction {
     public String getWorkSiteId(HttpServletRequest request, HttpServletResponse resp){
         String comid = RequestUtil.processParams(request, "comid");
         String result = getDataService.getWorkSiteId(comid);
+        StringUtils.ajaxOutput(resp,result);
+        return null;
+    }
+
+    /*
+    *
+    * 获得集团或者城市下面所有车场
+    * */
+    @RequestMapping(value = "/cityparks")
+    public String getAllParks(HttpServletRequest request, HttpServletResponse resp){
+        String groupid = request.getParameter("groupid");
+        String cityid = request.getParameter("cityid");
+        System.out.println("=====groupid:"+groupid+"===cityid:"+cityid);
+        String result = getDataService.getAllParks(groupid,cityid);
+        StringUtils.ajaxOutput(resp,result);
+        return null;
+    }
+
+    /*
+   *
+   * 获得集团或者城市下面所有 收费员
+   * */
+    @RequestMapping(value = "/allcollectors")
+    public String getAllCollectors(HttpServletRequest request, HttpServletResponse resp){
+        String groupid = request.getParameter("groupid");
+        String cityid = request.getParameter("cityid");
+        System.out.println("=====groupid:"+groupid+"===cityid:"+cityid);
+        String result = getDataService.getAllCollectors(groupid,cityid);
+        StringUtils.ajaxOutput(resp,result);
+        return null;
+    }
+
+    /*
+  *
+  * 获得集团或者城市下面所有 套餐
+  * */
+    @RequestMapping(value = "/getAllPackage")
+    public String getAllPackage(HttpServletRequest request, HttpServletResponse resp){
+        String groupid = request.getParameter("groupid");
+        String cityid = request.getParameter("cityid");
+        System.out.println("=====groupid:"+groupid+"======cityid:"+cityid);
+        String result = getDataService.getAllPackage(groupid,cityid);
         StringUtils.ajaxOutput(resp,result);
         return null;
     }

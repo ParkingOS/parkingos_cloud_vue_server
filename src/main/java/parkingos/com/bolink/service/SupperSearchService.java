@@ -16,4 +16,6 @@ public interface SupperSearchService<T> {
     JSONObject supperSearch(T t,Map<String,String> params);
 
     Map<String,Object> getBaseSearch(T t, Map<String, String> params);
+
+    Map<String,Object> getGroupOrCitySearch(T t,Map<String, String> params);
 }

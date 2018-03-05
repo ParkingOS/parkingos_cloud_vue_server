@@ -25,6 +25,8 @@ public class SuperSearchServiceImp<T> implements SupperSearchService<T> {
     Logger logger = Logger.getLogger(SupperSearchService.class);
     @Autowired
     private CommonDao commonDao;
+    @Autowired
+    private CommonMethods commonMethods;
 
 
     public  Map<String,Object> getBaseSearch(T t ,Map<String,String> params){
@@ -93,6 +95,52 @@ public class SuperSearchServiceImp<T> implements SupperSearchService<T> {
         if(!result.containsKey("base"))
             result.put("base",t);
         return result;
+    }
+
+    @Override
+    public Map<String, Object> getGroupOrCitySearch(T t, Map<String, String> params) {
+
+
+        Map searchMap = getBaseSearch(t,params);
+        String groupid = params.get("groupid");
+        String cityid = params.get("cityid");
+        System.out.println("======groupid:"+groupid+"===!!cityid:"+cityid);
+        if(searchMap!=null&&!searchMap.isEmpty()){
+            T baseQuery =(T)searchMap.get("base");
+            List<SearchBean> supperQuery = null;
+            if(searchMap.containsKey("supper"))
+                supperQuery = (List<SearchBean>)searchMap.get("supper");
+            PageOrderConfig config = null;
+            if(searchMap.containsKey("config"))
+                config = (PageOrderConfig)searchMap.get("config");
+
+            List parks =new ArrayList();
+
+            if(groupid !=null&&!"".equals(groupid)){
+                parks = commonMethods.getParks(Long.parseLong(groupid));
+            }else if(cityid !=null&&!"".equals(cityid)){
+                parks = commonMethods.getparks(Long.parseLong(cityid));
+            }
+
+            System.out.println("=======parks:"+parks);
+
+            //封装searchbean  集团或者城市下面所有车场
+            SearchBean searchBean = new SearchBean();
+            searchBean.setOperator(FieldOperator.CONTAINS);
+            searchBean.setFieldName("comid");
+            searchBean.setBasicValue(parks);
+
+            if (supperQuery == null) {
+                supperQuery = new ArrayList<>();
+            }
+            supperQuery.add( searchBean );
+
+            searchMap.put("supper",supperQuery);
+            searchMap.put("config",config);
+            searchMap.put("base",baseQuery);
+        }
+
+        return searchMap;
     }
 
     @Override
