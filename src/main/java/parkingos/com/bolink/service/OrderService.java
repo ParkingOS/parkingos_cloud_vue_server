@@ -17,4 +17,6 @@ public interface OrderService {
     byte[] getCarPics(String orderid, Long comid, String type, Integer currentnum);
 
     List<List<Object>> exportExcel(Map<String, String> reqParameterMap);
+
+    Long getComidByOrder(Long id);
 }

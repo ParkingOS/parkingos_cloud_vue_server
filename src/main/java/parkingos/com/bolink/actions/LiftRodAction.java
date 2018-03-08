@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import parkingos.com.bolink.service.LiftRodService;
+import parkingos.com.bolink.utils.CustomDefind;
 import parkingos.com.bolink.utils.ExportDataExcel;
 import parkingos.com.bolink.utils.RequestUtil;
 import parkingos.com.bolink.utils.StringUtils;
@@ -44,15 +45,22 @@ public class LiftRodAction {
     public String getLiftRodPicture(HttpServletRequest request, HttpServletResponse response) throws Exception {
         String comid = RequestUtil.getString(request, "comid");
         String liftrodId = RequestUtil.getString(request, "liftrodid");
-
+        //集团 抬杆,获得id 根据id获得comid
+        String id = RequestUtil.getString(request,"id");
+        logger.error("==========>>>>获取图片"+id);
+        if(id!=null&&!"undefined".equals(id)&&!"".equals(id)){
+            comid = getComidByLift(Long.parseLong(id));
+        }
         logger.error("==========>>>>获取图片"+liftrodId);
         logger.error("==========>>>>获取图片"+comid);
 
         byte[] content = liftRodService.getLiftRodPicture(comid, liftrodId);
 
         if (content.length == 0) {
+            System.out.println("==========>>>>获取图片"+CustomDefind.IMAGEURL);
             //测试用  之后读配置文件
-            response.sendRedirect("http://192.168.199.205:12305/images/nopic.jpg");
+            response.sendRedirect(CustomDefind.IMAGEURL+"/images/nopic.jpg");
+//            response.sendRedirect("http://120.25.121.204:8080/cloud/images/nopic.jpg");
             return null;
         } else {
             response.setDateHeader("Expires", System.currentTimeMillis() + 12 * 60 * 60 * 1000);
@@ -65,6 +73,11 @@ public class LiftRodAction {
         }
         return null;
     }
+
+    private String getComidByLift(long liftId) {
+        return liftRodService.getComidByLift(liftId);
+    }
+
     @RequestMapping(value = "/exportExcel")
     public String exportExcel(HttpServletRequest request, HttpServletResponse response) {
         Map<String, String> reqParameterMap = RequestUtil.readBodyFormRequset(request);

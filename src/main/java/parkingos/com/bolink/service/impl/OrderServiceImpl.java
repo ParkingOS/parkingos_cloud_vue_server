@@ -408,6 +408,17 @@ public class OrderServiceImpl implements OrderService {
         return bodyList;
     }
 
+    @Override
+    public Long getComidByOrder(Long id) {
+        OrderTb orderTb = new OrderTb();
+        orderTb.setId(id);
+        orderTb = (OrderTb)commonDao.selectObjectByConditions(orderTb);
+        if(orderTb!=null&&orderTb.getComid()!=null){
+            return orderTb.getComid();
+        }
+        return -1L;
+    }
+
     private String getPassName(Long comId,Integer passId) {
         ComPassTb comPassTb = new ComPassTb();
         comPassTb.setComid(comId);

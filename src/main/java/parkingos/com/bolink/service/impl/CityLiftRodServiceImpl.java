@@ -7,11 +7,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import parkingos.com.bolink.dao.spring.CommonDao;
 import parkingos.com.bolink.models.LiftRodTb;
+import parkingos.com.bolink.models.UserInfoTb;
 import parkingos.com.bolink.qo.PageOrderConfig;
 import parkingos.com.bolink.qo.SearchBean;
 import parkingos.com.bolink.service.CityLiftRodService;
+import parkingos.com.bolink.service.LiftRodService;
 import parkingos.com.bolink.service.SupperSearchService;
 import parkingos.com.bolink.utils.OrmUtil;
+import parkingos.com.bolink.utils.TimeTools;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -28,6 +31,8 @@ public class CityLiftRodServiceImpl implements CityLiftRodService {
     private SupperSearchService<LiftRodTb> supperSearchService;
     @Autowired
     private CommonMethods commonMethods;
+    @Autowired
+    private LiftRodService liftRodService;
 
     @Override
     public JSONObject selectResultByConditions(Map<String, String> reqmap) {
@@ -47,7 +52,13 @@ public class CityLiftRodServiceImpl implements CityLiftRodService {
 
         count = commonDao.selectCountByConditions(baseQuery,supperQuery);
         if(count>0){
-            list = commonDao.selectListByConditions(baseQuery,supperQuery,config);
+            if(config==null){
+                config = new PageOrderConfig();
+                config.setPageInfo(1,Integer.MAX_VALUE);
+                list = commonDao.selectListByConditions(baseQuery,supperQuery,config);
+            }else{
+                list = commonDao.selectListByConditions(baseQuery,supperQuery,config);
+            }
             if (list != null && !list.isEmpty()) {
                 for (LiftRodTb liftRodTb1 : list) {
                     OrmUtil<LiftRodTb> otm = new OrmUtil<>();
@@ -108,8 +119,69 @@ public class CityLiftRodServiceImpl implements CityLiftRodService {
 //            }
 //        }
         result.put("total",count);
-        result.put("page",Integer.parseInt(reqmap.get("page")));
+        if(reqmap.get("page")!=null){
+            result.put("page",Integer.parseInt(reqmap.get("page")));
+        }
         logger.error("============>>>>>返回数据"+result);
         return result;
+    }
+
+    @Override
+    public List<List<Object>> exportExcel(Map<String, String> reqParameterMap) {
+
+        //删除分页条件  查询该条件下所有  不然为一页数据
+        reqParameterMap.remove("orderfield");
+        reqParameterMap.remove("orderby");
+
+        JSONObject result = selectResultByConditions(reqParameterMap);
+        List<LiftRodTb> liftRodList = JSON.parseArray(result.get("rows").toString(), LiftRodTb.class);
+        List<List<Object>> bodyList = new ArrayList<List<Object>>();
+        if(liftRodList!=null&&liftRodList.size()>0){
+            String [] f = new String[]{"id","liftrod_id","ctime","uin","out_channel_id","reason","resume"};
+            Map<Integer, String> reasonMap = (Map)liftRodService.getLiftReason(1);
+            for(LiftRodTb liftRodTb : liftRodList){
+//                List<String> values = new ArrayList<String>();
+                List<Object> values = new ArrayList<Object>();
+                OrmUtil<LiftRodTb> otm = new OrmUtil<>();
+                Map map = otm.pojoToMap(liftRodTb);
+                //判断各种字段 组装导出数据
+                for(String field : f){
+                    if("uin".equals(field)){
+                        values.add(getUinName(Long.valueOf(map.get(field)+"")));
+                    }else if("reason".equals(field)){
+                        Integer key = Integer.valueOf(map.get(field)+"");
+                        if(reasonMap.get(key)!=null)
+                            values.add(reasonMap.get(key));
+                        else {
+                            values.add("无");
+                        }
+                    }else{
+                        if("ctime".equals(field)){
+                            if(map.get(field)!=null){
+                                values.add(TimeTools.getTime_yyyyMMdd_HHmmss(Long.valueOf((map.get(field)+""))*1000));
+                            }else{
+                                values.add("null");
+                            }
+                        }else{
+                            values.add(map.get(field)+"");
+                        }
+                    }
+                }
+                bodyList.add(values);
+            }
+        }
+        return bodyList;
+    }
+
+    private String getUinName(Long uin) {
+        UserInfoTb userInfoTb = new UserInfoTb();
+        userInfoTb.setId(uin);
+        userInfoTb = (UserInfoTb)commonDao.selectObjectByConditions(userInfoTb);
+
+        String uinName = "";
+        if(userInfoTb!=null&&userInfoTb.getNickname()!=null){
+            uinName = userInfoTb.getNickname();
+        }
+        return uinName;
     }
 }

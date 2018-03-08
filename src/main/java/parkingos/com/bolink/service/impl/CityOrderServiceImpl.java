@@ -6,16 +6,19 @@ import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import parkingos.com.bolink.dao.spring.CommonDao;
+import parkingos.com.bolink.models.ComPassTb;
 import parkingos.com.bolink.models.OrderTb;
 import parkingos.com.bolink.qo.PageOrderConfig;
 import parkingos.com.bolink.qo.SearchBean;
 import parkingos.com.bolink.service.CityOrderService;
 import parkingos.com.bolink.service.SupperSearchService;
+import parkingos.com.bolink.utils.Check;
 import parkingos.com.bolink.utils.OrmUtil;
 import parkingos.com.bolink.utils.StringUtils;
 import parkingos.com.bolink.utils.TimeTools;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -78,11 +81,24 @@ public class CityOrderServiceImpl implements CityOrderService {
 
         count = commonDao.selectCountByConditions(baseQuery,supperQuery);
         if(count>0){
-            list = commonDao.selectListByConditions(baseQuery,supperQuery,config);
+            if(config==null){
+                config = new PageOrderConfig();
+                config.setPageInfo(null,null);
+                list = commonDao.selectListByConditions(baseQuery,supperQuery,config);
+            }else{
+                list = commonDao.selectListByConditions(baseQuery,supperQuery,config);
+            }
             if (list != null && !list.isEmpty()) {
                 for (OrderTb orderTb1 : list) {
                     OrmUtil<OrderTb> otm = new OrmUtil<>();
                     Map<String, Object> map = otm.pojoToMap(orderTb1);
+                    Long start = (Long) map.get("create_time");
+                    Long end = (Long) map.get("end_time");
+                    if (start != null && end != null) {
+                        map.put("duration",StringUtils.getTimeString(start, end));
+                    } else {
+                        map.put("duration","");
+                    }
                     sumtotal+=StringUtils.formatDouble(Double.parseDouble(map.get("total")+""));
                     cashpay+= (StringUtils.formatDouble(Double.parseDouble(map.get("cash_prepay")+""))+StringUtils.formatDouble(Double.parseDouble(map.get("cash_pay")+"")));
                     elepay+= (StringUtils.formatDouble(Double.parseDouble(map.get("electronic_prepay")+""))+StringUtils.formatDouble(Double.parseDouble(map.get("electronic_pay")+"")));
@@ -149,9 +165,133 @@ public class CityOrderServiceImpl implements CityOrderService {
         result.put("cashpay",String.format("%.2f",cashpay));
         result.put("elepay",String.format("%.2f",elepay));
         result.put("total",count);
-        result.put("page",Integer.parseInt(reqmap.get("page")));
+        if(reqmap.get("page")!=null){
+            result.put("page",Integer.parseInt(reqmap.get("page")));
+        }
         logger.error("============>>>>>返回数据"+result);
         return result;
     }
 
+    @Override
+    public List<List<Object>> exportExcel(Map<String, String> reqParameterMap) {
+
+        //删除分页条件  查询该条件下所有  不然为一页数据
+        reqParameterMap.remove("orderfield");
+        reqParameterMap.remove("orderby");
+
+        //获得要导出的结果
+        JSONObject result = selectResultByConditions(reqParameterMap);
+
+        List<OrderTb> orderlist = JSON.parseArray(result.get("rows").toString(), OrderTb.class);
+
+        logger.error("=========>>>>>>.导出订单" + orderlist.size());
+        List<List<Object>> bodyList = new ArrayList<List<Object>>();
+//        List<List<String>> bodyList = new ArrayList<List<String>>();
+        if (orderlist != null && orderlist.size() > 0) {
+            String[] f = new String[]{"id","company_name","car_number","c_type","create_time","end_time","duration","pay_type","total","prepaid","uid","collector","state","in_passid","out_passid"};
+            Map<Long, String> uinNameMap = new HashMap<Long, String>();
+            Map<Long, String> passNameMap = new HashMap<Long, String>();
+            for (OrderTb orderTb : orderlist) {
+//                List<String> values = new ArrayList<String>();
+                List<Object> values = new ArrayList<Object>();
+                OrmUtil<OrderTb> otm = new OrmUtil<>();
+                Map map = otm.pojoToMap(orderTb);
+                for (String field : f) {
+                    Object v = map.get(field);
+                    if(v == null)
+                        v = "";
+                    if("c_type".equals(field)){
+                        try{
+                            switch(Integer.valueOf(v + "")){//0:NFC,1:IBeacon,2:照牌   3通道照牌 4直付 5月卡用户
+                                case 0:values.add("NFC刷卡");break;
+                                case 1:values.add("Ibeacon");break;
+                                case 2:values.add("手机扫牌");break;
+                                case 3:values.add("通道扫牌");break;
+                                case 4:values.add("直付");break;
+                                case 5:values.add("全天月卡");break;
+                                case 6:values.add("车位二维码");break;
+                                case 7:values.add("月卡第二辆车");break;
+                                case 8:values.add("分段月卡");break;
+                                default:values.add("");
+                            }
+                        }catch (Exception e){
+                            values.add((String) v);
+                        };
+
+                    }else if("duration".equals(field)){
+                        Long start = (Long)map.get("create_time");
+                        Long end = (Long)map.get("end_time");
+                        if(start != null && end != null){
+                            values.add(StringUtils.getTimeString(start, end));
+                        }else{
+                            values.add("");
+                        }
+                    }else if("pay_type".equals(field)){
+                        switch(Integer.valueOf(v + "")){
+                            case 0:values.add("账户支付");break;
+                            case 1:values.add("现金支付");break;
+                            case 2:values.add("手机支付");break;
+                            case 3:values.add("包月");break;
+                            case 4:values.add("中央预支付现金");break;
+                            case 5:values.add("中央预支付银联卡");break;
+                            case 6:values.add("中央预支付商家卡");break;
+                            case 8:values.add("免费");break;
+                            default:values.add("");
+                        }
+                    }else if("state".equals(field)){
+                        switch(Integer.valueOf(v + "")){
+                            case 0:values.add("未支付");break;
+                            case 1:values.add("已支付");break;
+                            default:values.add("");
+                        }
+                    }else if("in_passid".equals(field) || "out_passid".equals(field)){
+                        if (!"".equals(v.toString()) && Check.isNumber(v.toString())) {
+                            Long passId = Long.valueOf(v.toString());
+                            if (passNameMap.containsKey(passId))
+                                values.add(passNameMap.get(passId));
+                            else {
+                                String passName = getPassName(passId);
+                                values.add(passName);
+                                passNameMap.put(passId, passName);
+                            }
+                        } else {
+                            values.add(v + "");
+                        }
+                    }else if("create_time".equals(field) || "end_time".equals(field)){
+                        if(!"".equals(v.toString())){
+                            values.add(TimeTools.getTime_yyyyMMdd_HHmmss(Long.valueOf((v+""))*1000));
+                        }else{
+                            values.add("");
+                        }
+                    }else if("prepaid".equals(field)){
+                        if(map.get("prepaid") != null){
+                            Double prepaid = Double.valueOf(map.get("prepaid") + "");
+                            if(prepaid > 0){
+                                values.add(prepaid + "");
+                            }else{
+                                values.add("");
+                            }
+                        }else{
+                            values.add("");
+                        }
+                    }else{
+                        values.add(v + "");
+                    }
+                }
+                bodyList.add(values);
+            }
+        }
+        return bodyList;
+    }
+
+
+    private String getPassName(Long passId) {
+        ComPassTb comPassTb = new ComPassTb();
+        comPassTb.setId(passId);
+        comPassTb = (ComPassTb)commonDao.selectObjectByConditions(comPassTb);
+        if(comPassTb!=null&&comPassTb.getPassname()!=null){
+            return comPassTb.getPassname();
+        }
+        return "";
+    }
 }

@@ -12,6 +12,7 @@ import parkingos.com.bolink.qo.SearchBean;
 import parkingos.com.bolink.service.CityUnorderService;
 import parkingos.com.bolink.service.SupperSearchService;
 import parkingos.com.bolink.utils.OrmUtil;
+import parkingos.com.bolink.utils.StringUtils;
 import parkingos.com.bolink.utils.TimeTools;
 
 import java.util.ArrayList;
@@ -84,6 +85,12 @@ public class CityUnorderServiceImpl implements CityUnorderService {
                 for (OrderTb orderTb1 : list) {
                     OrmUtil<OrderTb> otm = new OrmUtil<>();
                     Map<String, Object> map = otm.pojoToMap(orderTb1);
+                    Long start = (Long) map.get("create_time");
+                    if (start != null ) {
+                        map.put("duration", StringUtils.getTimeString(start, System.currentTimeMillis()/1000));
+                    } else {
+                        map.put("duration","");
+                    }
                     resList.add(map);
                 }
                 result.put("rows", JSON.toJSON(resList));

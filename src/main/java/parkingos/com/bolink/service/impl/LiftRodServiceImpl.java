@@ -131,34 +131,6 @@ public class LiftRodServiceImpl implements LiftRodService {
         return bodyList;
     }
 
-//    @Override
-//    public String getLiftReason() {
-//        String reason = CustomDefind.getValue("LIFTRODREASON");
-////        if(type==0){
-//            String ret = "[{value_no:-1,value_name:\"\"},{value_no:100,value_name:\"原因未选\"}";
-//            if(reason!=null){
-//                String res[] = reason.split("\\|");
-//                for(int i=0;i<res.length;i++){
-//                    ret+=",{value_no:"+i+",value_name:\""+res[i]+"\"}";
-//                }
-//            }
-//            ret +="]";
-//            return ret;
-////        }else {
-////        Map<Integer, String> reasonMap = new HashMap<Integer, String>();
-////        if(reason!=null){
-////            String res[] = reason.split("\\|");
-////            for(int i=0;i<res.length;i++){
-////                reasonMap.put(i, res[i]);
-////            }
-////        }
-////            return reasonMap;
-////        }
-//
-////        return reasonMap;
-//    }
-
-
     /*
     * 读取配置文件 获得抬杆原因 两种形式返回
     *
@@ -187,6 +159,17 @@ public class LiftRodServiceImpl implements LiftRodService {
             }
             return reasonMap;
         }
+    }
+
+    @Override
+    public String getComidByLift(long liftId) {
+        LiftRodTb liftRodTb = new LiftRodTb();
+        liftRodTb.setId(liftId);
+        liftRodTb = (LiftRodTb) commonDao.selectObjectByConditions(liftRodTb);
+        if(liftRodTb!=null&&liftRodTb.getComid()!=null){
+            return liftRodTb.getComid()+"";
+        }
+        return "";
     }
 
     private String getUinName(Long uin) {

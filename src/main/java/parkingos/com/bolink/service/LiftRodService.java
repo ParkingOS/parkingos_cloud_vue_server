@@ -13,4 +13,6 @@ public interface LiftRodService {
     List<List<Object>> exportExcel(Map<String, String> reqParameterMap);
 
     Object getLiftReason(int type);
+
+    String getComidByLift(long liftId);
 }

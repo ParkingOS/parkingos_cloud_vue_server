@@ -117,4 +117,9 @@ public class OrderServiceMybatisImpl implements OrderService {
         return null;
     }
 
+    @Override
+    public Long getComidByOrder(Long id) {
+        return null;
+    }
+
 }

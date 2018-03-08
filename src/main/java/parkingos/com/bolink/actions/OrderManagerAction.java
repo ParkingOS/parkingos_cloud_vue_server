@@ -47,6 +47,12 @@ public class OrderManagerAction {
     public String getOrderPicture(HttpServletRequest request, HttpServletResponse resp) {
         String orderid = RequestUtil.getString(request,"orderid");
         Long comid = RequestUtil.getLong(request, "comid", -1L);
+
+        //根据传过来的id 来判断车场  集团时候用
+        Long id = RequestUtil.getLong(request,"id",-1L);
+        if(id!=-1){
+            comid = orderService.getComidByOrder(id);
+        }
         logger.error("==========>>>>获取图片..orderid..comid==>" + orderid+"==>"+comid);
         JSONObject result = orderService.getPicResult(orderid, comid);
         StringUtils.ajaxOutput(resp, result.toJSONString());

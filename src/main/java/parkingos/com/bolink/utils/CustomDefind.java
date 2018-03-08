@@ -23,6 +23,7 @@ public class CustomDefind {
 	public static String CUSTOMPARKIDS = getValue("CUSTOMPARKIDS");
 	public static String ISLOTTERY = getValue("ISLOTTERY");
 	public static String MONGOADDRESS = getValue("MONGOADDRESS");
+	public static String IMAGEURL = getValue("IMAGEURL");
 	public static String SENDTICKET = getValue("SENDTICKET");
 	public static String PARKBACK = getValue("PARKBACK");
 	public static String ETCPARK = getValue("ETCPARK");
