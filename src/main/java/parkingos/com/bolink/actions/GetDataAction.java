@@ -145,7 +145,7 @@ public class GetDataAction {
     public String getAllCollectors(HttpServletRequest request, HttpServletResponse resp){
         String groupid = request.getParameter("groupid");
         String cityid = request.getParameter("cityid");
-        System.out.println("=====groupid:"+groupid+"===cityid:"+cityid);
+        System.out.println("=====allcollectors.groupid:"+groupid+"===cityid:"+cityid);
         String result = getDataService.getAllCollectors(groupid,cityid);
         StringUtils.ajaxOutput(resp,result);
         return null;

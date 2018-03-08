@@ -6,6 +6,7 @@ import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import parkingos.com.bolink.dao.spring.CommonDao;
+import parkingos.com.bolink.models.ComInfoTb;
 import parkingos.com.bolink.models.ComPassTb;
 import parkingos.com.bolink.models.OrderTb;
 import parkingos.com.bolink.qo.PageOrderConfig;
@@ -99,9 +100,29 @@ public class CityOrderServiceImpl implements CityOrderService {
                     } else {
                         map.put("duration","");
                     }
-                    sumtotal+=StringUtils.formatDouble(Double.parseDouble(map.get("total")+""));
-                    cashpay+= (StringUtils.formatDouble(Double.parseDouble(map.get("cash_prepay")+""))+StringUtils.formatDouble(Double.parseDouble(map.get("cash_pay")+"")));
-                    elepay+= (StringUtils.formatDouble(Double.parseDouble(map.get("electronic_prepay")+""))+StringUtils.formatDouble(Double.parseDouble(map.get("electronic_pay")+"")));
+                    if(!Check.isEmpty(map.get("amount_receivable")+"")){
+                        sumtotal+=StringUtils.formatDouble(Double.parseDouble(map.get("amount_receivable")+""));
+                    }
+                    Double cashPrepay =0.00;
+                    Double cashPay = 0.00;
+                    Double elePrepay = 0.00;
+                    Double elePay = 0.00;
+                    if(!Check.isEmpty( map.get("cash_prepay")+"")){
+                        cashPrepay = StringUtils.formatDouble(Double.parseDouble(map.get("cash_prepay")+""));
+                    }
+                    if(!Check.isEmpty( map.get("cash_pay")+"")){
+                        cashPay = StringUtils.formatDouble(Double.parseDouble(map.get("cash_pay")+""));
+                    }
+                    cashpay+=(cashPay+cashPrepay);
+
+                    if(!Check.isEmpty( map.get("electronic_prepay")+"")){
+                        elePrepay = StringUtils.formatDouble(Double.parseDouble(map.get("electronic_prepay")+""));
+                    }
+                    if(!Check.isEmpty( map.get("electronic_pay")+"")){
+                        elePay = StringUtils.formatDouble(Double.parseDouble(map.get("electronic_pay")+""));
+                    }
+                    elepay+=(elePay+elePrepay);
+
                     resList.add(map);
                 }
                 result.put("rows", JSON.toJSON(resList));
@@ -188,7 +209,7 @@ public class CityOrderServiceImpl implements CityOrderService {
         List<List<Object>> bodyList = new ArrayList<List<Object>>();
 //        List<List<String>> bodyList = new ArrayList<List<String>>();
         if (orderlist != null && orderlist.size() > 0) {
-            String[] f = new String[]{"id","company_name","car_number","c_type","create_time","end_time","duration","pay_type","total","prepaid","uid","collector","state","in_passid","out_passid"};
+            String[] f = new String[]{"id","comid","car_number","c_type","create_time","end_time","duration","total","prepaid","uid","collector","state","in_passid","out_passid"};
             Map<Long, String> uinNameMap = new HashMap<Long, String>();
             Map<Long, String> passNameMap = new HashMap<Long, String>();
             for (OrderTb orderTb : orderlist) {
@@ -218,6 +239,19 @@ public class CityOrderServiceImpl implements CityOrderService {
                             values.add((String) v);
                         };
 
+                    }else if("comid".equals(field)){
+                        ComInfoTb comInfoTb = new ComInfoTb();
+                        if(v!=null&&Check.isNumber(v+"")){
+                            comInfoTb.setId(Long.parseLong(v+""));
+                            comInfoTb = (ComInfoTb)commonDao.selectObjectByConditions(comInfoTb);
+                            if(comInfoTb.getCompanyName()!=null){
+                                values.add(comInfoTb.getCompanyName());
+                            }else{
+                                values.add("");
+                            }
+                        }else{
+                            values.add(v+"");
+                        }
                     }else if("duration".equals(field)){
                         Long start = (Long)map.get("create_time");
                         Long end = (Long)map.get("end_time");
@@ -225,18 +259,6 @@ public class CityOrderServiceImpl implements CityOrderService {
                             values.add(StringUtils.getTimeString(start, end));
                         }else{
                             values.add("");
-                        }
-                    }else if("pay_type".equals(field)){
-                        switch(Integer.valueOf(v + "")){
-                            case 0:values.add("账户支付");break;
-                            case 1:values.add("现金支付");break;
-                            case 2:values.add("手机支付");break;
-                            case 3:values.add("包月");break;
-                            case 4:values.add("中央预支付现金");break;
-                            case 5:values.add("中央预支付银联卡");break;
-                            case 6:values.add("中央预支付商家卡");break;
-                            case 8:values.add("免费");break;
-                            default:values.add("");
                         }
                     }else if("state".equals(field)){
                         switch(Integer.valueOf(v + "")){
