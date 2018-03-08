@@ -41,15 +41,15 @@ public class CityVipManageAction {
 
 
 
-    @RequestMapping(value = "add")
-    public String add(HttpServletRequest req, HttpServletResponse resp){
-
-        JSONObject result = cityVipService.createVip(req);
-
-        StringUtils.ajaxOutput(resp,result.toJSONString());
-
-        return null;
-    }
+//    @RequestMapping(value = "add")
+//    public String add(HttpServletRequest req, HttpServletResponse resp){
+//
+//        JSONObject result = cityVipService.createVip(req);
+//
+//        StringUtils.ajaxOutput(resp,result.toJSONString());
+//
+//        return null;
+//    }
 
 
 

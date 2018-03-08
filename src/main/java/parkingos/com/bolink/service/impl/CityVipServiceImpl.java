@@ -132,136 +132,136 @@ public class CityVipServiceImpl implements CityVipService {
 
 
 
-    @Override
-    public JSONObject createVip(HttpServletRequest req) {
-
-        String str = "{\"state\":0,\"msg\":\"添加失败\"}";
-        JSONObject result = JSONObject.parseObject(str);
-
-        String[] coms = req.getParameterMap().get("comid");
-        boolean isAll=false;//是否添加到所有车场
-        if(coms!=null&&coms.length>0){
-            for(String c : coms){
-                if(c.equals("-1")){
-                    isAll = true;
-                    break;
-                }
-            }
-        }
-        Long pid = RequestUtil.getLong(req, "p_name", -1L);
-
-        Long carTypeId = RequestUtil.getLong(req,"car_type_id",-1L);
-        System.out.println("=====>>>car_type_id:"+carTypeId);
-
-        //车主手机
-        String mobile = RequestUtil.processParams(req, "mobile").trim();
-        String name = RequestUtil.processParams(req, "name").trim();
-        String address = StringUtils.decodeUTF8(RequestUtil.processParams(req, "address").trim());
-        //起始时间
-        String b_time = RequestUtil.processParams(req, "b_time");
-        String e_time =RequestUtil.processParams(req, "e_time");
-
-        //修改月卡会员编号cardId为主键id
-        Long nextid = commonDao.selectSequence(CarowerProduct.class);
-        String cardId = String.valueOf(nextid);
-
-        Integer flag = RequestUtil.getInteger(req, "flag", -1);
-        //备注
-        String remark = StringUtils.decodeUTF8(RequestUtil.processParams(req, "remark"));
-        String carNumber = RequestUtil.processParams(req, "car_number");
-        logger.error("=======>>>>>carNumber"+carNumber);
-        //实收金额
-        Double act_total = RequestUtil.getDouble(req,"act_total",0.0);
-
-        Long ntime = System.currentTimeMillis() / 1000;
-        Long btime = TimeTools.getLongMilliSecondFrom_HHMMDD(b_time) / 1000;
-        Long etime = TimeTools.getLongMilliSecondFrom_HHMMDD(e_time)/1000+86399;
-
-//        CarowerProduct carowerProduct = new CarowerProduct();
-//        carowerProduct.setComId(comid);
-//        carowerProduct.setCardId(cardId);
-//        carowerProduct.setIsDelete(0L);
-//        int count = commonDao.selectCountByConditions(carowerProduct);
+//    @Override
+//    public JSONObject createVip(HttpServletRequest req) {
 //
-//        logger.error("======>>>>>>>>count"+count);
-//        if (count > 0) {
-//            result.put("msg", "月卡编号重复");
+//        String str = "{\"state\":0,\"msg\":\"添加失败\"}";
+//        JSONObject result = JSONObject.parseObject(str);
+//
+//        String[] coms = req.getParameterMap().get("comid");
+//        boolean isAll=false;//是否添加到所有车场
+//        if(coms!=null&&coms.length>0){
+//            for(String c : coms){
+//                if(c.equals("-1")){
+//                    isAll = true;
+//                    break;
+//                }
+//            }
+//        }
+//        Long pid = RequestUtil.getLong(req, "p_name", -1L);
+//
+//        Long carTypeId = RequestUtil.getLong(req,"car_type_id",-1L);
+//        System.out.println("=====>>>car_type_id:"+carTypeId);
+//
+//        //车主手机
+//        String mobile = RequestUtil.processParams(req, "mobile").trim();
+//        String name = RequestUtil.processParams(req, "name").trim();
+//        String address = StringUtils.decodeUTF8(RequestUtil.processParams(req, "address").trim());
+//        //起始时间
+//        String b_time = RequestUtil.processParams(req, "b_time");
+//        String e_time =RequestUtil.processParams(req, "e_time");
+//
+//        //修改月卡会员编号cardId为主键id
+//        Long nextid = commonDao.selectSequence(CarowerProduct.class);
+//        String cardId = String.valueOf(nextid);
+//
+//        Integer flag = RequestUtil.getInteger(req, "flag", -1);
+//        //备注
+//        String remark = StringUtils.decodeUTF8(RequestUtil.processParams(req, "remark"));
+//        String carNumber = RequestUtil.processParams(req, "car_number");
+//        logger.error("=======>>>>>carNumber"+carNumber);
+//        //实收金额
+//        Double act_total = RequestUtil.getDouble(req,"act_total",0.0);
+//
+//        Long ntime = System.currentTimeMillis() / 1000;
+//        Long btime = TimeTools.getLongMilliSecondFrom_HHMMDD(b_time) / 1000;
+//        Long etime = TimeTools.getLongMilliSecondFrom_HHMMDD(e_time)/1000+86399;
+//
+////        CarowerProduct carowerProduct = new CarowerProduct();
+////        carowerProduct.setComId(comid);
+////        carowerProduct.setCardId(cardId);
+////        carowerProduct.setIsDelete(0L);
+////        int count = commonDao.selectCountByConditions(carowerProduct);
+////
+////        logger.error("======>>>>>>>>count"+count);
+////        if (count > 0) {
+////            result.put("msg", "月卡编号重复");
+////            return result;
+////        }
+//
+//        Long uin =-1L;
+//        //添加生成月卡会员时的车主编号
+//        if(carNumber != null && !carNumber.equals("")){
+//            String [] carNumStrings = carNumber.split(",");
+//            if(carNumStrings != null && carNumStrings.length>0){
+//                for(String strNum :carNumStrings){
+//                    strNum = strNum.toUpperCase();
+//                    logger.error("==>>>.strNum"+strNum);
+//                    if(StringUtils.checkPlate(strNum)){
+//                        CarInfoTb carInfoTb = new CarInfoTb();
+//                        carInfoTb.setCarNumber(strNum);
+//                        carInfoTb = (CarInfoTb) commonDao.selectObjectByConditions(carInfoTb);
+//                        if (carInfoTb != null && carInfoTb.getId() != null) {
+//                            uin = carInfoTb.getUin();
+//                        }
+//                    }else{
+//                        result.put("msg", "车牌号有误");
+//                        return result;
+//                    }
+//                }
+//            }
+//        }
+//
+//        List<Long> comids = new ArrayList<>();
+//
+//        if(coms.length>0){
+//            for(String s : coms){
+//                if(!"-1".equals(s)&& Check.isLong(s))
+//                    comids.add(Long.valueOf(s));
+//            }
+//        }
+//        System.out.println(comids);
+//
+//        if(comids!=null&&comids.size()>0){
+//            for(Long comid:comids){
+//                //组装增加会员参数插入数据库
+//                int ret=0;
+//                CarowerProduct carowerProduct1 = new CarowerProduct();
+//                carowerProduct1.setId(nextid);
+//                carowerProduct1.setUin(uin);
+//                carowerProduct1.setPid(pid);
+//                carowerProduct1.setCarTypeId(carTypeId);
+//                carowerProduct1.setCreateTime(ntime);
+//                carowerProduct1.setUpdateTime(ntime);
+//                carowerProduct1.setbTime(btime);
+//                carowerProduct1.seteTime(etime);
+////              carowerProduct1.setTotal(new BigDecimal(total+""));
+//                carowerProduct1.setRemark(remark);
+//                carowerProduct1.setName(name);
+//                carowerProduct1.setAddress(address);
+//                carowerProduct1.setActTotal(new BigDecimal(act_total+""));
+//                carowerProduct1.setComId(comid);
+//                carowerProduct1.setCarNumber(carNumber.toUpperCase());
+//                carowerProduct1.setCardId(nextid+"");
+//                carowerProduct1.setMobile(mobile);
+//                ret = commonDao.insert(carowerProduct1);
+//                if(ret==1){
+//                    result.put("state",1);
+//                    result.put("msg","添加成功");
+//                    int ins = insertSysn(carowerProduct1,0,comid);
+//                    if(ins!=1){
+//                        logger.error("======>>>>>>>>>插入同步表失败");
+//                    }
+//                }
+//            }
+//        }else{
+//            result.put("msg","请选择车场");
 //            return result;
 //        }
-
-        Long uin =-1L;
-        //添加生成月卡会员时的车主编号
-        if(carNumber != null && !carNumber.equals("")){
-            String [] carNumStrings = carNumber.split(",");
-            if(carNumStrings != null && carNumStrings.length>0){
-                for(String strNum :carNumStrings){
-                    strNum = strNum.toUpperCase();
-                    logger.error("==>>>.strNum"+strNum);
-                    if(StringUtils.checkPlate(strNum)){
-                        CarInfoTb carInfoTb = new CarInfoTb();
-                        carInfoTb.setCarNumber(strNum);
-                        carInfoTb = (CarInfoTb) commonDao.selectObjectByConditions(carInfoTb);
-                        if (carInfoTb != null && carInfoTb.getId() != null) {
-                            uin = carInfoTb.getUin();
-                        }
-                    }else{
-                        result.put("msg", "车牌号有误");
-                        return result;
-                    }
-                }
-            }
-        }
-
-        List<Long> comids = new ArrayList<>();
-
-        if(coms.length>0){
-            for(String s : coms){
-                if(!"-1".equals(s)&& Check.isLong(s))
-                    comids.add(Long.valueOf(s));
-            }
-        }
-        System.out.println(comids);
-
-        if(comids!=null&&comids.size()>0){
-            for(Long comid:comids){
-                //组装增加会员参数插入数据库
-                int ret=0;
-                CarowerProduct carowerProduct1 = new CarowerProduct();
-                carowerProduct1.setId(nextid);
-                carowerProduct1.setUin(uin);
-                carowerProduct1.setPid(pid);
-                carowerProduct1.setCarTypeId(carTypeId);
-                carowerProduct1.setCreateTime(ntime);
-                carowerProduct1.setUpdateTime(ntime);
-                carowerProduct1.setbTime(btime);
-                carowerProduct1.seteTime(etime);
-//              carowerProduct1.setTotal(new BigDecimal(total+""));
-                carowerProduct1.setRemark(remark);
-                carowerProduct1.setName(name);
-                carowerProduct1.setAddress(address);
-                carowerProduct1.setActTotal(new BigDecimal(act_total+""));
-                carowerProduct1.setComId(comid);
-                carowerProduct1.setCarNumber(carNumber.toUpperCase());
-                carowerProduct1.setCardId(nextid+"");
-                carowerProduct1.setMobile(mobile);
-                ret = commonDao.insert(carowerProduct1);
-                if(ret==1){
-                    result.put("state",1);
-                    result.put("msg","添加成功");
-                    int ins = insertSysn(carowerProduct1,0,comid);
-                    if(ins!=1){
-                        logger.error("======>>>>>>>>>插入同步表失败");
-                    }
-                }
-            }
-        }else{
-            result.put("msg","请选择车场");
-            return result;
-        }
-
-
-        return result;
-    }
+//
+//
+//        return result;
+//    }
 
 
 //    private int insertCardSysn(CardRenewTb cardRenewTb, int operater, Long comid) {

@@ -8,7 +8,7 @@ import java.util.Map;
 public interface CityVipService {
     JSONObject selectResultByConditions(Map<String, String> reqParameterMap);
 
-    JSONObject createVip(HttpServletRequest req);
+//    JSONObject createVip(HttpServletRequest req);
 
 //    List<List<String>> exportExcel(Map<String, String> reqParameterMap);
 
