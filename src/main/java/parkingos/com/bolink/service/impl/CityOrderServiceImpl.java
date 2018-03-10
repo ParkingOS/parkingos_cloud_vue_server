@@ -9,6 +9,7 @@ import parkingos.com.bolink.dao.spring.CommonDao;
 import parkingos.com.bolink.models.ComInfoTb;
 import parkingos.com.bolink.models.ComPassTb;
 import parkingos.com.bolink.models.OrderTb;
+import parkingos.com.bolink.models.UserInfoTb;
 import parkingos.com.bolink.qo.PageOrderConfig;
 import parkingos.com.bolink.qo.SearchBean;
 import parkingos.com.bolink.service.CityOrderService;
@@ -46,7 +47,10 @@ public class CityOrderServiceImpl implements CityOrderService {
         Double sumtotal = 0.00;
         Double cashpay = 0.00;
         Double elepay = 0.00;
+        //需要显示数据的集合
         List<OrderTb> list =null;
+        //统计满足条件的所有订单的集合  用来统计价格
+        List<OrderTb> moneyList =null;
         List<Map<String, Object>> resList =new ArrayList<>();
 
         //查询今天的数据显示
@@ -74,7 +78,6 @@ public class CityOrderServiceImpl implements CityOrderService {
             logger.error("=========..req"+reqmap.size());
         }
 
-
         Map searchMap = supperSearchService.getGroupOrCitySearch(orderTb,reqmap);
         OrderTb baseQuery =(OrderTb)searchMap.get("base");
         List<SearchBean> supperQuery =(List<SearchBean>)searchMap.get("supper");
@@ -87,7 +90,23 @@ public class CityOrderServiceImpl implements CityOrderService {
                 config.setPageInfo(null,null);
                 list = commonDao.selectListByConditions(baseQuery,supperQuery,config);
             }else{
+                //价格统计不需要分页  要查询所有
+                PageOrderConfig newPage = new PageOrderConfig();
+                newPage.setPageInfo(null,null);
+                moneyList =  commonDao.selectListByConditions(baseQuery,supperQuery,newPage);
+                //带分页的 要显示在页面  的数据list
                 list = commonDao.selectListByConditions(baseQuery,supperQuery,config);
+
+//                if(moneyList!=null&&!moneyList.isEmpty()){
+//                    list = new ArrayList<>();
+//                    Integer pageSize =Integer.valueOf(reqmap.get("rp"));
+//                    Integer pageNum = Integer.valueOf(reqmap.get("page"));
+//                    for(int i = (pageNum-1)*pageSize;i<pageNum*pageSize;i++){
+//                        if(i<moneyList.size()){
+//                            list.add(moneyList.get(i));
+//                        }
+//                    }
+//                }
             }
             if (list != null && !list.isEmpty()) {
                 for (OrderTb orderTb1 : list) {
@@ -100,88 +119,41 @@ public class CityOrderServiceImpl implements CityOrderService {
                     } else {
                         map.put("duration","");
                     }
-                    if(!Check.isEmpty(map.get("amount_receivable")+"")){
-                        sumtotal+=StringUtils.formatDouble(Double.parseDouble(map.get("amount_receivable")+""));
-                    }
-                    Double cashPrepay =0.00;
-                    Double cashPay = 0.00;
-                    Double elePrepay = 0.00;
-                    Double elePay = 0.00;
-                    if(!Check.isEmpty( map.get("cash_prepay")+"")){
-                        cashPrepay = StringUtils.formatDouble(Double.parseDouble(map.get("cash_prepay")+""));
-                    }
-                    if(!Check.isEmpty( map.get("cash_pay")+"")){
-                        cashPay = StringUtils.formatDouble(Double.parseDouble(map.get("cash_pay")+""));
-                    }
-                    cashpay+=(cashPay+cashPrepay);
-
-                    if(!Check.isEmpty( map.get("electronic_prepay")+"")){
-                        elePrepay = StringUtils.formatDouble(Double.parseDouble(map.get("electronic_prepay")+""));
-                    }
-                    if(!Check.isEmpty( map.get("electronic_pay")+"")){
-                        elePay = StringUtils.formatDouble(Double.parseDouble(map.get("electronic_pay")+""));
-                    }
-                    elepay+=(elePay+elePrepay);
-
                     resList.add(map);
+                }
+
+                if(moneyList!=null&&!moneyList.isEmpty()){
+                    for(OrderTb newOrder:moneyList){
+                        OrmUtil<OrderTb> otm = new OrmUtil<>();
+                        Map<String, Object> map = otm.pojoToMap(newOrder);
+                        if(!Check.isEmpty(map.get("amount_receivable")+"")){
+                            sumtotal+=StringUtils.formatDouble(Double.parseDouble(map.get("amount_receivable")+""));
+                        }
+                        Double cashPrepay =0.00;
+                        Double cashPay = 0.00;
+                        Double elePrepay = 0.00;
+                        Double elePay = 0.00;
+                        if(!Check.isEmpty( map.get("cash_prepay")+"")){
+                            cashPrepay = StringUtils.formatDouble(Double.parseDouble(map.get("cash_prepay")+""));
+                        }
+                        if(!Check.isEmpty( map.get("cash_pay")+"")){
+                            cashPay = StringUtils.formatDouble(Double.parseDouble(map.get("cash_pay")+""));
+                        }
+                        cashpay+=(cashPay+cashPrepay);
+
+                        if(!Check.isEmpty( map.get("electronic_prepay")+"")){
+                            elePrepay = StringUtils.formatDouble(Double.parseDouble(map.get("electronic_prepay")+""));
+                        }
+                        if(!Check.isEmpty( map.get("electronic_pay")+"")){
+                            elePay = StringUtils.formatDouble(Double.parseDouble(map.get("electronic_pay")+""));
+                        }
+                        elepay+=(elePay+elePrepay);
+                    }
                 }
                 result.put("rows", JSON.toJSON(resList));
             }
         }
 
-//        String groupid = reqmap.get("groupid");
-//        String cityid = reqmap.get("cityid");
-//        System.out.println("=====groupid:"+groupid+"===cityid:"+cityid);
-//
-//        Map searchMap = supperSearchService.getBaseSearch(orderTb,reqmap);
-//        logger.info(searchMap);
-//        if(searchMap!=null&&!searchMap.isEmpty()){
-//            OrderTb baseQuery =(OrderTb)searchMap.get("base");
-//            List<SearchBean> supperQuery = null;
-//            if(searchMap.containsKey("supper"))
-//                supperQuery = (List<SearchBean>)searchMap.get("supper");
-//            PageOrderConfig config = null;
-//            if(searchMap.containsKey("config"))
-//                config = (PageOrderConfig)searchMap.get("config");
-//
-//            List parks =new ArrayList();
-//
-//            if(groupid !=null&&!"".equals(groupid)){
-//                parks = commonMethods.getParks(Long.parseLong(groupid));
-//            }else if(cityid !=null&&!"".equals(cityid)){
-//                parks = commonMethods.getparks(Long.parseLong(cityid));
-//            }
-//
-//            System.out.println("=======parks:"+parks);
-//
-//            //封装searchbean  集团或者城市下面所有车场
-//            SearchBean searchBean = new SearchBean();
-//            searchBean.setOperator(FieldOperator.CONTAINS);
-//            searchBean.setFieldName("comid");
-//            searchBean.setBasicValue(parks);
-//
-//            if (supperQuery == null) {
-//                supperQuery = new ArrayList<>();
-//            }
-//            supperQuery.add( searchBean );
-//
-//            count = commonDao.selectCountByConditions(baseQuery,supperQuery);
-//            if(count>0){
-//                list = commonDao.selectListByConditions(baseQuery,supperQuery,config);
-//                if (list != null && !list.isEmpty()) {
-//
-//                    for (OrderTb order : list) {
-//                        OrmUtil<OrderTb> otm = new OrmUtil<>();
-//                        Map<String, Object> map = otm.pojoToMap(order);
-//                        sumtotal+=StringUtils.formatDouble(Double.parseDouble(map.get("total")+""));
-//                        cashpay+= (StringUtils.formatDouble(Double.parseDouble(map.get("cash_prepay")+""))+StringUtils.formatDouble(Double.parseDouble(map.get("cash_pay")+"")));
-//                        elepay+= (StringUtils.formatDouble(Double.parseDouble(map.get("electronic_prepay")+""))+StringUtils.formatDouble(Double.parseDouble(map.get("electronic_pay")+"")));
-//                        resList.add(map);
-//                    }
-//                    result.put("rows", JSON.toJSON(resList));
-//                }
-//            }
-//        }
         result.put("sumtotal",String.format("%.2f",sumtotal));
         result.put("cashpay",String.format("%.2f",cashpay));
         result.put("elepay",String.format("%.2f",elepay));
@@ -207,13 +179,11 @@ public class CityOrderServiceImpl implements CityOrderService {
 
         logger.error("=========>>>>>>.导出订单" + orderlist.size());
         List<List<Object>> bodyList = new ArrayList<List<Object>>();
-//        List<List<String>> bodyList = new ArrayList<List<String>>();
         if (orderlist != null && orderlist.size() > 0) {
-            String[] f = new String[]{"id","comid","car_number","c_type","create_time","end_time","duration","total","prepaid","uid","collector","state","in_passid","out_passid"};
-            Map<Long, String> uinNameMap = new HashMap<Long, String>();
+            String[] f = new String[]{"id","comid", "uid", "out_uid","c_type", "car_number","car_type", "create_time", "end_time", "duration", "pay_type", "freereasons","amount_receivable", "total", "electronic_prepay", "cash_prepay", "electronic_pay", "cash_pay", "reduce_amount",  "state", "in_passid", "out_passid","order_id_local"};
             Map<Long, String> passNameMap = new HashMap<Long, String>();
+            Map<Long, String> uinNameMap = new HashMap<Long, String>();
             for (OrderTb orderTb : orderlist) {
-//                List<String> values = new ArrayList<String>();
                 List<Object> values = new ArrayList<Object>();
                 OrmUtil<OrderTb> otm = new OrmUtil<>();
                 Map map = otm.pojoToMap(orderTb);
@@ -223,7 +193,7 @@ public class CityOrderServiceImpl implements CityOrderService {
                         v = "";
                     if("c_type".equals(field)){
                         try{
-                            switch(Integer.valueOf(v + "")){//0:NFC,1:IBeacon,2:照牌   3通道照牌 4直付 5月卡用户
+                            switch(Integer.valueOf(v + "")){
                                 case 0:values.add("NFC刷卡");break;
                                 case 1:values.add("Ibeacon");break;
                                 case 2:values.add("手机扫牌");break;
@@ -236,10 +206,36 @@ public class CityOrderServiceImpl implements CityOrderService {
                                 default:values.add("");
                             }
                         }catch (Exception e){
-                            values.add((String) v);
-                        };
-
+                            values.add(v);
+                        }
                     }else if("comid".equals(field)){
+                        if (Check.isLong(v+"")){
+                            Long comid =  Long.parseLong(v+"");
+                            values.add(getComName(comid));
+                        }else {
+                            values.add("");
+                        }
+                    }else if ("uid".equals(field) || "out_uid".equals(field)) {
+                        Long uid = -1L;
+                        if (Check.isLong(v + ""))
+                            uid = Long.valueOf(v + "");
+                        if (uinNameMap.containsKey(uid)) {
+                            values.add(uinNameMap.get(uid));
+                        } else {
+                            String name = getUinName(Long.valueOf(map.get(field) + ""));
+                            values.add(name);
+                            uinNameMap.put(uid, name);
+                        }
+                    } else if ("pay_type".equals(field)) {
+                        switch (Integer.valueOf(v + "")) {//0:NFC,1:IBeacon,2:照牌   3通道照牌 4直付 5月卡用户
+                            case 0: values.add("账户支付");break;
+                            case 1: values.add("现金支付");break;
+                            case 2: values.add("手机支付");break;
+                            case 3: values.add("包月");break;
+                            case 8: values.add("免费");break;
+                            default: values.add("");
+                        }
+                    } else if("comid".equals(field)){
                         ComInfoTb comInfoTb = new ComInfoTb();
                         if(v!=null&&Check.isNumber(v+"")){
                             comInfoTb.setId(Long.parseLong(v+""));
@@ -285,17 +281,6 @@ public class CityOrderServiceImpl implements CityOrderService {
                         }else{
                             values.add("");
                         }
-                    }else if("prepaid".equals(field)){
-                        if(map.get("prepaid") != null){
-                            Double prepaid = Double.valueOf(map.get("prepaid") + "");
-                            if(prepaid > 0){
-                                values.add(prepaid + "");
-                            }else{
-                                values.add("");
-                            }
-                        }else{
-                            values.add("");
-                        }
                     }else{
                         values.add(v + "");
                     }
@@ -313,6 +298,26 @@ public class CityOrderServiceImpl implements CityOrderService {
         comPassTb = (ComPassTb)commonDao.selectObjectByConditions(comPassTb);
         if(comPassTb!=null&&comPassTb.getPassname()!=null){
             return comPassTb.getPassname();
+        }
+        return "";
+    }
+
+    private String getUinName(Long uin) {
+        UserInfoTb userInfoTb = new UserInfoTb();
+        userInfoTb.setId(uin);
+        userInfoTb = (UserInfoTb)commonDao.selectObjectByConditions(userInfoTb);
+        if(userInfoTb!=null&&userInfoTb.getNickname()!=null){
+            return userInfoTb.getNickname();
+        }
+        return "";
+    }
+
+    private String getComName(Long comid){
+        ComInfoTb comInfoTb  = new ComInfoTb();
+        comInfoTb.setId(comid);
+        comInfoTb = (ComInfoTb)commonDao.selectObjectByConditions(comInfoTb);
+        if(comInfoTb!=null&&comInfoTb.getCompanyName()!=null){
+            return comInfoTb.getCompanyName();
         }
         return "";
     }

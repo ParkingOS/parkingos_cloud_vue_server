@@ -51,7 +51,7 @@ public class CityOrderAction {
 
         List<List<Object>> bodyList = cityOrderService.exportExcel(reqParameterMap);
 //        new String[]{"订单编号","车场名称","所属泊位段","泊位编号","车牌号","进场方式","进场时间","出场时间","停车时长","支付方式","金额","预付金额","收款人账号","收款人名称","订单状态","结算方式","进场通道","出场通道"};
-        String [][] heards = new String[][]{{"订单编号","STR"},{"车场名称","STR"},{"车牌号","STR"},{"进场方式","STR"},{"进场时间","STR"},{"出场时间","STR"},{"时长","STR"},{"金额","STR"},{"预付金额","STR"},{"收款人账号","STR"},{"收款人名称","STR"},{"订单状态","STR"},{"进场通道","STR"},{"出场通道","STR"}};
+        String [][] heards = new String[][]{{"编号","STR"},{"车场名称","STR"},{"收款人账号","STR"},{"收款人名称","STR"},{"进场方式","STR"},{"车牌号","STR"},{"车型","STR"},{"进场时间","STR"},{"出场时间","STR"},{"时长","STR"},{"支付方式","STR"},{"优惠原因","STR"},{"应收金额","STR"},{"实收金额","STR"},{"电子预付金额","STR"},{"现金预付金额","STR"},{"电子结算金额","STR"},{"现金结算金额","STR"},{"减免金额","STR"},{"订单状态","STR"},{"进场通道","STR"},{"出场通道","STR"},{"订单编号","STR"}};
         ExportDataExcel excel = new ExportDataExcel("订单数据", heards, "sheet1");
         String fname = "订单数据";
         fname = StringUtils.encodingFileName(fname)+".xls";

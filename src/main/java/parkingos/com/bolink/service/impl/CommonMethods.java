@@ -1099,7 +1099,20 @@ public class CommonMethods {
 		List<Object> collectors = new ArrayList<Object>();
 		try {
 			String sql = "select id from user_info_tb where state<>1 and (auth_flag=1 or auth_flag=2)" +
-					" and groupid= "+groupid ;
+					" and (groupid= "+groupid  ;
+			List<Object> parkList = getParks(groupid);
+			String preParams  ="";
+			if(parkList!=null&&!parkList.isEmpty()) {
+				for (Object parkid : parkList) {
+					if (preParams.equals(""))
+						preParams = parkid + "";
+					else
+						preParams += "," + parkid;
+				}
+				sql += " or comid in ("+preParams+")";
+			}
+			sql+=")";
+
 			List<Map<String, Object>> list = commonDao.getObjectBySql(sql);
 
 			if(list != null && !list.isEmpty()){

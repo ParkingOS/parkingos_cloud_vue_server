@@ -337,15 +337,6 @@ public class OrderServiceImpl implements OrderService {
                             case 3:
                                 values.add("包月");
                                 break;
-                            case 4:
-                                values.add("中央预支付现金 ");
-                                break;
-                            case 5:
-                                values.add("中央预支付银联卡 ");
-                                break;
-                            case 6:
-                                values.add("中央预支付商家卡");
-                                break;
                             case 8:
                                 values.add("免费");
                                 break;
