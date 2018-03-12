@@ -81,6 +81,7 @@ public class CityVipManageAction {
     @RequestMapping(value = "importExcel")
     public String importExcel(HttpServletRequest request, HttpServletResponse resp) throws Exception{
 
+        System.out.println("===进入上传方法");
         JSONObject result = cityVipService.importExcel(request);
 
         StringUtils.ajaxOutput(resp,result.toJSONString());

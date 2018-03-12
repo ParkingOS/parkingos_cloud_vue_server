@@ -17,7 +17,7 @@ public interface VipService {
 
     JSONObject deleteCarowerProById(Long id, Long comid);
 
-    JSONObject createVip(HttpServletRequest req);
+    JSONObject createVip(HttpServletRequest req) throws Exception;
 
     JSONObject editCarNum(Long id, String carNumber, Long comid);
 

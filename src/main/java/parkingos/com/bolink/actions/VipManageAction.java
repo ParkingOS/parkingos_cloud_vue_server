@@ -56,7 +56,7 @@ public class VipManageAction {
 
 
     @RequestMapping(value = "add")
-    public String add(HttpServletRequest req, HttpServletResponse resp){
+    public String add(HttpServletRequest req, HttpServletResponse resp) throws Exception{
 
         JSONObject result = vipService.createVip(req);
 

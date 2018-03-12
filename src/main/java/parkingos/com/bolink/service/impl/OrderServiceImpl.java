@@ -45,6 +45,7 @@ public class OrderServiceImpl implements OrderService {
         OrderTb newOrder = new OrderTb();
         newOrder.setComid(Long.parseLong(reqmap.get("comid")));
         newOrder.setState(0);
+        newOrder.setIshd(0);
         //不用高级查询条件 只需要基本条件  新建map
         JSONObject newResult = supperSearchService.supperSearch(newOrder, newReqmap);
         Integer total = (Integer) JSON.parse(newResult.get("total")+"");
@@ -79,13 +80,14 @@ public class OrderServiceImpl implements OrderService {
         logger.error("=========..req"+reqmap.size());
         OrderTb orderTb = new OrderTb();
         orderTb.setComid(Long.parseLong(reqmap.get("comid")));
+        orderTb.setIshd(0);
         //判断是不是设置了订单功能
-        if(reqmap.get("ishdorder")!=null&&!"".equals(reqmap.get("ishdorder"))){
-            int ishd = Integer.parseInt(reqmap.get("ishdorder"));
-            if(ishd==1){
-                orderTb.setIshd(0);
-            }
-        }
+//        if(reqmap.get("ishdorder")!=null&&!"".equals(reqmap.get("ishdorder"))){
+//            int ishd = Integer.parseInt(reqmap.get("ishdorder"));
+//            if(ishd==1){
+//                orderTb.setIshd(0);
+//            }
+//        }
         String createTime = reqmap.get("create_time");
         logger.error("===>>>createTime"+createTime);
         //组装 一个月 参数

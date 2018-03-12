@@ -17,6 +17,7 @@ import parkingos.com.bolink.utils.TimeTools;
 
 import javax.servlet.http.HttpServletRequest;
 import java.math.BigDecimal;
+import java.text.SimpleDateFormat;
 import java.util.*;
 
 
@@ -74,7 +75,7 @@ public class VipServiceImpl implements VipService {
     }
 
     @Override
-    public JSONObject createVip(HttpServletRequest req) {
+    public JSONObject createVip(HttpServletRequest req) throws Exception{
 
         String str = "{\"state\":0,\"msg\":\"添加失败\"}";
         JSONObject result = JSONObject.parseObject(str);
@@ -89,8 +90,17 @@ public class VipServiceImpl implements VipService {
         String mobile = RequestUtil.processParams(req, "mobile").trim();
         String name = RequestUtil.processParams(req, "name").trim();
         String address = StringUtils.decodeUTF8(RequestUtil.processParams(req, "address").trim());
-        //起始时间
+        //起始时间   "2015-12-7T16:00:00.000Z";
         String b_time = RequestUtil.processParams(req, "b_time");
+        System.out.println("=====chenbowen:"+b_time);
+        //时区问题  进行转换
+        b_time = b_time.replace("Z", " UTC");//注意是空格+UTC
+        SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS Z");//注意格式化的表达式
+        Date d = format.parse(b_time);
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        b_time = sdf.format(d);
+        System.out.println("=====chen:"+b_time);
+
         //购买月数
         Integer months = RequestUtil.getInteger(req, "months", 1);
         //修改月卡会员编号cardId为主键id
