@@ -78,7 +78,7 @@ public class CityVipManageAction {
 //        return null;
 //    }
 
-    @RequestMapping(value = "importExcel")
+    @RequestMapping(value = "/importExcel")
     public String importExcel(HttpServletRequest request, HttpServletResponse resp) throws Exception{
 
         System.out.println("===进入上传方法");

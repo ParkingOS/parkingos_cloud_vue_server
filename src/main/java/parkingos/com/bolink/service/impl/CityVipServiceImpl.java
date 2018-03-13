@@ -139,6 +139,7 @@ public class CityVipServiceImpl implements CityVipService {
 //        JSONObject result = JSONObject.parseObject(str);
 //
 //        String[] coms = req.getParameterMap().get("comid");
+//        String coms[]=request.getParameterValues("comid");
 //        boolean isAll=false;//是否添加到所有车场
 //        if(coms!=null&&coms.length>0){
 //            for(String c : coms){
