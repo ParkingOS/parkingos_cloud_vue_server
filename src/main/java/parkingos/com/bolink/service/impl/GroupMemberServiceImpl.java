@@ -1,18 +1,14 @@
 package parkingos.com.bolink.service.impl;
 
-import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import parkingos.com.bolink.dao.spring.CommonDao;
-import parkingos.com.bolink.models.ComInfoTb;
 import parkingos.com.bolink.models.SyncInfoPoolTb;
 import parkingos.com.bolink.models.UserInfoTb;
-import parkingos.com.bolink.models.UserRoleTb;
 import parkingos.com.bolink.service.GroupMemberService;
 import parkingos.com.bolink.service.SupperSearchService;
-import parkingos.com.bolink.utils.OrmUtil;
 import parkingos.com.bolink.utils.StringUtils;
 
 import java.util.ArrayList;
@@ -39,28 +35,28 @@ public class GroupMemberServiceImpl implements GroupMemberService {
 
         JSONObject result = supperSearchService.supperSearch(userInfoTb,reqmap);
 
-        List<UserInfoTb> userlist = JSON.parseArray(result.get("rows").toString(), UserInfoTb.class);
-        List<Map<String, Object>> resList =new ArrayList<>();
-        for(UserInfoTb userInfoTb1 :userlist){
-            OrmUtil<UserInfoTb> otm = new OrmUtil<>();
-            Map map = otm.pojoToMap(userInfoTb1);
-            if(map.get("role_id")!=null&&map.get("role_id")!=-1){
-                Long roleId = Long.parseLong(map.get("role_id")+"");
-                UserRoleTb userRoleTb = new UserRoleTb();
-                userRoleTb.setId(roleId);
-                userRoleTb.setState(0);
-                userRoleTb.setOid(Long.parseLong(reqmap.get("oid")));
-                userRoleTb = (UserRoleTb)commonDao.selectObjectByConditions(userRoleTb);
-                if(userRoleTb==null){
-                    continue;
-                }else if(userRoleTb!=null&&userRoleTb.getRoleName()!=null){
-                    map.put("role_id",userRoleTb.getRoleName());
-                    resList.add(map);
-                }
-            }
-        }
-        result.remove("rows");
-        result.put("rows",JSON.toJSON(resList));
+//        List<UserInfoTb> userlist = JSON.parseArray(result.get("rows").toString(), UserInfoTb.class);
+//        List<Map<String, Object>> resList =new ArrayList<>();
+//        for(UserInfoTb userInfoTb1 :userlist){
+//            OrmUtil<UserInfoTb> otm = new OrmUtil<>();
+//            Map map = otm.pojoToMap(userInfoTb1);
+//            if(map.get("role_id")!=null&&map.get("role_id")!=-1){
+//                Long roleId = Long.parseLong(map.get("role_id")+"");
+//                UserRoleTb userRoleTb = new UserRoleTb();
+//                userRoleTb.setId(roleId);
+//                userRoleTb.setState(0);
+//                userRoleTb.setOid(Long.parseLong(reqmap.get("oid")));
+//                userRoleTb = (UserRoleTb)commonDao.selectObjectByConditions(userRoleTb);
+//                if(userRoleTb==null){
+//                    continue;
+//                }else if(userRoleTb!=null&&userRoleTb.getRoleName()!=null){
+//                    map.put("role_id",userRoleTb.getRoleName());
+//                    resList.add(map);
+//                }
+//            }
+//        }
+//        result.remove("rows");
+//        result.put("rows",JSON.toJSON(resList));
         return result;
 
     }
@@ -131,23 +127,23 @@ public class GroupMemberServiceImpl implements GroupMemberService {
         if(count>0){
             return result;
         }
-        Long comId = Long.parseLong(reqParameterMap.get("comid"));
+//        Long comId = Long.parseLong(reqParameterMap.get("comid"));
 //        if(comId == null || comId==0)
 //            comId = RequestUtil.getLong(request, "comid", 0L);
         Long groupId = -1L;
         if(reqParameterMap.get("groupid")!=null&&!"undefined".equals(reqParameterMap.get("groupid"))){
             groupId = Long.parseLong(reqParameterMap.get("groupid"));
         }
-        if(groupId==null||groupId<0){
-            ComInfoTb comInfoTb = new ComInfoTb();
-            comInfoTb.setId(comId);
-            comInfoTb = (ComInfoTb) commonDao.selectObjectByConditions(comInfoTb);
-            if(comInfoTb!=null)
-                groupId = comInfoTb.getGroupid();//(Long)comMap.get("groupid");
-        }
+//        if(groupId==null||groupId<0){
+//            ComInfoTb comInfoTb = new ComInfoTb();
+//            comInfoTb.setId(comId);
+//            comInfoTb = (ComInfoTb) commonDao.selectObjectByConditions(comInfoTb);
+//            if(comInfoTb!=null)
+//                groupId = comInfoTb.getGroupid();//(Long)comMap.get("groupid");
+//        }
         logger.error("groupid:"+groupId);
         Long cityid = -1L;
-        if(reqParameterMap.get("cityid")!=null&&!"undefined".equals(reqParameterMap.get("cityid"))){
+        if(reqParameterMap.get("cityid")!=null&&!"undefined".equals(reqParameterMap.get("cityid"))&&!"".equals(reqParameterMap.get("cityid"))){
             cityid = Long.parseLong(reqParameterMap.get("cityid"));
         }
         if(auth_flag==1){//总后台设置的管理员，默认为后台车场管理员
@@ -168,7 +164,7 @@ public class GroupMemberServiceImpl implements GroupMemberService {
         user.setMobile(mobile);
         user.setPhone(phone);
         user.setAuthFlag(auth_flag);
-        user.setComid(comId);
+//        user.setComid(comId);
         user.setRoleId(role_id);
         user.setIsview(isview);
         user.setUserId(userId);

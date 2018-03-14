@@ -190,7 +190,7 @@ public class MemberServiceImpl implements MemberService {
 //        if(comId == null || comId==0)
 //            comId = RequestUtil.getLong(request, "comid", 0L);
         Long groupId = -1L;
-        if(reqParameterMap.get("groupid")!=null&&!"undefined".equals(reqParameterMap.get("groupid"))){
+        if(reqParameterMap.get("groupid")!=null&&!"undefined".equals(reqParameterMap.get("groupid"))&&!"".equals(reqParameterMap.get("groupid"))){
             groupId = Long.parseLong(reqParameterMap.get("groupid"));
         }
         if(groupId==null||groupId<0){
@@ -202,7 +202,7 @@ public class MemberServiceImpl implements MemberService {
         }
         logger.error("groupid:"+groupId);
         Long cityid = -1L;
-        if(reqParameterMap.get("cityid")!=null&&!"undefined".equals(reqParameterMap.get("cityid"))){
+        if(reqParameterMap.get("cityid")!=null&&!"undefined".equals(reqParameterMap.get("cityid"))&&!"".equals(reqParameterMap.get("cityid"))){
             cityid = Long.parseLong(reqParameterMap.get("cityid"));
         }
         if(auth_flag==1){//总后台设置的管理员，默认为后台车场管理员
