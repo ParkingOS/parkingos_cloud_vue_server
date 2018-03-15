@@ -38,7 +38,7 @@ public class CityParkOrderanlysisServiceImpl implements CityParkOrderAnlysisServ
         String str = "{\"page\":1,\"rows\":[]}";
         JSONObject result = JSONObject.parseObject(str);
 
-        String comidStr = reqmap.get("comid");
+        String comidStr = reqmap.get("comid_start");
         System.out.println("CityParkOrderanlysis>>>>comidStr:"+comidStr);
 
         SimpleDateFormat df2 = new SimpleDateFormat("yyyy-MM-dd");
@@ -58,20 +58,23 @@ public class CityParkOrderanlysisServiceImpl implements CityParkOrderAnlysisServ
 
         if(Check.isNumber(comidStr)){
             sql +=" = "+Long.parseLong(comidStr)+" and end_time ";
+            free_sql +=" = "+Long.parseLong(comidStr)+" and end_time ";
         }else {
             sql +=" in ( select id from com_info_tb where state<>1 and groupid= "+Long.parseLong(reqmap.get("groupid"))+" )  and end_time  ";
+            free_sql +=" in ( select id from com_info_tb where state<>1 and groupid= "+Long.parseLong(reqmap.get("groupid"))+" )  and end_time  ";
         }
 
 
-        String date = reqmap.get("end_time");
+        String date = reqmap.get("time");
 
         logger.error("=====date:"+date);
 
         Long btime = TimeTools.getToDayBeginTime();
         Long etime =TimeTools.getToDayBeginTime()+86400;
         if(date!=null&&!Check.isEmpty(date)){
-            String start = reqmap.get("end_time_start");//RequestUtil.getString(request, "ctime_start");
-            String end = reqmap.get("end_time_end");//RequestUtil.getString(request, "ctime_end");
+            String start = reqmap.get("time_start");//RequestUtil.getString(request, "ctime_start");
+            String end = reqmap.get("time_end");//RequestUtil.getString(request, "ctime_end");
+            System.out.println("默认开始时间:"+start+"默认结束时间:"+end);
             if("3".equals(date)&&Check.isEmpty(start)&&Check.isEmpty(end)){
                 date="between";
             }else{
@@ -172,7 +175,7 @@ public class CityParkOrderanlysisServiceImpl implements CityParkOrderAnlysisServ
         if(backList.size()>0){
             Map sumMap = new HashMap();
             sumMap.put("time","合计");
-            sumMap.put("scount",totalCount);
+            sumMap.put("comid","-");
             sumMap.put("amount_receivable",String.format("%.2f",StringUtils.formatDouble(totalMoney)));
             sumMap.put("cash_pay",String.format("%.2f",StringUtils.formatDouble(cashMoney)));
             sumMap.put("electronic_pay",String.format("%.2f",StringUtils.formatDouble(elecMoney)));

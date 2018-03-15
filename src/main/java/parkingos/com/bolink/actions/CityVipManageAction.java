@@ -6,6 +6,8 @@ import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.multipart.MultipartFile;
 import parkingos.com.bolink.dao.spring.CommonDao;
 import parkingos.com.bolink.service.CityVipService;
 import parkingos.com.bolink.utils.RequestUtil;
@@ -79,10 +81,14 @@ public class CityVipManageAction {
 //    }
 
     @RequestMapping(value = "/importExcel")
-    public String importExcel(HttpServletRequest request, HttpServletResponse resp) throws Exception{
+    public String importExcel(HttpServletRequest request, HttpServletResponse resp,@RequestParam("file")MultipartFile file) throws Exception{
+
 
         System.out.println("===进入上传方法");
-        JSONObject result = cityVipService.importExcel(request);
+        Long groupid = RequestUtil.getLong(request,"groupid",-1L);
+
+        System.out.println("===进入上传方法groupid:"+groupid);
+        JSONObject result = cityVipService.importExcel(file,groupid);
 
         StringUtils.ajaxOutput(resp,result.toJSONString());
 

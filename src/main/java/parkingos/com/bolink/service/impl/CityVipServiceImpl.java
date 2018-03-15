@@ -2,13 +2,10 @@ package parkingos.com.bolink.service.impl;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
-import org.apache.commons.fileupload.FileItem;
-import org.apache.commons.fileupload.FileUploadException;
-import org.apache.commons.fileupload.disk.DiskFileItemFactory;
-import org.apache.commons.fileupload.servlet.ServletFileUpload;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 import parkingos.com.bolink.dao.spring.CommonDao;
 import parkingos.com.bolink.enums.FieldOperator;
 import parkingos.com.bolink.models.*;
@@ -19,7 +16,7 @@ import parkingos.com.bolink.service.GetDataService;
 import parkingos.com.bolink.service.SupperSearchService;
 import parkingos.com.bolink.utils.*;
 
-import javax.servlet.http.HttpServletRequest;
+import java.io.IOException;
 import java.io.InputStream;
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -396,42 +393,25 @@ public class CityVipServiceImpl implements CityVipService {
 //    }
 
     @Override
-    public JSONObject importExcel(HttpServletRequest request)  throws Exception{
+    public JSONObject importExcel(MultipartFile file,Long groupid)  throws Exception{
 
         JSONObject result = new JSONObject();
 
-        Long groupid = RequestUtil.getLong(request,"groupid",-1L);
-        System.out.println("===========groupid:"+groupid);
         String errmsg ="";
-        request.setCharacterEncoding("UTF-8"); // 设置处理请求参数的编码格式
-        DiskFileItemFactory factory = new DiskFileItemFactory(); // 建立FileItemFactory对象
-        factory.setSizeThreshold(16 * 4096 * 1024);
-        ServletFileUpload upload = new ServletFileUpload(factory);
-        // 分析请求，并得到上传文件的FileItem对象
-        upload.setSizeMax(16 * 4096 * 1024);
-        List<FileItem> items = null;
-        try {
-            items = upload.parseRequest(request);
-        } catch (FileUploadException e) {
-            e.printStackTrace();
-            return null;
-        }
         String filename = ""; // 上传文件保存到服务器的文件名
         InputStream is = null; // 当前上传文件的InputStream对象
-        // 循环处理上传文件
 
-        for (FileItem item : items) {
-            // 处理普通的表单域
-            if (!item.isFormField()) {
-                // 从客户端发送过来的上传文件路径中截取文件名
-                // logger.error(item.getName());
-                filename = item.getName().substring(
-                        item.getName().lastIndexOf("\\") + 1);
-                is = item.getInputStream(); // 得到上传文件的InputStream对象
+        if(file!=null) {
+            filename = file.getOriginalFilename();
+            try {
+                is = file.getInputStream();
+            } catch (IOException e2) {
+                e2.printStackTrace();
             }
         }
-
         System.out.println("====上传月卡会员:"+filename);
+//        System.out.println("====上传月卡会员:"+is);
+
 
         if(is!=null&&filename!=null){
             List<Object[]> syncValues = new ArrayList<>();
@@ -492,7 +472,7 @@ public class CityVipServiceImpl implements CityVipService {
                         }else{
                             ComInfoTb comInfoTb = new ComInfoTb();
                             comInfoTb.setId(comid);
-                            comInfoTb.setGroupid(groupid);
+                            comInfoTb.setGroupid(76L);
                             int count = commonDao.selectCountByConditions(comInfoTb);//daService.getLong("select count(id) from com_info_tb where id =? and groupid =? ",new Object[]{comid,groupid});
                             if(count<1){
                                 errmsg+=i+"行，车场编号不存在："+comid;

@@ -180,7 +180,7 @@ public class CityOrderServiceImpl implements CityOrderService {
         logger.error("=========>>>>>>.导出订单" + orderlist.size());
         List<List<Object>> bodyList = new ArrayList<List<Object>>();
         if (orderlist != null && orderlist.size() > 0) {
-            String[] f = new String[]{"id","comid", "uid", "out_uid","c_type", "car_number","car_type", "create_time", "end_time", "duration", "pay_type", "freereasons","amount_receivable", "total", "electronic_prepay", "cash_prepay", "electronic_pay", "cash_pay", "reduce_amount",  "state", "in_passid", "out_passid","order_id_local"};
+            String[] f = new String[]{"id","comid", "uin", "out_uid","c_type", "car_number","car_type", "create_time", "end_time", "duration", "pay_type", "freereasons","amount_receivable", "total", "electronic_prepay", "cash_prepay", "electronic_pay", "cash_pay", "reduce_amount",  "state", "in_passid", "out_passid","order_id_local"};
             Map<Long, String> passNameMap = new HashMap<Long, String>();
             Map<Long, String> uinNameMap = new HashMap<Long, String>();
             for (OrderTb orderTb : orderlist) {
@@ -226,7 +226,9 @@ public class CityOrderServiceImpl implements CityOrderService {
                             values.add(name);
                             uinNameMap.put(uid, name);
                         }
-                    } else if ("pay_type".equals(field)) {
+                    } else if("uin".equals(field)){
+                        values.add(map.get("out_uid"));
+                    }else if ("pay_type".equals(field)) {
                         switch (Integer.valueOf(v + "")) {//0:NFC,1:IBeacon,2:照牌   3通道照牌 4直付 5月卡用户
                             case 0: values.add("账户支付");break;
                             case 1: values.add("现金支付");break;
