@@ -12,7 +12,7 @@ public class CrossFilter implements Filter{
     public void doFilter(ServletRequest servletRequest, ServletResponse servletResponse, FilterChain filterChain) throws IOException, ServletException {
 //        System.out.println("======进入拦截器");
         HttpServletResponse response= (HttpServletResponse) servletResponse;
-        String origin= servletRequest.getRemoteHost()+":"+servletRequest.getRemotePort();
+//        String origin= servletRequest.getRemoteHost()+":"+servletRequest.getRemotePort();
 
         response.addHeader("Access-Control-Allow-Origin", "*");
         response.addHeader("Access-Control-Allow-Credentials", "true");
