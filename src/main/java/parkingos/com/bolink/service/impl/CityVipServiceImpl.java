@@ -472,7 +472,7 @@ public class CityVipServiceImpl implements CityVipService {
                         }else{
                             ComInfoTb comInfoTb = new ComInfoTb();
                             comInfoTb.setId(comid);
-                            comInfoTb.setGroupid(76L);
+                            comInfoTb.setGroupid(groupid);
                             int count = commonDao.selectCountByConditions(comInfoTb);//daService.getLong("select count(id) from com_info_tb where id =? and groupid =? ",new Object[]{comid,groupid});
                             if(count<1){
                                 errmsg+=i+"行，车场编号不存在："+comid;

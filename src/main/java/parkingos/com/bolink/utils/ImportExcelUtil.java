@@ -5,8 +5,10 @@
  */
 package parkingos.com.bolink.utils;
 
+import org.apache.poi.POIXMLDocument;
 import org.apache.poi.hssf.usermodel.HSSFCell;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
+import org.apache.poi.poifs.filesystem.POIFSFileSystem;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
@@ -16,6 +18,7 @@ import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
+import java.io.PushbackInputStream;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -37,9 +40,10 @@ public class ImportExcelUtil {
 	 */
 	public static ArrayList<Object[]> generateUserSql(InputStream in,String formFileName,int isTitle)
 			throws Exception {
-        Workbook wb;
+        Workbook wb = null;
         Sheet sheet;
         Row row;
+
 		//FileInputStream in = null;
 		ArrayList<Object[]> list = new ArrayList<Object[]>();
 		//Map<String, String> localMap = readLocal();
@@ -49,14 +53,28 @@ public class ImportExcelUtil {
 			//in = new FileInputStream(formFile);//将文件读入到输入流中
 
 			//从输入流中获取WorkBook对象，加载选中的excel文件
-			String suffix = formFileName.substring(formFileName.lastIndexOf("."));  // 文件后辍.
+//			String suffix = formFileName.substring(formFileName.lastIndexOf("."));  // 文件后辍.
 
-			//支持office2007
-			if (".xlsx".equals(suffix.toLowerCase())) {
+			if(! in.markSupported()) {
+				in = new PushbackInputStream(in, 8);
+			}
+			boolean is2003Excel = false;
+			boolean is2007Excel = false;
+			if(POIFSFileSystem.hasPOIFSHeader(in)) {
+				System.out.println("2003及以下");
+				is2003Excel = true;
+			}
+			if(POIXMLDocument.hasOOXMLHeader(in)) {
+				System.out.println("2007及以上");
+				is2007Excel = true;
+			}
+
+//			支持office2007
+			if (is2007Excel) {
 				wb = new XSSFWorkbook(in);
 			}
-			else{
-				//支持office2003
+			//支持office2003
+			if(is2003Excel){
 				wb = new HSSFWorkbook(in);
 			}
 
@@ -97,7 +115,7 @@ public class ImportExcelUtil {
 			e.printStackTrace();
 			throw e;
 		} finally {
-			if (in != null) {
+			if (in != null ) {
 				try {
 					in.close();
 				} catch (Exception e) {
