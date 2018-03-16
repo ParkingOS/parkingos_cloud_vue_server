@@ -114,9 +114,9 @@ public class CityParkOrderanlysisServiceImpl implements CityParkOrderAnlysisServ
         logger.error("====sql:"+sql);
         logger.error("====free_sql:"+free_sql);
         //总订单集合
-        List<Map<String, Object>> totalList =commonDao.getObjectBySql(sql +groupby+" order by scount desc ");
+        List<Map<String, Object>> totalList =commonDao.getObjectBySql(sql +groupby+" order by  e_time ");
         //免费订单集合
-        List<Map<String, Object>> freeList = commonDao.getObjectBySql(free_sql +" and pay_type=8 "+groupby+" order by scount desc ");//pgOnlyReadService.getAllMap(free_sql +" and pay_type=8 group by out_uid,comid order by scount desc ",params);
+        List<Map<String, Object>> freeList = commonDao.getObjectBySql(free_sql +" and pay_type=8 "+groupby+" order by e_time  ");//pgOnlyReadService.getAllMap(free_sql +" and pay_type=8 group by out_uid,comid order by scount desc ",params);
         int totalCount = 0;//总订单数
         double totalMoney = 0.0;//订单金额
         double cashMoney = 0.0;//现金支付金额

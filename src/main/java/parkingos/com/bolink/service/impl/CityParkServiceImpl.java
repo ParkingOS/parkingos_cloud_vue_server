@@ -45,7 +45,7 @@ public class CityParkServiceImpl implements CityParkService {
         List<Map<String, Object>> resList =new ArrayList<>();
 
         ComInfoTb comInfoTb = new ComInfoTb();
-        comInfoTb.setState(0);
+//        comInfoTb.setState(0);
 
 //        Map searchMap = supperSearchService.getGroupOrCitySearch(liftRodTb,reqmap);
 //        LiftRodTb baseQuery =(LiftRodTb)searchMap.get("base");
@@ -96,10 +96,19 @@ public class CityParkServiceImpl implements CityParkService {
             searchBean.setFieldName("id");
             searchBean.setBasicValue(parks);
 
+            SearchBean searchBean1  = new SearchBean();
+            searchBean1.setOperator(FieldOperator.CONTAINS);
+            searchBean1.setFieldName("state");
+            ArrayList stateList = new ArrayList<Integer>();
+            stateList.add(0);
+            stateList.add(2);
+            searchBean1.setBasicValue(stateList);
+
             if (supperQuery == null) {
                 supperQuery = new ArrayList<>();
             }
             supperQuery.add( searchBean );
+            supperQuery.add(searchBean1);
 
             count = commonDao.selectCountByConditions(baseQuery,supperQuery);
             if(count>0){
@@ -134,9 +143,11 @@ public class CityParkServiceImpl implements CityParkService {
         company = company.replace("\r", "").replace("\n", "");
         String address =StringUtils.decodeUTF8(RequestUtil.processParams(request, "address"));
         address = address.replace("\r", "").replace("\n", "");
-        String phone =RequestUtil.processParams(request, "phone");
         String mobile =RequestUtil.processParams(request, "mobile");
-        String mcompany =StringUtils.decodeUTF8(RequestUtil.processParams(request, "mcompany"));
+        if(mobile.length()>15){
+            result.put("msg","手机号输入有误");
+            return result;
+        }
         Integer parking_total =RequestUtil.getInteger(request, "parking_total", 0);
         Integer state =RequestUtil.getInteger(request, "state", 0);
         Integer city = RequestUtil.getInteger(request, "city", 0);
@@ -164,20 +175,16 @@ public class CityParkServiceImpl implements CityParkService {
         }
 
 
-
         ComInfoTb comInfoTb = new ComInfoTb();
         comInfoTb.setGroupid(groupId);
         comInfoTb.setState(state);
         comInfoTb.setCompanyName(company);
-        comInfoTb.setUpdateTime(System.currentTimeMillis()/1000);
         comInfoTb.setLatitude(new BigDecimal(latitude));
         comInfoTb.setLongitude(new BigDecimal(longitude));
         comInfoTb.setAddress(address);
         comInfoTb.setCity(city);
-        comInfoTb.setPhone(phone);
         comInfoTb.setMobile(mobile);
         comInfoTb.setParkingTotal(parking_total);
-        comInfoTb.setMcompany(mcompany);
 
         if(id==-1){
             //获取id
@@ -186,6 +193,7 @@ public class CityParkServiceImpl implements CityParkService {
             //添加自动生成车场16位秘钥的逻辑
             String ukey = StringUtils.createRandomCharData(16);
             comInfoTb.setUkey(ukey);
+            comInfoTb.setCreateTime(System.currentTimeMillis()/1000);
             int insert = commonDao.insert(comInfoTb);
             if(insert==1){
                 result.put("state",1);
@@ -193,6 +201,7 @@ public class CityParkServiceImpl implements CityParkService {
             }
         }else{
             comInfoTb.setId(id);
+            comInfoTb.setUpdateTime(System.currentTimeMillis()/1000);
             int update = commonDao.updateByPrimaryKey(comInfoTb);
             if(update==1){
                 result.put("state",1);
