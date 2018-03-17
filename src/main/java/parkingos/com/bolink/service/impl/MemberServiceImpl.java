@@ -148,6 +148,10 @@ public class MemberServiceImpl implements MemberService {
         String nickname =reqParameterMap.get("nickname");
         String phone =reqParameterMap.get("phone");
         String mobile =reqParameterMap.get("mobile");
+        if(mobile.length()>15||phone.length()>15){
+            result.put("msg","电话或手机长度不大于15位");
+            return result;
+        }
         Long auth_flag =-1L;
         if(reqParameterMap.get("auth_flag")!=null&&!"".equals(reqParameterMap.get("auth_flag"))){
             auth_flag =Long.parseLong(reqParameterMap.get("auth_flag"));

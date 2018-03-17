@@ -393,7 +393,7 @@ public class CityVipServiceImpl implements CityVipService {
 //    }
 
     @Override
-    public JSONObject importExcel(MultipartFile file,Long groupid)  throws Exception{
+    public JSONObject importExcel(MultipartFile file,Long groupid,Long cityid)  throws Exception{
 
         JSONObject result = new JSONObject();
 
@@ -472,10 +472,28 @@ public class CityVipServiceImpl implements CityVipService {
                         }else{
                             ComInfoTb comInfoTb = new ComInfoTb();
                             comInfoTb.setId(comid);
-                            comInfoTb.setGroupid(groupid);
-                            int count = commonDao.selectCountByConditions(comInfoTb);//daService.getLong("select count(id) from com_info_tb where id =? and groupid =? ",new Object[]{comid,groupid});
+
+
+                            List parks =new ArrayList();
+                            if(groupid != -1){
+                                parks = commonMethods.getParks(groupid);
+                            }else if(cityid != -1){
+                                parks = commonMethods.getparks(cityid);
+                            }
+
+                            System.out.println("=======parks:"+parks);
+
+                            //封装searchbean  集团和城市下面所有车场
+                            SearchBean searchBean = new SearchBean();
+                            searchBean.setOperator(FieldOperator.CONTAINS);
+                            searchBean.setFieldName("id");
+                            searchBean.setBasicValue(parks);
+                            List<SearchBean> searchBeanList = new ArrayList<>();
+
+                            comInfoTb.setState(0);
+                            int count = commonDao.selectCountByConditions(comInfoTb,searchBeanList);
                             if(count<1){
-                                errmsg+=i+"行，车场编号不存在："+comid;
+                                errmsg+=i+"行，车场编号不存在或者不可用："+comid;
                                 isValid = false;
                             }
                             comMaps.put(comid,count);
