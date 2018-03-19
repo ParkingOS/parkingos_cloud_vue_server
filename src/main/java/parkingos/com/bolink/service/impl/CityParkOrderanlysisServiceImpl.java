@@ -69,8 +69,8 @@ public class CityParkOrderanlysisServiceImpl implements CityParkOrderAnlysisServ
 
         logger.error("=====date:"+date);
 
-        Long btime = TimeTools.getToDayBeginTime();
-        Long etime =TimeTools.getToDayBeginTime()+86400;
+        Long btime = TimeTools.getToDayBeginTime()-86400*9;
+        Long etime =TimeTools.getToDayBeginTime()+86399;
         if(date!=null&&!Check.isEmpty(date)){
             String start = reqmap.get("time_start");//RequestUtil.getString(request, "ctime_start");
             String end = reqmap.get("time_end");//RequestUtil.getString(request, "ctime_end");
