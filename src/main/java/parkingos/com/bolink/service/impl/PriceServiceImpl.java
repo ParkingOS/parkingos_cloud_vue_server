@@ -73,7 +73,7 @@ public class PriceServiceImpl implements PriceService {
         int ret = commonDao.updateByPrimaryKey(priceTb);
         if(ret==1){
             priceTb = (PriceTb)commonDao.selectObjectByConditions(priceTb);
-            insertSysn(priceTb,1);
+            insertSysn(priceTb,2);
             result.put("state",1);
             result.put("msg","删除成功");
         }

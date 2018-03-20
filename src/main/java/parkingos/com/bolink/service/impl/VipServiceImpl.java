@@ -66,7 +66,7 @@ public class VipServiceImpl implements VipService {
         if (ret == 1) {
             result.put("state", 1);
             result.put("msg", "删除成功");
-            int ins = insertSysn(carowerProduct, 0, comid);
+            int ins = insertSysn(carowerProduct, 2, comid);
             if (ins != 1) {
                 logger.error("====>>>>>插入同步表失败");
             }
@@ -184,46 +184,46 @@ public class VipServiceImpl implements VipService {
                             validuin = uin;
                         }
                         //修改或添加车牌时查询此车牌是否已经对应有月卡会员记录
-                        String subCar = strNum.startsWith("无")?strNum:"%"+strNum.substring(1)+"%";
-                        logger.error("======>>>>>subCar"+subCar);
-                        String sql = "select pid, car_number from  carower_product where com_id=" + comid + " and is_delete=0 and car_number like '" + subCar+"'";
-                        logger.error("======>>>sql"+sql);
-                        List<Map> carinfoList = commonDao.getObjectBySql(sql);
-                        logger.error("=====>>>>>carinfoList"+carinfoList.size());
-                        Long pidMonth = -1L;
-                        boolean isMonthUser = false;
-                        if(carinfoList != null && !carinfoList.isEmpty() && carinfoList.size()>0){
-                            for (Iterator iterator = carinfoList.iterator(); iterator
-                                    .hasNext();) {
-                                Map uinmap = (Map) iterator.next();
-                                pidMonth = (Long)uinmap.get("pid");
-                                String carNumUnique = String.valueOf(uinmap.get("car_number"));
-                                logger.error("====>>>>>>pidMonth"+pidMonth);
-                                logger.error("====>>>>>>carNumUnique"+carNumUnique);
-                                if (pidMonth != null && pidMonth != -1) {
-                                    String isMonthUsersql = "select p.b_time,p.e_time,p.type from product_package_tb p,carower_product c where c.pid=p.id and p.comid=" + comid + " and c.car_number='" + carNumUnique + "' order by c.id desc ";
-                                    List<Map<String, Object>> list = commonDao.getObjectBySql(isMonthUsersql);
-                                    if (list != null && list.size() > 0) {
-                                        isMonthUser = true;
-                                    }
-                                }
-								/*
-								 * 假如改车牌已经注册过月卡会员，车牌一致时才能继续添加，否则提示已注册
-								 * 其中A,B和B,A也代表车牌是一致的
-								 */
-                                boolean isSameCarNumber = isCarNumberSame(carNumber, carNumUnique);
-                                logger.error("=====>>>>>>isSameCarNumber"+isSameCarNumber);
-                                if(isMonthUser && isSameCarNumber){
-                                    isMonthUser = false;
-                                    carNumber = carNumUnique;
-                                }
-                            }
-                            logger.error("=====>>>>isMonthUser"+isMonthUser);
-                            if(isMonthUser){
-                                result.put("msg", "该车牌已注册为月卡会员,请修改车牌");
-                                return result;
-                            }
-                        }
+//                        String subCar = strNum.startsWith("无")?strNum:"%"+strNum.substring(1)+"%";
+//                        logger.error("======>>>>>subCar"+subCar);
+//                        String sql = "select pid, car_number from  carower_product where com_id=" + comid + " and is_delete=0 and car_number like '" + subCar+"'";
+//                        logger.error("======>>>sql"+sql);
+//                        List<Map> carinfoList = commonDao.getObjectBySql(sql);
+//                        logger.error("=====>>>>>carinfoList"+carinfoList.size());
+//                        Long pidMonth = -1L;
+//                        boolean isMonthUser = false;
+//                        if(carinfoList != null && !carinfoList.isEmpty() && carinfoList.size()>0){
+//                            for (Iterator iterator = carinfoList.iterator(); iterator
+//                                    .hasNext();) {
+//                                Map uinmap = (Map) iterator.next();
+//                                pidMonth = (Long)uinmap.get("pid");
+//                                String carNumUnique = String.valueOf(uinmap.get("car_number"));
+//                                logger.error("====>>>>>>pidMonth"+pidMonth);
+//                                logger.error("====>>>>>>carNumUnique"+carNumUnique);
+//                                if (pidMonth != null && pidMonth != -1) {
+//                                    String isMonthUsersql = "select p.b_time,p.e_time,p.type from product_package_tb p,carower_product c where c.pid=p.id and p.comid=" + comid + " and c.car_number='" + carNumUnique + "' order by c.id desc ";
+//                                    List<Map<String, Object>> list = commonDao.getObjectBySql(isMonthUsersql);
+//                                    if (list != null && list.size() > 0) {
+//                                        isMonthUser = true;
+//                                    }
+//                                }
+//								/*
+//								 * 假如改车牌已经注册过月卡会员，车牌一致时才能继续添加，否则提示已注册
+//								 * 其中A,B和B,A也代表车牌是一致的
+//								 */
+//                                boolean isSameCarNumber = isCarNumberSame(carNumber, carNumUnique);
+//                                logger.error("=====>>>>>>isSameCarNumber"+isSameCarNumber);
+//                                if(isMonthUser && isSameCarNumber){
+//                                    isMonthUser = false;
+//                                    carNumber = carNumUnique;
+//                                }
+//                            }
+//                            logger.error("=====>>>>isMonthUser"+isMonthUser);
+//                            if(isMonthUser){
+//                                result.put("msg", "该车牌已注册为月卡会员,请修改车牌");
+//                                return result;
+//                            }
+//                        }
                     }else{
                         result.put("msg", "车牌号有误");
                         return result;
@@ -338,39 +338,39 @@ public class VipServiceImpl implements VipService {
                                 validuin = uin;
                             }
                             //修改或添加车牌时查询此车牌是否已经对应有月卡会员记录
-                            String subCar = strNum.startsWith("无") ? strNum : "%" + strNum.substring(1) + "%";
-                            String sql = "select pid, car_number from  carower_product where com_id=" + comid + " and is_delete=0 and car_number like '" + subCar +"'";
-                            List<Map> carinfoList = commonDao.getObjectBySql(sql);
-                            Long pid = -1L;
-                            boolean isMonthUser = false;
-                            //定义月卡会员记录中对应的车牌
-                            String carNumUnique = "";
-                            if (carinfoList != null && !carinfoList.isEmpty() && carinfoList.size() > 0) {
-                                for (Iterator iterator = carinfoList.iterator(); iterator
-                                        .hasNext(); ) {
-                                    Map uinmap = (Map) iterator.next();
-                                    pid = (Long) uinmap.get("pid");
-                                    carNumUnique = String.valueOf(uinmap.get("car_number"));
-                                    if (pid != null && pid != -1) {
-                                        String isMonthUsersql = "select p.b_time,p.e_time,p.type from product_package_tb p," +
-                                                "carower_product c where c.pid=p.id and p.comid=" + comid + " and c.car_number='" + carNumUnique + "' order by c.id desc ";
-                                        List<Map<String, Object>> list = commonDao.getObjectBySql(isMonthUsersql);
-                                        if (list != null && list.size() > 0) {
-                                            isMonthUser = true;
-                                        }
-                                    }
-                                    boolean isSameCarNumber = isCarNumberSame(carNumber, carNumUnique);
-                                    if (isMonthUser && isSameCarNumber) {
-                                        isMonthUser = false;
-                                    } else if (isMonthUser && carinfoList.size() < 2) {
-                                        isMonthUser = false;
-                                    }
-                                }
-                            }
-                            if (isMonthUser) {
-                                result.put("msg", "该车牌:" + carNumberBefore + "已注册为月卡会员,请修改车牌");
-                                return result;
-                            }
+//                            String subCar = strNum.startsWith("无") ? strNum : "%" + strNum.substring(1) + "%";
+//                            String sql = "select pid, car_number from  carower_product where com_id=" + comid + " and is_delete=0 and car_number like '" + subCar +"'";
+//                            List<Map> carinfoList = commonDao.getObjectBySql(sql);
+//                            Long pid = -1L;
+//                            boolean isMonthUser = false;
+//                            //定义月卡会员记录中对应的车牌
+//                            String carNumUnique = "";
+//                            if (carinfoList != null && !carinfoList.isEmpty() && carinfoList.size() > 0) {
+//                                for (Iterator iterator = carinfoList.iterator(); iterator
+//                                        .hasNext(); ) {
+//                                    Map uinmap = (Map) iterator.next();
+//                                    pid = (Long) uinmap.get("pid");
+//                                    carNumUnique = String.valueOf(uinmap.get("car_number"));
+//                                    if (pid != null && pid != -1) {
+//                                        String isMonthUsersql = "select p.b_time,p.e_time,p.type from product_package_tb p," +
+//                                                "carower_product c where c.pid=p.id and p.comid=" + comid + " and c.car_number='" + carNumUnique + "' order by c.id desc ";
+//                                        List<Map<String, Object>> list = commonDao.getObjectBySql(isMonthUsersql);
+//                                        if (list != null && list.size() > 0) {
+//                                            isMonthUser = true;
+//                                        }
+//                                    }
+//                                    boolean isSameCarNumber = isCarNumberSame(carNumber, carNumUnique);
+//                                    if (isMonthUser && isSameCarNumber) {
+//                                        isMonthUser = false;
+//                                    } else if (isMonthUser && carinfoList.size() < 2) {
+//                                        isMonthUser = false;
+//                                    }
+//                                }
+//                            }
+//                            if (isMonthUser) {
+//                                result.put("msg", "该车牌:" + carNumberBefore + "已注册为月卡会员,请修改车牌");
+//                                return result;
+//                            }
                         } else {
                             result.put("msg", "车牌号有误");
                             return result;

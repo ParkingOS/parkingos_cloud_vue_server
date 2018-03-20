@@ -156,7 +156,7 @@ public class CityBlackUserServiceImpl implements CityBlackUserService {
             zldBlackTb1.setId(id);
             zldBlackTb1 = (ZldBlackTb)commonDao.selectObjectByConditions(zldBlackTb1);
             if(zldBlackTb1!=null&&zldBlackTb1.getState()!=null){
-                insertSysn(zldBlackTb1,0);
+                insertSysn(zldBlackTb1,1);
             }
             result.put("state",1);
             result.put("msg","修改成功");

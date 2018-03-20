@@ -78,7 +78,7 @@ public class ProductPackageServiceImpl implements ProductPackageService {
             result.put("state",1);
             result.put("msg","删除成功");
             productPackageTb = (ProductPackageTb)commonDao.selectObjectByConditions(productPackageTb);
-            int ins = insertSysn(productPackageTb,1);
+            int ins = insertSysn(productPackageTb,2);
             if(ins!=1){
                 logger.error("=======>>>>插入同步表失败");
             }

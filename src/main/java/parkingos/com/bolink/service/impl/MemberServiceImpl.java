@@ -148,8 +148,12 @@ public class MemberServiceImpl implements MemberService {
         String nickname =reqParameterMap.get("nickname");
         String phone =reqParameterMap.get("phone");
         String mobile =reqParameterMap.get("mobile");
-        if(mobile.length()>15||phone.length()>15){
-            result.put("msg","电话或手机长度不大于15位");
+        if(mobile!=null&&mobile.length()>15){
+            result.put("msg","手机长度不大于15位");
+            return result;
+        }
+        if(phone!=null&&phone.length()>15){
+            result.put("msg","电话长度不大于15位");
             return result;
         }
         Long auth_flag =-1L;
@@ -338,7 +342,7 @@ public class MemberServiceImpl implements MemberService {
             result.put("state",1);
             result.put("msg","删除成功");
             userInfoTb =(UserInfoTb)commonDao.selectObjectByConditions(userInfoTb);
-            insertSysn(userInfoTb,1);
+            insertSysn(userInfoTb,2);
 
 //            //判断是否支持ETCPARK
 //            String isSupportEtcPark = CustomDefind.ISSUPPORTETCPARK;

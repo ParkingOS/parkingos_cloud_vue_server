@@ -59,7 +59,7 @@ public class BlackUserServiceImpl implements BlackUserService {
         int ret = commonDao.updateByPrimaryKey(zldBlackTb);
         if(ret==1){
             zldBlackTb = (ZldBlackTb)commonDao.selectObjectByConditions(zldBlackTb);
-            int ins = insertSysn(zldBlackTb,1);
+            int ins = insertSysn(zldBlackTb,2);
             if(ins!=1){
                 logger.error("======>>>>插入同步表失败");
             }

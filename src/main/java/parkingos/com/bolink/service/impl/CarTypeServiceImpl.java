@@ -73,7 +73,7 @@ public class CarTypeServiceImpl implements CarTypeService {
             result.put("state",1);
             result.put("msg","删除成功");
             carTypeTb = (CarTypeTb)commonDao.selectObjectByConditions(carTypeTb);
-            insertSysn(carTypeTb,1);
+            insertSysn(carTypeTb,2);
         }
         return result;
     }

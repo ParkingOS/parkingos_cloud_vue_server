@@ -140,6 +140,7 @@ public class MonthParkOrderanlysisServiceImpl implements MonthParkOrderAnlysisSe
                     backList.add(totalList.get(0));
                 }else{
                     totalList.get(0).put("sdate", str);
+                    totalList.get(0).put("act_total", 0.00);
                     totalList.get(0).put("amount_receivable",0.00);
                     totalList.get(0).put("free_pay",0.00);
                     totalList.get(0).put("cash_pay",0.00);
