@@ -293,6 +293,7 @@ public class VipServiceImpl implements VipService {
             result.put("state",1);
             result.put("msg","添加成功");
            int ins = insertSysn(carowerProduct1,0,comid);
+           int reNew = insertCardSysn(cardRenewTb,0,comid);
            if(ins!=1){
                logger.error("======>>>>>>>>>插入同步表失败");
            }
@@ -444,10 +445,11 @@ public class VipServiceImpl implements VipService {
         Long ntime = System.currentTimeMillis()/1000;
 //        Long btime = TimeTools.getLongMilliSecondFrom_HHMMDD(b_time)/1000+86400;
         Long btime = RequestUtil.getLong(req,"b_time",ntime);
+//        System.out.println("chenbowen+++>>>:"+btime);
         Calendar calendar = Calendar.getInstance();
         calendar.setTimeInMillis(btime*1000);
         calendar.set(Calendar.MONTH, calendar.get(Calendar.MONTH)+months);
-        Long etime = calendar.getTimeInMillis()/1000-1;
+        Long etime = calendar.getTimeInMillis()/1000;
 
         //金额
         Double total = Double.parseDouble(getDataService.getprodsum(pid, months));
@@ -505,6 +507,7 @@ public class VipServiceImpl implements VipService {
             cardRenewTb.setCreateTime(ntime.intValue());
             cardRenewTb.setUpdateTime(ntime.intValue());
             cardRenewTb.setLimitTime(etime);
+            cardRenewTb.setStartTime(btime);
             int renew = commonDao.insert(cardRenewTb);
 
             if(renew==1){
@@ -589,15 +592,15 @@ public class VipServiceImpl implements VipService {
         reqParameterMap.remove("orderby");
 
         JSONObject result = selectResultByConditions(reqParameterMap);
-        List<CarowerProduct> orderlist = JSON.parseArray(result.get("rows").toString(),CarowerProduct.class);
+        List<CarowerProduct> viplist = JSON.parseArray(result.get("rows").toString(),CarowerProduct.class);
 
-        logger.error("=========>>>>>>.导出订单" + orderlist.size());
+        logger.error("=========>>>>>>.导出会员" + viplist.size());
 
         List<List<String>> bodyList = new ArrayList<List<String>>();
-        if(orderlist!=null&&orderlist.size()>0){
+        if(viplist!=null&&viplist.size()>0){
 //            mongoDbUtils.saveLogs( request,0, 5, "导出会员数量："+list.size());
             String [] f = new String[]{"id","p_name","mobile"/*,"uin"*/,"name","car_number","create_time","b_time","e_time","total","car_type_id","limit_day_type","remark"};
-            for(CarowerProduct carowerProduct : orderlist){
+            for(CarowerProduct carowerProduct : viplist){
                 List<String> values = new ArrayList<String>();
                 OrmUtil<CarowerProduct> otm = new OrmUtil<>();
                 Map map = otm.pojoToMap(carowerProduct);

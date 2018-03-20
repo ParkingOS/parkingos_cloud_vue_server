@@ -7,12 +7,17 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import parkingos.com.bolink.service.CityUnorderService;
+import parkingos.com.bolink.utils.ExportDataExcel;
 import parkingos.com.bolink.utils.RequestUtil;
 import parkingos.com.bolink.utils.StringUtils;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.text.ParseException;
+import java.util.List;
 import java.util.Map;
 
 @Controller
@@ -39,6 +44,28 @@ public class CityUnorderAction {
         logger.info(result);
         //把结果返回页面
         StringUtils.ajaxOutput(resp, result.toJSONString());
+        return null;
+    }
+
+    @RequestMapping(value = "/exportExcel")
+    public String exportExcel(HttpServletRequest request, HttpServletResponse response) {
+        Map<String, String> reqParameterMap = RequestUtil.readBodyFormRequset(request);
+
+        List<List<Object>> bodyList = cityUnorderService.exportExcel(reqParameterMap);
+        String [][] heards = new String[][]{{"编号","STR"},{"所属车场","STR"},{"进场收费员","STR"},{"进场方式","STR"},{"车牌号","STR"},{"进场时间","STR"},{"时长","STR"},{"订单状态","STR"},{"进场通道","STR"},{"订单编号","STR"}};
+        ExportDataExcel excel = new ExportDataExcel("在场车辆数据", heards, "sheet1");
+        String fname = "在场车辆数据";
+        fname = StringUtils.encodingFileName(fname)+".xls";
+        try {
+            OutputStream os = response.getOutputStream();
+            response.reset();
+            response.setHeader("Content-disposition", "attachment; filename="+fname);
+            excel.PoiWriteExcel_To2007(bodyList, os);
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
         return null;
     }
 }

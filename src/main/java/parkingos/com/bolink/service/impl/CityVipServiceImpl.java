@@ -110,6 +110,10 @@ public class CityVipServiceImpl implements CityVipService {
 
             count = commonDao.selectCountByConditions(baseQuery,supperQuery);
             if(count>0){
+                if(config==null){
+                    config = new PageOrderConfig();
+                    config.setPageInfo(null,null);
+                }
                 list = commonDao.selectListByConditions(baseQuery,supperQuery,config);
                 if (list != null && !list.isEmpty()) {
                     for (CarowerProduct carowerProduct1 : list) {
@@ -122,7 +126,9 @@ public class CityVipServiceImpl implements CityVipService {
             }
         }
         result.put("total",count);
-        result.put("page",Integer.parseInt(reqmap.get("page")));
+        if(reqmap.get("page")!=null){
+            result.put("page",Integer.parseInt(reqmap.get("page")));
+        }
         logger.error("============>>>>>返回数据"+result);
         return result;
     }
@@ -316,81 +322,86 @@ public class CityVipServiceImpl implements CityVipService {
         return false;
     }
 
-//    @Override
-//    public List<List<String>> exportExcel(Map<String, String> reqParameterMap) {
-//
-//        //删除分页条件  查询该条件下所有  不然为一页数据
-//        reqParameterMap.remove("orderfield");
-//        reqParameterMap.remove("orderby");
-//
-//        JSONObject result = selectResultByConditions(reqParameterMap);
-//        List<CarowerProduct> orderlist = JSON.parseArray(result.get("rows").toString(),CarowerProduct.class);
-//
-//        logger.error("=========>>>>>>.导出订单" + orderlist.size());
-//
-//        List<List<String>> bodyList = new ArrayList<List<String>>();
-//        if(orderlist!=null&&orderlist.size()>0){
-////            mongoDbUtils.saveLogs( request,0, 5, "导出会员数量："+list.size());
-//            String [] f = new String[]{"id","p_name","mobile"/*,"uin"*/,"name","car_number","create_time","b_time","e_time","total","car_type_id","limit_day_type","remark"};
-//            for(CarowerProduct carowerProduct : orderlist){
-//                List<String> values = new ArrayList<String>();
-//                OrmUtil<CarowerProduct> otm = new OrmUtil<>();
-//                Map map = otm.pojoToMap(carowerProduct);
-//                for(String field : f){
-//                    if("p_name".equals(field)){
-//                        if(map.get("pid")!= null) {
-//                            ProductPackageTb productPackageTb = getProduct(Long.parseLong(map.get("pid") + ""));
-//                            if(productPackageTb!=null){
-//                                values.add(productPackageTb.getpName());
-//                            }else{
-//                                values.add("");
-//                            }
-//                        }else{
-//                            values.add("");
-//                        }
-//                    }else if("car_type_id".equals(field)){
-//                        if(map.get("car_type_id")!= null){
-//                            CarTypeTb carTypeTb = null;
-//                            try{
-//                                carTypeTb = getCarType(Long.parseLong(map.get("car_type_id") + ""));
-//                            }catch (Exception e){
-//                                values.add(map.get("car_type_id")+"");
-//                            }
-//                            if(carTypeTb!=null){
-//                                values.add(carTypeTb.getName());
-//                            }else{
-//                                values.add("");
-//                            }
-//                        }else{
-//                            values.add("");
-//                        }
-//                    }else if("limit_day_type".equals(field)){
-//                        if(map.get("limit_day_type")!=null){
-//                            if((Integer)map.get("limit_day_type")==0){
-//                                values.add("不限行");
-//                            }else if((Integer)map.get("limit_day_type")==1){
-//                                values.add("限行");
-//                            }
-//                        }else{
-//                            values.add("");
-//                        }
-//                    } else{
-//                        if("create_time".equals(field)||"b_time".equals(field)||"e_time".equals(field)){
-//                            if(map.get(field)!=null){
-//                                values.add(TimeTools.getTime_yyyyMMdd_HHmmss(Long.valueOf((map.get(field)+""))*1000));
-//                            }else {
-//                                values.add("");
-//                            }
-//                        }else{
-//                            values.add(map.get(field)+"");
-//                        }
-//                    }
-//                }
-//                bodyList.add(values);
-//            }
-//        }
-//        return bodyList;
-//    }
+    @Override
+    public List<List<String>> exportExcel(Map<String, String> reqParameterMap) {
+
+        //删除分页条件  查询该条件下所有  不然为一页数据
+        reqParameterMap.remove("orderfield");
+
+        JSONObject result = selectResultByConditions(reqParameterMap);
+        List<CarowerProduct> viplist = JSON.parseArray(result.get("rows").toString(),CarowerProduct.class);
+
+        List<List<String>> bodyList = new ArrayList<List<String>>();
+        if(viplist!=null&&viplist.size()>0){
+            String [] f = new String[]{"id","p_name","com_id","name","car_number","create_time","b_time","e_time","total","act_total","car_type_id","limit_day_type","remark"};
+            for(CarowerProduct carowerProduct : viplist){
+                List<String> values = new ArrayList<String>();
+                OrmUtil<CarowerProduct> otm = new OrmUtil<>();
+                Map map = otm.pojoToMap(carowerProduct);
+                for(String field : f){
+                    if("p_name".equals(field)){
+                        if(map.get("pid")!= null) {
+                            if(Check.isNumber(map.get("pid") + "")){
+                                ProductPackageTb productPackageTb = getProduct(Long.parseLong(map.get("pid") + ""));
+                                if(productPackageTb!=null){
+                                    values.add(productPackageTb.getpName());
+                                }else{
+                                    values.add("");
+                                }
+                            }else{
+                                values.add(map.get("pid") + "");
+                            }
+                        }else{
+                            values.add("");
+                        }
+                    }else if("car_type_id".equals(field)){
+                        if(map.get("car_type_id")!= null){
+                            CarTypeTb carTypeTb = null;
+                            if(Check.isNumber(map.get("car_type_id") + "")){
+                                carTypeTb = getCarType(Long.parseLong(map.get("car_type_id") + ""));
+                                if(carTypeTb!=null){
+                                    values.add(carTypeTb.getName());
+                                }else{
+                                    values.add("");
+                                }
+                            }else{
+                                values.add(map.get("car_type_id") + "");
+                            }
+                        }else{
+                            values.add("");
+                        }
+                    }else if("limit_day_type".equals(field)){
+                        if(map.get("limit_day_type")!=null){
+                            if((Integer)map.get("limit_day_type")==1){
+                                values.add("限行");
+                            }else if((Integer)map.get("limit_day_type")==0){
+                                values.add("不限行");
+                            }
+                        }else{
+                            values.add("");
+                        }
+                    } else if("create_time".equals(field)||"e_time".equals(field)||"b_time".equals(field)){
+                        if(map.get(field)!=null){
+                            values.add(TimeTools.getTime_yyyyMMdd_HHmmss(Long.valueOf((map.get(field)+""))*1000));
+                        }else {
+                            values.add("");
+                        }
+                    }else if("com_id".equals(field)){
+                        if (Check.isLong(map.get(field)+"")){
+                            Long comid =  Long.parseLong(map.get(field)+"");
+                            values.add(getComName(comid));
+                        }else {
+                            values.add("");
+                        }
+                    }else{
+                        values.add(map.get(field)+"");
+                    }
+                }
+                bodyList.add(values);
+            }
+        }
+        return bodyList;
+    }
 
     @Override
     public JSONObject importExcel(MultipartFile file,Long groupid,Long cityid)  throws Exception{
@@ -565,7 +576,6 @@ public class CityVipServiceImpl implements CityVipService {
                         Double total = StringUtils.formatDouble(o[5]);
                         Object[] va = new Object[]{btime,etime,o[3],o[4],total,comid,o[6]};
                         updateValues.add(va);
-//                        Long id = daService.getLong("select id from carower_product where com_id=? and car_number=? ",new Object[]{comid,o[6]});
                         CarowerProduct carowerProduct = new CarowerProduct();
                         carowerProduct.setComId(comid);
                         carowerProduct.setCarNumber(o[6]+"");
@@ -615,8 +625,6 @@ public class CityVipServiceImpl implements CityVipService {
                 errmsg +="</br>更新"+r+"条";
             }
             if(!syncValues.isEmpty()){
-//                String syncSql = "insert into sync_info_pool_tb(comid,table_name,table_id,create_time,operate) values(?,?,?,?,?)";
-//                Object[] syncVa = new Object[]{comid,"carower_product",carowerProduct.getId(),ntime,1};
                 int r = 0;
                 for(Object[] arr:syncValues){
                     SyncInfoPoolTb syncInfoPoolTb = new SyncInfoPoolTb();
@@ -624,7 +632,7 @@ public class CityVipServiceImpl implements CityVipService {
                     syncInfoPoolTb.setTableName((String)arr[1]);
                     syncInfoPoolTb.setTableId((Long)arr[2]);
                     syncInfoPoolTb.setCreateTime((Long)arr[3]);
-                    syncInfoPoolTb.setOperate(1);
+                    syncInfoPoolTb.setOperate((Integer) arr[4]);
                     r += commonDao.insert(syncInfoPoolTb);
                 }
                 logger.error("批量下发："+r);
@@ -636,6 +644,7 @@ public class CityVipServiceImpl implements CityVipService {
         return result;
 
     }
+
 
     private CarTypeTb getCarType(long car_type_id) {
         CarTypeTb carTypeTb = new CarTypeTb();
@@ -649,4 +658,13 @@ public class CityVipServiceImpl implements CityVipService {
         return (ProductPackageTb)commonDao.selectObjectByConditions(productPackageTb);
     }
 
+    private String getComName(Long comid){
+        ComInfoTb comInfoTb  = new ComInfoTb();
+        comInfoTb.setId(comid);
+        comInfoTb = (ComInfoTb)commonDao.selectObjectByConditions(comInfoTb);
+        if(comInfoTb!=null&&comInfoTb.getCompanyName()!=null){
+            return comInfoTb.getCompanyName();
+        }
+        return "";
+    }
 }

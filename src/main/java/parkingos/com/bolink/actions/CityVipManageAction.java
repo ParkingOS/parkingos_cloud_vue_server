@@ -10,11 +10,16 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
 import parkingos.com.bolink.dao.spring.CommonDao;
 import parkingos.com.bolink.service.CityVipService;
+import parkingos.com.bolink.utils.ExportDataExcel;
 import parkingos.com.bolink.utils.RequestUtil;
 import parkingos.com.bolink.utils.StringUtils;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.text.ParseException;
+import java.util.List;
 import java.util.Map;
 
 @Controller
@@ -55,30 +60,6 @@ public class CityVipManageAction {
 
 
 
-//    @RequestMapping(value = "/exportExcel")
-//    public String exportExcel(HttpServletRequest request, HttpServletResponse response) {
-//        Map<String, String> reqParameterMap = RequestUtil.readBodyFormRequset(request);
-//
-//        List<List<String>> bodyList = cityVipService.exportExcel(reqParameterMap);
-////        String[] heards = new String[]{"编号","包月产品名称","车主手机"/*,"车主账户"*/,"名字","车牌号码","购买时间","开始时间","结束时间","金额","车型类型","单双日限行","备注"};
-//        String[][] heards = new String[][]{{"编号","STR"},{"包月产品名称","STR"},{"车主手机","STR"}/*,"车主账户"*/,{"名字","STR"},{"车牌号码","STR"},{"购买时间","STR"},{"开始时间","STR"},{"结束时间","STR"},{"金额","STR"},{"车型类型","STR"},{"单双日限行","STR"},{"备注","STR"}};
-//
-//        ExportDataExcel excel = new ExportDataExcel("会员数据", heards, "sheet1");
-//        String fname = "会员数据";
-//        fname = StringUtils.encodingFileName(fname);
-//        try {
-//            OutputStream os = response.getOutputStream();
-//            response.reset();
-//            response.setHeader("Content-disposition", "attachment; filename="+fname+".xls");
-//            excel.PoiWriteExcel_To2007(bodyList, os);
-//        } catch (IOException e) {
-//            e.printStackTrace();
-//        } catch (ParseException e) {
-//            e.printStackTrace();
-//        }
-//
-//        return null;
-//    }
 
     @RequestMapping(value = "/importExcel")
     public String importExcel(HttpServletRequest request, HttpServletResponse resp,@RequestParam("file")MultipartFile file) throws Exception{
@@ -95,5 +76,28 @@ public class CityVipManageAction {
         return null;
     }
 
+    @RequestMapping(value = "/exportExcel")
+    public String exportExcel(HttpServletRequest request, HttpServletResponse response) {
+        Map<String, String> reqParameterMap = RequestUtil.readBodyFormRequset(request);
+
+        List<List<String>> bodyList = cityVipService.exportExcel(reqParameterMap);
+        String[][] heards = new String[][]{{"编号","STR"},{"套餐名称","STR"},{"所属车场","STR"},{"车主姓名","STR"},{"车牌号码","STR"},{"购买时间","STR"},{"开始时间","STR"},{"结束时间","STR"},{"应收金额","STR"},{"实收金额","STR"},{"联系电话","STR"},{"车型类型","STR"},{"单双日限行","STR"},{"备注","STR"}};
+
+        ExportDataExcel excel = new ExportDataExcel("集团会员数据", heards, "sheet1");
+        String fname = "集团会员数据";
+        fname = StringUtils.encodingFileName(fname);
+        try {
+            OutputStream os = response.getOutputStream();
+            response.reset();
+            response.setHeader("Content-disposition", "attachment; filename="+fname+".xls");
+            excel.PoiWriteExcel_To2007(bodyList, os);
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+
+        return null;
+    }
 
 }

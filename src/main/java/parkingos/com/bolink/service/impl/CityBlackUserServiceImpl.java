@@ -6,15 +6,18 @@ import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import parkingos.com.bolink.dao.spring.CommonDao;
+import parkingos.com.bolink.models.ComInfoTb;
 import parkingos.com.bolink.models.SyncInfoPoolTb;
 import parkingos.com.bolink.models.ZldBlackTb;
 import parkingos.com.bolink.qo.PageOrderConfig;
 import parkingos.com.bolink.qo.SearchBean;
 import parkingos.com.bolink.service.CityBlackUserService;
 import parkingos.com.bolink.service.SupperSearchService;
+import parkingos.com.bolink.utils.Check;
 import parkingos.com.bolink.utils.OrmUtil;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -53,11 +56,6 @@ public class CityBlackUserServiceImpl implements CityBlackUserService {
             }
         }
 
-
-//        String groupid = reqmap.get("groupid");
-//        String cityid = reqmap.get("cityid");
-//        System.out.println("=====groupid:"+groupid+"===cityid:"+cityid);
-
         Map searchMap = supperSearchService.getGroupOrCitySearch(zldBlackTb,reqmap);
         ZldBlackTb baseQuery =(ZldBlackTb)searchMap.get("base");
         List<SearchBean> supperQuery =(List<SearchBean>)searchMap.get("supper");
@@ -65,6 +63,10 @@ public class CityBlackUserServiceImpl implements CityBlackUserService {
 
         count = commonDao.selectCountByConditions(baseQuery,supperQuery);
         if(count>0){
+            if(config==null){
+                config = new PageOrderConfig();
+                config.setPageInfo(null,null);
+            }
             list = commonDao.selectListByConditions(baseQuery,supperQuery,config);
             if (list != null && !list.isEmpty()) {
                 for (ZldBlackTb zldBlackTb1 : list) {
@@ -76,54 +78,10 @@ public class CityBlackUserServiceImpl implements CityBlackUserService {
             }
         }
 
-//        Map searchMap = supperSearchService.getBaseSearch(zldBlackTb,reqmap);
-//        logger.info(searchMap);
-//        if(searchMap!=null&&!searchMap.isEmpty()){
-//            ZldBlackTb baseQuery =(ZldBlackTb)searchMap.get("base");
-//            List<SearchBean> supperQuery = null;
-//            if(searchMap.containsKey("supper"))
-//                supperQuery = (List<SearchBean>)searchMap.get("supper");
-//            PageOrderConfig config = null;
-//            if(searchMap.containsKey("config"))
-//                config = (PageOrderConfig)searchMap.get("config");
-//
-//            List parks =new ArrayList();
-//
-//            if(groupid !=null&&!"".equals(groupid)){
-//                parks = commonMethods.getParks(Long.parseLong(groupid));
-//            }else if(cityid !=null&&!"".equals(cityid)){
-//                parks = commonMethods.getparks(Long.parseLong(cityid));
-//            }
-//
-//            System.out.println("=======parks:"+parks);
-//
-//            //封装searchbean  集团和城市下面所有车场
-//            SearchBean searchBean = new SearchBean();
-//            searchBean.setOperator(FieldOperator.CONTAINS);
-//            searchBean.setFieldName("comid");
-//            searchBean.setBasicValue(parks);
-//
-//            if (supperQuery == null) {
-//                supperQuery = new ArrayList<>();
-//            }
-//            supperQuery.add( searchBean );
-//
-//
-//            count = commonDao.selectCountByConditions(baseQuery,supperQuery);
-//            if(count>0){
-//                list = commonDao.selectListByConditions(baseQuery,supperQuery,config);
-//                if (list != null && !list.isEmpty()) {
-//                    for (ZldBlackTb zldBlackTb1 : list) {
-//                        OrmUtil<ZldBlackTb> otm = new OrmUtil<>();
-//                        Map<String, Object> map = otm.pojoToMap(zldBlackTb1);
-//                        resList.add(map);
-//                    }
-//                    result.put("rows", JSON.toJSON(resList));
-//                }
-//            }
-//        }
         result.put("total",count);
-        result.put("page",Integer.parseInt(reqmap.get("page")));
+        if(reqmap.get("page")!=null){
+            result.put("page",Integer.parseInt(reqmap.get("page")));
+        }
         logger.error("============>>>>>返回数据"+result);
         return result;
     }
@@ -162,17 +120,48 @@ public class CityBlackUserServiceImpl implements CityBlackUserService {
             result.put("msg","修改成功");
         }
 
-//        int ret = commonDao.updateByPrimaryKey(zldBlackTb);
-//        if(ret==1){
-//            zldBlackTb = (ZldBlackTb)commonDao.selectObjectByConditions(zldBlackTb);
-//            int ins = insertSysn(zldBlackTb,1);
-//            if(ins!=1){
-//                logger.error("======>>>>插入同步表失败");
-//            }
-//            result.put("state",1);
-//            result.put("msg","修改成功");
-//        }
         return result;
+    }
+
+
+    @Override
+    public List<List<Object>> exportExcel(Map<String, String> reqParameterMap) {
+
+        //删除分页条件  查询该条件下所有  不然为一页数据
+        reqParameterMap.remove("orderby");
+
+        //获得要导出的结果
+        JSONObject result = selectResultByConditions(reqParameterMap);
+
+        List<ZldBlackTb> blackList = JSON.parseArray(result.get("rows").toString(), ZldBlackTb.class);
+
+        logger.error("=========>>>>>>.导出黑名单" + blackList.size());
+        List<List<Object>> bodyList = new ArrayList<List<Object>>();
+        if (blackList != null && blackList.size() > 0) {
+            String[] f = new String[]{"id","car_number", "black_uuid","state",  "comid", "ctime",  "utime", "remark"};
+            Map<Long, String> passNameMap = new HashMap<Long, String>();
+            Map<Long, String> uinNameMap = new HashMap<Long, String>();
+            for (ZldBlackTb zldBlackTb : blackList) {
+                List<Object> values = new ArrayList<Object>();
+                OrmUtil<ZldBlackTb> otm = new OrmUtil<>();
+                Map map = otm.pojoToMap(zldBlackTb);
+                for (String field : f) {
+                    Object v = map.get(field);
+                    if("comid".equals(field)){
+                        if(Check.isLong(map.get("comid")+"")){
+                            String comName = getComName(Long.parseLong(map.get("comid")+""));
+                            values.add(comName);
+                        }else {
+                            values.add(v+"");
+                        }
+                    }else {
+                        values.add(v+"");
+                    }
+                }
+                bodyList.add(values);
+            }
+        }
+        return bodyList;
     }
 
     private int  insertSysn(ZldBlackTb zldBlackTb, Integer operater){
@@ -183,6 +172,16 @@ public class CityBlackUserServiceImpl implements CityBlackUserService {
         syncInfoPoolTb.setCreateTime(System.currentTimeMillis()/1000);
         syncInfoPoolTb.setOperate(operater);
         return commonDao.insert(syncInfoPoolTb);
+    }
+
+    private String getComName(Long comid){
+        ComInfoTb comInfoTb  = new ComInfoTb();
+        comInfoTb.setId(comid);
+        comInfoTb = (ComInfoTb)commonDao.selectObjectByConditions(comInfoTb);
+        if(comInfoTb!=null&&comInfoTb.getCompanyName()!=null){
+            return comInfoTb.getCompanyName();
+        }
+        return "";
     }
 
 }

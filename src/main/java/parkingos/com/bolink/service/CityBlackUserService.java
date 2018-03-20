@@ -2,6 +2,7 @@ package parkingos.com.bolink.service;
 
 import com.alibaba.fastjson.JSONObject;
 
+import java.util.List;
 import java.util.Map;
 
 public interface CityBlackUserService {
@@ -9,4 +10,5 @@ public interface CityBlackUserService {
 
     JSONObject editBlackUser(Long id,Integer state);
 
+    List<List<Object>> exportExcel(Map<String, String> reqParameterMap);
 }

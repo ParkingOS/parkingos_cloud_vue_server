@@ -38,4 +38,9 @@ public class CityOrderServiceMybatisImpl implements CityUnorderService {
         return result;
     }
 
+    @Override
+    public List<List<Object>> exportExcel(Map<String, String> reqParameterMap) {
+        return null;
+    }
+
 }

@@ -33,6 +33,8 @@ public class CardRenewTb {
 
     private Long limitTime;
 
+    private Long startTime;
+
     public Integer getId() {
         return id;
     }
@@ -159,5 +161,13 @@ public class CardRenewTb {
 
     public void setLimitTime(Long limitTime) {
         this.limitTime = limitTime;
+    }
+
+    public Long getStartTime() {
+        return startTime;
+    }
+
+    public void setStartTime(Long startTime) {
+        this.startTime = startTime;
     }
 }
