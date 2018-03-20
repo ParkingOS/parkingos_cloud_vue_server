@@ -65,47 +65,60 @@ public class CityParkOrderanlysisServiceImpl implements CityParkOrderAnlysisServ
         }
 
 
-        String date = reqmap.get("time");
+        String date = reqmap.get("date");
 
         logger.error("=====date:"+date);
 
-        Long btime = TimeTools.getToDayBeginTime()-86400*9;
-        Long etime =TimeTools.getToDayBeginTime()+86399;
-        if(date!=null&&!Check.isEmpty(date)){
-            String start = reqmap.get("time_start");//RequestUtil.getString(request, "ctime_start");
-            String end = reqmap.get("time_end");//RequestUtil.getString(request, "ctime_end");
-            System.out.println("默认开始时间:"+start+"默认结束时间:"+end);
-            if("3".equals(date)&&Check.isEmpty(start)&&Check.isEmpty(end)){
-                date="between";
-            }else{
-                btime = Check.isLong(start)?Long.valueOf(start)/1000:TimeTools.getToDayBeginTime();
-                etime = Check.isLong(end)?Long.valueOf(end)/1000:TimeTools.getToDayBeginTime();
-            }
 
+        Long btime = null;
+        Long etime = null;
+        if(date==null||"".equals(date)){
+            btime = TimeTools.getToDayBeginTime()-86400*9;
+            etime =TimeTools.getToDayBeginTime()+86399;
+        }else {
+            String[] dateArr = date.split("至");
+            String start =dateArr[0];
+            String end = dateArr[1];
+            btime = TimeTools.getLongMilliSecondFrom_HHMMDDHHmmss(start);
+            etime = TimeTools.getLongMilliSecondFrom_HHMMDDHHmmss(end);
         }
+//        if(date!=null&&!Check.isEmpty(date)){
+//            String start = reqmap.get("time_start");//RequestUtil.getString(request, "ctime_start");
+//            String end = reqmap.get("time_end");//RequestUtil.getString(request, "ctime_end");
+//            System.out.println("默认开始时间:"+start+"默认结束时间:"+end);
+//            if("3".equals(date)&&Check.isEmpty(start)&&Check.isEmpty(end)){
+//                date="between";
+//            }else{
+//                btime = Check.isLong(start)?Long.valueOf(start)/1000:TimeTools.getToDayBeginTime();
+//                etime = Check.isLong(end)?Long.valueOf(end)/1000:TimeTools.getToDayBeginTime();
+//            }
+//
+//        }
         logger.info("=====>>>>>>btime="+btime+"=====>>>etime="+etime);
 
-        if("between".equals(date)){
-            sql +=" between "+btime+" and "+etime;
-            free_sql +=" between "+btime+" and "+etime;
+//        if("between".equals(date)){
+//            sql +=" between "+btime+" and "+etime;
+//            free_sql +=" between "+btime+" and "+etime;
+//
+//        }else if("1".equals(date)){
+//            sql +=" >= "+btime;
+//            free_sql +=" >= "+btime;
+//        }else if("2".equals(date)){
+//            sql +=" <= "+etime;
+//            free_sql +=" <= "+etime;
+//        }else if("3".equals(date)){
+////            String stime = TimeTools.getTimeStr_yyyy_MM_dd(btime*1000);
+////            btime = TimeTools.getStrDateToSecond(stime+" 00:00:00");
+//            logger.info(btime);
+//            sql +=" = "+btime;
+//            free_sql +=" = "+btime;
+//        }else {
+//            sql +=" between "+btime+" and "+etime;
+//            free_sql +=" between "+btime+" and "+etime;
+//        }
 
-        }else if("1".equals(date)){
-            sql +=" >= "+btime;
-            free_sql +=" >= "+btime;
-        }else if("2".equals(date)){
-            sql +=" <= "+etime;
-            free_sql +=" <= "+etime;
-        }else if("3".equals(date)){
-//            String stime = TimeTools.getTimeStr_yyyy_MM_dd(btime*1000);
-//            btime = TimeTools.getStrDateToSecond(stime+" 00:00:00");
-            logger.info(btime);
-            sql +=" = "+btime;
-            free_sql +=" = "+btime;
-        }else {
-            sql +=" between "+btime+" and "+etime;
-            free_sql +=" between "+btime+" and "+etime;
-        }
-
+        sql +=" between "+btime+" and "+etime;
+        free_sql +=" between "+btime+" and "+etime;
         sql +=" and state= 1 and out_uid > -1 and ishd=0 ";
         free_sql +=" and state= 1 and out_uid >-1 and ishd=0 ";
 

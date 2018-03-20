@@ -461,6 +461,7 @@ public class CityVipServiceImpl implements CityVipService {
                         isValid = false;
                     }
                     if(isValid){
+                        System.out.println("============comid:"+comid);
                         //数据库检验车场编号和月卡会员中同一车场同一车牌是否存在
                         //校验车场
                         if(comMaps.containsKey(comid)){
@@ -489,32 +490,37 @@ public class CityVipServiceImpl implements CityVipService {
                             searchBean.setFieldName("id");
                             searchBean.setBasicValue(parks);
                             List<SearchBean> searchBeanList = new ArrayList<>();
+                            searchBeanList.add(searchBean);
 
                             comInfoTb.setState(0);
                             int count = commonDao.selectCountByConditions(comInfoTb,searchBeanList);
+                            System.out.println("============comid:"+comid);
+                            System.out.println("============count:"+count);
                             if(count<1){
                                 errmsg+=i+"行，车场编号不存在或者不可用："+comid;
                                 isValid = false;
                             }
                             comMaps.put(comid,count);
                         }
-                        if(comCarMap.containsKey(comid+car_number)){
-                            Integer ha = comCarMap.get(comid+car_number);
-                            if(ha!=null&&ha==1){
-                                //errmsg+=i+"行，数据已存在：(车场-车牌)"+comid+"-"+car_number;
-                                isValid = false;
+                        if(isValid){
+                            if(comCarMap.containsKey(comid+car_number)){
+                                Integer ha = comCarMap.get(comid+car_number);
+                                if(ha!=null&&ha==1){
+                                    //errmsg+=i+"行，数据已存在：(车场-车牌)"+comid+"-"+car_number;
+                                    isValid = false;
+                                }
+                            }else{
+                                CarowerProduct carowerProduct = new CarowerProduct();
+                                carowerProduct.setComId(comid);
+                                carowerProduct.setCarNumber(car_number);
+                                int count = commonDao.selectCountByConditions(carowerProduct);//daService.getLong("select count(id) from carower_product where com_id =? and car_number=?  ",new Object[]{comid,car_number});
+                                if(count>0){
+                                    //errmsg+=i+"行，数据已存在：(车场-车牌)"+comid+"-"+car_number;
+                                    isValid = false;
+                                    updateDatas.add(o);//加入到更新数据中
+                                }
+                                comCarMap.put(comid+car_number,count);
                             }
-                        }else{
-                            CarowerProduct carowerProduct = new CarowerProduct();
-                            carowerProduct.setComId(comid);
-                            carowerProduct.setCarNumber(car_number);
-                            int count = commonDao.selectCountByConditions(carowerProduct);//daService.getLong("select count(id) from carower_product where com_id =? and car_number=?  ",new Object[]{comid,car_number});
-                            if(count>0){
-                                //errmsg+=i+"行，数据已存在：(车场-车牌)"+comid+"-"+car_number;
-                                isValid = false;
-                                updateDatas.add(o);//加入到更新数据中
-                            }
-                            comCarMap.put(comid+car_number,count);
                         }
 
                         if(isValid){
@@ -569,6 +575,8 @@ public class CityVipServiceImpl implements CityVipService {
                         syncValues.add(syncVa);
                     }
                 }
+            }else{
+                errmsg+="请上传正确的Excel文件";
             }
             if(!insertValues.isEmpty()) {
                 int r = 0;

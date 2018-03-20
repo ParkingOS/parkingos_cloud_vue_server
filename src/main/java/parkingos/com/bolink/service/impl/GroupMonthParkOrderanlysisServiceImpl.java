@@ -1,0 +1,155 @@
+package parkingos.com.bolink.service.impl;
+
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
+import org.apache.log4j.Logger;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import parkingos.com.bolink.dao.spring.CommonDao;
+import parkingos.com.bolink.models.OrderTb;
+import parkingos.com.bolink.service.GroupMonthParkOrderAnlysisService;
+import parkingos.com.bolink.service.SupperSearchService;
+import parkingos.com.bolink.utils.StringUtils;
+import parkingos.com.bolink.utils.TimeTools;
+
+import java.text.SimpleDateFormat;
+import java.util.*;
+
+@Service
+public class GroupMonthParkOrderanlysisServiceImpl implements GroupMonthParkOrderAnlysisService {
+
+    Logger logger = Logger.getLogger(GroupMonthParkOrderanlysisServiceImpl.class);
+
+    @Autowired
+    private CommonDao commonDao;
+
+    @Autowired
+    private SupperSearchService<OrderTb> supperSearchService;
+
+    @Override
+    public JSONObject selectResultByConditions(Map<String, String> reqmap) throws Exception{
+
+        JSONObject result = new JSONObject();
+
+
+//        Long comid = Long.parseLong(reqmap.get("comid"));
+
+        SimpleDateFormat df2 = new SimpleDateFormat("yyyy-MM");
+        String nowtime = df2.format(System.currentTimeMillis());
+
+
+        String btime = reqmap.get("btime");
+        String etime = reqmap.get("etime");
+
+        if (etime!=null&&!"".equals(etime)) {
+            etime = TimeTools.getTime_yyMM(TimeTools.getDateFromStr2(etime));
+        }
+        logger.info("======>>>btime:"+btime);
+        logger.info("======>>>etime:"+etime);
+        if (btime==null||"".equals(btime))
+            btime = nowtime;
+        if (etime==null||"".equals(etime)) {
+            Long nextMonth = TimeTools.getNextMonthStartMillis();
+            etime = df2.format(nextMonth);
+        }
+
+
+        Date d1 = new SimpleDateFormat("yyyy-MM").parse(btime);//定义起始日期
+        Date d2 = new SimpleDateFormat("yyyy-MM").parse(etime);//定义结束日期
+        Calendar dd = Calendar.getInstance();//定义日期实例
+        dd.setTime(d1);//设置日期起始时间
+
+        List<Map<String, Object>> backList = new ArrayList<Map<String, Object>>();
+        int totalCount = 0;//总订单数
+        double totalMoney = 0.0;//订单金额
+        double cashMoney = 0.0;//现金支付金额
+        double elecMoney = 0.0;//电子支付金额
+        double actFreeMoney = 0.0;//免费金额+减免支付
+
+        int i= 1;
+        while (dd.getTime().before(d2)&&i<=12) {//判断是否到结束日期
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM");
+            String str = sdf.format(dd.getTime());
+            Long b = dd.getTime().getTime() / 1000;
+            dd.add(Calendar.MONTH, 1);//进行当前日期月份加1
+            Long e = dd.getTime().getTime() / 1000;
+
+            String sql = "select count(*) scount,sum(amount_receivable) amount_receivable, " +
+                    "sum(total) total , sum(cash_pay) cash_pay,sum(cash_prepay) cash_prepay, sum(electronic_pay) electronic_pay,sum(electronic_prepay) electronic_prepay, " +
+                    "sum(reduce_amount) reduce_pay from order_tb where comid";
+            String free_sql = "select count(*) scount,sum(amount_receivable-electronic_prepay-cash_prepay-reduce_amount) free_pay from order_tb where comid";
+
+            sql +=" in ( select id from com_info_tb where state<>1 and groupid= "+Long.parseLong(reqmap.get("groupid"))+" )  and end_time  ";
+            free_sql +=" in ( select id from com_info_tb where state<>1 and groupid= "+Long.parseLong(reqmap.get("groupid"))+" )  and end_time";
+
+            sql +=" between "+b+" and "+e;
+            free_sql +=" between "+b+" and "+e;
+
+            sql +=" and state= 1 and out_uid > -1 and ishd=0 ";
+            free_sql +=" and state= 1 and out_uid >-1 and ishd=0 and pay_type=8 ";
+
+            //总订单集合
+            List<Map<String, Object>> totalList =commonDao.getObjectBySql(sql);
+            //免费订单集合
+            List<Map<String, Object>> freeList = commonDao.getObjectBySql(free_sql);
+
+            if (totalList != null && totalList.size() > 0) {
+
+                if (Integer.parseInt(totalList.get(0).get("scount") + "") > 0) {
+                    totalList.get(0).put("sdate", str);
+
+                    totalCount += Integer.parseInt(totalList.get(0).get("scount") + "");
+
+                    totalMoney += Double.parseDouble(totalList.get(0).get("amount_receivable") + "");
+
+                    //格式化应收
+                    totalList.get(0).put("amount_receivable", String.format("%.2f", StringUtils.formatDouble(Double.parseDouble(totalList.get(0).get("amount_receivable") + ""))));
+
+                    //现金支付
+                    cashMoney += StringUtils.formatDouble(totalList.get(0).get("cash_pay")) + StringUtils.formatDouble(totalList.get(0).get("cash_prepay"));
+                    totalList.get(0).put("cash_pay", String.format("%.2f", StringUtils.formatDouble(totalList.get(0).get("cash_pay")) + StringUtils.formatDouble(totalList.get(0).get("cash_prepay"))));
+                    //电子支付
+                    elecMoney += StringUtils.formatDouble(totalList.get(0).get("electronic_pay")) + StringUtils.formatDouble(totalList.get(0).get("electronic_prepay"));
+                    totalList.get(0).put("electronic_pay", String.format("%.2f", StringUtils.formatDouble(totalList.get(0).get("electronic_pay")) + StringUtils.formatDouble(totalList.get(0).get("electronic_prepay"))));
+                    //每一行的合计 = 现金支付+电子支付
+                    totalList.get(0).put("act_total", String.format("%.2f", StringUtils.formatDouble(Double.parseDouble(totalList.get(0).get("cash_pay") + "") + Double.parseDouble(totalList.get(0).get("electronic_pay") + ""))));
+
+                    //免费支付
+                    totalList.get(0).put("free_pay", String.format("%.2f", 0.00));
+                    //遍历免费集合
+                    if (freeList != null && freeList.size() > 0) {
+                        double reduceAmount = StringUtils.formatDouble(Double.parseDouble((totalList.get(0).get("reduce_pay") == null ? "0.00" : totalList.get(0).get("reduce_pay") + "")));
+                        double freePay = StringUtils.formatDouble(Double.parseDouble((freeList.get(0).get("free_pay") == null ? "0.00" : freeList.get(0).get("free_pay") + "")));
+                        double actFreePay = freePay + reduceAmount;
+                        totalList.get(0).put("free_pay", String.format("%.2f", StringUtils.formatDouble(actFreePay)));
+                        actFreeMoney += actFreePay;
+                    }
+                    backList.add(totalList.get(0));
+                }else{
+                    totalList.get(0).put("sdate", str);
+                    totalList.get(0).put("act_total", 0.00);
+                    totalList.get(0).put("amount_receivable",0.00);
+                    totalList.get(0).put("free_pay",0.00);
+                    totalList.get(0).put("electronic_pay",0.00);
+                    totalList.get(0).put("cash_pay",0.00);
+                    backList.add(totalList.get(0));
+                }
+            }
+            i++;
+        }
+        if (backList!=null&&backList.size() > 0) {
+            Map totalMap = new HashMap();
+            totalMap.put("sdate", "合计");
+            totalMap.put("scount", totalCount);
+            totalMap.put("amount_receivable", String.format("%.2f", StringUtils.formatDouble(totalMoney)));
+            totalMap.put("cash_pay", String.format("%.2f", StringUtils.formatDouble(cashMoney)));
+            totalMap.put("electronic_pay", String.format("%.2f", StringUtils.formatDouble(elecMoney)));
+            totalMap.put("free_pay", String.format("%.2f", StringUtils.formatDouble(actFreeMoney)));
+            totalMap.put("act_total", String.format("%.2f", StringUtils.formatDouble((cashMoney + elecMoney))));
+            backList.add(totalMap);
+        }
+
+        result.put("rows",JSON.toJSON(backList));
+        return result;
+    }
+}
