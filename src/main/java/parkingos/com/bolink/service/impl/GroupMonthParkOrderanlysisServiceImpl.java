@@ -152,4 +152,34 @@ public class GroupMonthParkOrderanlysisServiceImpl implements GroupMonthParkOrde
         result.put("rows",JSON.toJSON(backList));
         return result;
     }
+
+    @Override
+    public List<List<Object>> exportExcel(Map<String, String> reqParameterMap) throws Exception{
+
+        //删除分页条件  查询该条件下所有  不然为一页数据
+        reqParameterMap.remove("orderby");
+
+        //获得要导出的结果
+        JSONObject result = selectResultByConditions(reqParameterMap);
+
+        List<Object> resList = JSON.parseArray(result.get("rows").toString());
+
+        logger.error("=========>>>>>>.导出订单" + resList.size());
+        List<List<Object>> bodyList = new ArrayList<List<Object>>();
+        if (resList != null && resList.size() > 0) {
+            for (Object object : resList) {
+                Map<String,Object> map = (Map)object;
+                List<Object> values = new ArrayList<Object>();
+                values.add(map.get("sdate"));
+                values.add(map.get("scount"));
+                values.add(map.get("amount_receivable"));
+                values.add(map.get("cash_pay"));
+                values.add(map.get("electronic_pay"));
+                values.add(map.get("act_total"));
+                values.add(map.get("free_pay"));
+                bodyList.add(values);
+            }
+        }
+        return bodyList;
+    }
 }

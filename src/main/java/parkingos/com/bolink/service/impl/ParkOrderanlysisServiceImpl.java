@@ -63,6 +63,7 @@ public class ParkOrderanlysisServiceImpl implements ParkOrderAnlysisService {
             etime = nowtime + " 23:59:59";
         }else {
 //            date:2017-12-28 00:00:00至2018-01-27 23:59:59
+            date = StringUtils.decodeUTF8(date);
             String[] dateArr = date.split("至");
             btime = dateArr[0];
             etime = dateArr[1];
@@ -400,5 +401,35 @@ public class ParkOrderanlysisServiceImpl implements ParkOrderAnlysisService {
         }else {
             return result;
         }
+    }
+
+    @Override
+    public List<List<Object>> exportExcel(Map<String, String> reqParameterMap) {
+
+        //删除分页条件  查询该条件下所有  不然为一页数据
+        reqParameterMap.remove("orderby");
+
+        //获得要导出的结果
+        JSONObject result = selectResultByConditions(reqParameterMap);
+
+        List<Object> resList = JSON.parseArray(result.get("rows").toString());
+
+        logger.error("=========>>>>>>.导出订单" + resList.size());
+        List<List<Object>> bodyList = new ArrayList<List<Object>>();
+        if (resList != null && resList.size() > 0) {
+            for (Object object : resList) {
+                Map<String,Object> map = (Map)object;
+                List<Object> values = new ArrayList<Object>();
+                values.add(map.get("name"));
+                values.add(map.get("scount"));
+                values.add(map.get("amount_receivable"));
+                values.add(map.get("cash_pay"));
+                values.add(map.get("electronic_pay"));
+                values.add(map.get("act_total"));
+                values.add(map.get("free_pay"));
+                bodyList.add(values);
+            }
+        }
+        return bodyList;
     }
 }
