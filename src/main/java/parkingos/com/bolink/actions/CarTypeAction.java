@@ -38,6 +38,7 @@ public class CarTypeAction {
 
 
     @RequestMapping(value = "/add")
+//    public String add(sting, HttpServletResponse resp){
     public String add(HttpServletRequest request, HttpServletResponse resp){
         Long comid = RequestUtil.getLong(request,"comid",-1L);
         String name =RequestUtil.getString(request, "name");
@@ -62,7 +63,7 @@ public class CarTypeAction {
     @RequestMapping(value = "/edit")
     public String edit(HttpServletRequest request, HttpServletResponse resp){
 
-        String name = StringUtils.decodeUTF8(RequestUtil.getString(request, "name"));
+        String name =RequestUtil.getString(request, "name");
         Integer sort = RequestUtil.getInteger(request, "sort", 0);
         Long id = RequestUtil.getLong(request,"id",-1L);
 
