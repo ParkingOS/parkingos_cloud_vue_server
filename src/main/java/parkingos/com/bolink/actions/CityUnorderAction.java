@@ -52,7 +52,7 @@ public class CityUnorderAction {
         Map<String, String> reqParameterMap = RequestUtil.readBodyFormRequset(request);
 
         List<List<Object>> bodyList = cityUnorderService.exportExcel(reqParameterMap);
-        String [][] heards = new String[][]{{"编号","STR"},{"所属车场","STR"},{"进场收费员","STR"},{"进场方式","STR"},{"车牌号","STR"},{"进场时间","STR"},{"时长","STR"},{"订单状态","STR"},{"进场通道","STR"},{"订单编号","STR"}};
+        String [][] heards = new String[][]{{"编号","STR"},{"所属车场","STR"},{"进场收费员","STR"},{"进场方式","STR"},{"车牌号","STR"},{"进场时间","STR"},{"停车时长","STR"},{"状态","STR"},{"进场通道","STR"},{"车场订单编号","STR"}};
         ExportDataExcel excel = new ExportDataExcel("在场车辆数据", heards, "sheet1");
         String fname = "在场车辆数据";
         fname = StringUtils.encodingFileName(fname)+".xls";

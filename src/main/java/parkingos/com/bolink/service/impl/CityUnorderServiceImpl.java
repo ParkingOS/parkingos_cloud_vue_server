@@ -245,12 +245,20 @@ public class CityUnorderServiceImpl implements CityUnorderService {
                         }
                     }else if("duration".equals(field)){
                         Long start = (Long)map.get("create_time");
-                        Long end = (Long)map.get("end_time");
-                        if(start != null && end != null){
-                            values.add(StringUtils.getTimeString(start, end));
+                        if(start!=null){
+                            values.add(StringUtils.getTimeString(start, System.currentTimeMillis()/1000));
                         }else{
                             values.add("");
                         }
+//                        Long end = (Long)map.get("end_time");
+//                        if(end==null){
+//                            end = System.currentTimeMillis()/1000;
+//                        }
+//                        if(start!=null){
+//                            values.add(StringUtils.getTimeString(start, end));
+//                        }else{
+//                            values.add("");
+//                        }
                     }else if("state".equals(field)){
                         switch(Integer.valueOf(v + "")){
                             case 1:values.add("已支付");break;

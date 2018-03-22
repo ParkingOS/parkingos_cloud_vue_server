@@ -53,7 +53,7 @@ public class ParkOrderanlysisServiceImpl implements ParkOrderAnlysisService {
 
         logger.error("====outuid:"+outuid+"======comid:"+comid);
 
-        String date = reqmap.get("date");
+        String date =StringUtils.decodeUTF8(StringUtils.decodeUTF8(reqmap.get("date")));
 
         logger.error("=====date:"+date);
         String btime = "";
@@ -63,7 +63,7 @@ public class ParkOrderanlysisServiceImpl implements ParkOrderAnlysisService {
             etime = nowtime + " 23:59:59";
         }else {
 //            date:2017-12-28 00:00:00至2018-01-27 23:59:59
-            date = StringUtils.decodeUTF8(date);
+//            date = StringUtils.decodeUTF8(date);
             String[] dateArr = date.split("至");
             btime = dateArr[0];
             etime = dateArr[1];

@@ -154,6 +154,12 @@ public class CityBlackUserServiceImpl implements CityBlackUserService {
                         }else {
                             values.add(v+"");
                         }
+                    }else if("state".equals(field)){
+                        switch(Integer.valueOf(v + "")){
+                            case 0:values.add("正常");break;
+                            case 1:values.add("漂白");break;
+                            default:values.add("");
+                        }
                     }else {
                         values.add(v+"");
                     }

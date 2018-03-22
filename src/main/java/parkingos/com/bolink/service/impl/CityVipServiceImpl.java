@@ -333,7 +333,7 @@ public class CityVipServiceImpl implements CityVipService {
 
         List<List<String>> bodyList = new ArrayList<List<String>>();
         if(viplist!=null&&viplist.size()>0){
-            String [] f = new String[]{"id","p_name","com_id","name","car_number","create_time","b_time","e_time","total","act_total","car_type_id","limit_day_type","remark"};
+            String [] f = new String[]{"id","p_name","com_id","name","car_number","create_time","b_time","e_time","total","act_total","mobile","car_type_id","limit_day_type","remark"};
             for(CarowerProduct carowerProduct : viplist){
                 List<String> values = new ArrayList<String>();
                 OrmUtil<CarowerProduct> otm = new OrmUtil<>();
@@ -348,6 +348,8 @@ public class CityVipServiceImpl implements CityVipService {
                                 }else{
                                     values.add("");
                                 }
+                            }else if("-1".equals(map.get("pid") + "")){
+                                values.add("");
                             }else{
                                 values.add(map.get("pid") + "");
                             }
@@ -364,6 +366,8 @@ public class CityVipServiceImpl implements CityVipService {
                                 }else{
                                     values.add("");
                                 }
+                            }else if("-1".equals(map.get("car_type_id") + "")){
+                                values.add("");
                             }else{
                                 values.add(map.get("car_type_id") + "");
                             }

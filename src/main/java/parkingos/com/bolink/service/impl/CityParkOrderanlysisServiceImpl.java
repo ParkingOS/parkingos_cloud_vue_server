@@ -65,10 +65,8 @@ public class CityParkOrderanlysisServiceImpl implements CityParkOrderAnlysisServ
         }
 
 
-        String date = reqmap.get("date");
-
+        String date = StringUtils.decodeUTF8(StringUtils.decodeUTF8(reqmap.get("date")));
         logger.error("=====date:"+date);
-
 
         Long btime = null;
         Long etime = null;
@@ -77,6 +75,7 @@ public class CityParkOrderanlysisServiceImpl implements CityParkOrderAnlysisServ
             etime =TimeTools.getToDayBeginTime()+86399;
         }else {
             String[] dateArr = date.split("至");
+            System.out.println("陈博文"+dateArr.length);
             String start =dateArr[0];
             String end = dateArr[1];
             btime = TimeTools.getLongMilliSecondFrom_HHMMDDHHmmss(start);
