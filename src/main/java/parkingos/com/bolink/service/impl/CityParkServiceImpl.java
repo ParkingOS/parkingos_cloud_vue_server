@@ -90,6 +90,11 @@ public class CityParkServiceImpl implements CityParkService {
 
             System.out.println("=======parks:"+parks);
 
+
+            if(parks==null||parks.size()<1){
+                return result;
+            }
+
             //封装searchbean  城市和集团下所有车场
             SearchBean searchBean = new SearchBean();
             searchBean.setOperator(FieldOperator.CONTAINS);
@@ -154,10 +159,6 @@ public class CityParkServiceImpl implements CityParkService {
         Double longitude =RequestUtil.getDouble(request, "longitude",0d);
         Double latitude =RequestUtil.getDouble(request, "latitude",0d);
 
-        if(groupId==null||groupId==-1){
-            result.put("msg","请选择运营集团");
-            return result;
-        }
 
         if(longitude == 0 || latitude == 0){
             result.put("msg","请标注地理位置");
@@ -176,7 +177,6 @@ public class CityParkServiceImpl implements CityParkService {
 
 
         ComInfoTb comInfoTb = new ComInfoTb();
-        comInfoTb.setGroupid(groupId);
         comInfoTb.setState(state);
         comInfoTb.setCompanyName(company);
         comInfoTb.setLatitude(new BigDecimal(latitude));
@@ -187,9 +187,17 @@ public class CityParkServiceImpl implements CityParkService {
         comInfoTb.setParkingTotal(parking_total);
 
         if(id==-1){
+            if(groupId==null||groupId==-1){
+                groupId = RequestUtil.getLong(request,"group_id",-1L);
+                if(groupId==null||groupId==-1){
+                    result.put("msg","请选择运营集团");
+                    return result;
+                }
+            }
             //获取id
             Long comid = commonDao.selectSequence(ComInfoTb.class);
             comInfoTb.setId(comid);
+            comInfoTb.setGroupid(groupId);
             //添加自动生成车场16位秘钥的逻辑
             String ukey = StringUtils.createRandomCharData(16);
             comInfoTb.setUkey(ukey);

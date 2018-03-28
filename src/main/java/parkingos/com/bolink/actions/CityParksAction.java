@@ -41,6 +41,8 @@ public class CityParksAction {
     @RequestMapping(value = "/editpark")
     public String addpark(HttpServletRequest request, HttpServletResponse resp) {
 //        System.out.println("创建车场:"+comInfoTb);
+
+        System.out.println("进入创建车场");
         JSONObject result = cityParkService.createPark(request);
         //把结果返回页面
         StringUtils.ajaxOutput(resp, result.toJSONString());

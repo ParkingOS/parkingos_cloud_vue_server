@@ -23,4 +23,6 @@ public interface GetDataService {
     String getAllCollectors(String groupid, String cityid);
 
     String getAllPackage(String groupid,String cityid);
+
+    String getAllUnion(Long cityid);
 }

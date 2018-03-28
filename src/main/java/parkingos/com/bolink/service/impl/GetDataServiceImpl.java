@@ -354,6 +354,31 @@ public class GetDataServiceImpl implements GetDataService {
         return result;
     }
 
+    @Override
+    public String getAllUnion(Long cityid) {
+        List<Map<String,Object>>  unionList = null;
+//        String result = "[{\"value_no\":\"-1\",\"value_name\":\"请选择\"}";
+        String result = "[";
+
+        String sql = "select id,name from org_group_tb where cityid = "+ cityid;
+
+        unionList = commonDao.getObjectBySql(sql);
+
+        if(unionList!=null&&unionList.size()>0){
+            int i = 0;
+            for(Map map : unionList){
+                if(i==0){
+                    result += "{\"value_no\":\"" + map.get("id") + "\",\"value_name\":\"" + map.get("name") + "\"}";
+                }else {
+                    result += ",{\"value_no\":\"" + map.get("id") + "\",\"value_name\":\"" + map.get("name") + "\"}";
+                }
+                i++;
+            }
+        }
+        result+="]";
+        return result;
+    }
+
     private List<Map<String, Object>> getcollectors(Long cityid){
         try {
             if(cityid != null && cityid > 0){

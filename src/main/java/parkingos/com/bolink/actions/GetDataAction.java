@@ -89,6 +89,14 @@ public class GetDataAction {
         return null;
     }
 
+    @RequestMapping(value = "/getallunion")
+    public String getAllUnion(HttpServletRequest request, HttpServletResponse resp){
+        Long cityid = RequestUtil.getLong(request, "cityid", -1L);
+        String result = getDataService.getAllUnion(cityid);
+        StringUtils.ajaxOutput(resp,result);
+        return null;
+    }
+
     /*
     * 获得监控名称
     *
