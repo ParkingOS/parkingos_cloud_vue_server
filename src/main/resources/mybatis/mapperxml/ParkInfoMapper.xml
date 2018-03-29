@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="parkingos.com.bolink.dao.mybatis.mapper.ParkInfoMapper" >
+    <!--获取入场车辆-->
+    <select id="getEntryCar"  resultType="map">
+        <![CDATA[
+    select
+    a.car_number AS "cartId",
+    a.create_time AS "timemills",
+    b.company_name AS "parkName"
+    from order_tb a,
+    com_info_tb b
+    where a.comid = b.id
+    and a.create_time > #{create_time,jdbcType=BIGINT}
+    and a.groupid= #{groupid,jdbcType=BIGINT}
+    and a.end_time is NULL
+    ORDER BY a.create_time DESC
+    limit  5
+    ]]>
+    </select>
+    <!--获取出场车辆数据-->
+    <select id="getExitCar"  resultType="map">
+        <![CDATA[
+        select
+    a.car_number AS "cartId",
+    a.end_time AS "timemills",
+    b.company_name AS "parkName"
+    from order_tb a,
+    com_info_tb b
+    where a.comid = b.id
+        and a.end_time > #{create_time,jdbcType=BIGINT}
+        and a.groupid= #{groupid,jdbcType=BIGINT}
+        ORDER BY a.end_time ASC
+        limit  5
+        ]]>
+    </select>
+    <!--获取车场收费排行-->
+    <select id="getParkRank"  resultType="map">
+    select sum(a.cash_pay+a.electronic_pay) AS "total" ,
+    b.company_name AS "parkName"
+    from order_tb a ,com_info_tb b
+    where a.comid=b.id
+     and a.end_time > #{end_time,jdbcType=BIGINT}
+     and a.groupid= #{groupid,jdbcType=BIGINT}
+     GROUP BY a.comid, b.company_name
+      ORDER BY  total desc
+      limit 10
+    </select>
+   <!--获取总的车位-->
+    <select id="getBerthTotal" parameterType="int" resultType="java.lang.Integer">
+        select sum(a.parking_total) AS "parkingtotal"
+        from com_info_tb a
+        where a.groupid = #{groupid,jdbcType=BIGINT}
+    </select>
+   <!--获取今日电子收费-->
+    <select id="getElectronicPay"  resultType="java.lang.Double">
+        select sum(a.electronic_pay) AS "electronic_pay"
+        from order_tb a
+        where a.create_time > #{create_time,jdbcType=BIGINT}
+        and a.groupid= #{groupid,jdbcType=BIGINT}
+    </select>
+    <!--获取今日现金收费-->
+    <select id="getCashPay"  resultType="java.lang.Double">
+        select sum(a.cash_pay) cash_pay
+        from order_tb a
+        where a.create_time > #{create_time,jdbcType=BIGINT}
+        and a.groupid= #{groupid,jdbcType=BIGINT}
+    </select>
+    <!--获取今日减免-->
+    <select id="getReduceAmount"  resultType="java.lang.Double">
+        select sum(a.reduce_amount) reduce_amount
+        from order_tb a
+        where a.create_time > #{create_time,jdbcType=BIGINT}
+        and a.groupid= #{groupid,jdbcType=BIGINT}
+    </select>
+    <!--获取今日进场总数-->
+    <select id="getEntryCount"  resultType="java.lang.Integer">
+        select count(id) inCars
+        from order_tb a
+        where a.create_time > #{create_time,jdbcType=BIGINT}
+        and a.groupid= #{groupid,jdbcType=BIGINT}
+    </select>
+    <!--获取今日离场总数-->
+    <select id="getExitCount"  resultType="java.lang.Integer">
+        select count(id) outCars
+        from order_tb a
+        where a.end_time > #{end_time,jdbcType=BIGINT}
+        and a.groupid= #{groupid,jdbcType=BIGINT}
+    </select>
+    <!--获取今日在场总数-->
+    <select id="getInparkCount"  resultType="java.lang.Integer">
+        select count(id) outCars
+        from order_tb a
+        where a.create_time > #{create_time,jdbcType=BIGINT}
+        and end_time is null
+        and a.groupid= #{groupid,jdbcType=BIGINT}
+    </select>
+    <!--获取集团下所有车场的id-->
+    <select id="getParkIdByGroupId"  resultType="map">
+        select a.id parkid,
+        a.company_name AS "parkName"
+        from com_info_tb a
+        where
+        a.groupid= #{groupid,jdbcType=BIGINT}
+    </select>
+    <!--根据车场id查询登录信息-->
+    <select id="getParkLogin"  resultType="map">
+        select a.login_time logintime,
+        a.beat_time beattime
+        from park_token_tb a
+        where
+        a.park_id= #{parkid,jdbcType=VARCHAR}
+        order by a.login_time desc
+
+    </select>
+</mapper>
