@@ -30,5 +30,4 @@ public class CityUinAction {
         StringUtils.ajaxOutput(resp, result.toJSONString());
         return null;
     }
-
 }

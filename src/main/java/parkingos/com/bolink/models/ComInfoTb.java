@@ -143,6 +143,8 @@ public class ComInfoTb {
 
     private String ukey;
 
+    private String bolinkId;
+
     public Long getId() {
         return id;
     }
@@ -777,5 +779,13 @@ public class ComInfoTb {
 
     public void setUkey(String ukey) {
         this.ukey = ukey == null ? null : ukey.trim();
+    }
+
+    public String getBolinkId() {
+        return bolinkId;
+    }
+
+    public void setBolinkId(String bolinkId) {
+        this.bolinkId = bolinkId == null ? null : bolinkId.trim();
     }
 }

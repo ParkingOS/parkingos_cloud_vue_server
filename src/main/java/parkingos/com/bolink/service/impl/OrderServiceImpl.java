@@ -13,7 +13,10 @@ import parkingos.com.bolink.dao.spring.CommonDao;
 import parkingos.com.bolink.models.*;
 import parkingos.com.bolink.service.OrderService;
 import parkingos.com.bolink.service.SupperSearchService;
-import parkingos.com.bolink.utils.*;
+import parkingos.com.bolink.utils.MongoClientFactory;
+import parkingos.com.bolink.utils.OrmUtil;
+import parkingos.com.bolink.utils.StringUtils;
+import parkingos.com.bolink.utils.TimeTools;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -267,7 +270,8 @@ public class OrderServiceImpl implements OrderService {
         List<List<Object>> bodyList = new ArrayList<List<Object>>();
 //        List<List<String>> bodyList = new ArrayList<List<String>>();
         if (orderlist != null && orderlist.size() > 0) {
-            String[] f = new String[]{"id", "c_type", "car_number","car_type", "create_time", "end_time", "duration", "pay_type", "freereasons","amount_receivable", "total", "electronic_prepay", "cash_prepay", "electronic_pay", "cash_pay", "reduce_amount", "uid", "out_uid", "state", "in_passid", "out_passid","order_id_local"};
+            //{"车场订单编号","STR"},{"车牌号码","STR"},{"订单状态","STR"},{"支付方式","STR"},{"实收金额","STR"},{"进场时间","STR"},{"出场时间","STR"}
+            String[] f = new String[]{"order_id_local","car_number","state","pay_type","total", "create_time", "end_time"};
             Map<Long, String> uinNameMap = new HashMap<Long, String>();
             Map<Integer, String> passNameMap = new HashMap<Integer, String>();
             for (OrderTb orderTb : orderlist) {
@@ -279,57 +283,8 @@ public class OrderServiceImpl implements OrderService {
                     Object v = map.get(field);
                     if (v == null)
                         v = "";
-                    if ("uid".equals(field) || "out_uid".equals(field)) {
-                        Long uid = -1L;
-                        if (Check.isLong(v + ""))
-                            uid = Long.valueOf(v + "");
-                        if (uinNameMap.containsKey(uid))
-                            values.add(uinNameMap.get(uid));
-                        else {
-                            String name = getUinName(Long.valueOf(map.get(field) + ""));
-                            values.add(name);
-                            uinNameMap.put(uid, name);
-                        }
-                    } else if ("c_type".equals(field)) {
-                        if (Check.isLong(v + "")) {
-                            switch (Integer.valueOf(v + "")) {//0:NFC,1:IBeacon,2:照牌   3通道照牌 4直付 5月卡用户
-                                case 0:
-                                    values.add("NFC刷卡");
-                                    break;
-                                case 1:
-                                    values.add("Ibeacon");
-                                    break;
-                                case 2:
-                                    values.add("手机扫牌");
-                                    break;
-                                case 3:
-                                    values.add("通道扫牌");
-                                    break;
-                                case 4:
-                                    values.add("直付");
-                                    break;
-                                case 5:
-                                    values.add("月卡");
-                                    break;
-                                default:
-                                    values.add("");
-                            }
-                        } else {
-                            values.add(v + "");
-                        }
-                    } else if ("duration".equals(field)) {
-                        Long start = (Long) map.get("create_time");
-                        Long end = (Long) map.get("end_time");
-                        if (start != null && end != null) {
-                            values.add(StringUtils.getTimeString(start, end));
-                        } else {
-                            values.add("");
-                        }
-                    } else if ("pay_type".equals(field)) {
+                  if ("pay_type".equals(field)) {
                         switch (Integer.valueOf(v + "")) {//0:NFC,1:IBeacon,2:照牌   3通道照牌 4直付 5月卡用户
-                            case 0:
-                                values.add("账户支付");
-                                break;
                             case 1:
                                 values.add("现金支付");
                                 break;
@@ -353,35 +308,8 @@ public class OrderServiceImpl implements OrderService {
                             case 1:
                                 values.add("已结算 ");
                                 break;
-//                            case 2:
-//                                values.add("逃单 ");
-//                                break;
                             default:
                                 values.add("");
-                        }
-                    } else if ("isclick".equals(field)) {
-                        switch (Integer.valueOf(map.get(field) + "")) {//0:NFC,1:IBeacon,2:照牌   3通道照牌 4直付 5月卡用户
-                            case 0:
-                                values.add("系统结算");
-                                break;
-                            case 1:
-                                values.add("手动结算");
-                                break;
-                            default:
-                                values.add("");
-                        }
-                    } else if ("in_passid".equals(field) || "out_passid".equals(field)) {
-                        if (!"".equals(v.toString()) && Check.isNumber(v.toString())) {
-                            Integer passId = Integer.valueOf(v.toString());
-                            if (passNameMap.containsKey(passId))
-                                values.add(passNameMap.get(passId));
-                            else {
-                                String passName = getPassName(comid, passId);
-                                values.add(passName);
-                                passNameMap.put(passId, passName);
-                            }
-                        } else {
-                            values.add(v + "");
                         }
                     } else {
                         if ("create_time".equals(field) || "end_time".equals(field)) {

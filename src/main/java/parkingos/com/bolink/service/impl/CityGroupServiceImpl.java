@@ -50,12 +50,13 @@ public class CityGroupServiceImpl implements CityGroupService {
     }
 
     @Override
-    public JSONObject addGroup(String name,String latitude, String longitude ,String cityid, String union_id, String address, Long id) {
+    public JSONObject addGroup(String name,String latitude, String longitude ,String cityid, String operatorid, String address, Long id) {
         JSONObject result = new JSONObject();
         OrgGroupTb orgGroupTb = new OrgGroupTb();
         orgGroupTb.setName(name);
         orgGroupTb.setAddress(address);
         orgGroupTb.setCityid(Long.parseLong(cityid));
+        orgGroupTb.setOperatorid(operatorid);
         if(id==null){
             orgGroupTb.setLatitude(new BigDecimal(latitude));
             orgGroupTb.setLongitude(new BigDecimal(longitude));

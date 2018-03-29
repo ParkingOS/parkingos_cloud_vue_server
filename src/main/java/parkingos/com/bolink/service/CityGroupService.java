@@ -10,5 +10,5 @@ public interface CityGroupService {
 
     JSONObject deleteGroup(Long id);
 
-    JSONObject addGroup(String name,String latitude, String longitude ,String cityid,String union_id, String address, Long id);
+    JSONObject addGroup(String name,String latitude, String longitude ,String cityid,String operatorid, String address, Long id);
 }

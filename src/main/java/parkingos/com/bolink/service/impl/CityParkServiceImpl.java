@@ -12,10 +12,7 @@ import parkingos.com.bolink.qo.PageOrderConfig;
 import parkingos.com.bolink.qo.SearchBean;
 import parkingos.com.bolink.service.CityParkService;
 import parkingos.com.bolink.service.SupperSearchService;
-import parkingos.com.bolink.utils.OrmUtil;
-import parkingos.com.bolink.utils.RequestUtil;
-import parkingos.com.bolink.utils.StringUtils;
-import parkingos.com.bolink.utils.TimeTools;
+import parkingos.com.bolink.utils.*;
 
 import javax.servlet.http.HttpServletRequest;
 import java.math.BigDecimal;
@@ -141,6 +138,21 @@ public class CityParkServiceImpl implements CityParkService {
         result.put("state",0);
         result.put("msg","创建车场失败");
 
+        String bolinkid = RequestUtil.getString(request,"bolink_id");
+        System.out.println("创建车场===bolinkid:"+bolinkid);
+        if(bolinkid!=null&&!"".equals(bolinkid)){
+            if(Check.isNumber(bolinkid)){
+                //验证填写的泊链编号在yun是不是重复
+                Long comid = Long.parseLong(bolinkid);
+                ComInfoTb comInfoTb = new ComInfoTb();
+                comInfoTb.setId(comid);
+                int count = commonDao.selectCountByConditions(comInfoTb);
+                if(count>0){
+                    result.put("msg","创建失败,编号重复");
+                    return result;
+                }
+            }
+        }
 
         Long id = RequestUtil.getLong(request,"id",-1L);
         Long groupId = RequestUtil.getLong(request,"groupid",-1L);
@@ -185,6 +197,7 @@ public class CityParkServiceImpl implements CityParkService {
         comInfoTb.setCity(city);
         comInfoTb.setMobile(mobile);
         comInfoTb.setParkingTotal(parking_total);
+        comInfoTb.setBolinkId(bolinkid);
 
         if(id==-1){
             if(groupId==null||groupId==-1){

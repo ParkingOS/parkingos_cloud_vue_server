@@ -89,7 +89,7 @@ public class OrderManagerAction {
 //        List<List<String>> bodyList = orderService.exportExcel(reqParameterMap);
 //        String[] heards =  new String[]{"编号","进场方式","车牌号","进场时间","出场时间","时长","支付方式","应收金额","实收金额","电子预付金额","现金预付金额","电子结算金额","现金结算金额","减免金额","优惠原因","入场收费员","收款人","状态 ","进场通道 ","出场通道 "};
         List<List<Object>> bodyList = orderService.exportExcel(reqParameterMap);
-        String [][] heards = new String[][]{{"编号","STR"},{"进场方式","STR"},{"车牌号","STR"},{"车型","STR"},{"进场时间","STR"},{"出场时间","STR"},{"时长","STR"},{"支付方式","STR"},{"优惠原因","STR"},{"应收金额","STR"},{"实收金额","STR"},{"电子预付金额","STR"},{"现金预付金额","STR"},{"电子结算金额","STR"},{"现金结算金额","STR"},{"减免金额","STR"},{"入场收费员","STR"},{"收款人","STR"},{"状态","STR"},{"进场通道","STR"},{"出场通道","STR"},{"订单编号","STR"}};
+        String [][] heards = new String[][]{{"车场订单编号","STR"},{"车牌号码","STR"},{"订单状态","STR"},{"支付方式","STR"},{"实收金额","STR"},{"进场时间","STR"},{"出场时间","STR"}};
         ExportDataExcel excel = new ExportDataExcel("订单数据", heards, "sheet1");
         String fname = "订单数据";
         fname = StringUtils.encodingFileName(fname);
