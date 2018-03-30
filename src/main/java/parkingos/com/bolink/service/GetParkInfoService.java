@@ -8,5 +8,6 @@ import java.util.List;
  */
 public interface GetParkInfoService {
     String getInfo(int groupid );
+    String getInfoByComid(int comid);
 
 }

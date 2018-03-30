@@ -18,6 +18,16 @@ public interface ParkInfoMapper {
     int getInparkCount(@Param("create_time") long create_time,@Param("groupid")int groupid);
     List<HashMap<String,Object>> getParkIdByGroupId(@Param("groupid") int groupid);
     List<HashMap<String,Object>> getParkLogin(@Param("parkid")String parkid);
+    List<HashMap<String,Object>> getExpByGid(@Param("groupid") int groupid);
 
-
+    List<HashMap<String,Object>> getEntryCarByComid(@Param("create_time") long create_time, @Param("comid")int comid );
+    List<HashMap<String,Object>> getExitCarByComid( @Param("create_time") long create_time, @Param("comid")int comid);
+    List<HashMap<String,Object>> getRankByout(@Param("end_time") long create_time, @Param("comid")int comid);
+    double getElectronicPaybc(@Param("create_time") long create_time, @Param("comid")int comid);
+    double getCashPaybc(@Param("create_time") long create_time, @Param("comid")int comid);
+    double getReduceAmountbc(@Param("create_time") long create_time, @Param("comid")int comid);
+    int getEntryCountbc(@Param("create_time") long create_time, @Param("comid")int comid);
+    int getExitCountbc(@Param("end_time") long end_time, @Param("comid")int comid);
+    int getInparkCountbc(@Param("create_time") long create_time,@Param("comid")int comid);
+    int getBerthTotalbc(@Param("comid") int comid);
 }

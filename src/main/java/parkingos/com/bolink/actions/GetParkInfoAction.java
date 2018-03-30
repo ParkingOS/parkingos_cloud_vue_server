@@ -19,9 +19,17 @@ public class GetParkInfoAction {
     @Autowired
     private GetParkInfoService getParkInfoService;
     @RequestMapping(value = "/bygroupid")
-    public String getNicknameById(HttpServletRequest request, HttpServletResponse resp){
+    public String getInfoById(HttpServletRequest request, HttpServletResponse resp){
         int groupid = RequestUtil.getInteger(request,"groupid",0);
        String  ret=getParkInfoService.getInfo(groupid);
+
+        StringUtils.ajaxOutput(resp,ret);
+        return null;
+    }
+    @RequestMapping(value = "/bycomid")
+    public String getInfoBycomId(HttpServletRequest request, HttpServletResponse resp){
+        int comid = RequestUtil.getInteger(request,"comid",0);
+        String  ret=getParkInfoService.getInfoByComid(comid);
 
         StringUtils.ajaxOutput(resp,ret);
         return null;

@@ -36,7 +36,7 @@
     </select>
     <!--获取车场收费排行-->
     <select id="getParkRank"  resultType="map">
-    select sum(a.cash_pay+a.electronic_pay) AS "total" ,
+    select COALESCE(sum(a.cash_pay+a.electronic_pay),0) AS "total" ,
     b.company_name AS "parkName"
     from order_tb a ,com_info_tb b
     where a.comid=b.id
@@ -48,27 +48,27 @@
     </select>
    <!--获取总的车位-->
     <select id="getBerthTotal" parameterType="int" resultType="java.lang.Integer">
-        select sum(a.parking_total) AS "parkingtotal"
+        select COALESCE(sum(a.parking_total),0) AS "parkingtotal"
         from com_info_tb a
         where a.groupid = #{groupid,jdbcType=BIGINT}
     </select>
    <!--获取今日电子收费-->
     <select id="getElectronicPay"  resultType="java.lang.Double">
-        select sum(a.electronic_pay) AS "electronic_pay"
+        select COALESCE(sum(a.electronic_pay),0 )AS "electronic_pay"
         from order_tb a
         where a.create_time > #{create_time,jdbcType=BIGINT}
         and a.groupid= #{groupid,jdbcType=BIGINT}
     </select>
     <!--获取今日现金收费-->
     <select id="getCashPay"  resultType="java.lang.Double">
-        select sum(a.cash_pay) cash_pay
+        select COALESCE(sum(a.cash_pay),0) cash_pay
         from order_tb a
         where a.create_time > #{create_time,jdbcType=BIGINT}
         and a.groupid= #{groupid,jdbcType=BIGINT}
     </select>
     <!--获取今日减免-->
     <select id="getReduceAmount"  resultType="java.lang.Double">
-        select sum(a.reduce_amount) reduce_amount
+        select COALESCE(sum(a.reduce_amount),0) reduce_amount
         from order_tb a
         where a.create_time > #{create_time,jdbcType=BIGINT}
         and a.groupid= #{groupid,jdbcType=BIGINT}
@@ -89,7 +89,7 @@
     </select>
     <!--获取今日在场总数-->
     <select id="getInparkCount"  resultType="java.lang.Integer">
-        select count(id) outCars
+        select count(id) inPark
         from order_tb a
         where a.create_time > #{create_time,jdbcType=BIGINT}
         and end_time is null
@@ -106,11 +106,122 @@
     <!--根据车场id查询登录信息-->
     <select id="getParkLogin"  resultType="map">
         select a.login_time logintime,
-        a.beat_time beattime
+        a.beat_time beattime,
+        a.local_id AS "localid"
         from park_token_tb a
         where
         a.park_id= #{parkid,jdbcType=VARCHAR}
         order by a.login_time desc
 
     </select>
+    <!--根据grouid查询抬杆异常信息-->
+    <select id="getExpByGid"  resultType="map">
+select count(a.id) total,
+b.company_name AS "parkName"
+from lift_rod_tb a
+left join com_info_tb b ON
+a.comid = b.id where b.groupid= #{groupid,jdbcType=BIGINT}
+GROUP BY b.company_name ORDER BY total desc;
+    </select>
+    <!--=============================================================-->
+    <!--获取入场车辆-->
+    <select id="getEntryCarByComid"  resultType="map">
+        <![CDATA[
+    select
+    a.car_number AS "cartId",
+    a.create_time AS "timemills",
+    a.in_passid AS "inpass"
+    from order_tb a
+    where
+    a.create_time > #{create_time,jdbcType=BIGINT}
+    and a.comid= #{comid,jdbcType=BIGINT}
+    and a.end_time is NULL
+    ORDER BY a.create_time DESC
+    limit  5
+    ]]>
+    </select>
+    <!--获取出场车辆数据-->
+    <select id="getExitCarByComid"  resultType="map">
+        <![CDATA[
+        select
+    a.car_number AS "cartId",
+    a.end_time AS "timemills",
+    a.out_passid AS "outpass"
+    from order_tb a
+    where
+         a.end_time > #{create_time,jdbcType=BIGINT}
+        and a.comid = #{comid,jdbcType=BIGINT}
+        ORDER BY a.end_time ASC
+        limit  5
+        ]]>
+    </select>
+
+    <!--获取岗亭收费排行-->
+    <select id="getRankByout"  resultType="map">
+        <![CDATA[
+        select
+    a.car_number AS "cartId",
+    a.end_time AS "timemills",
+    a.out_passid AS "outpass"
+    from order_tb a
+    where
+         a.end_time > #{end_time,jdbcType=BIGINT}
+        and a.comid = #{comid,jdbcType=BIGINT}
+        ORDER BY a.end_time ASC
+        limit  5
+        ]]>
+    </select>
+
+    <!--获取今日电子收费-->
+    <select id="getElectronicPaybc"  resultType="java.lang.Double">
+        select COALESCE(sum(a.electronic_pay),0 )AS "electronic_pay"
+        from order_tb a
+        where a.create_time > #{create_time,jdbcType=BIGINT}
+        and a.comid= #{comid,jdbcType=BIGINT}
+    </select>
+    <!--获取今日现金收费-->
+    <select id="getCashPaybc"  resultType="java.lang.Double">
+        select COALESCE(sum(a.cash_pay),0) cash_pay
+        from order_tb a
+        where a.create_time > #{create_time,jdbcType=BIGINT}
+        and a.comid= #{comid,jdbcType=BIGINT}
+    </select>
+    <!--获取今日减免-->
+    <select id="getReduceAmountbc"  resultType="java.lang.Double">
+        select COALESCE(sum(a.reduce_amount),0) reduce_amount
+        from order_tb a
+        where a.create_time > #{create_time,jdbcType=BIGINT}
+        and a.comid= #{comid,jdbcType=BIGINT}
+  </select>
+
+    <!--获取今日进场总数-->
+    <select id="getEntryCountbc"  resultType="java.lang.Integer">
+        select count(id) inCars
+        from order_tb a
+        where a.create_time > #{create_time,jdbcType=BIGINT}
+       and a.comid= #{comid,jdbcType=BIGINT}
+    </select>
+    <!--获取今日离场总数-->
+    <select id="getExitCountbc"  resultType="java.lang.Integer">
+        select count(id) outCars
+        from order_tb a
+        where a.end_time > #{end_time,jdbcType=BIGINT}
+        and a.comid= #{comid,jdbcType=BIGINT}
+    </select>
+    <!--获取今日在场总数-->
+    <select id="getInparkCountbc"  resultType="java.lang.Integer">
+        select count(id) inPark
+        from order_tb a
+        where a.create_time > #{create_time,jdbcType=BIGINT}
+        and end_time is null
+        and a.comid= #{comid,jdbcType=BIGINT}
+    </select>
+
+    <!--获取总的车位-->
+    <select id="getBerthTotalbc" parameterType="int" resultType="java.lang.Integer">
+        select COALESCE(sum(a.parking_total),0) AS "parkingtotal"
+        from com_info_tb a
+        where a.id= #{comid,jdbcType=BIGINT}
+    </select>
+
 </mapper>

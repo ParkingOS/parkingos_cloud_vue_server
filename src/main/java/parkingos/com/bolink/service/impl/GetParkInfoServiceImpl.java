@@ -1,12 +1,10 @@
 package parkingos.com.bolink.service.impl;
 
 import com.alibaba.fastjson.JSON;
-import com.mongodb.util.Hash;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import parkingos.com.bolink.dao.mybatis.mapper.ParkInfoMapper;
 import parkingos.com.bolink.service.GetParkInfoService;
-
 import java.text.SimpleDateFormat;
 import java.util.*;
 
@@ -14,7 +12,6 @@ import java.util.*;
 public class GetParkInfoServiceImpl implements GetParkInfoService {
     @Autowired
     private ParkInfoMapper parkInfoMapper;
-
     @Override
     public String getInfo(int groupid) {
         HashMap<String, Object> retMap = new HashMap<String, Object>();
@@ -31,9 +28,18 @@ public class GetParkInfoServiceImpl implements GetParkInfoService {
         parseTmtoDate(outCarList);
         int berthtotal = parkInfoMapper.getBerthTotal(groupid);
         //获取今日电子支付，现金支付，减免金额的统计
-        double cashPay = parkInfoMapper.getCashPay(tday, groupid);
-        double electronicPay = parkInfoMapper.getElectronicPay(tday, groupid);
-        double reduceamount = parkInfoMapper.getReduceAmount(tday, groupid);
+        Double cashPay  = parkInfoMapper.getCashPay(tday, groupid);
+        Double electronicPay = parkInfoMapper.getElectronicPay(tday, groupid);
+        Double reduceamount = parkInfoMapper.getReduceAmount(tday, groupid);
+        if(cashPay == null){
+            cashPay=0d;
+        }
+        if(electronicPay == null){
+            electronicPay=0d;
+        }
+        if(reduceamount == null){
+            reduceamount=0d;
+        }
         HashMap<String, Object> cashPaymap = new HashMap<String, Object>();
         HashMap<String, Object> electronicPaymap = new HashMap<String, Object>();
         HashMap<String, Object> reduceamap = new HashMap<String, Object>();
@@ -69,6 +75,8 @@ public class GetParkInfoServiceImpl implements GetParkInfoService {
         berthPercentData.put("percent",parkOnpecent);
         //计算车场在线
         List<HashMap<String,Object>> parkState = getParkStatus(groupid);
+        //查询抬杆异常信息
+        List<HashMap<String,Object>> exceptionEvents = parkInfoMapper.getExpByGid(groupid);
         retMap.put("inPartData", entryCarList); //存入进场车辆
         retMap.put("outPartData", outCarList); //存入离场车辆
         retMap.put("totalIncomPie", totalIncomPie); //存入金额分类统计list
@@ -76,7 +84,84 @@ public class GetParkInfoServiceImpl implements GetParkInfoService {
         retMap.put("parkRank", parkRankList); //收入排行
         retMap.put("inOutCarsCount", countMap);//进出车统计
         retMap.put("berthPercentData", berthPercentData);//泊位使用率
-        retMap.put("parkState", parkState);
+        retMap.put("parkState", parkState); //车场状态
+        retMap.put("exceptionEvents", exceptionEvents);//车场异常信息
+        String result = JSON.toJSON(retMap).toString();
+        return result;
+    }
+
+    @Override
+    public String getInfoByComid(int comid) {
+        HashMap<String, Object> retMap = new HashMap<String, Object>();
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(new Date());
+        calendar.set(Calendar.HOUR_OF_DAY, 0);
+        calendar.set(Calendar.MINUTE, 0);
+        calendar.set(Calendar.SECOND, 0);
+        long tday = calendar.getTimeInMillis() / 1000;
+        //获取进场和离场数据
+        List<HashMap<String, Object>> entryCarList = parkInfoMapper.getEntryCarByComid(tday, comid);
+        List<HashMap<String, Object>> outCarList = parkInfoMapper.getExitCarByComid(tday, comid);
+        parseTmtoDate(entryCarList);
+        parseTmtoDate(outCarList);
+        int berthtotal = parkInfoMapper.getBerthTotalbc(comid);
+        //获取今日电子支付，现金支付，减免金额的统计
+        Double cashPay  = parkInfoMapper.getCashPaybc(tday, comid);
+        Double electronicPay = parkInfoMapper.getElectronicPaybc(tday, comid);
+        Double reduceamount = parkInfoMapper.getReduceAmountbc(tday, comid);
+        if(cashPay == null){
+            cashPay=0d;
+        }
+        if(electronicPay == null){
+            electronicPay=0d;
+        }
+        if(reduceamount == null){
+            reduceamount=0d;
+        }
+        HashMap<String, Object> cashPaymap = new HashMap<String, Object>();
+        HashMap<String, Object> electronicPaymap = new HashMap<String, Object>();
+        HashMap<String, Object> reduceamap = new HashMap<String, Object>();
+        HashMap<String, Object> totalIncomemap = new HashMap<String, Object>();
+        totalIncomemap.put("elePay", electronicPay);
+        totalIncomemap.put("cashPay", cashPay);
+        cashPaymap.put("name", "电子");
+        cashPaymap.put("value", electronicPay);
+        electronicPaymap.put("name", "现金");
+        electronicPaymap.put("value", cashPay);
+        reduceamap.put("name", "减免");
+        reduceamap.put("value", reduceamount);
+        List<HashMap<String, Object>> totalIncomPie = new ArrayList<HashMap<String, Object>>();
+        totalIncomPie.add(cashPaymap);
+        totalIncomPie.add(electronicPaymap);
+        totalIncomPie.add(reduceamap);
+        //获取收费排行数据
+        List<HashMap<String, Object>> parkRankList = parkInfoMapper.getRankByout(tday, comid);
+        //获取车辆进场，离场，在场的数量统计
+        int inCars = parkInfoMapper.getEntryCountbc(tday, comid);
+        int outCars = parkInfoMapper.getExitCountbc(tday, comid);
+        int inPark = parkInfoMapper.getInparkCountbc(tday, comid);
+        HashMap<String, Object> countMap = new HashMap<String, Object>();
+        countMap.put("inCars", inCars);
+        countMap.put("outCars", outCars);
+        countMap.put("inPark", inPark);
+        //计算泊位使用率
+        double parkOnpecent =  inPark*100/berthtotal ;
+        Calendar calendar1 = Calendar.getInstance();
+        int hour = calendar1.get(Calendar.HOUR_OF_DAY);
+        HashMap<String, Object> berthPercentData = new HashMap<String, Object>();
+        berthPercentData.put("time",hour);
+        berthPercentData.put("percent",parkOnpecent);
+        //计算车场在线
+        List<HashMap<String,Object>> parkState = getParkStatusbc(comid);
+
+        retMap.put("inPartData", entryCarList); //存入进场车辆
+        retMap.put("outPartData", outCarList); //存入离场车辆
+        retMap.put("totalIncomPie", totalIncomPie); //存入金额分类统计list
+        retMap.put("totalIncome", totalIncomemap);//今日收入统计
+        retMap.put("parkRank", parkRankList); //收入排行
+        retMap.put("inOutCarsCount", countMap);//进出车统计
+        retMap.put("berthPercentData", berthPercentData);//泊位使用率
+        retMap.put("parkState", parkState);//在线状态
         String result = JSON.toJSON(retMap).toString();
         return result;
     }
@@ -137,6 +222,34 @@ public class GetParkInfoServiceImpl implements GetParkInfoService {
         return parkState;
     }
 
+    private List<HashMap<String, Object>> getParkStatusbc(int parkid) {
+        List<HashMap<String,Object>> parkState = new ArrayList<HashMap<String,Object>>();
+                HashMap<String,Object> parkstatusmap = new  HashMap<String,Object>();
+                List<HashMap<String, Object>> parkLoginList = parkInfoMapper.getParkLogin(parkid + "");
+                if (parkLoginList != null && parkLoginList.size() > 0) {
+                    HashMap<String, Object> loginmap = parkLoginList.get(0);
+                    Long beattime = (Long) loginmap.get("beattime");
+                    Long logintime = (Long) loginmap.get("logintime");
+                    boolean isonline = false;
+                    if(beattime!=null) {
+                        //心跳在60秒内证明在线
+                        isonline=isParkOnline(beattime.longValue(),60);
+
+                        if(!isonline){
+                            isonline=isParkOnline(logintime.longValue(),10);
+                        }
+                    }
+                    if(isonline){
+                        parkstatusmap.put("state",1);
+                    }else{
+                        parkstatusmap.put("state",0);
+                    }
+                }else{
+                    parkstatusmap.put("state",0);
+                }
+                parkState.add(parkstatusmap);
+        return parkState;
+    }
     /**
      * 判断车场是否在线
      * @param time
