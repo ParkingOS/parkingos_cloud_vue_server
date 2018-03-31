@@ -1,14 +1,20 @@
 package parkingos.com.bolink.service.impl;
 
+import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import parkingos.com.bolink.dao.spring.CommonDao;
+import parkingos.com.bolink.enums.FieldOperator;
 import parkingos.com.bolink.models.SyncInfoPoolTb;
 import parkingos.com.bolink.models.UserInfoTb;
+import parkingos.com.bolink.models.UserRoleTb;
+import parkingos.com.bolink.qo.PageOrderConfig;
+import parkingos.com.bolink.qo.SearchBean;
 import parkingos.com.bolink.service.GroupMemberService;
 import parkingos.com.bolink.service.SupperSearchService;
+import parkingos.com.bolink.utils.OrmUtil;
 import parkingos.com.bolink.utils.StringUtils;
 
 import java.util.ArrayList;
@@ -29,12 +35,74 @@ public class GroupMemberServiceImpl implements GroupMemberService {
     public JSONObject selectResultByConditions(Map<String, String> reqmap) {
 
 
+        String str = "{\"total\":0,\"page\":1,\"rows\":[]}";
+        JSONObject result = JSONObject.parseObject(str);
+
         UserInfoTb userInfoTb = new UserInfoTb();
         userInfoTb.setGroupid(Long.parseLong(reqmap.get("groupid")));
         userInfoTb.setState(0);
 
-        JSONObject result = supperSearchService.supperSearch(userInfoTb,reqmap);
+        System.out.println("=====:"+reqmap.get("oid"));
 
+
+        UserRoleTb userRoleTb = new UserRoleTb();
+        userRoleTb.setState(0);
+        userRoleTb.setOid(Long.parseLong(reqmap.get("oid")));
+        PageOrderConfig pageOrderConfig = new PageOrderConfig();
+        pageOrderConfig.setPageInfo(null,null);
+        List<UserRoleTb> userRoleList = commonDao.selectListByConditions(userRoleTb,pageOrderConfig);
+        List roleIdList = new ArrayList();
+        for(UserRoleTb userRoleTb1 :userRoleList){
+            roleIdList.add(userRoleTb1.getId());
+        }
+
+        int count = 0;
+        List<UserInfoTb> list =null;
+        List<Map<String, Object>> resList =new ArrayList<>();
+
+        Map searchMap = supperSearchService.getBaseSearch(userInfoTb,reqmap);
+        logger.info(searchMap);
+        if(searchMap!=null&&!searchMap.isEmpty()){
+            UserInfoTb baseQuery =(UserInfoTb)searchMap.get("base");
+            List<SearchBean> supperQuery = null;
+            if(searchMap.containsKey("supper"))
+                supperQuery = (List<SearchBean>)searchMap.get("supper");
+            PageOrderConfig config = null;
+            if(searchMap.containsKey("config"))
+                config = (PageOrderConfig)searchMap.get("config");
+
+
+            //封装searchbean  城市和集团下所有车场
+            SearchBean searchBean = new SearchBean();
+            searchBean.setOperator(FieldOperator.CONTAINS);
+            searchBean.setFieldName("role_id");
+            searchBean.setBasicValue(roleIdList);
+
+            if (supperQuery == null) {
+                supperQuery = new ArrayList<>();
+            }
+            supperQuery.add( searchBean );
+
+            count = commonDao.selectCountByConditions(baseQuery,supperQuery);
+            if(count>0){
+                list = commonDao.selectListByConditions(baseQuery,supperQuery,config);
+                if (list != null && !list.isEmpty()) {
+                    for (UserInfoTb userInfoTb1 : list) {
+                        OrmUtil<UserInfoTb> otm = new OrmUtil<>();
+                        Map<String, Object> map = otm.pojoToMap(userInfoTb1);
+                        resList.add(map);
+                    }
+                    result.put("rows", JSON.toJSON(resList));
+                }
+            }
+        }
+        result.put("total",count);
+        result.put("page",Integer.parseInt(reqmap.get("page")));
+        logger.error("============>>>>>返回数据"+result);
+        return result;
+
+//        JSONObject result = supperSearchService.supperSearch(userInfoTb,reqmap);
+//
 //        List<UserInfoTb> userlist = JSON.parseArray(result.get("rows").toString(), UserInfoTb.class);
 //        List<Map<String, Object>> resList =new ArrayList<>();
 //        for(UserInfoTb userInfoTb1 :userlist){
@@ -56,8 +124,8 @@ public class GroupMemberServiceImpl implements GroupMemberService {
 //            }
 //        }
 //        result.remove("rows");
-//        result.put("rows",JSON.toJSON(resList));
-        return result;
+//        result.put("rows", JSON.toJSON(resList));
+//        return result;
 
     }
 
@@ -158,14 +226,10 @@ public class GroupMemberServiceImpl implements GroupMemberService {
         if(reqParameterMap.get("cityid")!=null&&!"undefined".equals(reqParameterMap.get("cityid"))&&!"".equals(reqParameterMap.get("cityid"))){
             cityid = Long.parseLong(reqParameterMap.get("cityid"));
         }
-        if(auth_flag==1){//总后台设置的管理员，默认为后台车场管理员
-            role_id=30L;
-        }else if(auth_flag==-1)
-            auth_flag=2L;
-        if(role_id == 30){
-            auth_flag = 1L;
-        }
 
+        if(groupId!=-1&&role_id==-1){//运营商直接添加员工,没有角色,默认管理员
+            role_id = 26L;
+        }
         UserInfoTb user= new UserInfoTb();
         user.setId(nextid);
         user.setNickname(nickname);
@@ -186,7 +250,6 @@ public class GroupMemberServiceImpl implements GroupMemberService {
         logger.error("======>>>>>user"+user);
         int ret = commonDao.insert(user);
         if(ret==1){
-
             result.put("state",1);
             result.put("msg","增加成功");
             //不支持ETCPark,支持的话再加

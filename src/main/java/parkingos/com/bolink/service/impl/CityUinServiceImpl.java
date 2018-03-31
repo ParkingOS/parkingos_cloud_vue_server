@@ -24,6 +24,13 @@ public class CityUinServiceImpl implements CityUinService {
     @Override
     public JSONObject createCity(String name, String union_id, String ukey) {
         JSONObject result = new JSONObject();
+
+        if("".equals(name)||"".equals(ukey)||"".equals(union_id)){
+            result.put("state",0);
+            result.put("msg","添加失败");
+            return result;
+        }
+
         OrgCityMerchants orgCityMerchants = new OrgCityMerchants();
         Long id = commonDao.selectSequence(OrgCityMerchants.class);
         orgCityMerchants.setId(id);
@@ -36,7 +43,7 @@ public class CityUinServiceImpl implements CityUinService {
 
             UserInfoTb userInfotb = new UserInfoTb();
             userInfotb.setCityid(id);
-            userInfotb.setStrid("liuyang");
+            userInfotb.setStrid("zhaoshuyu");
             userInfotb.setNickname(name+"管理员");
             userInfotb.setRoleId(29L);
             userInfotb.setRegTime(System.currentTimeMillis()/1000);

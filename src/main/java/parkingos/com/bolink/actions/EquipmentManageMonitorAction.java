@@ -90,7 +90,7 @@ public class EquipmentManageMonitorAction {
 	public String update(HttpServletRequest request, HttpServletResponse response) {
 
 		Long id = RequestUtil.getLong(request,"id",null);
-		Long name = RequestUtil.getLong(request,"name",null);
+		String name = RequestUtil.getString(request,"name");
 		//Long monitorId = RequestUtil.getLong(request,"monitor_id",null);
 		Long channelId = RequestUtil.getLong(request,"channel_id",null);
 		Integer netStatus = RequestUtil.getInteger(request,"net_status",null);
@@ -105,6 +105,7 @@ public class EquipmentManageMonitorAction {
 		monitorInfoTb.setId(id);
 		//monitorInfoTb.setMonitorId(monitorId);
 		monitorInfoTb.setChannelId(channelId);
+		monitorInfoTb.setName(name);
 		monitorInfoTb.setNetStatus(netStatus);
 		monitorInfoTb.setIsShow(isShow);
 		monitorInfoTb.setShowOrder(showOrder);

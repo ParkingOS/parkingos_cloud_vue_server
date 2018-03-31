@@ -200,13 +200,13 @@ public class CityParkServiceImpl implements CityParkService {
         comInfoTb.setBolinkId(bolinkid);
 
         if(id==-1){
-            if(groupId==null||groupId==-1){
-                groupId = RequestUtil.getLong(request,"group_id",-1L);
-                if(groupId==null||groupId==-1){
-                    result.put("msg","请选择运营集团");
-                    return result;
-                }
-            }
+//            if(groupId==null||groupId==-1){
+//                groupId = RequestUtil.getLong(request,"group_id",-1L);
+//                if(groupId==null||groupId==-1){
+//                    result.put("msg","请选择运营集团");
+//                    return result;
+//                }
+//            }
             //获取id
             Long comid = commonDao.selectSequence(ComInfoTb.class);
             comInfoTb.setId(comid);

@@ -1,13 +1,19 @@
 package parkingos.com.bolink.service.impl;
 
+import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import parkingos.com.bolink.dao.spring.CommonDao;
+import parkingos.com.bolink.enums.FieldOperator;
 import parkingos.com.bolink.models.UserInfoTb;
+import parkingos.com.bolink.models.UserRoleTb;
+import parkingos.com.bolink.qo.PageOrderConfig;
+import parkingos.com.bolink.qo.SearchBean;
 import parkingos.com.bolink.service.CityMemberService;
 import parkingos.com.bolink.service.SupperSearchService;
+import parkingos.com.bolink.utils.OrmUtil;
 import parkingos.com.bolink.utils.StringUtils;
 
 import java.util.ArrayList;
@@ -27,14 +33,78 @@ public class CityMemberServiceImpl implements CityMemberService {
     @Override
     public JSONObject selectResultByConditions(Map<String, String> reqmap) {
 
+        String str = "{\"total\":0,\"page\":1,\"rows\":[]}";
+        JSONObject result = JSONObject.parseObject(str);
 
         UserInfoTb userInfoTb = new UserInfoTb();
-        userInfoTb.setCityid(Long.parseLong(reqmap.get("cityid")));
+        userInfoTb.setCityid((Long.parseLong(reqmap.get("cityid"))));
         userInfoTb.setState(0);
 
-        JSONObject result = supperSearchService.supperSearch(userInfoTb,reqmap);
+        System.out.println("=====:"+reqmap.get("oid"));
 
+
+        UserRoleTb userRoleTb = new UserRoleTb();
+        userRoleTb.setState(0);
+        userRoleTb.setOid(Long.parseLong(reqmap.get("oid")));
+        PageOrderConfig pageOrderConfig = new PageOrderConfig();
+        pageOrderConfig.setPageInfo(null,null);
+        List<UserRoleTb> userRoleList = commonDao.selectListByConditions(userRoleTb,pageOrderConfig);
+        List roleIdList = new ArrayList();
+        for(UserRoleTb userRoleTb1 :userRoleList){
+            roleIdList.add(userRoleTb1.getId());
+        }
+
+        int count = 0;
+        List<UserInfoTb> list =null;
+        List<Map<String, Object>> resList =new ArrayList<>();
+
+        Map searchMap = supperSearchService.getBaseSearch(userInfoTb,reqmap);
+        logger.info(searchMap);
+        if(searchMap!=null&&!searchMap.isEmpty()){
+            UserInfoTb baseQuery =(UserInfoTb)searchMap.get("base");
+            List<SearchBean> supperQuery = null;
+            if(searchMap.containsKey("supper"))
+                supperQuery = (List<SearchBean>)searchMap.get("supper");
+            PageOrderConfig config = null;
+            if(searchMap.containsKey("config"))
+                config = (PageOrderConfig)searchMap.get("config");
+
+
+            //封装searchbean  城市和集团下所有车场
+            SearchBean searchBean = new SearchBean();
+            searchBean.setOperator(FieldOperator.CONTAINS);
+            searchBean.setFieldName("role_id");
+            searchBean.setBasicValue(roleIdList);
+
+            if (supperQuery == null) {
+                supperQuery = new ArrayList<>();
+            }
+            supperQuery.add( searchBean );
+
+            count = commonDao.selectCountByConditions(baseQuery,supperQuery);
+            if(count>0){
+                list = commonDao.selectListByConditions(baseQuery,supperQuery,config);
+                if (list != null && !list.isEmpty()) {
+                    for (UserInfoTb userInfoTb1 : list) {
+                        OrmUtil<UserInfoTb> otm = new OrmUtil<>();
+                        Map<String, Object> map = otm.pojoToMap(userInfoTb1);
+                        resList.add(map);
+                    }
+                    result.put("rows", JSON.toJSON(resList));
+                }
+            }
+        }
+        result.put("total",count);
+        result.put("page",Integer.parseInt(reqmap.get("page")));
+        logger.error("============>>>>>返回数据"+result);
         return result;
+//        UserInfoTb userInfoTb = new UserInfoTb();
+//        userInfoTb.setCityid(Long.parseLong(reqmap.get("cityid")));
+//        userInfoTb.setState(0);
+//
+//        JSONObject result = supperSearchService.supperSearch(userInfoTb,reqmap);
+//
+//        return result;
 
     }
 
@@ -89,6 +159,7 @@ public class CityMemberServiceImpl implements CityMemberService {
             role_id = Long.parseLong(reqParameterMap.get("role_id"));
         }
 
+
         if("".equals(nickname)) nickname=null;
         if("".equals(mobile)) mobile=null;
         if("".equals(phone)) phone=null;
@@ -113,6 +184,11 @@ public class CityMemberServiceImpl implements CityMemberService {
             cityid = Long.parseLong(reqParameterMap.get("cityid"));
         }
         logger.error("cityid:"+cityid);
+
+
+        if(cityid!=-1&&role_id==-1){
+            role_id = 29L;
+        }
 
         UserInfoTb user= new UserInfoTb();
         user.setId(nextid);
