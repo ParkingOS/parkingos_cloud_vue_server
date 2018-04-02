@@ -155,6 +155,9 @@ public class CityParkServiceImpl implements CityParkService {
         }
 
         Long id = RequestUtil.getLong(request,"id",-1L);
+        Long cityid= RequestUtil.getLong(request,"cityid",-1L);
+
+        System.out.println("==============chenbowen:"+cityid);
         Long groupId = RequestUtil.getLong(request,"groupid",-1L);
         String company =StringUtils.decodeUTF8(RequestUtil.processParams(request, "company_name"));
         company = company.replace("\r", "").replace("\n", "");
@@ -211,6 +214,7 @@ public class CityParkServiceImpl implements CityParkService {
             Long comid = commonDao.selectSequence(ComInfoTb.class);
             comInfoTb.setId(comid);
             comInfoTb.setGroupid(groupId);
+            comInfoTb.setCityid(cityid);
             //添加自动生成车场16位秘钥的逻辑
             String ukey = StringUtils.createRandomCharData(16);
             comInfoTb.setUkey(ukey);

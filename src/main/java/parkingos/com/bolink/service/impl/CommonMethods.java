@@ -1077,7 +1077,7 @@ public class CommonMethods {
 					else
 						preParams += ","+groupid;
 				}
-				sql += " and groupid in ("+preParams+") ";
+				sql += " and groupid in ("+preParams+") or cityid = "+ cityid;
 				System.out.println("=========="+sql);
 				List<Map<String, Object>> list = commonDao.getObjectBySql(sql);
 				if(list != null && !list.isEmpty()){
