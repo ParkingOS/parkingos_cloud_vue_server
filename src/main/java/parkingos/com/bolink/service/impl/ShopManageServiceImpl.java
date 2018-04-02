@@ -6,6 +6,7 @@ import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import parkingos.com.bolink.dao.spring.CommonDao;
+import parkingos.com.bolink.models.ComInfoTb;
 import parkingos.com.bolink.models.ShopAccountTb;
 import parkingos.com.bolink.models.ShopTb;
 import parkingos.com.bolink.qo.PageOrderConfig;
@@ -86,6 +87,11 @@ public class ShopManageServiceImpl implements ShopManageService {
     }
 
     @Override
+    public int updateComSuperimposed(ComInfoTb comInfoTb) {
+        return commonDao.updateByPrimaryKey(comInfoTb);
+    }
+
+    @Override
     public String delete(HttpServletRequest request) {
         Long id = RequestUtil.getLong( request, "id", -1L );
         int delete = 0;
@@ -143,6 +149,8 @@ public class ShopManageServiceImpl implements ShopManageService {
         String mobile = RequestUtil.processParams( request, "mobile" );
         //String phone = RequestUtil.processParams( request, "phone" );
         Integer ticket_type = RequestUtil.getInteger( request, "ticket_type", 1 );
+        Integer handInputEnable = RequestUtil.getInteger( request, "hand_input_enable", 0 );
+        System.out.println("====是否可手输额度:"+handInputEnable);
         String default_limit = RequestUtil.getString( request, "default_limit" );
         double discount_percent = RequestUtil.getDouble( request, "discount_percent", 100.00 );//商户折扣/%
         double discount_money = RequestUtil.getDouble( request, "discount_money", 1.00 );//商户折扣---每小时/元
@@ -163,6 +171,7 @@ public class ShopManageServiceImpl implements ShopManageService {
         shopTb.setDiscountPercent( new BigDecimal( discount_percent ) );
         shopTb.setValiditeTime( validite_time );
         shopTb.setFreeMoney( new BigDecimal( free_money ) );
+        shopTb.setHandInputEnable(handInputEnable);
 
         shopTb.setComid( RequestUtil.getLong( request, "comid", -1L ) );
         int update = 0;

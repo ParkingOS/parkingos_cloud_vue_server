@@ -172,4 +172,21 @@ public class GetDataAction {
         StringUtils.ajaxOutput(resp,result);
         return null;
     }
+
+
+    /*
+*
+* 获得这个车场是不是支持叠加用券
+* */
+    @RequestMapping(value = "/getSuperimposed")
+    public String getSuperimposed(HttpServletRequest request, HttpServletResponse resp){
+        String comid = request.getParameter("comid");
+        if(comid==null||"".equals(comid)){
+            return null;
+        }
+        System.out.println("是不是支持叠加用券=====comid:"+comid);
+        String result = getDataService.getSuperimposed(comid);
+        StringUtils.ajaxOutput(resp,result);
+        return null;
+    }
 }

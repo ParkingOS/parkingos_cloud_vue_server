@@ -145,6 +145,17 @@ public class ComInfoTb {
 
     private String bolinkId;
 
+    private Integer superimposed;
+
+    public void setSuperimposed(Integer superimposed) {
+        this.superimposed = superimposed;
+    }
+
+    public Integer getSuperimposed() {
+
+        return superimposed;
+    }
+
     public Long getId() {
         return id;
     }
