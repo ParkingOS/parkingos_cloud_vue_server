@@ -5,6 +5,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import parkingos.com.bolink.dao.mybatis.mapper.ParkInfoMapper;
 import parkingos.com.bolink.service.GetParkInfoService;
+
+import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
@@ -26,7 +28,7 @@ public class GetParkInfoServiceImpl implements GetParkInfoService {
         List<HashMap<String, Object>> outCarList = parkInfoMapper.getExitCar(tday, Long.parseLong(groupid + ""));
         parseTmtoDate(entryCarList);
         parseTmtoDate(outCarList);
-        int berthtotal = parkInfoMapper.getBerthTotal(groupid);
+        int parkingtotal = parkInfoMapper.getBerthTotal(groupid);
         //获取今日电子支付，现金支付，减免金额的统计
         Double cashPay  = parkInfoMapper.getCashPay(tday, groupid);
         Double electronicPay = parkInfoMapper.getElectronicPay(tday, groupid);
@@ -68,15 +70,16 @@ public class GetParkInfoServiceImpl implements GetParkInfoService {
         countMap.put("outCars", outCars);
         countMap.put("inPark", inPark);
         //计算泊位使用率
+        DecimalFormat df = new DecimalFormat("0.0000");
         double parkOnpecent=0d;
         if(inPark !=0){
-            parkOnpecent =  inPark*100/berthtotal ;
+            parkOnpecent =  (float)inPark*100/parkingtotal ;
         }
         Calendar calendar1 = Calendar.getInstance();
         int hour = calendar1.get(Calendar.HOUR_OF_DAY);
         HashMap<String, Object> berthPercentData = new HashMap<String, Object>();
         berthPercentData.put("time",hour);
-        berthPercentData.put("percent",parkOnpecent);
+        berthPercentData.put("percent",df.format(parkOnpecent));
         //计算车场在线
         List<HashMap<String,Object>> parkState = getParkStatus(groupid);
         //查询抬杆异常信息
@@ -151,14 +154,15 @@ public class GetParkInfoServiceImpl implements GetParkInfoService {
         countMap.put("inPark", inPark);
         //计算泊位使用率
         double parkOnpecent=0d;
+        DecimalFormat df = new DecimalFormat("0.0000");
         if(inPark !=0){
-            parkOnpecent =  inPark*100/berthtotal ;
+            parkOnpecent =  (float)inPark*100/berthtotal ;
         }
         Calendar calendar1 = Calendar.getInstance();
         int hour = calendar1.get(Calendar.HOUR_OF_DAY);
         HashMap<String, Object> berthPercentData = new HashMap<String, Object>();
         berthPercentData.put("time",hour);
-        berthPercentData.put("percent",parkOnpecent);
+        berthPercentData.put("percent",df.format(parkOnpecent));
         //计算车场在线
         List<HashMap<String,Object>> parkState = getParkStatusbc(comid);
         List<HashMap<String,Object>> exceptionEvents = getExceptions(comid,"comid",tday);
