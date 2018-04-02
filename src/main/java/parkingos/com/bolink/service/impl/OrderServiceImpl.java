@@ -76,7 +76,7 @@ public class OrderServiceImpl implements OrderService {
             blank = 0;
         }
 
-        //查询一个月的数据显示
+        //查询三天的数据显示
         logger.error("=========..req"+reqmap.size());
         OrderTb orderTb = new OrderTb();
         orderTb.setComid(Long.parseLong(reqmap.get("comid")));
@@ -93,7 +93,7 @@ public class OrderServiceImpl implements OrderService {
         //组装 一个月 参数
         if(createTime==null||"undefined".equals(createTime)||"".equals(createTime)){
             reqmap.put("create_time","1");
-            reqmap.put("create_time_start",(System.currentTimeMillis()-30*86400*1000L)+"");
+            reqmap.put("create_time_start",(TimeTools.getToDayBeginTime()-2*86400)+"");
             logger.error("=========..req"+reqmap.size());
         }
         JSONObject result = supperSearchService.supperSearch(orderTb, reqmap);
