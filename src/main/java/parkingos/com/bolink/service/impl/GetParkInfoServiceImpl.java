@@ -46,6 +46,7 @@ public class GetParkInfoServiceImpl implements GetParkInfoService {
         HashMap<String, Object> totalIncomemap = new HashMap<String, Object>();
         totalIncomemap.put("elePay", electronicPay);
         totalIncomemap.put("cashPay", cashPay);
+        totalIncomemap.put("freePay", reduceamount);
         cashPaymap.put("name", "电子");
         cashPaymap.put("value", electronicPay);
         electronicPaymap.put("name", "现金");
@@ -67,7 +68,10 @@ public class GetParkInfoServiceImpl implements GetParkInfoService {
         countMap.put("outCars", outCars);
         countMap.put("inPark", inPark);
         //计算泊位使用率
-        double parkOnpecent =  inPark*100/berthtotal ;
+        double parkOnpecent=0d;
+        if(inPark !=0){
+            parkOnpecent =  inPark*100/berthtotal ;
+        }
         Calendar calendar1 = Calendar.getInstance();
         int hour = calendar1.get(Calendar.HOUR_OF_DAY);
         HashMap<String, Object> berthPercentData = new HashMap<String, Object>();
@@ -76,7 +80,7 @@ public class GetParkInfoServiceImpl implements GetParkInfoService {
         //计算车场在线
         List<HashMap<String,Object>> parkState = getParkStatus(groupid);
         //查询抬杆异常信息
-        List<HashMap<String,Object>> exceptionEvents = parkInfoMapper.getExpByGid(groupid);
+        List<HashMap<String,Object>> exceptionEvents = getExceptions(groupid,"groupid",tday);
         retMap.put("inPartData", entryCarList); //存入进场车辆
         retMap.put("outPartData", outCarList); //存入离场车辆
         retMap.put("totalIncomPie", totalIncomPie); //存入金额分类统计list
@@ -124,6 +128,7 @@ public class GetParkInfoServiceImpl implements GetParkInfoService {
         HashMap<String, Object> totalIncomemap = new HashMap<String, Object>();
         totalIncomemap.put("elePay", electronicPay);
         totalIncomemap.put("cashPay", cashPay);
+        totalIncomemap.put("freePay", reduceamount);
         cashPaymap.put("name", "电子");
         cashPaymap.put("value", electronicPay);
         electronicPaymap.put("name", "现金");
@@ -145,7 +150,10 @@ public class GetParkInfoServiceImpl implements GetParkInfoService {
         countMap.put("outCars", outCars);
         countMap.put("inPark", inPark);
         //计算泊位使用率
-        double parkOnpecent =  inPark*100/berthtotal ;
+        double parkOnpecent=0d;
+        if(inPark !=0){
+            parkOnpecent =  inPark*100/berthtotal ;
+        }
         Calendar calendar1 = Calendar.getInstance();
         int hour = calendar1.get(Calendar.HOUR_OF_DAY);
         HashMap<String, Object> berthPercentData = new HashMap<String, Object>();
@@ -153,6 +161,7 @@ public class GetParkInfoServiceImpl implements GetParkInfoService {
         berthPercentData.put("percent",parkOnpecent);
         //计算车场在线
         List<HashMap<String,Object>> parkState = getParkStatusbc(comid);
+        List<HashMap<String,Object>> exceptionEvents = getExceptions(comid,"comid",tday);
 
         retMap.put("inPartData", entryCarList); //存入进场车辆
         retMap.put("outPartData", outCarList); //存入离场车辆
@@ -162,10 +171,37 @@ public class GetParkInfoServiceImpl implements GetParkInfoService {
         retMap.put("inOutCarsCount", countMap);//进出车统计
         retMap.put("berthPercentData", berthPercentData);//泊位使用率
         retMap.put("parkState", parkState);//在线状态
+        retMap.put("exceptionEvents", exceptionEvents);//车场异常信息
         String result = JSON.toJSON(retMap).toString();
         return result;
     }
+   private List<HashMap<String,Object>> getExceptions(int id,String sflag,long ctime){
+       List<HashMap<String,Object>> exceptionEvents = new ArrayList<HashMap<String,Object>>();
+        if("comid".equals(sflag)){
+           exceptionEvents = parkInfoMapper.getExpByCid(id,ctime);
+        }else if("groupid".equals(sflag)){
+             exceptionEvents = parkInfoMapper.getExpByGid(id,ctime);
+        }
+       if(exceptionEvents!=null && exceptionEvents.size()>0){
+           SimpleDateFormat sdf = new SimpleDateFormat("HH:mm");
+           for (HashMap<String,Object> map:exceptionEvents){
+               Long uin =(Long) map.get("uid");
+               if(uin !=null) {
+                   String username = parkInfoMapper.getUserInfo(uin);
+                   if (username != null && "".equals(username))
+                       map.put("uid", username);
+               }
+               Long time = (Long) map.get("ctime");
+               if(time !=null) {
+                   Date date = new Date(time * 1000);
+                   map.put("time", sdf.format(date));
+                   map.remove("ctime");
+               }
+           }
 
+       }
+    return exceptionEvents;
+   }
     /**
      * 把从数据库查出的long时间秒值转为时间：分钟格式的时间字符串
      *
@@ -223,31 +259,34 @@ public class GetParkInfoServiceImpl implements GetParkInfoService {
     }
 
     private List<HashMap<String, Object>> getParkStatusbc(int parkid) {
-        List<HashMap<String,Object>> parkState = new ArrayList<HashMap<String,Object>>();
-                HashMap<String,Object> parkstatusmap = new  HashMap<String,Object>();
-                List<HashMap<String, Object>> parkLoginList = parkInfoMapper.getParkLogin(parkid + "");
-                if (parkLoginList != null && parkLoginList.size() > 0) {
-                    HashMap<String, Object> loginmap = parkLoginList.get(0);
-                    Long beattime = (Long) loginmap.get("beattime");
-                    Long logintime = (Long) loginmap.get("logintime");
-                    boolean isonline = false;
-                    if(beattime!=null) {
-                        //心跳在60秒内证明在线
-                        isonline=isParkOnline(beattime.longValue(),60);
+        List<HashMap<String, Object>> parkState = new ArrayList<HashMap<String, Object>>();
+        HashMap<String, Object> parkstatusmap = new HashMap<String, Object>();
+        List<HashMap<String, Object>> parkLoginList = parkInfoMapper.getParkLogin(parkid + "");
+        if (parkLoginList != null && parkLoginList.size() > 0) {
+            for (HashMap<String, Object> loginmap : parkLoginList){
+            Long beattime = (Long) loginmap.get("beattime");
+            Long logintime = (Long) loginmap.get("logintime");
+            String localid = (String) loginmap.get("localid");
+            boolean isonline = false;
+            if (beattime != null) {
+                //心跳在60秒内证明在线
+                isonline = isParkOnline(beattime.longValue(), 60);
 
-                        if(!isonline){
-                            isonline=isParkOnline(logintime.longValue(),10);
-                        }
-                    }
-                    if(isonline){
-                        parkstatusmap.put("state",1);
-                    }else{
-                        parkstatusmap.put("state",0);
-                    }
-                }else{
-                    parkstatusmap.put("state",0);
+                if (!isonline) {
+                    isonline = isParkOnline(logintime.longValue(), 10);
                 }
+            }
+            if (isonline) {
+                parkstatusmap.put("state", 1);
+                parkstatusmap.put("localid", localid);
+            } else {
+                parkstatusmap.put("state", 0);
+                parkstatusmap.put("localid", localid);
+            }
                 parkState.add(parkstatusmap);
+        }
+    }
+
         return parkState;
     }
     /**

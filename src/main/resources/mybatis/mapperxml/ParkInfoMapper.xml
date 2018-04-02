@@ -116,12 +116,16 @@
     </select>
     <!--根据grouid查询抬杆异常信息-->
     <select id="getExpByGid"  resultType="map">
-select count(a.id) total,
-b.company_name AS "parkName"
+select
+a.uin uin,
+a.pass_id passid,
+a.reason reason,
+a.ctime ctime
 from lift_rod_tb a
 left join com_info_tb b ON
 a.comid = b.id where b.groupid= #{groupid,jdbcType=BIGINT}
-GROUP BY b.company_name ORDER BY total desc;
+and a.ctime>#{ctime,jdbcType=BIGINT}
+ ORDER BY a.ctime desc;
     </select>
     <!--=============================================================-->
     <!--获取入场车辆-->
@@ -223,5 +227,24 @@ GROUP BY b.company_name ORDER BY total desc;
         from com_info_tb a
         where a.id= #{comid,jdbcType=BIGINT}
     </select>
-
+    <!--根据comid查询抬杆异常信息-->
+    <select id="getExpByCid"  resultType="map">
+        select
+        a.uin uid,
+        a.pass_id passid,
+        a.reason reason,
+        a.ctime ctime
+        from lift_rod_tb a
+       where a.comid= #{comid,jdbcType=BIGINT}
+       and a.ctime>#{ctime,jdbcType=BIGINT}
+        ORDER BY a.ctime desc;
+    </select>
+    <!--根据id查询用户信息-->
+    <select id="getUserInfo"  resultType="java.lang.String">
+        select
+        a.nickname nickname
+        from user_info_tb a
+        where a.id= #{id,jdbcType=BIGINT}
+        limit 1
+    </select>
 </mapper>

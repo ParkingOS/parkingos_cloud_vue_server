@@ -18,7 +18,8 @@ public interface ParkInfoMapper {
     int getInparkCount(@Param("create_time") long create_time,@Param("groupid")int groupid);
     List<HashMap<String,Object>> getParkIdByGroupId(@Param("groupid") int groupid);
     List<HashMap<String,Object>> getParkLogin(@Param("parkid")String parkid);
-    List<HashMap<String,Object>> getExpByGid(@Param("groupid") int groupid);
+    List<HashMap<String,Object>> getExpByGid(@Param("groupid") int groupid,@Param("ctime")long ctime);
+    List<HashMap<String,Object>> getExpByCid(@Param("comid") int comid,@Param("ctime")long ctime);
 
     List<HashMap<String,Object>> getEntryCarByComid(@Param("create_time") long create_time, @Param("comid")int comid );
     List<HashMap<String,Object>> getExitCarByComid( @Param("create_time") long create_time, @Param("comid")int comid);
@@ -30,4 +31,5 @@ public interface ParkInfoMapper {
     int getExitCountbc(@Param("end_time") long end_time, @Param("comid")int comid);
     int getInparkCountbc(@Param("create_time") long create_time,@Param("comid")int comid);
     int getBerthTotalbc(@Param("comid") int comid);
+    String getUserInfo(@Param("id") long id);
 }
