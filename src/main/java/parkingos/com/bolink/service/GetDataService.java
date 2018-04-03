@@ -25,4 +25,6 @@ public interface GetDataService {
     String getAllPackage(String groupid,String cityid);
 
     String getAllUnion(Long cityid);
+
+    String getSuperimposed(String comid);
 }

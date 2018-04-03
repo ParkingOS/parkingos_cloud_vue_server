@@ -4,7 +4,9 @@ import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
+import parkingos.com.bolink.models.ComInfoTb;
 import parkingos.com.bolink.service.ShopManageService;
+import parkingos.com.bolink.utils.RequestUtil;
 import parkingos.com.bolink.utils.StringUtils;
 
 import javax.servlet.http.HttpServletRequest;
@@ -55,7 +57,7 @@ public class ShopManageAction {
         return null;
     }
 
-    /**
+    /**changeSuperimposed
      * 删除
      */
     @RequestMapping("/delete")
@@ -63,6 +65,26 @@ public class ShopManageAction {
         String result = shopManageService.delete( request );
         logger.info( result );
         StringUtils.ajaxOutput( resp, result );
+        return null;
+    }
+
+
+
+    /**
+     * 删除
+     */
+    @RequestMapping("/changeSuperimposed")
+    public String changeSuperimposed(HttpServletRequest request, HttpServletResponse resp) {
+        //车场是否支持叠加用券  默认不支持
+        Integer superimposed = RequestUtil.getInteger(request,"superimposed",0);
+        Long comid = RequestUtil.getLong(request,"comid",-1L);
+        logger.info( "商户是否支持叠加用券"+superimposed+"   comid:"+comid );
+        ComInfoTb comInfoTb = new ComInfoTb();
+        comInfoTb.setId(comid);
+        comInfoTb.setSuperimposed(superimposed);
+        int count = shopManageService.updateComSuperimposed(comInfoTb);
+        logger.error("更改车场是否可叠加用券:"+count);
+        StringUtils.ajaxOutput( resp, count+"" );
         return null;
     }
 

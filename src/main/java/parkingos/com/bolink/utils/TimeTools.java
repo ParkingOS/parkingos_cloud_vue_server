@@ -385,6 +385,36 @@ public class TimeTools {
 	}
 
 	/*
+	* 获得本周一的开始时间
+	*
+	* */
+	public static Long getThisWeekBeginTime() {
+		Date date = new Date();
+		//本周的第几天
+		int now = date.getDay();
+
+		Calendar c = Calendar.getInstance();
+		c.add(Calendar.DAY_OF_MONTH, -(now-1));
+		SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+		String mDateTime = formatter.format(c.getTime());
+		String strStart = mDateTime.substring(0, 10);//
+		System.out.println("这周的开始时间:"+strStart);
+		Long weekMillion = getLongMilliSecondFrom_HHMMDD(strStart)/1000;
+		return weekMillion;
+	}
+
+	/*
+	* 获得今年的开始时间
+	* */
+	public static String getThisYearBeginTime() {
+		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+		String today = sdf.format(new Date());
+		today = today.substring(0, 4) + "-01-01 00:00:00";
+		return today;
+	}
+
+
+	/*
 	 * 获得传入日期的零点秒值
 	 * miliseconds毫秒数
 	 */

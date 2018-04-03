@@ -1,5 +1,7 @@
 package parkingos.com.bolink.service;
 
+import parkingos.com.bolink.models.ComInfoTb;
+
 import javax.servlet.http.HttpServletRequest;
 
 public interface ShopManageService {
@@ -10,4 +12,6 @@ public interface ShopManageService {
     String quickquery(HttpServletRequest req);
 
     String addMoney(HttpServletRequest request);
+
+    int updateComSuperimposed(ComInfoTb comInfoTb);
 }

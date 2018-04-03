@@ -71,7 +71,9 @@ public class ParkOrderanlysisServiceImpl implements ParkOrderAnlysisService {
         Long btime = null;
         Long etime = null;
         if(date==null||"".equals(date)){
-            btime = TimeTools.getToDayBeginTime()-86400*9;
+//            btime = TimeTools.getToDayBeginTime()-86400*6;
+            btime = TimeTools.getThisWeekBeginTime();
+            System.out.println("陈博文"+btime);
             etime =TimeTools.getToDayBeginTime()+86399;
         }else {
             String[] dateArr = date.split("至");

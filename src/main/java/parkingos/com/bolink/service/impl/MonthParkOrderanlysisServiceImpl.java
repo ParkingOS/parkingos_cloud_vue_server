@@ -48,7 +48,9 @@ public class MonthParkOrderanlysisServiceImpl implements MonthParkOrderAnlysisSe
         logger.info("======>>>btime:"+btime);
         logger.info("======>>>etime:"+etime);
         if (btime==null||"".equals(btime))
-            btime = nowtime;
+            btime = TimeTools.getThisYearBeginTime();
+            logger.info("======>>>chenbowen:"+btime);
+//            btime = nowtime;
         if (etime==null||"".equals(etime)) {
             Long nextMonth = TimeTools.getNextMonthStartMillis();
             etime = df2.format(nextMonth);

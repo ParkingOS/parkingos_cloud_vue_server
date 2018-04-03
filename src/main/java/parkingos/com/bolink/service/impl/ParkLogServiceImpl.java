@@ -39,13 +39,16 @@ public class ParkLogServiceImpl implements ParkLogService {
         String date = StringUtils.decodeUTF8(StringUtils.decodeUTF8(reqmap.get("date")));
         System.out.println("日期===="+date);
 
-        if (date == null) {
+        Long start = null;
+        Long end = null;
+        if (date == null||"".equals(date)) {
+            reqmap.put("operate_time","1");
+            reqmap.put("operate_time_start",(TimeTools.getToDayBeginTime())+"");
             result = supperSearchService.supperSearch(parkLogTb, reqmap);
         } else {
-
-            Long start = TimeTools.getLongMilliSecondFrom_HHMMDDHHmmss(date.split("至")[0]);
-            Long end = TimeTools.getLongMilliSecondFrom_HHMMDDHHmmss(date.split("至")[1]);
-//            System.out.println("开始时间和结束时间"+start+end);
+            start = TimeTools.getLongMilliSecondFrom_HHMMDDHHmmss(date.split("至")[0]);
+            end = TimeTools.getLongMilliSecondFrom_HHMMDDHHmmss(date.split("至")[1]);
+            System.out.println("开始时间和结束时间"+start+end);
             int count = 0;
             List<ParkLogTb> list = null;
             List<Map<String, Object>> resList = new ArrayList<>();

@@ -41,6 +41,8 @@ public class ShopTb {
 
     private Integer validiteTime;
 
+    private Integer handInputEnable;
+
     public Long getId() {
         return id;
     }
@@ -216,5 +218,13 @@ public class ShopTb {
 
     public void setValiditeTime(Integer validiteTime) {
         this.validiteTime = validiteTime;
+    }
+
+    public Integer getHandInputEnable() {
+        return handInputEnable;
+    }
+
+    public void setHandInputEnable(Integer handInputEnable) {
+        this.handInputEnable = handInputEnable;
     }
 }
