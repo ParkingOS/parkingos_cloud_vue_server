@@ -125,8 +125,8 @@
     <select id="getExpByGid"  resultType="map">
 select
 a.uin uin,
-a.pass_id passid,
-a.reason reason,
+a.out_channel_id passid,
+a.resume reason,
 a.ctime ctime
 from lift_rod_tb a
 left join com_info_tb b ON
@@ -244,9 +244,9 @@ and a.ctime>#{ctime,jdbcType=BIGINT}
     <!--根据comid查询抬杆异常信息-->
     <select id="getExpByCid"  resultType="map">
         select
-        a.uin uid,
-        a.pass_id passid,
-        a.reason reason,
+        a.uin uin,
+        a.out_channel_id passid,
+        a.resume reason,
         a.ctime ctime
         from lift_rod_tb a
        where a.comid= #{comid,jdbcType=BIGINT}

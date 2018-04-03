@@ -203,11 +203,11 @@ public class GetParkInfoServiceImpl implements GetParkInfoService {
        if(exceptionEvents!=null && exceptionEvents.size()>0){
            SimpleDateFormat sdf = new SimpleDateFormat("HH:mm");
            for (HashMap<String,Object> map:exceptionEvents){
-               Long uin =(Long) map.get("uid");
+               Long uin =(Long) map.get("uin");
                if(uin !=null) {
                    String username = parkInfoMapper.getUserInfo(uin);
                    if (username != null && "".equals(username))
-                       map.put("uid", username);
+                       map.put("uin", username);
                }
                Long time = (Long) map.get("ctime");
                if(time !=null) {
