@@ -34,5 +34,6 @@ public interface ParkInfoMapper {
     String getUserInfo(@Param("id") long id);
     double getFreeAmount(@Param("create_time") long create_time, @Param("groupid")int groupid);
     double getFreeAmountbc(@Param("create_time") long create_time, @Param("comid")int comid);
+    List<HashMap<String,Object>> getBerthPercent(@Param("comidlist") List<HashMap<String,Object>> list,@Param("create_time") long create_time);
 
 }

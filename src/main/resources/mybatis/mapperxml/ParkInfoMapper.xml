@@ -172,12 +172,12 @@ and a.ctime>#{ctime,jdbcType=BIGINT}
         <![CDATA[
         select
     COALESCE(sum(a.cash_pay+a.electronic_pay),0) AS "total",
-    a.uid uid
+    a.out_uid uid
     from order_tb a
     where
     a.comid = #{comid,jdbcType=BIGINT}
     and  a.end_time > #{end_time,jdbcType=BIGINT}
-    group by a.uid
+    group by a.out_uid
     ORDER BY total desc
     limit  5
         ]]>
@@ -260,5 +260,19 @@ and a.ctime>#{ctime,jdbcType=BIGINT}
         from user_info_tb a
         where a.id= #{id,jdbcType=BIGINT}
         limit 1
+    </select>
+    <!--获取泊位率根据comid-->
+    <select id="getBerthPercent"  resultType="map">
+       select sum(share_count) asum,
+       sum(used_count) usum,
+       create_time
+      from park_anlysis_tb
+      where comid in
+        <foreach collection="comidlist" index="index" item="item" open="(" separator="," close=")">
+            #{item.parkid}
+        </foreach>
+        and create_time>#{create_time,jdbcType=BIGINT}
+      group by create_time
+      order by create_time asc;
     </select>
 </mapper>

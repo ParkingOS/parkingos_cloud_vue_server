@@ -72,6 +72,22 @@ public class GetParkInfoServiceImpl implements GetParkInfoService {
         countMap.put("outCars", outCars);
         countMap.put("inPark", inPark);
         //计算泊位使用率
+        List<HashMap<String,Object>> parkidList = parkInfoMapper.getParkIdByGroupId(groupid);
+        List<HashMap<String,Object>> ss =parkInfoMapper.getBerthPercent(parkidList,tday);
+        for(HashMap<String,Object> map :ss){
+            Long asum = (Long)map.get("asum");
+            Long usum = (Long) map.get("usum");
+            DecimalFormat df = new DecimalFormat("0.0000");
+            double pecent=0d;
+            if(usum !=0){
+                pecent =  (float)usum*100/asum ;
+            }
+            SimpleDateFormat sdf = new SimpleDateFormat("HH:mm");
+            long time = (long) map.get("create_time");
+            Date date = new Date(time * 1000);
+            map.put("time", sdf.format(date));
+            map.put("percent",df.format(pecent));
+        }
         DecimalFormat df = new DecimalFormat("0.0000");
         double parkOnpecent=0d;
         if(inPark !=0){
@@ -92,7 +108,7 @@ public class GetParkInfoServiceImpl implements GetParkInfoService {
         retMap.put("totalIncome", totalIncomemap);//今日收入统计
         retMap.put("parkRank", parkRankList); //收入排行
         retMap.put("inOutCarsCount", countMap);//进出车统计
-        retMap.put("berthPercentData", berthPercentData);//泊位使用率
+        retMap.put("berthPercentData", ss);//泊位使用率
         retMap.put("parkState", parkState); //车场状态
         retMap.put("exceptionEvents", exceptionEvents);//车场异常信息
         String result = JSON.toJSON(retMap).toString();
@@ -167,6 +183,25 @@ public class GetParkInfoServiceImpl implements GetParkInfoService {
         countMap.put("outCars", outCars);
         countMap.put("inPark", inPark);
         //计算泊位使用率
+        HashMap<String,Object> tempmap = new  HashMap<String,Object>();
+        List<HashMap<String,Object>> parkidList = new ArrayList<HashMap<String,Object>>();
+        tempmap.put("parkid",comid);
+        parkidList.add(tempmap);
+        List<HashMap<String,Object>> ss =parkInfoMapper.getBerthPercent(parkidList,tday);
+        for(HashMap<String,Object> map :ss){
+            Long asum = (Long)map.get("asum");
+            Long usum = (Long) map.get("usum");
+            DecimalFormat df = new DecimalFormat("0.0000");
+            double pecent=0d;
+            if(usum !=0){
+                pecent =  (float)usum*100/asum ;
+            }
+            SimpleDateFormat sdf = new SimpleDateFormat("HH:mm");
+            long time = (long) map.get("create_time");
+            Date date = new Date(time * 1000);
+            map.put("time", sdf.format(date));
+            map.put("percent",df.format(pecent));
+        }
         double parkOnpecent=0d;
         DecimalFormat df = new DecimalFormat("0.0000");
         if(inPark !=0){
@@ -187,7 +222,7 @@ public class GetParkInfoServiceImpl implements GetParkInfoService {
         retMap.put("totalIncome", totalIncomemap);//今日收入统计
         retMap.put("parkRank", parkRankList); //收入排行
         retMap.put("inOutCarsCount", countMap);//进出车统计
-        retMap.put("berthPercentData", berthPercentData);//泊位使用率
+        retMap.put("berthPercentData", ss);//泊位使用率
         retMap.put("parkState", parkState);//在线状态
         retMap.put("exceptionEvents", exceptionEvents);//车场异常信息
         String result = JSON.toJSON(retMap).toString();
