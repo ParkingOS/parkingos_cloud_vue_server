@@ -141,7 +141,7 @@ and a.ctime>#{ctime,jdbcType=BIGINT}
     select
     a.car_number AS "cartId",
     a.create_time AS "timemills",
-    a.in_passid AS "inpass"
+    a.in_passid AS "parkName"
     from order_tb a
     where
     a.create_time > #{create_time,jdbcType=BIGINT}
@@ -157,7 +157,7 @@ and a.ctime>#{ctime,jdbcType=BIGINT}
         select
     a.car_number AS "cartId",
     a.end_time AS "timemills",
-    a.out_passid AS "outpass"
+    a.out_passid AS "parkName"
     from order_tb a
     where
          a.end_time > #{create_time,jdbcType=BIGINT}
