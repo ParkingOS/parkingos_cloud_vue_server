@@ -150,10 +150,11 @@ public class GetParkInfoServiceImpl implements GetParkInfoService {
         if(parkRankList !=null && parkRankList.size()>0){
             for (HashMap<String, Object> map:parkRankList){
                 Long uin =(Long) map.get("uid");
+                map.put("parkName", uin);
                 if(uin !=null) {
                     String username = parkInfoMapper.getUserInfo(uin);
                     if (username != null && "".equals(username))
-                        map.put("uid", username);
+                        map.put("parkName", username);
                 }
             }
         }

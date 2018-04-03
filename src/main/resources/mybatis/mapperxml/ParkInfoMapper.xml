@@ -230,7 +230,7 @@ and a.ctime>#{ctime,jdbcType=BIGINT}
         select count(id) inPark
         from order_tb a
         where a.create_time > #{create_time,jdbcType=BIGINT}
-        and end_time is null
+        and state =0
         and a.comid= #{comid,jdbcType=BIGINT}
     </select>
 
