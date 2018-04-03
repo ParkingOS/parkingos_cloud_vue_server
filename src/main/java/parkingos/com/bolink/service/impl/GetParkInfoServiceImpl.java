@@ -153,7 +153,7 @@ public class GetParkInfoServiceImpl implements GetParkInfoService {
                 map.put("parkName", uin);
                 if(uin !=null) {
                     String username = parkInfoMapper.getUserInfo(uin);
-                    if (username != null && "".equals(username))
+                    if (username != null && !"".equals(username))
                         map.put("parkName", username);
                 }
             }
@@ -278,10 +278,10 @@ public class GetParkInfoServiceImpl implements GetParkInfoService {
 
     private List<HashMap<String, Object>> getParkStatusbc(int parkid) {
         List<HashMap<String, Object>> parkState = new ArrayList<HashMap<String, Object>>();
-        HashMap<String, Object> parkstatusmap = new HashMap<String, Object>();
         List<HashMap<String, Object>> parkLoginList = parkInfoMapper.getParkLogin(parkid + "");
         if (parkLoginList != null && parkLoginList.size() > 0) {
             for (HashMap<String, Object> loginmap : parkLoginList){
+                HashMap<String, Object> parkstatusmap = new HashMap<String, Object>();
             Long beattime = (Long) loginmap.get("beattime");
             Long logintime = (Long) loginmap.get("logintime");
             String localid = (String) loginmap.get("localid");
