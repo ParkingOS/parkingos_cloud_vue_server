@@ -73,6 +73,13 @@
         where a.create_time > #{create_time,jdbcType=BIGINT}
         and a.groupid= #{groupid,jdbcType=BIGINT}
     </select>
+    <select id="getFreeAmount"  resultType="java.lang.Double">
+        select COALESCE(sum(a.amount_receivable-a.electronic_prepay-a.cash_prepay-a.reduce_amount),0) free_amount
+        from order_tb a
+        where a.create_time > #{create_time,jdbcType=BIGINT}
+        and a.pay_type = 8
+        and a.groupid= #{groupid,jdbcType=BIGINT}
+    </select>
     <!--获取今日进场总数-->
     <select id="getEntryCount"  resultType="java.lang.Integer">
         select count(id) inCars
@@ -164,15 +171,14 @@ and a.ctime>#{ctime,jdbcType=BIGINT}
     <select id="getRankByout"  resultType="map">
         <![CDATA[
         select
-    a.car_number AS "cartId",
-    a.end_time AS "timemills",
-    a.out_passid AS "outpass"
+    COALESCE(sum(a.cash_pay+a.electronic_pay),0) AS "total"
     from order_tb a
     where
-         a.end_time > #{end_time,jdbcType=BIGINT}
-        and a.comid = #{comid,jdbcType=BIGINT}
-        ORDER BY a.end_time ASC
-        limit  5
+    a.comid = #{comid,jdbcType=BIGINT}
+    and  a.end_time > #{end_time,jdbcType=BIGINT}
+    group by a.out_uid
+    ORDER BY total desc
+    limit  5
         ]]>
     </select>
 
@@ -197,6 +203,13 @@ and a.ctime>#{ctime,jdbcType=BIGINT}
         where a.create_time > #{create_time,jdbcType=BIGINT}
         and a.comid= #{comid,jdbcType=BIGINT}
   </select>
+    <select id="getFreeAmountbc"  resultType="java.lang.Double">
+        select COALESCE(sum(a.amount_receivable-a.electronic_prepay-a.cash_prepay-a.reduce_amount),0) free_amount
+        from order_tb a
+        where a.create_time > #{create_time,jdbcType=BIGINT}
+        and a.pay_type = 8
+        and a.comid= #{comid,jdbcType=BIGINT}
+    </select>
 
     <!--获取今日进场总数-->
     <select id="getEntryCountbc"  resultType="java.lang.Integer">

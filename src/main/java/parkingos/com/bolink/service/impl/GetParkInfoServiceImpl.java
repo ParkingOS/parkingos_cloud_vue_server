@@ -14,6 +14,7 @@ import java.util.*;
 public class GetParkInfoServiceImpl implements GetParkInfoService {
     @Autowired
     private ParkInfoMapper parkInfoMapper;
+    DecimalFormat af1 = new DecimalFormat("0");
     @Override
     public String getInfo(int groupid) {
         HashMap<String, Object> retMap = new HashMap<String, Object>();
@@ -33,6 +34,7 @@ public class GetParkInfoServiceImpl implements GetParkInfoService {
         Double cashPay  = parkInfoMapper.getCashPay(tday, groupid);
         Double electronicPay = parkInfoMapper.getElectronicPay(tday, groupid);
         Double reduceamount = parkInfoMapper.getReduceAmount(tday, groupid);
+        Double freeamount = parkInfoMapper.getFreeAmount(tday, groupid);
         if(cashPay == null){
             cashPay=0d;
         }
@@ -46,15 +48,15 @@ public class GetParkInfoServiceImpl implements GetParkInfoService {
         HashMap<String, Object> electronicPaymap = new HashMap<String, Object>();
         HashMap<String, Object> reduceamap = new HashMap<String, Object>();
         HashMap<String, Object> totalIncomemap = new HashMap<String, Object>();
-        totalIncomemap.put("elePay", electronicPay);
-        totalIncomemap.put("cashPay", cashPay);
-        totalIncomemap.put("freePay", reduceamount);
+        totalIncomemap.put("elePay", af1.format(electronicPay));
+        totalIncomemap.put("cashPay", af1.format(cashPay));
+        totalIncomemap.put("freePay", af1.format(reduceamount+freeamount));
         cashPaymap.put("name", "电子");
-        cashPaymap.put("value", electronicPay);
+        cashPaymap.put("value", af1.format(electronicPay));
         electronicPaymap.put("name", "现金");
-        electronicPaymap.put("value", cashPay);
+        electronicPaymap.put("value", af1.format(cashPay));
         reduceamap.put("name", "减免");
-        reduceamap.put("value", reduceamount);
+        reduceamap.put("value", af1.format(reduceamount+freeamount));
         List<HashMap<String, Object>> totalIncomPie = new ArrayList<HashMap<String, Object>>();
         totalIncomPie.add(cashPaymap);
         totalIncomPie.add(electronicPaymap);
@@ -116,6 +118,7 @@ public class GetParkInfoServiceImpl implements GetParkInfoService {
         Double cashPay  = parkInfoMapper.getCashPaybc(tday, comid);
         Double electronicPay = parkInfoMapper.getElectronicPaybc(tday, comid);
         Double reduceamount = parkInfoMapper.getReduceAmountbc(tday, comid);
+        Double freeamount = parkInfoMapper.getFreeAmountbc(tday, comid);
         if(cashPay == null){
             cashPay=0d;
         }
@@ -129,21 +132,31 @@ public class GetParkInfoServiceImpl implements GetParkInfoService {
         HashMap<String, Object> electronicPaymap = new HashMap<String, Object>();
         HashMap<String, Object> reduceamap = new HashMap<String, Object>();
         HashMap<String, Object> totalIncomemap = new HashMap<String, Object>();
-        totalIncomemap.put("elePay", electronicPay);
-        totalIncomemap.put("cashPay", cashPay);
-        totalIncomemap.put("freePay", reduceamount);
+        totalIncomemap.put("elePay", af1.format(electronicPay));
+        totalIncomemap.put("cashPay", af1.format(cashPay));
+        totalIncomemap.put("freePay", af1.format(reduceamount+freeamount));
         cashPaymap.put("name", "电子");
-        cashPaymap.put("value", electronicPay);
+        cashPaymap.put("value", af1.format(electronicPay));
         electronicPaymap.put("name", "现金");
-        electronicPaymap.put("value", cashPay);
+        electronicPaymap.put("value", af1.format(cashPay));
         reduceamap.put("name", "减免");
-        reduceamap.put("value", reduceamount);
+        reduceamap.put("value", af1.format(reduceamount+freeamount));
         List<HashMap<String, Object>> totalIncomPie = new ArrayList<HashMap<String, Object>>();
         totalIncomPie.add(cashPaymap);
         totalIncomPie.add(electronicPaymap);
         totalIncomPie.add(reduceamap);
         //获取收费排行数据
         List<HashMap<String, Object>> parkRankList = parkInfoMapper.getRankByout(tday, comid);
+        if(parkRankList !=null && parkRankList.size()>0){
+            for (HashMap<String, Object> map:parkRankList){
+                Long uin =(Long) map.get("uid");
+                if(uin !=null) {
+                    String username = parkInfoMapper.getUserInfo(uin);
+                    if (username != null && "".equals(username))
+                        map.put("uid", username);
+                }
+            }
+        }
         //获取车辆进场，离场，在场的数量统计
         int inCars = parkInfoMapper.getEntryCountbc(tday, comid);
         int outCars = parkInfoMapper.getExitCountbc(tday, comid);

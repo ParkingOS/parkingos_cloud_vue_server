@@ -32,4 +32,7 @@ public interface ParkInfoMapper {
     int getInparkCountbc(@Param("create_time") long create_time,@Param("comid")int comid);
     int getBerthTotalbc(@Param("comid") int comid);
     String getUserInfo(@Param("id") long id);
+    double getFreeAmount(@Param("create_time") long create_time, @Param("groupid")int groupid);
+    double getFreeAmountbc(@Param("create_time") long create_time, @Param("comid")int comid);
+
 }
