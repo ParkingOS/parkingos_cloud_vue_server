@@ -241,7 +241,7 @@ public class GetParkInfoServiceImpl implements GetParkInfoService {
                Long uin =(Long) map.get("uin");
                if(uin !=null) {
                    String username = parkInfoMapper.getUserInfo(uin);
-                   if (username != null && "".equals(username))
+                   if (username != null && !"".equals(username))
                        map.put("uin", username);
                }
                Long time = (Long) map.get("ctime");
