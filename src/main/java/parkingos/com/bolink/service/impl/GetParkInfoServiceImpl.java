@@ -77,18 +77,18 @@ public class GetParkInfoServiceImpl implements GetParkInfoService {
         for(HashMap<String,Object> map :ss){
             Long asum = (Long)map.get("asum");
             Long usum = (Long) map.get("usum");
-            DecimalFormat df = new DecimalFormat("0.0000");
+            DecimalFormat df = new DecimalFormat("#");
             double pecent=0d;
             if(usum !=0){
                 pecent =  (float)usum*100/asum ;
             }
-            SimpleDateFormat sdf = new SimpleDateFormat("HH:mm");
+            SimpleDateFormat sdf = new SimpleDateFormat("HH");
             long time = (long) map.get("create_time");
             Date date = new Date(time * 1000);
             map.put("time", sdf.format(date));
             map.put("percent",df.format(pecent));
         }
-        DecimalFormat df = new DecimalFormat("0.0000");
+        DecimalFormat df = new DecimalFormat("#");
         double parkOnpecent=0d;
         if(inPark !=0){
             parkOnpecent =  (float)inPark*100/parkingtotal ;
@@ -191,19 +191,19 @@ public class GetParkInfoServiceImpl implements GetParkInfoService {
         for(HashMap<String,Object> map :ss){
             Long asum = (Long)map.get("asum");
             Long usum = (Long) map.get("usum");
-            DecimalFormat df = new DecimalFormat("0.0000");
+            DecimalFormat df = new DecimalFormat("#");
             double pecent=0d;
             if(usum !=0){
                 pecent =  (float)usum*100/asum ;
             }
-            SimpleDateFormat sdf = new SimpleDateFormat("HH:mm");
+            SimpleDateFormat sdf = new SimpleDateFormat("HH");
             long time = (long) map.get("create_time");
             Date date = new Date(time * 1000);
             map.put("time", sdf.format(date));
             map.put("percent",df.format(pecent));
         }
         double parkOnpecent=0d;
-        DecimalFormat df = new DecimalFormat("0.0000");
+        DecimalFormat df = new DecimalFormat("#");
         if(inPark !=0){
             parkOnpecent =  (float)inPark*100/berthtotal ;
         }
