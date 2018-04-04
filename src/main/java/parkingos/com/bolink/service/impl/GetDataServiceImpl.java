@@ -382,17 +382,18 @@ public class GetDataServiceImpl implements GetDataService {
 
     @Override
     public String getSuperimposed(String comid) {
-        String str = "{\"superimposed\":\"0\"}";
+        String str = "{\"superimposed\":\"不支持\"}";
         JSONObject result = JSONObject.parseObject(str);
         ComInfoTb comInfoTb = new ComInfoTb();
         comInfoTb.setId(Long.parseLong(comid));
         comInfoTb = (ComInfoTb)commonDao.selectObjectByConditions(comInfoTb);
-        if(comInfoTb.getSuperimposed()==0){
-            result.put("superimposed","不支持");
-        }else if(comInfoTb.getSuperimposed()==1){
-            result.put("superimposed","支持");
+        if(comInfoTb!=null){
+            if(comInfoTb.getSuperimposed()==0){
+                result.put("superimposed","不支持");
+            }else if(comInfoTb.getSuperimposed()==1){
+                result.put("superimposed","支持");
+            }
         }
-
         return result.toString();
     }
 
