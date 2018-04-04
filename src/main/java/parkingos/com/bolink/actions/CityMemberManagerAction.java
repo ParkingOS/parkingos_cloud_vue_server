@@ -65,7 +65,7 @@ public class CityMemberManagerAction {
         String resume = RequestUtil.processParams(request,"resume");
         String phone =RequestUtil.processParams(request, "phone");
         String mobile =RequestUtil.processParams(request, "mobile");
-        Long role_id = RequestUtil.getLong(request, "role_id", -1L);
+//        Long role_id = RequestUtil.getLong(request, "role_id", -1L);
         //修改时间
         Long updateTimeLong = System.currentTimeMillis()/1000;
 
@@ -75,7 +75,7 @@ public class CityMemberManagerAction {
         userInfoTb.setNickname(nickname);
         userInfoTb.setPhone(phone);
         userInfoTb.setMobile(mobile);
-        userInfoTb.setRoleId(role_id);
+//        userInfoTb.setRoleId(role_id);
         userInfoTb.setResume(resume);
         userInfoTb.setUpdateTime(updateTimeLong);
         userInfoTb.setId(id);

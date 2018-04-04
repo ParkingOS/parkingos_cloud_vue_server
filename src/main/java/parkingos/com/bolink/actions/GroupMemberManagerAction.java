@@ -67,7 +67,7 @@ public class GroupMemberManagerAction {
         if(mobile.equals("")){
             mobile = null;
         }
-        Long role_id = RequestUtil.getLong(request, "role_id", -1L);
+//        Long role_id = RequestUtil.getLong(request, "role_id", -1L);
         Integer isview = RequestUtil.getInteger(request, "isview", -1);
         Long sex = RequestUtil.getLong(request, "sex", -1L);
         //修改时间
@@ -79,7 +79,7 @@ public class GroupMemberManagerAction {
         userInfoTb.setNickname(nickname);
         userInfoTb.setPhone(phone);
         userInfoTb.setMobile(mobile);
-        userInfoTb.setRoleId(role_id);
+//        userInfoTb.setRoleId(role_id);
         userInfoTb.setSex(sex);
         userInfoTb.setIsview(isview);
         userInfoTb.setUpdateTime(updateTimeLong);
