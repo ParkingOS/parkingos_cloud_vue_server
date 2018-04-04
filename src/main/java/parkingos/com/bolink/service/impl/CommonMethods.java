@@ -1078,7 +1078,16 @@ public class CommonMethods {
 						preParams += ","+groupid;
 				}
 				sql += " and groupid in ("+preParams+") or cityid = "+ cityid;
-				System.out.println("=========="+sql);
+				System.out.println("==========获取城市下所有车场"+sql);
+				List<Map<String, Object>> list = commonDao.getObjectBySql(sql);
+				if(list != null && !list.isEmpty()){
+					for(Map<String, Object> map : list){
+						parks.add(map.get("id"));
+					}
+				}
+			}else{
+				sql +="and cityid = "+cityid;
+				System.out.println("==========获取城市下所有车场"+sql);
 				List<Map<String, Object>> list = commonDao.getObjectBySql(sql);
 				if(list != null && !list.isEmpty()){
 					for(Map<String, Object> map : list){

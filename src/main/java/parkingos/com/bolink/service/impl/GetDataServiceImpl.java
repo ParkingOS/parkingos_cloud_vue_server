@@ -360,7 +360,8 @@ public class GetDataServiceImpl implements GetDataService {
 //        String result = "[{\"value_no\":\"-1\",\"value_name\":\"请选择\"}";
         String result = "[";
 
-        String sql = "select id,name from org_group_tb where cityid = "+ cityid;
+        String sql = "select id,name from org_group_tb where state = 0 and cityid = "+ cityid;
+
 
         unionList = commonDao.getObjectBySql(sql);
 
