@@ -9,6 +9,7 @@ import parkingos.com.bolink.dao.spring.CommonDao;
 import parkingos.com.bolink.models.UserInfoTb;
 import parkingos.com.bolink.qo.PageOrderConfig;
 import parkingos.com.bolink.service.ShopMemberManageService;
+import parkingos.com.bolink.utils.CustomDefind;
 import parkingos.com.bolink.utils.OrmUtil;
 import parkingos.com.bolink.utils.RequestUtil;
 import parkingos.com.bolink.utils.StringUtils;
@@ -126,14 +127,18 @@ public class ShopMemberManageServiceImpl implements ShopMemberManageService {
         if (userid == -1) {
             //添加操作
             Long squen = commonDao.selectSequence( UserInfoTb.class );
-            userInfoTb.setStrid( "test" + squen );
-            userInfoTb.setPassword( "test" + squen );
+            String strid = CustomDefind.getValue("UNIONVALUE")+squen;
+            userInfoTb.setStrid(strid);
+            userInfoTb.setPassword(strid);
+//            userInfoTb.setStrid( "test" + squen );
+//            userInfoTb.setPassword( "test" + squen );
             userInfoTb.setRegTime( time );
             userInfoTb.setId( squen );
             String md5Pass = "";
             if(md5Pass.length()<32){
                 //md5密码 ，生成规则：原密码md5后，加上'zldtingchebao201410092009'再次md5
-                md5Pass = StringUtils.MD5("test" + squen);
+//                md5Pass = StringUtils.MD5("test" + squen);
+                md5Pass = StringUtils.MD5(strid);
                 md5Pass = StringUtils.MD5(md5Pass +"zldtingchebao201410092009");
             }
             userInfoTb.setMd5pass( md5Pass );

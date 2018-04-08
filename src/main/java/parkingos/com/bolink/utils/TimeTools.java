@@ -392,7 +392,10 @@ public class TimeTools {
 		Date date = new Date();
 		//本周的第几天
 		int now = date.getDay();
-
+		if(now==0){
+			now=7;
+		}
+		System.out.println("这周的第几天:"+now);
 		Calendar c = Calendar.getInstance();
 		c.add(Calendar.DAY_OF_MONTH, -(now-1));
 		SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
