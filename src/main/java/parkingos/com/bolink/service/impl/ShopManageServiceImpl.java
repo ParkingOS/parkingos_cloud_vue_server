@@ -159,8 +159,11 @@ public class ShopManageServiceImpl implements ShopManageService {
         }
         String[] defaultArr = default_limit.split(",");
         System.out.println("====默认显示额度:"+defaultArr.length);
-        if(defaultArr.length<1||defaultArr.length>3){
+        if(defaultArr.length<1){
             return "{\"state\":0,\"msg\":\"请输入正确的默认额度\"}";
+        }
+        if(defaultArr.length>3){
+            return "{\"state\":0,\"msg\":\"最多支持三个默认额度\"}";
         }
         for(String str:defaultArr){
             if(!Check.isNumber(str)){
