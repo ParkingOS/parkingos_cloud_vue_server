@@ -59,9 +59,9 @@ public class EquipmentManageMonitorAction {
 		Integer isShow = RequestUtil.getInteger(request,"is_show",1);
 		Integer showOrder = RequestUtil.getInteger(request,"show_order",null);
 		String playSrc = RequestUtil.processParams(request,"play_src");
-
-		Map<String, String> reqParameterMap = RequestUtil.readBodyFormRequset(request);
-		String comid = reqParameterMap.get("comid");
+		Long comid = RequestUtil.getLong(request,"comid",-1L);
+//		Map<String, String> reqParameterMap = RequestUtil.readBodyFormRequset(request);
+//		String comid = reqParameterMap.get("comid");
 
 		MonitorInfoTb monitorInfoTb = new MonitorInfoTb();
 		//monitorInfoTb.setId(id);
@@ -97,9 +97,9 @@ public class EquipmentManageMonitorAction {
 		Integer isShow = RequestUtil.getInteger(request,"is_show",1);
 		Integer showOrder = RequestUtil.getInteger(request,"show_order",null);
 		String playSrc = RequestUtil.processParams(request,"play_src");
-
-		Map<String, String> reqParameterMap = RequestUtil.readBodyFormRequset(request);
-		String comid = reqParameterMap.get("comid").toString();
+		Long comid = RequestUtil.getLong(request,"comid",-1L);
+//		Map<String, String> reqParameterMap = RequestUtil.readBodyFormRequset(request);
+//		String comid = reqParameterMap.get("comid").toString();
 
 		MonitorInfoTb monitorInfoTb = new MonitorInfoTb();
 		monitorInfoTb.setId(id);
@@ -136,4 +136,20 @@ public class EquipmentManageMonitorAction {
 		StringUtils.ajaxOutput(response,result);
 		return null;
 	}
+
+	@RequestMapping("/groupmonitors")
+	public String getGroupMonitors(HttpServletRequest request,HttpServletResponse response){
+
+		System.out.println("=====进去获取集团所有监控方法");
+//		Long groupid = RequestUtil.getLong(request,"groupid",-1L);
+//		System.out.println("获得集团下面所有监控:"+groupid);
+		Map<String, String> reqParameterMap = RequestUtil.readBodyFormRequset(request);
+
+		JSONObject result = equipmentManageMonitorService.selectGroupMonitors(reqParameterMap);
+		//把结果返回页面
+		StringUtils.ajaxOutput(response,result.toJSONString());
+		return null;
+
+	}
+
 }
