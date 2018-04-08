@@ -11,6 +11,7 @@ import parkingos.com.bolink.models.ShopAccountTb;
 import parkingos.com.bolink.models.ShopTb;
 import parkingos.com.bolink.qo.PageOrderConfig;
 import parkingos.com.bolink.service.ShopManageService;
+import parkingos.com.bolink.utils.Check;
 import parkingos.com.bolink.utils.OrmUtil;
 import parkingos.com.bolink.utils.RequestUtil;
 
@@ -152,6 +153,15 @@ public class ShopManageServiceImpl implements ShopManageService {
         Integer handInputEnable = RequestUtil.getInteger( request, "hand_input_enable", 0 );
         System.out.println("====是否可手输额度:"+handInputEnable);
         String default_limit = RequestUtil.getString( request, "default_limit" );
+        System.out.println("====默认显示额度:"+default_limit);
+        String[] defaultArr = default_limit.split(",");
+        System.out.println("====默认显示额度:"+defaultArr.length);
+        for(String str:defaultArr){
+            if(!Check.isNumber(str)){
+                return "{\"state\":0,\"msg\":\"请输入正确的默认额度\"}";
+            }
+        }
+
         double discount_percent = RequestUtil.getDouble( request, "discount_percent", 100.00 );//商户折扣/%
         double discount_money = RequestUtil.getDouble( request, "discount_money", 1.00 );//商户折扣---每小时/元
         Integer validite_time = RequestUtil.getInteger( request, "validite_time", 0 );//有效期/小时
