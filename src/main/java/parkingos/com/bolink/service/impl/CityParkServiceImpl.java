@@ -139,6 +139,15 @@ public class CityParkServiceImpl implements CityParkService {
         String bolinkid = RequestUtil.getString(request, "bolink_id");
         System.out.println("创建车场===bolinkid:" + bolinkid);
         if (bolinkid != null && !"".equals(bolinkid)) {
+            ComInfoTb infoTb = new ComInfoTb();
+            infoTb.setBolinkId(bolinkid);
+            infoTb.setState(0);
+            int infoCount = commonDao.selectCountByConditions(infoTb);
+            if(infoCount>0){
+                result.put("msg", "创建失败,泊链车场编号重复");
+                return result;
+            }
+
             if (Check.isNumber(bolinkid)) {
                 //验证填写的泊链编号在yun是不是重复
                 Long comid = Long.parseLong(bolinkid);
@@ -146,7 +155,7 @@ public class CityParkServiceImpl implements CityParkService {
                 comInfoTb.setId(comid);
                 int count = commonDao.selectCountByConditions(comInfoTb);
                 if (count > 0) {
-                    result.put("msg", "创建失败,编号重复");
+                    result.put("msg", "创建失败,云平台编号重复");
                     return result;
                 }
             }
