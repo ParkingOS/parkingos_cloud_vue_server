@@ -36,6 +36,8 @@ public class GetParkInfoServiceImpl implements GetParkInfoService {
         //获取进场和离场数据
         List<HashMap<String, Object>> entryCarList = parkInfoMapper.getEntryCar(tday, Long.parseLong(groupid + ""));
         List<HashMap<String, Object>> outCarList = parkInfoMapper.getExitCar(tday, Long.parseLong(groupid + ""));
+        Collections.reverse(entryCarList);
+        Collections.reverse(outCarList);
         parseTmtoDate(entryCarList);
         parseTmtoDate(outCarList);
         int parkingtotal = parkInfoMapper.getBerthTotal(groupid);
@@ -96,6 +98,9 @@ public class GetParkInfoServiceImpl implements GetParkInfoService {
         totalIncomPie.add(reduceamap);
         //获取收费排行数据
         List<HashMap<String, Object>> parkRankList = parkInfoMapper.getParkRank(tday, groupid);
+        for(HashMap<String, Object> map:parkRankList){
+            map.put("total",af1.format(map.get("total")));
+        }
         //获取车辆进场，离场，在场的数量统计
         int inCars = parkInfoMapper.getEntryCount(tday, groupid);
         int outCars = parkInfoMapper.getExitCount(tday, groupid);
@@ -160,6 +165,8 @@ public class GetParkInfoServiceImpl implements GetParkInfoService {
         //获取进场和离场数据
         List<HashMap<String, Object>> entryCarList = parkInfoMapper.getEntryCarByComid(tday, comid);
         List<HashMap<String, Object>> outCarList = parkInfoMapper.getExitCarByComid(tday, comid);
+        Collections.reverse(entryCarList);
+        Collections.reverse(outCarList);
         parseTmtoDate(entryCarList);
         parseTmtoDate(outCarList);
         int berthtotal = parkInfoMapper.getBerthTotalbc(comid);
@@ -223,6 +230,7 @@ public class GetParkInfoServiceImpl implements GetParkInfoService {
         List<HashMap<String, Object>> parkRankList = parkInfoMapper.getRankByout(tday, comid);
         if(parkRankList !=null && parkRankList.size()>0){
             for (HashMap<String, Object> map:parkRankList){
+                map.put("total",af1.format(map.get("total")));
                 Long uin =(Long) map.get("uid");
                 map.put("parkName", uin);
                 if(uin !=null) {
