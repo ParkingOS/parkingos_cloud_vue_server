@@ -59,9 +59,9 @@ public class EquipmentManageMonitorAction {
 		Integer isShow = RequestUtil.getInteger(request,"is_show",1);
 		Integer showOrder = RequestUtil.getInteger(request,"show_order",null);
 		String playSrc = RequestUtil.processParams(request,"play_src");
-		Long comid = RequestUtil.getLong(request,"comid",-1L);
-//		Map<String, String> reqParameterMap = RequestUtil.readBodyFormRequset(request);
-//		String comid = reqParameterMap.get("comid");
+
+		Map<String, String> reqParameterMap = RequestUtil.readBodyFormRequset(request);
+		String comid = reqParameterMap.get("comid");
 
 		MonitorInfoTb monitorInfoTb = new MonitorInfoTb();
 		//monitorInfoTb.setId(id);
@@ -97,9 +97,9 @@ public class EquipmentManageMonitorAction {
 		Integer isShow = RequestUtil.getInteger(request,"is_show",1);
 		Integer showOrder = RequestUtil.getInteger(request,"show_order",null);
 		String playSrc = RequestUtil.processParams(request,"play_src");
-		Long comid = RequestUtil.getLong(request,"comid",-1L);
-//		Map<String, String> reqParameterMap = RequestUtil.readBodyFormRequset(request);
-//		String comid = reqParameterMap.get("comid").toString();
+
+		Map<String, String> reqParameterMap = RequestUtil.readBodyFormRequset(request);
+		String comid = reqParameterMap.get("comid").toString();
 
 		MonitorInfoTb monitorInfoTb = new MonitorInfoTb();
 		monitorInfoTb.setId(id);

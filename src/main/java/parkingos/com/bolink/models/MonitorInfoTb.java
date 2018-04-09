@@ -15,7 +15,7 @@ public class MonitorInfoTb {
 
    private String playSrc;
 
-   private Long comid;
+   private String comid;
 
    private String groupid;
 
@@ -75,11 +75,11 @@ public class MonitorInfoTb {
         this.playSrc = playSrc;
     }
 
-    public Long getComid() {
+    public String getComid() {
         return comid;
     }
 
-    public void setComid(Long comid) {
+    public void setComid(String comid) {
         this.comid = comid;
     }
 

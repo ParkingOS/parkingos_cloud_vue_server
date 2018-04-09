@@ -38,7 +38,7 @@ public class EquipmentManageMonitorServiceImpl implements EquipmentManageMonitor
         String comid = reqmap.get("comid");
         MonitorInfoTb monitorInfoTb = new MonitorInfoTb();
         monitorInfoTb.setState(1);
-        monitorInfoTb.setComid(Long.parseLong(comid));
+        monitorInfoTb.setComid(comid);
         JSONObject result = supperSearchService.supperSearch(monitorInfoTb,reqmap);
 
         return result;
@@ -94,13 +94,18 @@ public class EquipmentManageMonitorServiceImpl implements EquipmentManageMonitor
                 parks = commonMethods.getParks(Long.parseLong(groupid));
             }
 
+            List<String> parksCon = new ArrayList<>();
+            for(Object parkid:parks){
+                parksCon.add(parkid+"");
+            }
+
             System.out.println("=======parks:"+parks);
 
             //封装searchbean  集团或城市下面所有车场
             SearchBean searchBean = new SearchBean();
             searchBean.setOperator(FieldOperator.CONTAINS);
             searchBean.setFieldName("comid");
-            searchBean.setBasicValue(parks);
+            searchBean.setBasicValue(parksCon);
 
             if (supperQuery == null) {
                 supperQuery = new ArrayList<>();
