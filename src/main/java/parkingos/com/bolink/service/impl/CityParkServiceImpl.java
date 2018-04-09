@@ -157,7 +157,7 @@ public class CityParkServiceImpl implements CityParkService {
 
         System.out.println("==============chenbowen:" + cityid);
         Long groupId = RequestUtil.getLong(request, "groupid", -1L);
-        if(groupId==-1){
+        if (groupId == -1) {
             groupId = RequestUtil.getLong(request, "group_id", -1L);
         }
         System.out.println("==============chenbowen:" + groupId);
@@ -204,7 +204,7 @@ public class CityParkServiceImpl implements CityParkService {
         comInfoTb.setParkingTotal(parking_total);
         comInfoTb.setBolinkId(bolinkid);
 
-        if(id==-1){
+        if (id == -1) {
 //            if(groupId==null||groupId==-1){
 //                groupId = RequestUtil.getLong(request,"group_id",-1L);
 //                if(groupId==null||groupId==-1){
@@ -221,91 +221,128 @@ public class CityParkServiceImpl implements CityParkService {
             String ukey = StringUtils.createRandomCharData(16);
             comInfoTb.setUkey(ukey);
             comInfoTb.setCreateTime(System.currentTimeMillis() / 1000);
-            int insert = commonDao.insert(comInfoTb);
-            if (insert == 1) {
-                result.put("state", 1);
 
-                //判断车场是否要上传到泊链,如果没有写bolinkid,那么上传
-                if (bolinkid == null || "".equals(bolinkid)) {
 
-                    //查询他的厂商编号以及服务商编号 (查询有集团编号的)
-                    List<Map<String, Object>> unionInfoList = commonDao.getObjectBySql("select oc.union_id, oc.ukey union_key, og.operatorid operator_id from org_city_merchants oc " +
-                            "left outer join org_group_tb og on oc.id = og.cityid " +
-                            "left outer join com_info_tb co on co.groupid = og.id " +
-                            "where co.id = " + comid);
-//                    String server_id = "";
-                    String operator_id = "";
-                    String union_key = "";
-                    String union_id = "";
-                    if (unionInfoList != null && unionInfoList.size() > 0) {
-                        if (unionInfoList.get(0).get("operator_id") != null) {
-                            operator_id = unionInfoList.get(0).get("operator_id") + "";
-                        }
-                        union_key = unionInfoList.get(0).get("union_key") + "";
-                        union_id = unionInfoList.get(0).get("union_id") + "";
-                    }else{
-                        //查询没有集团编号的 车场
-                        unionInfoList = commonDao.getObjectBySql("select oc.union_id, oc.ukey union_key from org_city_merchants oc " +
-                                "left outer join com_info_tb co on co.cityid = oc.id " +
-                                "where co.id = " + comid);
-                        union_key = unionInfoList.get(0).get("union_key") + "";
-                        union_id = unionInfoList.get(0).get("union_id") + "";
-                    }
-                    int uploadCount = 0;
-                    int unUploadCount = 0;
-                    //String url = "https://127.0.0.1/api-web/park/addpark";
-                    String url = CustomDefind.UNIONIP + "park/addpark";
-                    //String url = "https://s.bolink.club/unionapi/park/addpark";
-                    Map<String, Object> paramMap = new HashMap<String, Object>();
-                    paramMap.put("park_id", comid);
-                    paramMap.put("name", company);
-                    paramMap.put("address", address);
-                    paramMap.put("phone", mobile);
-                    paramMap.put("lng", longitude);
-                    paramMap.put("lat", latitude);
-                    paramMap.put("total_plot", parking_total);
-                    paramMap.put("empty_plot", parking_total);
-                    paramMap.put("price_desc", getPrice(comid));
-                    paramMap.put("remark", "");
-                    paramMap.put("union_id", union_id);
-//                    paramMap.put("server_id", server_id);
-                    paramMap.put("operator_id", operator_id);
-                    paramMap.put("rand", Math.random());
-                    String ret = "";
-                    try {
-                        logger.error(paramMap);
-                        String linkParams = StringUtils.createLinkString(paramMap) + "key=" + union_key;
-                        System.out.println(linkParams);
-                        String sign = StringUtils.MD5(linkParams).toUpperCase();
-                        logger.error(sign);
-                        paramMap.put("sign", sign);
-                        //param = DesUtils.encrypt(param,"NQ0eSXs720170114");
-                        String param = StringUtils.createJson(paramMap);
-                        logger.error(param);
-                        ret = HttpsProxy.doPost(url, param, "utf-8", 20000, 20000);
-                        JSONObject object = JSONObject.parseObject(ret);
-                        if (object != null) {
-                            Integer uploadState = Integer.parseInt(object.get("state")+"");
-                            System.out.println("chenbowen:" + uploadState);
-                            if (uploadState == 1) {
-                                ComInfoTb comInfoTb1 = new ComInfoTb();
-                                comInfoTb1.setUploadUnionTime(System.currentTimeMillis()/1000L);
-                                comInfoTb1.setUnionState(2);
-                                comInfoTb1.setId(comid);
-                                uploadCount = commonDao.updateByPrimaryKey(comInfoTb1);
-                                logger.error("上传车场个数:"+uploadCount);
-                                result.put("msg", "新建车场成功,上传到泊链成功");
-                            } else {
-                                logger.error(object.get("errmsg"));
-                                result.put("msg", "新建车场成功,上传到泊链失败");
-                            }
-                        }
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
-                    logger.error(ret);
+//            int insert = commonDao.insert(comInfoTb);
+//            if (insert == 1) {
+//                result.put("state", 1);
+
+            List<Map<String, Object>> unionInfoList = commonDao.getObjectBySql("select oc.union_id, oc.ukey union_key, og.operatorid operator_id from org_city_merchants oc " +
+                    "left outer join org_group_tb og on oc.id = og.cityid " +
+                    "where og.id = " + groupId);
+            String operator_id = "";
+            String union_key = "";
+            String union_id = "";
+            if (unionInfoList != null && unionInfoList.size() > 0) {
+                if (unionInfoList.get(0).get("operator_id") != null) {
+                    operator_id = unionInfoList.get(0).get("operator_id") + "";
                 }
+                union_key = unionInfoList.get(0).get("union_key") + "";
+                union_id = unionInfoList.get(0).get("union_id") + "";
+            } else {
+                //查询没有集团编号的 车场
+                unionInfoList = commonDao.getObjectBySql("select oc.union_id, oc.ukey union_key from org_city_merchants oc " +
+                        "where oc.id = " + cityid);
+                union_key = unionInfoList.get(0).get("union_key") + "";
+                union_id = unionInfoList.get(0).get("union_id") + "";
             }
+
+            //判断车场是否要上传到泊链,如果没有写bolinkid,那么上传
+            if (bolinkid == null || "".equals(bolinkid)) {
+                //查询他的厂商编号以及服务商编号 (查询有集团编号的)
+//                List<Map<String, Object>> unionInfoList = commonDao.getObjectBySql("select oc.union_id, oc.ukey union_key, og.operatorid operator_id from org_city_merchants oc " +
+//                        "left outer join org_group_tb og on oc.id = og.cityid " +
+//                        "left outer join com_info_tb co on co.groupid = og.id " +
+//                        "where co.id = " + comid);
+                int uploadCount = 0;
+                int unUploadCount = 0;
+                //String url = "https://127.0.0.1/api-web/park/addpark";
+                String url = CustomDefind.UNIONIP + "park/addpark";
+                //String url = "https://s.bolink.club/unionapi/park/addpark";
+                Map<String, Object> paramMap = new HashMap<String, Object>();
+                paramMap.put("park_id", comid);
+                paramMap.put("name", company);
+                paramMap.put("address", address);
+                paramMap.put("phone", mobile);
+                paramMap.put("lng", longitude);
+                paramMap.put("lat", latitude);
+                paramMap.put("total_plot", parking_total);
+                paramMap.put("empty_plot", parking_total);
+                paramMap.put("price_desc", getPrice(comid));
+                paramMap.put("remark", "");
+                paramMap.put("union_id", union_id);
+//                    paramMap.put("server_id", server_id);
+                paramMap.put("operator_id", operator_id);
+                paramMap.put("rand", Math.random());
+                String ret = "";
+                try {
+                    logger.error(paramMap);
+                    String linkParams = StringUtils.createLinkString(paramMap) + "key=" + union_key;
+                    System.out.println(linkParams);
+                    String sign = StringUtils.MD5(linkParams).toUpperCase();
+                    logger.error(sign);
+                    paramMap.put("sign", sign);
+                    //param = DesUtils.encrypt(param,"NQ0eSXs720170114");
+                    String param = StringUtils.createJson(paramMap);
+                    logger.error(param);
+                    ret = HttpsProxy.doPost(url, param, "utf-8", 20000, 20000);
+                    JSONObject object = JSONObject.parseObject(ret);
+                    if (object != null) {
+                        Integer uploadState = Integer.parseInt(object.get("state") + "");
+                        System.out.println("chenbowen:" + uploadState);
+                        if (uploadState == 1) {
+                            ComInfoTb comInfoTb1 = new ComInfoTb();
+                            comInfoTb1.setUploadUnionTime(System.currentTimeMillis() / 1000L);
+                            comInfoTb1.setUnionState(2);
+                            comInfoTb1.setId(comid);
+                            uploadCount = commonDao.updateByPrimaryKey(comInfoTb1);
+                            int insert = commonDao.insert(comInfoTb);
+                            logger.error("上传车场个数:" + uploadCount + "云平台新建车场:" + insert);
+                            result.put("state", 1);
+                            result.put("msg", "新建车场成功,上传到泊链成功");
+                            return result;
+                        } else {
+                            result.put("state", 0);
+                            logger.error(object.get("errmsg"));
+                            String errmsg = object.get("errmsg") + "";
+                            if (errmsg.contains("运营商编号")) {
+                                result.put("msg", "新建车场失败,泊链运营集团编号错误");
+                                return result;
+                            }
+                            result.put("msg", "新建车场成功,上传到泊链失败");
+                        }
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+                logger.error(ret);
+            }else {//如果填写了泊链车场编号,证明泊链那边有车场,去验证所填泊链编号是否正确
+                String url = CustomDefind.UNIONIP + "park/checkparkid";
+                Map<String, Object> paramMap = new HashMap<String, Object>();
+                paramMap.put("park_id", bolinkid);
+                paramMap.put("union_id",union_id);
+                String param = StringUtils.createJson(paramMap);
+                try{
+                    String ret = HttpsProxy.doPost(url, param, "utf-8", 20000, 20000);
+                    JSONObject object = JSONObject.parseObject(ret);
+                    Integer checkstate = Integer.parseInt(object.get("state") + "");
+                    if(checkstate==1){//泊链车场编号正确
+                        int insert = commonDao.insert(comInfoTb);
+                        logger.error("填写了泊链编号进行校验新建车场:"+insert);
+                        result.put("state", 1);
+                        result.put("msg","新建车场成功");
+                        return result;
+                    }else{
+                        result.put("state", 0);
+                        result.put("msg","新建车场失败,泊链车场编号错误");
+                        return result;
+                    }
+                }catch (Exception e){
+                    logger.error("去泊链查询operatorid是否存在出现异常");
+                }
+
+            }
+//            }
         } else {
             comInfoTb.setId(id);
             comInfoTb.setUpdateTime(System.currentTimeMillis() / 1000);
