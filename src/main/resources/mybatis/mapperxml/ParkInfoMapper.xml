@@ -15,7 +15,7 @@
     and a.groupid= #{groupid,jdbcType=BIGINT}
     and a.state = 0
     ORDER BY a.create_time DESC
-    limit  5
+    limit  10
     ]]>
     </select>
     <!--获取出场车辆数据-->
@@ -30,13 +30,14 @@
     where a.comid = b.id
         and a.end_time > #{create_time,jdbcType=BIGINT}
         and a.groupid= #{groupid,jdbcType=BIGINT}
+        and a.state = 1
         ORDER BY a.end_time ASC
-        limit  5
+        limit  10
         ]]>
     </select>
     <!--获取车场收费排行-->
     <select id="getParkRank"  resultType="map">
-    select COALESCE(sum(a.cash_pay+a.electronic_pay),0) AS "total" ,
+    select COALESCE(sum(a.cash_pay+a.electronic_pay+a.cash_prepay+a.electronic_prepay),0) AS "total" ,
     b.company_name AS "parkName"
     from order_tb a ,com_info_tb b
     where a.comid=b.id
@@ -44,7 +45,7 @@
      and a.groupid= #{groupid,jdbcType=BIGINT}
      GROUP BY a.comid, b.company_name
       ORDER BY  total desc
-      limit 10
+      limit 5
     </select>
    <!--获取总的车位-->
     <select id="getBerthTotal" parameterType="int" resultType="java.lang.Integer">
@@ -148,7 +149,7 @@ and a.ctime>#{ctime,jdbcType=BIGINT}
     and a.comid= #{comid,jdbcType=BIGINT}
     and a.state = 0
     ORDER BY a.create_time DESC
-    limit  5
+    limit  10
     ]]>
     </select>
     <!--获取出场车辆数据-->
@@ -163,7 +164,7 @@ and a.ctime>#{ctime,jdbcType=BIGINT}
          a.end_time > #{create_time,jdbcType=BIGINT}
         and a.comid = #{comid,jdbcType=BIGINT}
         ORDER BY a.end_time ASC
-        limit  5
+        limit  10
         ]]>
     </select>
 
@@ -171,7 +172,7 @@ and a.ctime>#{ctime,jdbcType=BIGINT}
     <select id="getRankByout"  resultType="map">
         <![CDATA[
         select
-    COALESCE(sum(a.cash_pay+a.electronic_pay),0) AS "total",
+    COALESCE(sum(a.cash_pay+a.electronic_pay+a.cash_prepay+a.electronic_prepay),0) AS "total",
     a.out_uid uid
     from order_tb a
     where

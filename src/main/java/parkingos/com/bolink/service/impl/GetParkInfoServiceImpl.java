@@ -1,10 +1,15 @@
 package parkingos.com.bolink.service.impl;
 
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import parkingos.com.bolink.dao.mybatis.mapper.ParkInfoMapper;
+import parkingos.com.bolink.service.CityParkOrderAnlysisService;
 import parkingos.com.bolink.service.GetParkInfoService;
+import parkingos.com.bolink.service.ParkOrderAnlysisService;
+import parkingos.com.bolink.utils.TimeTools;
 
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
@@ -14,6 +19,10 @@ import java.util.*;
 public class GetParkInfoServiceImpl implements GetParkInfoService {
     @Autowired
     private ParkInfoMapper parkInfoMapper;
+    @Autowired
+    private ParkOrderAnlysisService parkOrderanlysisService;
+    @Autowired
+    private CityParkOrderAnlysisService cityParkOrderanlysisService;
     DecimalFormat af1 = new DecimalFormat("0");
     @Override
     public String getInfo(int groupid) {
@@ -31,7 +40,31 @@ public class GetParkInfoServiceImpl implements GetParkInfoService {
         parseTmtoDate(outCarList);
         int parkingtotal = parkInfoMapper.getBerthTotal(groupid);
         //获取今日电子支付，现金支付，减免金额的统计
-        Double cashPay  = parkInfoMapper.getCashPay(tday, groupid);
+        Map<String,String> parammap = new HashMap<String,String>();
+        parammap.put("groupid",groupid+"");
+        String todyyymmdd=TimeTools.getDate_YY_MM_DD();
+        parammap.put("date",todyyymmdd+" 00:00:00至"+todyyymmdd+"23:59:59");
+        JSONObject retjson=cityParkOrderanlysisService.selectResultByConditions(parammap);
+        JSONArray retarry = retjson.getJSONArray("rows");
+        Double cashPay=0d;
+        Double electronicPay=0d;
+        Double freePay=0d;
+        if(retarry.size()>0){
+            JSONObject object =(JSONObject)retarry.get(retarry.size()-1);
+            if(object.getString("cash_pay")!=null&&!"".equals(object.getString("cash_pay"))) {
+                cashPay = Double.parseDouble(object.getString("cash_pay"));
+                System.out.print("cashpay"+cashPay);
+            }
+            if(object.getString("electronic_pay")!=null&&!"".equals(object.getString("electronic_pay"))) {
+                electronicPay = Double.parseDouble(object.getString("electronic_pay"));
+                System.out.print("electronicPay"+electronicPay);
+            }
+            if(object.getString("free_pay")!=null&&!"".equals(object.getString("free_pay"))) {
+                freePay = Double.parseDouble(object.getString("free_pay"));
+                System.out.print("electronicPay"+electronicPay);
+            }
+        };
+       /* Double cashPay  = parkInfoMapper.getCashPay(tday, groupid);
         Double electronicPay = parkInfoMapper.getElectronicPay(tday, groupid);
         Double reduceamount = parkInfoMapper.getReduceAmount(tday, groupid);
         Double freeamount = parkInfoMapper.getFreeAmount(tday, groupid);
@@ -43,20 +76,20 @@ public class GetParkInfoServiceImpl implements GetParkInfoService {
         }
         if(reduceamount == null){
             reduceamount=0d;
-        }
+        }*/
         HashMap<String, Object> cashPaymap = new HashMap<String, Object>();
         HashMap<String, Object> electronicPaymap = new HashMap<String, Object>();
         HashMap<String, Object> reduceamap = new HashMap<String, Object>();
         HashMap<String, Object> totalIncomemap = new HashMap<String, Object>();
         totalIncomemap.put("elePay", af1.format(electronicPay));
         totalIncomemap.put("cashPay", af1.format(cashPay));
-        totalIncomemap.put("freePay", af1.format(reduceamount+freeamount));
+        totalIncomemap.put("freePay", af1.format(freePay));
         cashPaymap.put("name", "电子");
         cashPaymap.put("value", af1.format(electronicPay));
         electronicPaymap.put("name", "现金");
         electronicPaymap.put("value", af1.format(cashPay));
         reduceamap.put("name", "减免");
-        reduceamap.put("value", af1.format(reduceamount+freeamount));
+        reduceamap.put("value", af1.format(freePay));
         List<HashMap<String, Object>> totalIncomPie = new ArrayList<HashMap<String, Object>>();
         totalIncomPie.add(cashPaymap);
         totalIncomPie.add(electronicPaymap);
@@ -131,7 +164,32 @@ public class GetParkInfoServiceImpl implements GetParkInfoService {
         parseTmtoDate(outCarList);
         int berthtotal = parkInfoMapper.getBerthTotalbc(comid);
         //获取今日电子支付，现金支付，减免金额的统计
-        Double cashPay  = parkInfoMapper.getCashPaybc(tday, comid);
+        Map<String,String> parammap = new HashMap<String,String>();
+        parammap.put("comid",comid+"");
+        String todyyymmdd=TimeTools.getDate_YY_MM_DD();
+        parammap.put("date",todyyymmdd+" 00:00:00至"+todyyymmdd+" 23:59:59");
+        JSONObject retjson=parkOrderanlysisService.selectResultByConditions(parammap);
+        System.out.print("》》》》》查询金额统计结果："+retjson.toString());
+        JSONArray retarry = retjson.getJSONArray("rows");
+        Double cashPay=0d;
+        Double electronicPay=0d;
+        Double freePay=0d;
+        if(retarry.size()>0){
+            JSONObject object =(JSONObject)retarry.get(retarry.size()-1);
+            if(object.getString("cash_pay")!=null&&!"".equals(object.getString("cash_pay"))) {
+                cashPay = Double.parseDouble(object.getString("cash_pay"));
+                System.out.print("cashpay"+cashPay);
+            }
+            if(object.getString("electronic_pay")!=null&&!"".equals(object.getString("electronic_pay"))) {
+                electronicPay = Double.parseDouble(object.getString("electronic_pay"));
+                System.out.print("electronicPay"+electronicPay);
+            }
+            if(object.getString("free_pay")!=null&&!"".equals(object.getString("free_pay"))) {
+                freePay = Double.parseDouble(object.getString("free_pay"));
+                System.out.print("electronicPay"+electronicPay);
+            }
+        };
+       /* Double cashPay  = parkInfoMapper.getCashPaybc(tday, comid);
         Double electronicPay = parkInfoMapper.getElectronicPaybc(tday, comid);
         Double reduceamount = parkInfoMapper.getReduceAmountbc(tday, comid);
         Double freeamount = parkInfoMapper.getFreeAmountbc(tday, comid);
@@ -143,20 +201,20 @@ public class GetParkInfoServiceImpl implements GetParkInfoService {
         }
         if(reduceamount == null){
             reduceamount=0d;
-        }
+        }*/
         HashMap<String, Object> cashPaymap = new HashMap<String, Object>();
         HashMap<String, Object> electronicPaymap = new HashMap<String, Object>();
         HashMap<String, Object> reduceamap = new HashMap<String, Object>();
         HashMap<String, Object> totalIncomemap = new HashMap<String, Object>();
         totalIncomemap.put("elePay", af1.format(electronicPay));
         totalIncomemap.put("cashPay", af1.format(cashPay));
-        totalIncomemap.put("freePay", af1.format(reduceamount+freeamount));
+        totalIncomemap.put("freePay", af1.format(freePay));
         cashPaymap.put("name", "电子");
         cashPaymap.put("value", af1.format(electronicPay));
         electronicPaymap.put("name", "现金");
         electronicPaymap.put("value", af1.format(cashPay));
         reduceamap.put("name", "减免");
-        reduceamap.put("value", af1.format(reduceamount+freeamount));
+        reduceamap.put("value", af1.format(freePay));
         List<HashMap<String, Object>> totalIncomPie = new ArrayList<HashMap<String, Object>>();
         totalIncomPie.add(cashPaymap);
         totalIncomPie.add(electronicPaymap);
