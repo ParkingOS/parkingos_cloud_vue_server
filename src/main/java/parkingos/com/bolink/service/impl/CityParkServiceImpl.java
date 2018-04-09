@@ -224,22 +224,22 @@ public class CityParkServiceImpl implements CityParkService {
             int insert = commonDao.insert(comInfoTb);
             if (insert == 1) {
                 result.put("state", 1);
-                result.put("msg", "新建车场成功");
 
                 //判断车场是否要上传到泊链,如果没有写bolinkid,那么上传
                 if (bolinkid == null || "".equals(bolinkid)) {
 
                     //查询他的厂商编号以及服务商编号 (查询有集团编号的)
-                    List<Map<String, Object>> unionInfoList = commonDao.getObjectBySql("select oc.union_id, oc.ukey union_key, og.serverid server_id from org_city_merchants oc " +
+                    List<Map<String, Object>> unionInfoList = commonDao.getObjectBySql("select oc.union_id, oc.ukey union_key, og.operatorid operator_id from org_city_merchants oc " +
                             "left outer join org_group_tb og on oc.id = og.cityid " +
                             "left outer join com_info_tb co on co.groupid = og.id " +
                             "where co.id = " + comid);
-                    String server_id = "";
+//                    String server_id = "";
+                    String operator_id = "";
                     String union_key = "";
                     String union_id = "";
                     if (unionInfoList != null && unionInfoList.size() > 0) {
-                        if (unionInfoList.get(0).get("server_id") != null) {
-                            server_id = unionInfoList.get(0).get("server_id") + "";
+                        if (unionInfoList.get(0).get("operator_id") != null) {
+                            operator_id = unionInfoList.get(0).get("operator_id") + "";
                         }
                         union_key = unionInfoList.get(0).get("union_key") + "";
                         union_id = unionInfoList.get(0).get("union_id") + "";
@@ -248,9 +248,6 @@ public class CityParkServiceImpl implements CityParkService {
                         unionInfoList = commonDao.getObjectBySql("select oc.union_id, oc.ukey union_key from org_city_merchants oc " +
                                 "left outer join com_info_tb co on co.cityid = oc.id " +
                                 "where co.id = " + comid);
-                        if (unionInfoList.get(0).get("server_id") != null) {
-                            server_id = unionInfoList.get(0).get("server_id") + "";
-                        }
                         union_key = unionInfoList.get(0).get("union_key") + "";
                         union_id = unionInfoList.get(0).get("union_id") + "";
                     }
@@ -271,7 +268,8 @@ public class CityParkServiceImpl implements CityParkService {
                     paramMap.put("price_desc", getPrice(comid));
                     paramMap.put("remark", "");
                     paramMap.put("union_id", union_id);
-                    paramMap.put("server_id", server_id);
+//                    paramMap.put("server_id", server_id);
+                    paramMap.put("operator_id", operator_id);
                     paramMap.put("rand", Math.random());
                     String ret = "";
                     try {
@@ -296,9 +294,10 @@ public class CityParkServiceImpl implements CityParkService {
                                 comInfoTb1.setId(comid);
                                 uploadCount = commonDao.updateByPrimaryKey(comInfoTb1);
                                 logger.error("上传车场个数:"+uploadCount);
+                                result.put("msg", "新建车场成功,上传到泊链成功");
                             } else {
-                                unUploadCount = 1;
                                 logger.error(object.get("errmsg"));
+                                result.put("msg", "新建车场成功,上传到泊链失败");
                             }
                         }
                     } catch (Exception e) {
