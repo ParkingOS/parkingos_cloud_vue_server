@@ -386,6 +386,7 @@ public class GetParkInfoServiceImpl implements GetParkInfoService {
             Long beattime = (Long) loginmap.get("beattime");
             Long logintime = (Long) loginmap.get("logintime");
             String localid = (String) loginmap.get("localid");
+            if(localid == null)localid="";
             boolean isonline = false;
             if (beattime != null) {
                 //心跳在60秒内证明在线
@@ -397,10 +398,10 @@ public class GetParkInfoServiceImpl implements GetParkInfoService {
             }
             if (isonline) {
                 parkstatusmap.put("state", 1);
-                parkstatusmap.put("localid", localid.split("_")[0]);
+                parkstatusmap.put("localid", localid.substring(localid.indexOf("_")+1));
             } else {
                 parkstatusmap.put("state", 0);
-                parkstatusmap.put("localid", localid.split("_")[0]);
+                parkstatusmap.put("localid", localid.substring(localid.indexOf("_")+1));
             }
                 parkState.add(parkstatusmap);
         }

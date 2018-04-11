@@ -43,6 +43,7 @@
     where a.comid=b.id
      and a.end_time > #{end_time,jdbcType=BIGINT}
      and a.groupid= #{groupid,jdbcType=BIGINT}
+     and total >0
      GROUP BY a.comid, b.company_name
       ORDER BY  total desc
       limit 5
@@ -179,6 +180,7 @@ and a.ctime>#{ctime,jdbcType=BIGINT}
     where
     a.comid = #{comid,jdbcType=BIGINT}
     and  a.end_time > #{end_time,jdbcType=BIGINT}
+    and total >0
     group by a.out_uid
     ORDER BY total desc
     limit  5
