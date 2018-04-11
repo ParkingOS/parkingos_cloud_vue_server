@@ -397,10 +397,10 @@ public class GetParkInfoServiceImpl implements GetParkInfoService {
             }
             if (isonline) {
                 parkstatusmap.put("state", 1);
-                parkstatusmap.put("localid", localid);
+                parkstatusmap.put("localid", localid.split("_")[0]);
             } else {
                 parkstatusmap.put("state", 0);
-                parkstatusmap.put("localid", localid);
+                parkstatusmap.put("localid", localid.split("_")[0]);
             }
                 parkState.add(parkstatusmap);
         }
