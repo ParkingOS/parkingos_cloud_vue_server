@@ -119,6 +119,21 @@ public class GetDataAction {
         StringUtils.ajaxOutput(resp,result);
         return null;
     }
+
+    /*
+    * 获得集团下面所有的通道
+    *
+    */
+    @RequestMapping(value = "/getgroupchannels")
+    public String getGroupChannelTypes(HttpServletRequest request, HttpServletResponse resp){
+        Long groupid = RequestUtil.getLong(request,"groupid",-1L);
+        String result = getDataService.getGroupChannelTypes(groupid);
+        StringUtils.ajaxOutput(resp,result);
+        return null;
+    }
+
+
+
     /*
     * 获得工作站点
     *

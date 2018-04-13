@@ -397,6 +397,44 @@ public class GetDataServiceImpl implements GetDataService {
         return result.toString();
     }
 
+    @Override
+    public String getGroupChannelTypes(Long groupid) {
+        String result = "[";
+        logger.error("获取集团下面所有通道=========>>>>>groupid="+groupid);
+        if(groupid>-1){
+            String sql = "select id,passname from com_pass_tb ";
+            List parks = commonMethods.getParks(groupid);
+            String params = "";
+            if(parks!=null&&parks.size()>0){
+                for(Object id:parks){
+                    if(params.equals(""))
+                        params =id+"";
+                    else
+                        params += ","+id;
+                }
+                sql += "where ( comid in ("+params+") or groupid ="+groupid+") and state = 0";
+            }else{
+                sql+="where state =0 and groupid="+groupid;
+            }
+
+            List<Map<String,Object>>  pList = null;
+            logger.error("获取集团下面所有通道========="+sql);
+            pList = commonDao.getObjectBySql(sql);
+            if(pList!=null&&pList.size()>0){
+                for(int i = 0;i<pList.size();i++){
+                    Map map = pList.get(i);
+                    if(i==0){
+                        result+="{\"value_no\":\""+map.get("id")+"\",\"value_name\":\""+map.get("passname")+"\"}";
+                    }else{
+                        result+=",{\"value_no\":\""+map.get("id")+"\",\"value_name\":\""+map.get("passname")+"\"}";
+                    }
+                }
+            }
+        }
+        result+="]";
+        return result;
+    }
+
     private List<Map<String, Object>> getcollectors(Long cityid){
         try {
             if(cityid != null && cityid > 0){

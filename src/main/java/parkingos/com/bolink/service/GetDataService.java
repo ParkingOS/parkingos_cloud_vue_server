@@ -27,4 +27,6 @@ public interface GetDataService {
     String getAllUnion(Long cityid);
 
     String getSuperimposed(String comid);
+
+    String getGroupChannelTypes(Long groupid);
 }
