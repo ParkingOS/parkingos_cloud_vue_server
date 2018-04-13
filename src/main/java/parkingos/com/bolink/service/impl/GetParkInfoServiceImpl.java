@@ -176,7 +176,6 @@ public class GetParkInfoServiceImpl implements GetParkInfoService {
         String todyyymmdd=TimeTools.getDate_YY_MM_DD();
         parammap.put("date",todyyymmdd+" 00:00:00至"+todyyymmdd+" 23:59:59");
         JSONObject retjson=parkOrderanlysisService.selectResultByConditions(parammap);
-        System.out.print("》》》》》查询金额统计结果："+retjson.toString());
         JSONArray retarry = retjson.getJSONArray("rows");
         Double cashPay=0d;
         Double electronicPay=0d;
@@ -237,6 +236,10 @@ public class GetParkInfoServiceImpl implements GetParkInfoService {
                     String username = parkInfoMapper.getUserInfo(uin);
                     if (username != null && !"".equals(username))
                         map.put("parkName", username);
+                }
+                //uid为-1时不显示
+                if(uin == -1){
+                    map.put("parkName", "");
                 }
             }
         }
