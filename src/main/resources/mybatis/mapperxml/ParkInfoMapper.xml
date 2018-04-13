@@ -181,6 +181,7 @@ and a.ctime>#{ctime,jdbcType=BIGINT}
     a.comid = #{comid,jdbcType=BIGINT}
     and  a.end_time > #{end_time,jdbcType=BIGINT}
     and total >0
+    and uid <> -1
     group by a.out_uid
     ORDER BY total desc
     limit  5
