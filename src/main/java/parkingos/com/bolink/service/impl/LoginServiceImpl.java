@@ -8,6 +8,7 @@ import parkingos.com.bolink.dao.spring.CommonDao;
 import parkingos.com.bolink.models.*;
 import parkingos.com.bolink.service.LoginService;
 import parkingos.com.bolink.utils.Check;
+import parkingos.com.bolink.utils.CustomDefind;
 import parkingos.com.bolink.utils.StringUtils;
 import parkingos.com.bolink.utils.ZLDType;
 
@@ -41,10 +42,11 @@ public class LoginServiceImpl implements LoginService {
         }
         userInfoTb = (UserInfoTb) commonDao.selectObjectByConditions(userInfoTb);
         if (userInfoTb == null) {
-            if("liuyang".equals(userId)){
+
+            if("admin".equals(userId)){
                 result.put("state", true);
                 result.put("msg", "新建账号");
-                user.put("oid",10);
+                user.put("oid", CustomDefind.getValue("UNIONADMIN"));//开源云之后新建admin账号
                 result.put("user",user);
                 return result;
             }
@@ -100,6 +102,12 @@ public class LoginServiceImpl implements LoginService {
                         result.put("msg", "车场不存在或者车场未通过审核！");
                         return result;
                     } else {
+//                        comInfoTb = (ComInfoTb)commonDao.selectObjectByConditions(comInfoTb);
+//                        if(comInfoTb!=null&&comInfoTb.getSuperimposed()!=null){
+//                            user.put("superimposed",comInfoTb.getSuperimposed());
+//                        }
+
+
 //                        Map<String, Object> comMap = daService.getMap("select chanid from com_info_tb where id=? ",
 //                                new Object[]{user.get("comid")});
 //                        if(comMap != null && comMap.get("chanid") != null){
@@ -161,6 +169,18 @@ public class LoginServiceImpl implements LoginService {
                     if (groupcount == 0) {
                         result.put("state", false);
                         result.put("msg", "城市不存在！");
+                        return result;
+                    }
+                }else if (orgname.contains("商户")) {
+                    user.put("isadmin", 1);
+                    user.put("shopid", userInfoTb.getShopId());
+                    ShopTb shopTb = new ShopTb();
+                    shopTb.setId(userInfoTb.getShopId());
+                    shopTb.setState(0);
+                    int shopcount = commonDao.selectCountByConditions(shopTb);
+                    if (shopcount == 0) {
+                        result.put("state", false);
+                        result.put("msg", "商户不存在！");
                         return result;
                     }
                 }

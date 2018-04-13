@@ -89,12 +89,15 @@ public class OrderServiceImpl implements OrderService {
 //            }
 //        }
         String createTime = reqmap.get("create_time");
-        logger.error("===>>>createTime"+createTime);
+        String endTime = reqmap.get("end_time");
+        logger.error("===>>>createTime"+createTime+"~~~~endTime:"+endTime);
         //组装 一个月 参数
-        if(createTime==null||"undefined".equals(createTime)||"".equals(createTime)){
-            reqmap.put("create_time","1");
-            reqmap.put("create_time_start",(TimeTools.getToDayBeginTime()-2*86400)+"");
-            logger.error("=========..req"+reqmap.size());
+        if(endTime==null||"".equals(endTime)){
+            if(createTime==null||"undefined".equals(createTime)||"".equals(createTime)){
+                reqmap.put("create_time","1");
+                reqmap.put("create_time_start",(TimeTools.getToDayBeginTime()-2*86400)+"");
+                logger.error("=========..req"+reqmap.size());
+            }
         }
         JSONObject result = supperSearchService.supperSearch(orderTb, reqmap);
 

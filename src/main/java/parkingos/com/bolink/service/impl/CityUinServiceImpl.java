@@ -43,7 +43,7 @@ public class CityUinServiceImpl implements CityUinService {
 
             UserInfoTb userInfotb = new UserInfoTb();
             userInfotb.setCityid(id);
-            userInfotb.setStrid("zhaoshuyu");
+            userInfotb.setStrid("admin");
             userInfotb.setNickname(name+"管理员");
             userInfotb.setRoleId(29L);
             userInfotb.setRegTime(System.currentTimeMillis()/1000);
