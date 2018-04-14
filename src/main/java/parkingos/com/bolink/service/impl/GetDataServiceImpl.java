@@ -412,9 +412,9 @@ public class GetDataServiceImpl implements GetDataService {
                     else
                         params += ","+id;
                 }
-                sql += "where ( comid in ("+params+") or groupid ="+groupid+") and state = 0";
+                sql += "where comid in ("+params+")  and state = 0";
             }else{
-                sql+="where state =0 and groupid="+groupid;
+                sql+="where state =0 ";
             }
 
             List<Map<String,Object>>  pList = null;
