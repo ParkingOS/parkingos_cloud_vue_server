@@ -129,6 +129,7 @@ public class FixCodeServiceImpl implements FixCodeService {
                         }
 
                         fixCodeTb.setMoneyLimit(fixCodeTb.getMoneyLimit()-amount);
+                        fixCodeTb.setFreeLimit(fixCodeTb.getFreeLimit()-1);
                         commonDao.updateByPrimaryKey(fixCodeTb);
 
 
@@ -153,6 +154,7 @@ public class FixCodeServiceImpl implements FixCodeService {
                         }
 
                         fixCodeTb.setTimeLimit(fixCodeTb.getTimeLimit()-amount);
+                        fixCodeTb.setFreeLimit(fixCodeTb.getFreeLimit()-1);
                         commonDao.updateByPrimaryKey(fixCodeTb);
 
                         String ticketCode = retMap.get("code")+"";

@@ -73,12 +73,13 @@ public class FixCodeAction {
         fixCodeTb.setShopId(shopid);
         fixCodeTb.setId(id);
         fixCodeTb.setState(state);
-        fixCodeTb.setFreeLimit(freeLimit);
+        fixCodeTb.setFreeLimit(freeLimit);//总张数
         if(ticketUnit==1||ticketUnit==2||ticketUnit==3){//时长减免
-            fixCodeTb.setTimeLimit(amountLimit);
+            fixCodeTb.setTimeLimit(amountLimit*freeLimit);
         }else if(ticketUnit==4){//金额减免
-            fixCodeTb.setMoneyLimit(amountLimit);
+            fixCodeTb.setMoneyLimit(amountLimit*freeLimit);
         }
+        fixCodeTb.setAmount(amountLimit);//单张额度
         //fixCodeTb.setTimeLimit(timeLimit);
         fixCodeTb.setCode(code[0]);
 //        fixCodeTb.setAmount(amount);
