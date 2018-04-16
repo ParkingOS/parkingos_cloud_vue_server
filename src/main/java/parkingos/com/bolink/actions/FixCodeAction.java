@@ -135,7 +135,7 @@ public class FixCodeAction {
 
         String url = RequestUtil.getString(request,"url");
         logger.info("下载二维码图片:"+url);
-        String serverPath = request.getServletContext().getRealPath("/resource/images/");
+        String serverPath = request.getSession().getServletContext().getRealPath("/resource/images/");
         logger.info("下载二维码图片serverPath:" + serverPath);
         try {
             QrCodeUtil.generateQRCode(url, filename, serverPath);

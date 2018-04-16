@@ -160,8 +160,8 @@ public class QrCodeUtil {
 		try
 		{
 			String fileName = unionName+".png";
-			String filePath = request.getServletContext().getRealPath("/resource/images/"+unionName);
-			String downFilePath = request.getServletContext().getRealPath("/resource/images/"+unionName+".png");
+			String filePath = request.getSession().getServletContext().getRealPath("/resource/images/"+unionName);
+			String downFilePath = request.getSession().getServletContext().getRealPath("/resource/images/"+unionName+".png");
 			//FileUtil.fileToZip(filePath, downFilePath);
 			//下载
 			FileUtil.downFile(downFilePath, fileName, response);
