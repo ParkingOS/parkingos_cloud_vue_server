@@ -32,7 +32,7 @@ public class QrCodeUtil {
 	 * @author QuanHao
 	 */
 	public static String getServerPath(HttpServletRequest request){
-		String realPath = request.getServletContext().getRealPath("/");
+		String realPath = request.getSession().getServletContext().getRealPath("/");
 		String contextPath = request.getContextPath();
 		int indexOf = realPath.lastIndexOf(contextPath.substring(1));
 		return realPath.substring(0, indexOf);

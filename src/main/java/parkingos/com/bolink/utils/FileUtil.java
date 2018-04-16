@@ -141,7 +141,8 @@ public class FileUtil {
 	 */
 	public static void downFile(String filePath, String fileName, HttpServletResponse response) throws IOException {
 		// 设置Content-Disposition
-		response.setCharacterEncoding("UTF-8");
+		//response.setCharacterEncoding("UTF-8");
+		response.setContentType("text/html;charset=UTF-8");
 		response.setHeader("content-disposition",
 				"attachment;filename=" + URLEncoder.encode(fileName, "UTF-8"));
 		// 读取文件
