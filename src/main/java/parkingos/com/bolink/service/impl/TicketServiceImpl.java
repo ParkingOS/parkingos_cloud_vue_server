@@ -7,14 +7,17 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import parkingos.com.bolink.dao.spring.CommonDao;
 import parkingos.com.bolink.enums.FieldOperator;
+import parkingos.com.bolink.models.QrCodeTb;
 import parkingos.com.bolink.models.ShopTb;
 import parkingos.com.bolink.models.TicketTb;
 import parkingos.com.bolink.qo.PageOrderConfig;
 import parkingos.com.bolink.qo.SearchBean;
 import parkingos.com.bolink.service.SupperSearchService;
 import parkingos.com.bolink.service.TicketService;
-import parkingos.com.bolink.utils.OrmUtil;
+import parkingos.com.bolink.utils.*;
 
+import javax.servlet.http.HttpServletRequest;
+import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
@@ -241,5 +244,261 @@ public class TicketServiceImpl implements TicketService {
             }
         }
         return bodyList;
+    }
+
+    @Override
+    public JSONObject getTicketLog(Map<String, String> reqmap) {
+        String str = "{\"total\":0,\"page\":1,\"rows\":[]}";
+        JSONObject result = JSONObject.parseObject(str);
+
+        TicketTb ticketTb = new TicketTb();
+        ticketTb.setShopId(Long.parseLong(reqmap.get("shopid")));
+
+
+        String date = StringUtils.decodeUTF8(StringUtils.decodeUTF8(reqmap.get("date")));
+        System.out.println("日期====" + date);
+
+        Long start = null;
+        Long end = null;
+        if (date == null || "".equals(date)) {
+            start = TimeTools.getToDayBeginTime();
+            end = TimeTools.getToDayBeginTime()+86399;
+        } else {
+            start = TimeTools.getLongMilliSecondFrom_HHMMDDHHmmss(date.split("至")[0]);
+            end = TimeTools.getLongMilliSecondFrom_HHMMDDHHmmss(date.split("至")[1]);
+        }
+        System.out.println("开始时间和结束时间" + start + end);
+        int count = 0;
+        List<TicketTb> list = null;
+        List<Map<String, Object>> resList = new ArrayList<>();
+
+        Map searchMap = supperSearchService.getBaseSearch(ticketTb, reqmap);
+        if (searchMap != null && !searchMap.isEmpty()) {
+            TicketTb baseQuery = (TicketTb) searchMap.get("base");
+            List<SearchBean> supperQuery = null;
+            if (searchMap.containsKey("supper"))
+                supperQuery = (List<SearchBean>) searchMap.get("supper");
+            PageOrderConfig config = null;
+            if (searchMap.containsKey("config"))
+                config = (PageOrderConfig) searchMap.get("config");
+
+
+            //封装searchbean  集团或城市下面所有车场
+            SearchBean searchBean = new SearchBean();
+            searchBean.setOperator(FieldOperator.BETWEEN);
+            searchBean.setFieldName("create_time");
+            searchBean.setStartValue(start);
+            searchBean.setEndValue(end);
+
+            if (supperQuery == null) {
+                supperQuery = new ArrayList<>();
+            }
+            supperQuery.add(searchBean);
+
+
+            count = commonDao.selectCountByConditions(baseQuery, supperQuery);
+            if (count > 0) {
+
+                //获得该商户的优惠单位
+                ShopTb shopTb = new ShopTb();
+                shopTb.setId(Long.parseLong(reqmap.get("shopid")));
+                shopTb = (ShopTb)commonDao.selectObjectByConditions(shopTb);
+                if (shopTb!=null){
+                    logger.info("该商户的优惠单位:"+shopTb.getTicketUnit());
+                }
+
+                list = commonDao.selectListByConditions(baseQuery, supperQuery, config);
+                if (list != null && !list.isEmpty()) {
+                    for (TicketTb ticketTb1 : list) {
+                        OrmUtil<TicketTb> otm = new OrmUtil<>();
+                        Map<String, Object> map = otm.pojoToMap(ticketTb1);
+                        if(shopTb!=null){
+                            map.put("ticket_unit",shopTb.getTicketUnit());
+                        }
+                        resList.add(map);
+                    }
+                    result.put("rows", JSON.toJSON(resList));
+                }
+            }
+        }
+        result.put("total", count);
+        result.put("page", Integer.parseInt(reqmap.get("page")));
+
+        return result;
+    }
+
+    @Override
+    public Map<String, Object> createTicket(Long shop_id,Integer reduce,Integer type,Integer isAuto) {
+
+
+
+        logger.info("后台创建优惠券:"+isAuto+"~~~~"+type+"~~~~"+reduce);
+
+        Integer free = 0;//全免劵(张)
+        Map<String, Object> rMap = new HashMap<String, Object>();
+        if(shop_id == -1){
+            rMap.put("result", -1);
+            rMap.put("error", "商户编号>>"+shop_id+"不存在");
+            return rMap;
+        }
+        logger.error(">>>>>>>>>>打印优惠券，优惠券类型type:"+type+",优惠时长time："+reduce+",优惠金额amount："+reduce+",商户shop_id:"+shop_id);
+        SimpleDateFormat df2 = new SimpleDateFormat("yyyy-MM-dd");
+
+        ShopTb shopTb = new ShopTb();
+        shopTb.setId(shop_id);
+        ShopTb shopInfo =  (ShopTb) commonDao.selectObjectByConditions(shopTb);
+        Integer ticket_limit = shopInfo.getTicketLimit()== null ? 0: shopInfo.getTicketLimit();
+        Integer ticketfree_limit = shopInfo.getTicketfreeLimit() == null ? 0 : shopInfo.getTicketfreeLimit();
+        Integer ticket_money = shopInfo.getTicketMoney() == null ? 0 : shopInfo.getTicketMoney();
+        //未设置有效期,默认24小时
+        Integer validite_time = shopInfo.getValiditeTime() == null ? 24: shopInfo.getValiditeTime();
+        Long btime = System.currentTimeMillis()/1000;
+        //截止有效时间
+        Long etime =  btime + validite_time*60*60;
+        //判断商户额度是否可以发劵
+        if(type == 3){//优惠券-时长
+            if(reduce <= 0){
+                logger.error("优惠券额度必须为正数"+",商户shop_id:"+shop_id);
+                rMap.put("result", -2);
+                rMap.put("error", "优惠券额度必须为正数");
+                return rMap;
+            }
+            if(ticket_limit < (reduce)){
+                logger.error("优惠券额度已用完，还剩余额度"+ticket_limit+",优惠券时长time："+reduce+",商户shop_id:"+shop_id);
+                rMap.put("result", -2);
+                rMap.put("error", "优惠券额度不够");
+                return rMap;
+            }
+        }else if(type == 5){//优惠券-金额
+            if(reduce <= 0){
+                logger.error("优惠券额度必须为正数"+",商户shop_id:"+shop_id);
+                rMap.put("result", -2);
+                rMap.put("error", "优惠券额度必须为正数");
+                return rMap;
+            }
+            if(ticket_money < (reduce)){
+                logger.error("优惠券额度已用完，还剩余额度"+ticket_money+",优惠券金额amount："+reduce+",商户shop_id:"+shop_id);
+                rMap.put("result", -2);
+                rMap.put("error", "优惠券额度不够");
+                return rMap;
+            }
+        }else if(type==4){
+            free = 1;
+            reduce = 0;
+            if(ticketfree_limit <= 0){
+                logger.error("全免券额度已用完，还剩余额度"+ticketfree_limit+",商户shop_id:"+shop_id);
+                rMap.put("result", -2);
+                rMap.put("error", "全免券额度已用完");
+                return rMap;
+            }
+        }
+        List<Map<String, Object>> bathSql = new ArrayList<Map<String,Object>>();
+        //取当前最大减免劵的id然后+1
+        Long ticketid = qryMaxTicketId()+1;
+//        Long ticketid = commonDao.selectSequence(TicketTb.class);
+        String code = null;
+        Long ticketids[] = new Long[]{ticketid};
+        String []codes = StringUtils.getGRCode(ticketids);
+        if(codes.length > 0){
+            code = codes[0];
+        }
+        if(code != null){
+            //生成一张劵
+            TicketTb ticketTb = new TicketTb();
+            ticketTb.setId(ticketid);
+            ticketTb.setCreateTime(btime);
+            ticketTb.setLimitDay(etime);
+            if(type==3){
+                ticketTb.setMoney(reduce);
+            }else if(type==5){
+                BigDecimal amountDecimal = new BigDecimal(reduce+"");
+                ticketTb.setUmoney(amountDecimal);
+            }
+            ticketTb.setState(0);
+            ticketTb.setComid(shopInfo.getComid());
+            ticketTb.setType(type);
+            ticketTb.setShopId(shop_id);
+            Integer insertTicket = commonDao.insert(ticketTb);
+
+            //生成code
+            QrCodeTb qrCodeTb = new QrCodeTb();
+            qrCodeTb.setCtime(System.currentTimeMillis()/1000);
+            qrCodeTb.setType(5);
+            qrCodeTb.setCode(code);
+            qrCodeTb.setIsauto(isAuto);
+            qrCodeTb.setTicketid(ticketid);
+            qrCodeTb.setComid(shopInfo.getComid());
+            Integer insertQrcode = commonDao.insert(qrCodeTb);
+
+            //更新商户额度
+            ShopTb shopTbInfo = new ShopTb();
+            if(type==3){
+                shopTbInfo.setTicketLimit(shopInfo.getTicketLimit()-reduce);
+            }else if(type==5){
+                shopTbInfo.setTicketMoney(shopInfo.getTicketMoney()-reduce);
+            }else if(type==4){
+                shopTbInfo.setTicketfreeLimit(shopInfo.getTicketfreeLimit()-free);
+            }
+            ShopTb shopConditions = new ShopTb();
+            shopConditions.setId(shopInfo.getId());
+            Integer updateShop = commonDao.updateByConditions(shopTbInfo,shopConditions);
+            logger.error("打印优惠券结果："+insertTicket+","+insertQrcode+","+updateShop+",商户shop_id:"+shop_id);
+            if(insertTicket==1 && insertQrcode==1 && updateShop==1){
+                rMap.put("ticket_url", CustomDefind.getValue("TICKETURL")+code);
+                rMap.put("state", 1);
+                rMap.put("code", code);
+                return rMap;
+            }
+        }
+        rMap.put("result", -1);
+        rMap.put("error","生成减免劵出错，用劵失败");
+        return rMap;
+    }
+
+    private Long qryMaxTicketId() {
+        TicketTb ticketConditions = new TicketTb();
+        PageOrderConfig pageOrderConfig = new PageOrderConfig();
+        pageOrderConfig.setOrderInfo("id","desc");
+        List<TicketTb> ticketTbs = commonDao.selectListByConditions(ticketConditions,pageOrderConfig);
+        if(ticketTbs!=null && ticketTbs.size()>0){
+            return ticketTbs.get(0).getId();
+        }else{
+            return 0L;//没有生成过减免劵
+        }
+    }
+
+    @Override
+    public Map<String, Object> ifChangeCode(HttpServletRequest request) {
+        Map<String, Object> retMap = new HashMap<>();
+        retMap.put("state",0);
+        String code = RequestUtil.getString(request,"code");
+        logger.info("扫描二维码的code值:"+code);
+        if(code!=null&&!"".equals(code)){
+            QrCodeTb qrCodeTb = new QrCodeTb();
+            qrCodeTb.setCode(code);
+            qrCodeTb = (QrCodeTb)commonDao.selectObjectByConditions(qrCodeTb);
+            if(qrCodeTb!=null){
+                logger.info("qrcodeTb不为空:"+qrCodeTb);
+                //是否要一直轮询查询, 确认是否自动更新二维码
+                Integer isauto = qrCodeTb.getIsauto();
+                if(isauto!=null&&isauto==1){//自动更新
+//                    while (true){
+                        Long ticketid = qrCodeTb.getTicketid();
+                        TicketTb ticketTb = new TicketTb();
+                        ticketTb.setId(ticketid);
+                        ticketTb = (TicketTb)commonDao.selectObjectByConditions(ticketTb);
+                        if(ticketTb!=null){
+                            if(ticketTb.getState()==1){
+                                retMap.put("state",1);
+//                                break;
+                            }
+                        }
+//                    }
+
+                }
+            }
+        }
+
+        return retMap;
     }
 }

@@ -62,4 +62,59 @@ public class ShopTicketAction {
 
         return null;
     }
+
+
+    /*
+    * 优惠券明细
+    *
+    * */
+    @RequestMapping("/getticketlog")
+    //优惠券查询
+    public String getTicketLog(HttpServletRequest request, HttpServletResponse resp) {
+
+        Map<String, String> reqParameterMap = RequestUtil.readBodyFormRequset( request );
+        logger.info( reqParameterMap );
+        JSONObject result = ticketService.getTicketLog( reqParameterMap );
+        logger.info( result );
+        StringUtils.ajaxOutput( resp, result.toJSONString() );
+        return null;
+    }
+
+    /*
+    *   根据输入的额度生成二维码返回页面
+    *
+    * */
+    @RequestMapping("/createticket")
+    //优惠券查询
+    public String createTicket(HttpServletRequest request, HttpServletResponse resp) {
+        logger.info("进入商户后台创建二维码的方法");
+//        Map<String, String> reqParameterMap = RequestUtil.readBodyFormRequset( request );
+//        logger.info( reqParameterMap );
+        Long shop_id = RequestUtil.getLong(request,"shopid",-1L);
+        Integer reduce = RequestUtil.getInteger(request, "reduce", 0);
+        Integer type = RequestUtil.getInteger(request, "type", 3);
+        //判断页面是不是选中自动更新选项
+        Integer isAuto = RequestUtil.getInteger(request,"isauto",0);
+        Map<String,Object> mapResult = ticketService.createTicket(shop_id,reduce,type,isAuto);
+        StringUtils.ajaxOutput( resp, JSONObject.toJSONString(mapResult) );
+        return null;
+    }
+
+
+    /*
+    *  根据得到的code值一直轮询这张券是否使用,如果使用,那么更换二维码
+    *
+    * */
+    @RequestMapping("/ifchangecode")
+    //优惠券查询
+    public String ifChangeCode(HttpServletRequest request, HttpServletResponse resp) {
+
+        logger.info("进入轮询查询是否自动更新的方法");
+        Map<String,Object> mapResult = ticketService.ifChangeCode( request );
+        StringUtils.ajaxOutput( resp, JSONObject.toJSONString(mapResult) );
+        return null;
+    }
+
+
+
 }

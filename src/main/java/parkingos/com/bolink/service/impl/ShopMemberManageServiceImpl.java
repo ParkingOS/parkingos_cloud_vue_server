@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import parkingos.com.bolink.dao.spring.CommonDao;
 import parkingos.com.bolink.models.UserInfoTb;
+import parkingos.com.bolink.models.UserRoleTb;
 import parkingos.com.bolink.qo.PageOrderConfig;
 import parkingos.com.bolink.service.ShopMemberManageService;
 import parkingos.com.bolink.utils.CustomDefind;
@@ -134,6 +135,15 @@ public class ShopMemberManageServiceImpl implements ShopMemberManageService {
 //            userInfoTb.setPassword( "test" + squen );
             userInfoTb.setRegTime( time );
             userInfoTb.setId( squen );
+
+            UserRoleTb userRoleTb = new UserRoleTb();
+            userRoleTb.setOid(Long.parseLong(CustomDefind.getValue("SHOPOID")));
+            userRoleTb.setType(0);
+            userRoleTb = (UserRoleTb)commonDao.selectObjectByConditions(userRoleTb);
+            if(userRoleTb!=null){
+                userInfoTb.setRoleId(userRoleTb.getId());
+            }
+
             String md5Pass = "";
             if(md5Pass.length()<32){
                 //md5密码 ，生成规则：原密码md5后，加上'zldtingchebao201410092009'再次md5
