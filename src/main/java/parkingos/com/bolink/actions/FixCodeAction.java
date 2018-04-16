@@ -8,6 +8,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import parkingos.com.bolink.models.FixCodeTb;
 import parkingos.com.bolink.service.FixCodeService;
+import parkingos.com.bolink.service.ShopAcccountService;
 import parkingos.com.bolink.utils.CustomDefind;
 import parkingos.com.bolink.utils.QrCodeUtil;
 import parkingos.com.bolink.utils.RequestUtil;
@@ -25,6 +26,8 @@ public class FixCodeAction {
 
     @Autowired
     private FixCodeService fixCodeService;
+    @Autowired
+    private ShopAcccountService shopAcccountService;
 
     @RequestMapping(value = "/query")
     public String query(HttpServletRequest request, HttpServletResponse resp){
@@ -45,14 +48,20 @@ public class FixCodeAction {
     @RequestMapping(value = "/add")
     public String addRole(HttpServletRequest request, HttpServletResponse resp){
 
-        Integer type = RequestUtil.getInteger(request,"type",3);
+        Integer type = RequestUtil.getInteger(request,"type",1);
         Long shopid = RequestUtil.getLong(request,"shopid",-1L);
         Integer state = RequestUtil.getInteger(request,"state",0);
-        Integer moneyLimit = RequestUtil.getInteger(request,"money_limit",0);
+//        Integer moneyLimit = RequestUtil.getInteger(request,"money_limit",0);
         Integer freeLimit = RequestUtil.getInteger(request,"free_limit",0);
-        Integer timeLimit = RequestUtil.getInteger(request,"time_limit",0);
+        Integer amountLimit = RequestUtil.getInteger(request,"amount_limit",0);
         Integer validite_time = RequestUtil.getInteger(request,"validite_time",24);
-        Integer amount = RequestUtil.getInteger(request,"amount",0);
+//        Integer amount = RequestUtil.getInteger(request,"amount",0);
+
+        //根据shopid获得该商户的用券单位
+        Integer ticketUnit = shopAcccountService.getTicketUnitById(shopid);
+        System.out.println("该商户的优惠单位是:"+ticketUnit);
+
+
         Long btime = System.currentTimeMillis()/1000;
         //截止有效时间
         Long etime =  btime + validite_time*60*60;
@@ -65,10 +74,15 @@ public class FixCodeAction {
         fixCodeTb.setId(id);
         fixCodeTb.setState(state);
         fixCodeTb.setFreeLimit(freeLimit);
-        fixCodeTb.setTimeLimit(timeLimit);
+        if(ticketUnit==1||ticketUnit==2||ticketUnit==3){//时长减免
+            fixCodeTb.setTimeLimit(amountLimit);
+        }else if(ticketUnit==4){//金额减免
+            fixCodeTb.setMoneyLimit(amountLimit);
+        }
+        //fixCodeTb.setTimeLimit(timeLimit);
         fixCodeTb.setCode(code[0]);
-        fixCodeTb.setAmount(amount);
-        fixCodeTb.setMoneyLimit(moneyLimit);
+//        fixCodeTb.setAmount(amount);
+        //fixCodeTb.setMoneyLimit(moneyLimit);
         fixCodeTb.setType(type);
         fixCodeTb.setCreateTime(btime);
         fixCodeTb.setEndTime(etime);

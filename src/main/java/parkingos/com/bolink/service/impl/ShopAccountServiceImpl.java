@@ -273,4 +273,15 @@ public class ShopAccountServiceImpl implements ShopAcccountService {
 
         return result;
     }
+
+    @Override
+    public Integer getTicketUnitById(Long shopid) {
+        ShopTb shopTb = new ShopTb();
+        shopTb.setId(shopid);
+        shopTb = (ShopTb)commonDao.selectObjectByConditions(shopTb);
+        if(shopTb!=null){
+            return shopTb.getTicketUnit();
+        }
+        return null;
+    }
 }

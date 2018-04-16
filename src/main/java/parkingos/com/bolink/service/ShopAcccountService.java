@@ -14,4 +14,6 @@ public interface ShopAcccountService {
     int updateShopById(ShopTb shopTb);
 
     JSONObject getRecharge(Map<String, String> reqParameterMap);
+
+    Integer getTicketUnitById(Long shopid);
 }
