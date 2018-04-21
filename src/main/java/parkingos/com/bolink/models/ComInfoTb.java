@@ -47,6 +47,16 @@ public class ComInfoTb {
 
     private Long updateTime;
 
+    private Long beatTime;
+
+    public Long getBeatTime() {
+        return beatTime;
+    }
+
+    public void setBeatTime(Long beatTime) {
+        this.beatTime = beatTime;
+    }
+
     private Integer state;
 
     private Long bizId;

@@ -86,6 +86,7 @@ public class TicketServiceImpl implements TicketService {
         List<SearchBean> searchList = new ArrayList<>();
         searchList.add( searchBean );
         Map<Long, String> shopNames = null;
+        Map<Long,Integer> shopUnits = null;
 
         if (shopName != null && !shopName.equals( "" )) {
 
@@ -99,9 +100,11 @@ public class TicketServiceImpl implements TicketService {
                 searchBean.setFieldName( "shop_id" );
                 List<Long> idList = new ArrayList<Long>();
                 shopNames = new HashMap<>();
+                shopUnits = new HashMap<>();
                 for (ShopTb s : shopList) {
                     idList.add( s.getId() );
                     shopNames.put( s.getId(), s.getName() );
+                    shopUnits.put(s.getId(),s.getTicketUnit());
                 }
                 searchBean.setBasicValue( idList );
 
@@ -127,8 +130,8 @@ public class TicketServiceImpl implements TicketService {
             if (list != null && !list.isEmpty()) {
 
                 //查询停车场名称 和ticket_unit
-                Map<Long,Integer> shopUnits = new HashMap<>();
                 if (shopNames == null) {
+                    shopUnits = new HashMap<>();
                     shopNames = new HashMap<>();
                     List<Long> idList = new ArrayList<>();
                     for (TicketTb product : list) {
@@ -408,6 +411,7 @@ public class TicketServiceImpl implements TicketService {
             ticketTb.setId(ticketid);
             ticketTb.setCreateTime(btime);
             ticketTb.setLimitDay(etime);
+            ticketTb.setRemark("");
             if(type==3){
                 ticketTb.setMoney(reduce);
             }else if(type==5){

@@ -5,9 +5,11 @@ import com.alibaba.fastjson.JSONObject;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import parkingos.com.bolink.dao.mybatis.mapper.ParkInfoMapper;
 import parkingos.com.bolink.dao.spring.CommonDao;
 import parkingos.com.bolink.enums.FieldOperator;
 import parkingos.com.bolink.models.ComInfoTb;
+import parkingos.com.bolink.models.OrderTb;
 import parkingos.com.bolink.qo.PageOrderConfig;
 import parkingos.com.bolink.qo.SearchBean;
 import parkingos.com.bolink.service.CityParkService;
@@ -29,7 +31,8 @@ public class CityParkServiceImpl implements CityParkService {
     private SupperSearchService<ComInfoTb> supperSearchService;
     @Autowired
     private CommonMethods commonMethods;
-
+    @Autowired
+    private ParkInfoMapper parkInfoMapper;
     @Override
     public JSONObject selectResultByConditions(Map<String, String> reqmap) {
         String str = "{\"total\":0,\"page\":1,\"rows\":[]}";
@@ -117,7 +120,51 @@ public class CityParkServiceImpl implements CityParkService {
                     for (ComInfoTb comInfoTb1 : list) {
                         OrmUtil<ComInfoTb> otm = new OrmUtil<>();
                         Map<String, Object> map = otm.pojoToMap(comInfoTb1);
-                        resList.add(map);
+
+                        Long parkid = comInfoTb1.getId();
+
+                        List<HashMap<String, Object>> tokenList = getParkStatusbc(parkid);
+                        if(tokenList!=null&&tokenList.size()>0&&tokenList.get(0).get("beat_time")!=null){
+                            map.put("beat_time",tokenList.get(0).get("beat_time"));
+                            //更新车场的心跳时间
+                            comInfoTb1.setBeatTime(Long.parseLong(tokenList.get(0).get("beat_time")+""));
+                            int update = commonDao.updateByPrimaryKey(comInfoTb1);
+                            logger.error("更新车场心跳时间"+update);
+                        }
+
+
+//                        OrderTb newOrder = new OrderTb();
+//                        newOrder.setComid(parkid);
+//                        newOrder.setState(0);
+//                        newOrder.setIshd(0);
+//
+//                        int total = commonDao.selectCountByConditions(newOrder);
+////
+//                        logger.error("=======>>>在场车辆"+total);
+//
+//
+//                            Integer parking_total = 0;
+//                            if(comInfoTb1.getParkingTotal()!= null){
+//                                parking_total=comInfoTb1.getParkingTotal();//车场车位数
+//                            }
+//                            Integer shareNumber = 0;
+//                            if(comInfoTb1.getShareNumber() != null){
+//                                shareNumber=comInfoTb1.getShareNumber();//车场车位分享数
+//                            }
+//                            Integer parktotal = 0;
+//                            if(shareNumber > 0){
+//                                parktotal = shareNumber;
+//                            }else{
+//                                parktotal = parking_total;
+//                            }
+//
+//                            Integer blank = parktotal -total;
+//                            if(blank<=0){
+//                                blank = 0;
+//                            }
+//                            map.put("blank",blank);
+
+                            resList.add(map);
                     }
                     result.put("rows", JSON.toJSON(resList));
                 }
@@ -497,6 +544,64 @@ public class CityParkServiceImpl implements CityParkService {
             }
         }
         return "0.0元/小时";
+    }
+
+
+    private List<HashMap<String, Object>> getParkStatusbc(Long parkid) {
+        List<HashMap<String, Object>> parkState = new ArrayList<HashMap<String, Object>>();
+        List<HashMap<String, Object>> parkLoginList = parkInfoMapper.getParkLogin(parkid + "");
+        if (parkLoginList != null && parkLoginList.size() > 0) {
+            for (HashMap<String, Object> loginmap : parkLoginList){
+                HashMap<String, Object> parkstatusmap = new HashMap<String, Object>();
+                Long beattime = (Long) loginmap.get("beattime");
+                Long logintime = (Long) loginmap.get("logintime");
+                String localid = (String) loginmap.get("localid");
+                if(localid == null)localid="";
+                boolean isonline = false;
+                if (beattime != null) {
+                    //心跳在60秒内证明在线
+                    isonline = isParkOnline(beattime.longValue(), 60);
+
+                    if (!isonline) {
+                        isonline = isParkOnline(logintime.longValue(), 10);
+                    }
+                }
+                if (isonline) {
+                    parkstatusmap.put("state", 1);
+//                    parkstatusmap.put("localid", localid.substring(localid.indexOf("_")+1));
+//                    parkstatusmap.put("beat_time",beattime);
+                } else {
+                    parkstatusmap.put("state", 0);
+
+//                    parkstatusmap.put("localid", localid.substring(localid.indexOf("_")+1));
+                }
+                if(beattime!=null){
+                    parkstatusmap.put("beat_time",beattime);
+                }else{
+                    parkstatusmap.put("beat_time",logintime);
+                }
+                parkState.add(parkstatusmap);
+            }
+        }
+
+        return parkState;
+    }
+
+    /**
+     * 判断车场是否在线
+     * @param time
+     * @param delayTime
+     * @return
+     * @time 2017年 下午12:03:41
+     * @author QuanHao
+     */
+    private boolean isParkOnline(long time,int delayTime){
+        long curTime = System.currentTimeMillis()/1000;
+        long margin = curTime-time;
+        if(margin-delayTime<=0){
+            return true;
+        }
+        return false;
     }
 
 }

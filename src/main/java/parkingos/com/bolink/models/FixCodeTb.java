@@ -17,6 +17,26 @@ public class FixCodeTb {
 
     private Long createTime;
 
+    private String name;
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public Integer getValiditeTime() {
+        return validiteTime;
+    }
+
+    public void setValiditeTime(Integer validiteTime) {
+        this.validiteTime = validiteTime;
+    }
+
+    private Integer validiteTime;
+
     private Long endTime;
 
     public Long getCreateTime() {

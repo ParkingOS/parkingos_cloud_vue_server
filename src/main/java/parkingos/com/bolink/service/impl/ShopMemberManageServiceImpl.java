@@ -97,12 +97,14 @@ public class ShopMemberManageServiceImpl implements ShopMemberManageService {
     @Override
     public String create(HttpServletRequest request) {
 
-        String nickname = RequestUtil.processParams( request, "nickname" );
-        try {
-            nickname = new String( nickname.getBytes( "ISO-8859-1" ), "UTF-8" );
-        } catch (UnsupportedEncodingException e) {
-            e.printStackTrace();
-        }
+//        String nickname = RequestUtil.processParams( request, "nickname" );
+//        try {
+//            nickname = new String( nickname.getBytes( "ISO-8859-1" ), "UTF-8" );
+//        } catch (UnsupportedEncodingException e) {
+//            e.printStackTrace();
+//        }
+        String nickname = StringUtils.decodeUTF8(StringUtils.decodeUTF8(RequestUtil.getString(request,"nickname")));
+
         String phone = RequestUtil.processParams( request, "phone" );
         String mobile = RequestUtil.processParams( request, "mobile" );
         Long comid = Long.valueOf( RequestUtil.processParams( request, "comid" ) );
