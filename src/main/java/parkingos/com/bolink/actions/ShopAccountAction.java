@@ -7,6 +7,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import parkingos.com.bolink.models.ShopTb;
 import parkingos.com.bolink.service.ShopAcccountService;
+import parkingos.com.bolink.utils.Check;
 import parkingos.com.bolink.utils.RequestUtil;
 import parkingos.com.bolink.utils.StringUtils;
 
@@ -75,6 +76,30 @@ public class ShopAccountAction {
         String defaultLimit = RequestUtil.getString(request,"default_limit");
         Integer handInputEnable = RequestUtil.getInteger(request,"hand_input_enable",-1);
         System.out.println("进入更改商户action"+id+defaultLimit+validiteTime+handInputEnable);
+
+        if(defaultLimit.endsWith(",")){
+            StringUtils.ajaxOutput(response,"{\"state\":0,\"msg\":\"请输入正确的默认额度\"}");
+            return null;
+        }
+        String[] defaultArr = defaultLimit.split(",");
+        System.out.println("====默认显示额度:"+defaultArr.length);
+        if(defaultArr.length<1){
+            StringUtils.ajaxOutput(response,"{\"state\":0,\"msg\":\"请输入正确的默认额度\"}");
+            return null;
+        }
+        if(defaultArr.length>3){
+            StringUtils.ajaxOutput(response,"{\"state\":0,\"msg\":\"最多支持三个默认额度\"}");
+            return null;
+
+        }
+        for(String str:defaultArr){
+            if(!Check.isNumber(str)){
+                StringUtils.ajaxOutput(response,"{\"state\":0,\"msg\":\"请输入正确的默认额度\"}");
+                return null;
+
+            }
+        }
+
 
         ShopTb shopTb = new ShopTb();
         if(id!=-1){

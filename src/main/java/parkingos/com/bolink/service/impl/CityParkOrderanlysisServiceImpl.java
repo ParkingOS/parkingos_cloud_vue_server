@@ -60,8 +60,16 @@ public class CityParkOrderanlysisServiceImpl implements CityParkOrderAnlysisServ
             sql +=" = "+Long.parseLong(comidStr)+" and end_time ";
             free_sql +=" = "+Long.parseLong(comidStr)+" and end_time ";
         }else {
-            sql +=" in ( select id from com_info_tb where state<>1 and groupid= "+Long.parseLong(reqmap.get("groupid"))+" )  and end_time  ";
-            free_sql +=" in ( select id from com_info_tb where state<>1 and groupid= "+Long.parseLong(reqmap.get("groupid"))+" )  and end_time  ";
+            List parkList = commonMethods.getParks(Long.parseLong(reqmap.get("groupid")));
+            String preParams  ="";
+            for(Object parkid : parkList){
+                if(preParams.equals(""))
+                    preParams =parkid+"";
+                else
+                    preParams += ","+parkid;
+            }
+            sql +=" in (" +preParams+" )  and end_time  ";
+            free_sql +=" in ( "+preParams+" )  and end_time  ";
         }
 
 

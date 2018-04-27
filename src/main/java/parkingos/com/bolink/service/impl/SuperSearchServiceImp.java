@@ -260,8 +260,18 @@ public class SuperSearchServiceImp<T> implements SupperSearchService<T> {
                             bean.setStartValue(Double.valueOf( params.get(key+"_start") ));
                             bean.setEndValue(Double.valueOf( params.get(key+"_end") ));
                         }else if(fieldType== FieldTypes.DATE){
-                            bean.setStartValue(Long.valueOf(start)/1000);
-                            bean.setEndValue(Long.valueOf(end)/1000);
+                            if (start.length() > 10) {
+                                bean.setStartValue(Long.valueOf(start)/1000);
+                            } else {
+                                bean.setStartValue(Long.valueOf(start));
+                            }
+                            if (end.length() > 10) {
+                                bean.setEndValue(Long.valueOf(end)/1000);
+                            } else {
+                                bean.setEndValue(Long.valueOf(end));
+                            }
+//                            bean.setStartValue(Long.valueOf(start)/1000);
+//                            bean.setEndValue(Long.valueOf(end)/1000);
                         }
 
                         resultList.add(bean);

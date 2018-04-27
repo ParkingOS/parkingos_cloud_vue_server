@@ -22,6 +22,8 @@ public class GroupMonthParkOrderanlysisServiceImpl implements GroupMonthParkOrde
 
     @Autowired
     private CommonDao commonDao;
+    @Autowired
+    private CommonMethods commonMethods;
 
     @Autowired
     private SupperSearchService<OrderTb> supperSearchService;
@@ -79,8 +81,16 @@ public class GroupMonthParkOrderanlysisServiceImpl implements GroupMonthParkOrde
                     "sum(reduce_amount) reduce_pay from order_tb where comid";
             String free_sql = "select count(*) scount,sum(amount_receivable-electronic_prepay-cash_prepay-reduce_amount) free_pay from order_tb where comid";
 
-            sql +=" in ( select id from com_info_tb where state<>1 and groupid= "+Long.parseLong(reqmap.get("groupid"))+" )  and end_time  ";
-            free_sql +=" in ( select id from com_info_tb where state<>1 and groupid= "+Long.parseLong(reqmap.get("groupid"))+" )  and end_time";
+            List parkList = commonMethods.getParks(Long.parseLong(reqmap.get("groupid")));
+            String preParams  ="";
+            for(Object parkid : parkList){
+                if(preParams.equals(""))
+                    preParams =parkid+"";
+                else
+                    preParams += ","+parkid;
+            }
+            sql +=" in ("+ preParams+" )  and end_time  ";
+            free_sql +=" in ( "+preParams+" )  and end_time";
 
             sql +=" between "+b+" and "+e;
             free_sql +=" between "+b+" and "+e;
