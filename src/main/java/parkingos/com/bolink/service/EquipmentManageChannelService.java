@@ -13,4 +13,6 @@ public interface EquipmentManageChannelService {
     public Integer updateResultByConditions(ComPassTb comPassTb);
 
     public Integer removeResultByConditions(ComPassTb comPassTb);
+
+    Long getId();
 }

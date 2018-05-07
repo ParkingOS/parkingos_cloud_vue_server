@@ -445,11 +445,11 @@ public class VipServiceImpl implements VipService {
         Long ntime = System.currentTimeMillis()/1000;
 //        Long btime = TimeTools.getLongMilliSecondFrom_HHMMDD(b_time)/1000+86400;
         Long btime = RequestUtil.getLong(req,"b_time",ntime);
-//        System.out.println("chenbowen+++>>>:"+btime);
+        System.out.println("chenbowen+++>>>:"+btime);
         Calendar calendar = Calendar.getInstance();
-        calendar.setTimeInMillis(btime*1000);
+        calendar.setTimeInMillis((btime+1)*1000);
         calendar.set(Calendar.MONTH, calendar.get(Calendar.MONTH)+months);
-        Long etime = calendar.getTimeInMillis()/1000;
+        Long etime = calendar.getTimeInMillis()/1000-1;
 
         //金额
         Double total = Double.parseDouble(getDataService.getprodsum(pid, months));

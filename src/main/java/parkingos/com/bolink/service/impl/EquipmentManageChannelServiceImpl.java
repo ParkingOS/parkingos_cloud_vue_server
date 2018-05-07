@@ -6,7 +6,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import parkingos.com.bolink.dao.spring.CommonDao;
+import parkingos.com.bolink.models.CarTypeTb;
 import parkingos.com.bolink.models.ComPassTb;
+import parkingos.com.bolink.models.SyncInfoPoolTb;
 import parkingos.com.bolink.service.EquipmentManageChannelService;
 import parkingos.com.bolink.service.SupperSearchService;
 
@@ -52,7 +54,23 @@ public class EquipmentManageChannelServiceImpl implements EquipmentManageChannel
     @Transactional
     public Integer removeResultByConditions(ComPassTb comPassTb) {
         Integer result = commonDao.updateByPrimaryKey(comPassTb);
+        if(result==1){
+            SyncInfoPoolTb syncInfoPoolTb = new SyncInfoPoolTb();
+            syncInfoPoolTb.setOperate(2);
+            syncInfoPoolTb.setComid(comPassTb.getComid());
+            syncInfoPoolTb.setCreateTime(System.currentTimeMillis()/1000);
+            syncInfoPoolTb.setTableId(comPassTb.getId());
+            syncInfoPoolTb.setTableName("com_pass_tb");
+            syncInfoPoolTb.setState(0);
+            int ins = commonDao.insert(syncInfoPoolTb);
+            logger.info("插入同步表:"+syncInfoPoolTb);
+        }
         return result;
+    }
+
+    @Override
+    public Long getId() {
+        return commonDao.selectSequence(ComPassTb.class);
     }
 
 }

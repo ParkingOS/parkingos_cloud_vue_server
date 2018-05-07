@@ -54,7 +54,7 @@ public class EquipmentManageChannelAction {
 	@RequestMapping(value = "/add")
 	public String add(HttpServletRequest request, HttpServletResponse response) {
 
-		Long id = RequestUtil.getLong(request,"id",null);
+//		Long id = RequestUtil.getLong(request,"id",null);
 		String passname = RequestUtil.processParams(request,"passname");
 		String passtype = RequestUtil.processParams(request,"passtype");
 		Integer monthSet = RequestUtil.getInteger(request,"month_set",0);
@@ -65,6 +65,7 @@ public class EquipmentManageChannelAction {
 		Map<String, String> reqParameterMap = RequestUtil.readBodyFormRequset(request);
 		Long comid = Long.valueOf(Integer.valueOf(reqParameterMap.get("comid")));
 
+		Long id= equipmentManageChannelService.getId();
 		ComPassTb comPassTb = new ComPassTb();
 		comPassTb.setId(id);
 		comPassTb.setPassname(passname);
@@ -74,6 +75,7 @@ public class EquipmentManageChannelAction {
 		comPassTb.setWorksiteId(worksiteId);
 		comPassTb.setDescription(description);
 		comPassTb.setComid(comid);
+		comPassTb.setChannelId(id+"");
 		comPassTb.setState(0);
 
 		String result = equipmentManageChannelService.insertResultByConditions(comPassTb).toString();

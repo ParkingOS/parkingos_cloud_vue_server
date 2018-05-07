@@ -217,7 +217,7 @@ public class CityParkServiceImpl implements CityParkService {
             groupId = RequestUtil.getLong(request, "group_id", -1L);
         }
         System.out.println("==============chenbowen:" + groupId);
-        String company = StringUtils.decodeUTF8(RequestUtil.processParams(request, "company_name"));
+        String company = RequestUtil.processParams(request, "company_name");
         company = company.replace("\r", "").replace("\n", "");
         String address = StringUtils.decodeUTF8(RequestUtil.processParams(request, "address"));
         address = address.replace("\r", "").replace("\n", "");
