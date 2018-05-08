@@ -91,7 +91,7 @@ public class CarRenewServiceImpl implements CarRenewService {
 
 		List<List<Object>> bodyList = new ArrayList<List<Object>>();
 		if (cardRenewList != null && cardRenewList.size() > 0) {
-			String[] f = new String[]{"id", "trade_no", "card_id", "pay_time", "amount_receivable", "amount_pay", "collector", "pay_type", "car_number", "user_id", "limit_time", "resume"};
+			String[] f = new String[]{"trade_no", "card_id", "pay_time", "amount_receivable", "amount_pay", "collector", "pay_type", "car_number", "user_id", "start_time","limit_time", "resume"};
 			for (CardRenewTb cardRenewTb : cardRenewList) {
 				//javabean转map取参数
 //				List<String> values = new ArrayList<String>();
@@ -111,11 +111,11 @@ public class CarRenewServiceImpl implements CarRenewService {
 						else
 							values.add(uid + "");
 					} else {
-						if ("create_time".equals(field) || "pay_time".equals(field) || "limit_time".equals(field)) {
+						if ("create_time".equals(field) || "pay_time".equals(field) || "limit_time".equals(field)||"start_time".equals(field)) {
 							if (map.get(field) != null) {
 								values.add(TimeTools.getTime_yyyyMMdd_HHmmss(Long.valueOf((map.get(field) + "")) * 1000));
 							} else {
-								values.add("null");
+								values.add("");
 							}
 						} else {
 							values.add(map.get(field) + "");

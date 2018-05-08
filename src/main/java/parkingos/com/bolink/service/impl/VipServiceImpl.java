@@ -286,6 +286,8 @@ public class VipServiceImpl implements VipService {
         cardRenewTb.setComid(comid+"");
         cardRenewTb.setCreateTime(ntime.intValue());
         cardRenewTb.setUpdateTime(ntime.intValue());
+        cardRenewTb.setStartTime(btime);
+        cardRenewTb.setLimitTime(etime);
         int renew = commonDao.insert(cardRenewTb);
 
 

@@ -44,7 +44,7 @@ public class CarRenewAction {
         Map<String, String> reqParameterMap = RequestUtil.readBodyFormRequset(request);
 
 //        String[]  heards = new String[]{"编号", "购买流水号", "月卡编号", "月卡续费时间", "应收金额", "实收金额", "收费员", "缴费类型", "车牌号", "用户编号", "有效期", "备注"};
-        String[][]  heards = new String[][]{{"编号","STR"}, {"购买流水号","STR"}, {"月卡编号","STR"}, {"月卡续费时间","STR"}, {"应收金额","STR"}, {"实收金额","STR"}, {"收费员","STR"}, {"缴费类型","STR"}, {"车牌号","STR"}, {"用户编号","STR"}, {"有效期","STR"}, {"备注","STR"}};
+        String[][]  heards = new String[][]{{"购买流水号","STR"}, {"月卡编号","STR"}, {"月卡续费时间","STR"}, {"应收金额","STR"}, {"实收金额","STR"}, {"收费员","STR"}, {"缴费类型","STR"}, {"车牌号","STR"}, {"用户编号","STR"}, {"开始时间","STR"},{"结束时间","STR"}, {"备注","STR"}};
         logger.info(reqParameterMap);
         //获取要到处的数据
 //        List<List<String>> bodyList = carRenewService.exportExcel(reqParameterMap);
