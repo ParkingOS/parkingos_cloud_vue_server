@@ -43,6 +43,16 @@ public class ShopTb {
 
     private Integer handInputEnable;
 
+    private Integer supportType;
+
+    public Integer getSupportType() {
+        return supportType;
+    }
+
+    public void setSupportType(Integer supportType) {
+        this.supportType = supportType;
+    }
+
     public Long getId() {
         return id;
     }

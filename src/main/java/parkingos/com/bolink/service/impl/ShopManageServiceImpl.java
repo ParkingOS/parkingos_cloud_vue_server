@@ -151,6 +151,8 @@ public class ShopManageServiceImpl implements ShopManageService {
         //String phone = RequestUtil.processParams( request, "phone" );
         Integer ticket_type = RequestUtil.getInteger( request, "ticket_type", 1 );
         Integer handInputEnable = RequestUtil.getInteger( request, "hand_input_enable", 0 );
+        Integer supportType = RequestUtil.getInteger(request,"support_type",1);
+        System.out.println("全免券是否支持:"+supportType);
         System.out.println("====是否可手输额度:"+handInputEnable);
         String default_limit = RequestUtil.getString( request, "default_limit" );
         System.out.println("====默认显示额度:"+default_limit);
@@ -191,6 +193,7 @@ public class ShopManageServiceImpl implements ShopManageService {
         shopTb.setValiditeTime( validite_time );
         shopTb.setFreeMoney( new BigDecimal( free_money ) );
         shopTb.setHandInputEnable(handInputEnable);
+        shopTb.setSupportType(supportType);
 
         shopTb.setComid( RequestUtil.getLong( request, "comid", -1L ) );
         int update = 0;

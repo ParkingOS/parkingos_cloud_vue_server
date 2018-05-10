@@ -40,6 +40,17 @@ public class EquipmentManageChannelServiceImpl implements EquipmentManageChannel
     @Transactional
     public Integer insertResultByConditions(ComPassTb comPassTb) {
         Integer result = commonDao.insert(comPassTb);
+        if(result==1){
+            SyncInfoPoolTb syncInfoPoolTb = new SyncInfoPoolTb();
+            syncInfoPoolTb.setOperate(0);
+            syncInfoPoolTb.setComid(comPassTb.getComid());
+            syncInfoPoolTb.setCreateTime(System.currentTimeMillis()/1000);
+            syncInfoPoolTb.setTableId(comPassTb.getId());
+            syncInfoPoolTb.setTableName("com_pass_tb");
+            syncInfoPoolTb.setState(0);
+            int ins = commonDao.insert(syncInfoPoolTb);
+            logger.info("插入同步表:"+ins);
+        }
         return result;
     }
 
@@ -47,6 +58,20 @@ public class EquipmentManageChannelServiceImpl implements EquipmentManageChannel
     @Transactional
     public Integer updateResultByConditions(ComPassTb comPassTb) {
         Integer result = commonDao.updateByPrimaryKey(comPassTb);
+        if(result==1){
+            ComPassTb con = new ComPassTb();
+            con.setId(comPassTb.getId());
+            comPassTb=(ComPassTb)commonDao.selectObjectByConditions(con);
+            SyncInfoPoolTb syncInfoPoolTb = new SyncInfoPoolTb();
+            syncInfoPoolTb.setOperate(1);
+            syncInfoPoolTb.setComid(comPassTb.getComid());
+            syncInfoPoolTb.setCreateTime(System.currentTimeMillis()/1000);
+            syncInfoPoolTb.setTableId(comPassTb.getId());
+            syncInfoPoolTb.setTableName("com_pass_tb");
+            syncInfoPoolTb.setState(0);
+            int ins = commonDao.insert(syncInfoPoolTb);
+            logger.info("插入同步表:"+ins);
+        }
         return result;
     }
 
@@ -55,6 +80,9 @@ public class EquipmentManageChannelServiceImpl implements EquipmentManageChannel
     public Integer removeResultByConditions(ComPassTb comPassTb) {
         Integer result = commonDao.updateByPrimaryKey(comPassTb);
         if(result==1){
+            ComPassTb con = new ComPassTb();
+            con.setId(comPassTb.getId());
+            comPassTb=(ComPassTb)commonDao.selectObjectByConditions(con);
             SyncInfoPoolTb syncInfoPoolTb = new SyncInfoPoolTb();
             syncInfoPoolTb.setOperate(2);
             syncInfoPoolTb.setComid(comPassTb.getComid());
@@ -63,7 +91,7 @@ public class EquipmentManageChannelServiceImpl implements EquipmentManageChannel
             syncInfoPoolTb.setTableName("com_pass_tb");
             syncInfoPoolTb.setState(0);
             int ins = commonDao.insert(syncInfoPoolTb);
-            logger.info("插入同步表:"+syncInfoPoolTb);
+            logger.info("插入同步表:"+ins);
         }
         return result;
     }
