@@ -1,17 +1,24 @@
 package parkingos.com.bolink.service.impl;
 
+import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import org.apache.log4j.Logger;
+import org.apache.poi.ss.formula.functions.T;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import parkingos.com.bolink.dao.spring.CommonDao;
 import parkingos.com.bolink.models.FixCodeTb;
 import parkingos.com.bolink.models.ShopTb;
+import parkingos.com.bolink.qo.PageOrderConfig;
+import parkingos.com.bolink.qo.SearchBean;
 import parkingos.com.bolink.service.FixCodeService;
 import parkingos.com.bolink.service.SupperSearchService;
 import parkingos.com.bolink.service.TicketService;
 import parkingos.com.bolink.utils.CustomDefind;
+import parkingos.com.bolink.utils.OrmUtil;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 @Service
@@ -27,14 +34,55 @@ public class FixCodeServiceImpl implements FixCodeService {
     private TicketService ticketService;
 
     @Override
-    public JSONObject selectResultByConditions(Map<String, String> reqmap) {
+    public JSONObject selectResultByConditions(Map<String, String> params) {
+
+
+        JSONObject result = new JSONObject();
 
         FixCodeTb fixCodeTb = new FixCodeTb();
-        fixCodeTb.setShopId(Long.parseLong(reqmap.get("shopid")));
-
-        JSONObject result =  supperSearchService.supperSearch(fixCodeTb, reqmap);
-
+        fixCodeTb.setShopId(Long.parseLong(params.get("shopid")));
+        int count =0;
+        List<FixCodeTb> list =null;
+        List<Map<String, Object>> resList =new ArrayList<>();
+        Map searchMap = supperSearchService.getBaseSearch(fixCodeTb,params);
+        logger.info(searchMap);
+        if(searchMap!=null&&!searchMap.isEmpty()){
+            FixCodeTb t1 =(FixCodeTb)searchMap.get("base");
+            List<SearchBean> supperQuery = null;
+            if(searchMap.containsKey("supper"))
+                supperQuery = (List<SearchBean>)searchMap.get("supper");
+            PageOrderConfig config = null;
+            if(searchMap.containsKey("config"))
+                config = (PageOrderConfig)searchMap.get("config");
+            count = commonDao.selectCountByConditions(t1,supperQuery);
+            if(count>0){
+                if (config == null) {
+                    config = new PageOrderConfig();
+                    config.setPageInfo(1, Integer.MAX_VALUE);
+                }
+                list  = commonDao.selectListByConditions(t1,supperQuery,config);
+                if (list != null && !list.isEmpty()) {
+                    for (FixCodeTb fixCodeTb1 : list) {
+                        OrmUtil<FixCodeTb> otm = new OrmUtil<>();
+                        Map<String, Object> map = otm.pojoToMap(fixCodeTb1);
+                        if(map.get("end_time")!=null){
+                            if(Long.parseLong(map.get("end_time")+"")<System.currentTimeMillis()/1000){//已过期
+                                map.put("state",2);
+                            }
+                        }
+                        resList.add(map);
+                    }
+                    result.put("rows", JSON.toJSON(resList));
+                }
+            }
+        }
+        result.put("total",count);
+        //result.put("page",Integer.parseInt(params.get("page")));
+        if(params.get("page")!=null){
+            result.put("page",Integer.parseInt(params.get("page")));
+        }
         return result;
+
     }
 
     @Override
