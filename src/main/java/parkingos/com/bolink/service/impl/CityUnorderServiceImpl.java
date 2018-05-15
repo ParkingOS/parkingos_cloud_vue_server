@@ -79,6 +79,9 @@ public class CityUnorderServiceImpl implements CityUnorderService {
 //        System.out.println("=====groupid:"+groupid+"===cityid:"+cityid);
 
         Map searchMap = supperSearchService.getGroupOrCitySearch(orderTb,reqmap);
+        if(searchMap==null){
+            return result;
+        }
         OrderTb baseQuery =(OrderTb)searchMap.get("base");
         List<SearchBean> supperQuery =(List<SearchBean>)searchMap.get("supper");
         PageOrderConfig config = (PageOrderConfig)searchMap.get("config");

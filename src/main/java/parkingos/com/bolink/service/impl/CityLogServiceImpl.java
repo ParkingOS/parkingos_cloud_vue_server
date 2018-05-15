@@ -66,6 +66,9 @@ public class CityLogServiceImpl implements CityLogService {
 
             System.out.println("=======parks:"+parks);
 
+            if(parks==null||parks.isEmpty()){
+                return result;
+            }
             //封装searchbean  集团或城市下面所有车场
             SearchBean searchBean = new SearchBean();
             searchBean.setOperator(FieldOperator.CONTAINS);

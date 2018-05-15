@@ -96,32 +96,33 @@ public class CityVipServiceImpl implements CityVipService {
             }
 
             System.out.println("=======parks:"+parks);
+            if(parks!=null&&!parks.isEmpty()){
+                //封装searchbean  要
+                SearchBean searchBean = new SearchBean();
+                searchBean.setOperator(FieldOperator.CONTAINS);
+                searchBean.setFieldName("com_id");
+                searchBean.setBasicValue(parks);
 
-            //封装searchbean  要
-            SearchBean searchBean = new SearchBean();
-            searchBean.setOperator(FieldOperator.CONTAINS);
-            searchBean.setFieldName("com_id");
-            searchBean.setBasicValue(parks);
-
-            if (supperQuery == null) {
-                supperQuery = new ArrayList<>();
-            }
-            supperQuery.add( searchBean );
-
-            count = commonDao.selectCountByConditions(baseQuery,supperQuery);
-            if(count>0){
-                if(config==null){
-                    config = new PageOrderConfig();
-                    config.setPageInfo(null,null);
+                if (supperQuery == null) {
+                    supperQuery = new ArrayList<>();
                 }
-                list = commonDao.selectListByConditions(baseQuery,supperQuery,config);
-                if (list != null && !list.isEmpty()) {
-                    for (CarowerProduct carowerProduct1 : list) {
-                        OrmUtil<CarowerProduct> otm = new OrmUtil<>();
-                        Map<String, Object> map = otm.pojoToMap(carowerProduct1);
-                        resList.add(map);
+                supperQuery.add( searchBean );
+
+                count = commonDao.selectCountByConditions(baseQuery,supperQuery);
+                if(count>0){
+                    if(config==null){
+                        config = new PageOrderConfig();
+                        config.setPageInfo(null,null);
                     }
-                    result.put("rows", JSON.toJSON(resList));
+                    list = commonDao.selectListByConditions(baseQuery,supperQuery,config);
+                    if (list != null && !list.isEmpty()) {
+                        for (CarowerProduct carowerProduct1 : list) {
+                            OrmUtil<CarowerProduct> otm = new OrmUtil<>();
+                            Map<String, Object> map = otm.pojoToMap(carowerProduct1);
+                            resList.add(map);
+                        }
+                        result.put("rows", JSON.toJSON(resList));
+                    }
                 }
             }
         }

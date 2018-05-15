@@ -57,6 +57,9 @@ public class CityBlackUserServiceImpl implements CityBlackUserService {
         }
 
         Map searchMap = supperSearchService.getGroupOrCitySearch(zldBlackTb,reqmap);
+        if(searchMap==null){
+            return result;
+        }
         ZldBlackTb baseQuery =(ZldBlackTb)searchMap.get("base");
         List<SearchBean> supperQuery =(List<SearchBean>)searchMap.get("supper");
         PageOrderConfig config = (PageOrderConfig)searchMap.get("config");

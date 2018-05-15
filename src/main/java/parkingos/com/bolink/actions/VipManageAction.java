@@ -65,6 +65,17 @@ public class VipManageAction {
         return null;
     }
 
+
+    @RequestMapping(value = "edit")
+    public String edit(HttpServletRequest req, HttpServletResponse resp) throws Exception{
+
+        JSONObject result = vipService.editVip(req);
+
+        StringUtils.ajaxOutput(resp,result.toJSONString());
+
+        return null;
+    }
+
     @RequestMapping(value = "delete")
     public String delete(HttpServletRequest req, HttpServletResponse resp){
         Long id = RequestUtil.getLong(req, "id", -1L);

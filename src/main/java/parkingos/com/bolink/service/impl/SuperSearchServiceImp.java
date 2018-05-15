@@ -121,26 +121,27 @@ public class SuperSearchServiceImp<T> implements SupperSearchService<T> {
             }else if(cityid !=null&&!"".equals(cityid)){
                 parks = commonMethods.getparks(Long.parseLong(cityid));
             }
+            if(parks!=null&&!parks.isEmpty()){
+                System.out.println("=======parks:"+parks);
 
-            System.out.println("=======parks:"+parks);
+                //封装searchbean  集团或者城市下面所有车场
+                SearchBean searchBean = new SearchBean();
+                searchBean.setOperator(FieldOperator.CONTAINS);
+                searchBean.setFieldName("comid");
+                searchBean.setBasicValue(parks);
 
-            //封装searchbean  集团或者城市下面所有车场
-            SearchBean searchBean = new SearchBean();
-            searchBean.setOperator(FieldOperator.CONTAINS);
-            searchBean.setFieldName("comid");
-            searchBean.setBasicValue(parks);
+                if (supperQuery == null) {
+                    supperQuery = new ArrayList<>();
+                }
+                supperQuery.add( searchBean );
 
-            if (supperQuery == null) {
-                supperQuery = new ArrayList<>();
+                searchMap.put("supper",supperQuery);
+                searchMap.put("config",config);
+                searchMap.put("base",baseQuery);
+                return searchMap;
             }
-            supperQuery.add( searchBean );
-
-            searchMap.put("supper",supperQuery);
-            searchMap.put("config",config);
-            searchMap.put("base",baseQuery);
         }
-
-        return searchMap;
+        return null;
     }
 
     @Override
