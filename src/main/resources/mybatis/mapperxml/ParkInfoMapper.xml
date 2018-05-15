@@ -31,6 +31,7 @@
         and a.end_time > #{create_time,jdbcType=BIGINT}
         and a.groupid= #{groupid,jdbcType=BIGINT}
         and a.state in(1,2)
+        and b.state = 0
         ORDER BY a.end_time DESC
         limit  10
         ]]>
@@ -43,6 +44,7 @@
     where a.comid=b.id
      and a.end_time > #{end_time,jdbcType=BIGINT}
      and a.groupid= #{groupid,jdbcType=BIGINT}
+     and b.state= 0
      and total >0
      GROUP BY a.comid, b.company_name
       ORDER BY  total desc
@@ -53,6 +55,7 @@
         select COALESCE(sum(a.parking_total),0) AS "parkingtotal"
         from com_info_tb a
         where a.groupid = #{groupid,jdbcType=BIGINT}
+        and a.state = 0
     </select>
    <!--获取今日电子收费-->
     <select id="getElectronicPay"  resultType="java.lang.Double">
@@ -111,6 +114,7 @@
         from com_info_tb a
         where
         a.groupid= #{groupid,jdbcType=BIGINT}
+        and a.state = 0
     </select>
     <!--根据车场id查询登录信息-->
     <select id="getParkLogin"  resultType="map">
@@ -245,6 +249,7 @@ and a.ctime>#{ctime,jdbcType=BIGINT}
         select COALESCE(sum(a.parking_total),0) AS "parkingtotal"
         from com_info_tb a
         where a.id= #{comid,jdbcType=BIGINT}
+        and a.state= 0
     </select>
     <!--根据comid查询抬杆异常信息-->
     <select id="getExpByCid"  resultType="map">
