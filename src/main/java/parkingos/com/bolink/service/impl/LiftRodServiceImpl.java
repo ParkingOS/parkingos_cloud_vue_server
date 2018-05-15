@@ -48,6 +48,11 @@ public class LiftRodServiceImpl implements LiftRodService {
             reqmap.put("ctime_end",(TimeTools.getToDayBeginTime()+86399+""));
             logger.error("=========..req"+reqmap.size());
         }
+        String reason= reqmap.get("reason");
+        if("-1".equals(reason)){//全部原因。
+            reqmap.remove("reason");
+            reqmap.remove("reason_start");
+        }
         JSONObject result = supperSearchService.supperSearch(liftRodTb,reqmap);
         return result;
     }

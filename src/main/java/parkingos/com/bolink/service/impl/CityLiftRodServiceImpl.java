@@ -46,6 +46,9 @@ public class CityLiftRodServiceImpl implements CityLiftRodService {
         LiftRodTb liftRodTb = new LiftRodTb();
 
         Map searchMap = supperSearchService.getGroupOrCitySearch(liftRodTb,reqmap);
+        if(searchMap==null){
+            return result;
+        }
         LiftRodTb baseQuery =(LiftRodTb)searchMap.get("base");
         List<SearchBean> supperQuery =(List<SearchBean>)searchMap.get("supper");
         PageOrderConfig config = (PageOrderConfig)searchMap.get("config");

@@ -31,7 +31,8 @@ public class GroupMonthParkOrderanlysisServiceImpl implements GroupMonthParkOrde
     @Override
     public JSONObject selectResultByConditions(Map<String, String> reqmap) throws Exception{
 
-        JSONObject result = new JSONObject();
+        String strq = "{\"page\":1,\"rows\":[]}";
+        JSONObject result = JSONObject.parseObject(strq);
 
 
 //        Long comid = Long.parseLong(reqmap.get("comid"));
@@ -83,14 +84,19 @@ public class GroupMonthParkOrderanlysisServiceImpl implements GroupMonthParkOrde
 
             List parkList = commonMethods.getParks(Long.parseLong(reqmap.get("groupid")));
             String preParams  ="";
-            for(Object parkid : parkList){
-                if(preParams.equals(""))
-                    preParams =parkid+"";
-                else
-                    preParams += ","+parkid;
+            if(parkList!=null&&!parkList.isEmpty()){
+                for(Object parkid : parkList){
+                    if(preParams.equals(""))
+                        preParams =parkid+"";
+                    else
+                        preParams += ","+parkid;
+                }
+                sql +=" in ("+ preParams+" )  and end_time  ";
+                free_sql +=" in ( "+preParams+" )  and end_time";
+            }else{
+                return result;
             }
-            sql +=" in ("+ preParams+" )  and end_time  ";
-            free_sql +=" in ( "+preParams+" )  and end_time";
+
 
             sql +=" between "+b+" and "+e;
             free_sql +=" between "+b+" and "+e;

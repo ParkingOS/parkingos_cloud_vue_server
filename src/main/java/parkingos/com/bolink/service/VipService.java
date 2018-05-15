@@ -24,4 +24,6 @@ public interface VipService {
     JSONObject renewProduct(HttpServletRequest req);
 
     List<List<String>> exportExcel(Map<String, String> reqParameterMap);
+
+    JSONObject editVip(HttpServletRequest req);
 }
