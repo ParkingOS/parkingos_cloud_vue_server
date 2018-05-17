@@ -110,21 +110,35 @@ public class ProductPackageServiceImpl implements ProductPackageService {
         if(reqParameterMap.get("period")!=null&&!"undefined".equals(reqParameterMap.get("period"))){
             period =reqParameterMap.get("period");
         }
-        Long carTypeId =-1L;
-        if(reqParameterMap.get("car_type_id")!=null){
-            carTypeId = Long.parseLong(reqParameterMap.get("car_type_id"));
-        }
+//        String carTypeId =-1L;
+//        if(reqParameterMap.get("car_type_id")!=null){
+//            try{
+//                carTypeId = Long.parseLong(reqParameterMap.get("car_type_id"));
+//            }catch (Exception e){
+//                logger.error("=====>>>>"+reqParameterMap.get("car_type_id"));
+//                carTypeId=-1L;
+//            }
+//
+//        }
+        String carTypeId = reqParameterMap.get("car_type_id");
         Double price = 0.0;//RequestUtil.getDouble(request, "price", 0.0);
         if(reqParameterMap.get("price")!=null){
-            price = Double.parseDouble(reqParameterMap.get("price"));
+            try{
+                price = Double.parseDouble(reqParameterMap.get("price"));
+            }catch (Exception e){
+                logger.error("=====>>>>"+reqParameterMap.get("price"));
+                price = 0.0;
+            }
+
         }
+        logger.error("oooo+++"+price);
         BigDecimal bigDecimal = new BigDecimal(price+"");
 
         ProductPackageTb productPackageTb = new ProductPackageTb();
         productPackageTb.setId(id);
         productPackageTb.setUpdateTime(updateTime);
         productPackageTb.setComid(comid);
-        productPackageTb.setCarTypeId(carTypeId+"");
+        productPackageTb.setCarTypeId(carTypeId);
         productPackageTb.setPrice(bigDecimal);
         productPackageTb.setpName(p_name);
         productPackageTb.setDescribe(describe);
