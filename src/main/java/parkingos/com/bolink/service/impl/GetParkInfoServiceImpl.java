@@ -111,20 +111,25 @@ public class GetParkInfoServiceImpl implements GetParkInfoService {
         countMap.put("inPark", inPark);
         //计算泊位使用率
         List<HashMap<String,Object>> parkidList = parkInfoMapper.getParkIdByGroupId(groupid);
-        List<HashMap<String,Object>> ss =parkInfoMapper.getBerthPercent(parkidList,tday);
-        for(HashMap<String,Object> map :ss){
-            Long asum = (Long)map.get("asum");
-            Long usum = (Long) map.get("usum");
-            DecimalFormat df = new DecimalFormat("#");
-            double pecent=0d;
-            if(usum !=0){
-                pecent =  (float)usum*100/asum ;
+        List<HashMap<String,Object>> ss =new ArrayList<HashMap<String,Object>>();
+        if(parkidList!=null) {
+            ss = parkInfoMapper.getBerthPercent(parkidList, tday);
+        }
+        if(ss!=null&&ss.size()>0) {
+            for (HashMap<String, Object> map : ss) {
+                Long asum = (Long) map.get("asum");
+                Long usum = (Long) map.get("usum");
+                DecimalFormat df = new DecimalFormat("#");
+                double pecent = 0d;
+                if (usum != 0) {
+                    pecent = (float) usum * 100 / asum;
+                }
+                SimpleDateFormat sdf = new SimpleDateFormat("HH");
+                long time = (long) map.get("create_time");
+                Date date = new Date(time * 1000);
+                map.put("time", sdf.format(date));
+                map.put("percent", df.format(pecent));
             }
-            SimpleDateFormat sdf = new SimpleDateFormat("HH");
-            long time = (long) map.get("create_time");
-            Date date = new Date(time * 1000);
-            map.put("time", sdf.format(date));
-            map.put("percent",df.format(pecent));
         }
         DecimalFormat df = new DecimalFormat("#");
         double parkOnpecent=0d;
