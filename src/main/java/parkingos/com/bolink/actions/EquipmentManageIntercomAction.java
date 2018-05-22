@@ -55,11 +55,9 @@ public class EquipmentManageIntercomAction {
 
 		Map<String, String> reqParameterMap = RequestUtil.readBodyFormRequset(request);
 
-		logger.info(reqParameterMap);
 
 		JSONObject result = equipmentManageIntercomService.selectResultByConditions(reqParameterMap);
 
-		logger.info(result);
 		StringUtils.ajaxOutput(response,result.toJSONString());
 		return null;
 	}

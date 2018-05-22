@@ -27,7 +27,6 @@ public class ShopManageAction {
     @RequestMapping("/addmoney")
     public String addMoney(HttpServletRequest request, HttpServletResponse resp) {
         String result = shopManageService.addMoney( request );
-        logger.info( result );
         StringUtils.ajaxOutput( resp, result );
         return null;
     }
@@ -39,7 +38,6 @@ public class ShopManageAction {
     public String create(HttpServletRequest request, HttpServletResponse resp) {
 
         String result = shopManageService.create( request );
-        logger.info( result );
         StringUtils.ajaxOutput( resp, result );
         return null;
     }
@@ -52,7 +50,6 @@ public class ShopManageAction {
     public String query(HttpServletRequest req, HttpServletResponse resp) {
 
         String result = shopManageService.quickquery( req );
-        logger.info( result );
         StringUtils.ajaxOutput( resp, result );
         return null;
     }
@@ -63,7 +60,6 @@ public class ShopManageAction {
     @RequestMapping("/delete")
     public String delete(HttpServletRequest request, HttpServletResponse resp) {
         String result = shopManageService.delete( request );
-        logger.info( result );
         StringUtils.ajaxOutput( resp, result );
         return null;
     }
@@ -78,12 +74,10 @@ public class ShopManageAction {
         //车场是否支持叠加用券  默认不支持
         Integer superimposed = RequestUtil.getInteger(request,"superimposed",0);
         Long comid = RequestUtil.getLong(request,"comid",-1L);
-        logger.info( "商户是否支持叠加用券"+superimposed+"   comid:"+comid );
         ComInfoTb comInfoTb = new ComInfoTb();
         comInfoTb.setId(comid);
         comInfoTb.setSuperimposed(superimposed);
         int count = shopManageService.updateComSuperimposed(comInfoTb);
-        logger.error("更改车场是否可叠加用券:"+count);
         StringUtils.ajaxOutput( resp, count+"" );
         return null;
     }

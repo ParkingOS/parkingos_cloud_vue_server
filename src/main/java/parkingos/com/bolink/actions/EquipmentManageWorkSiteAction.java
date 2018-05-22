@@ -35,11 +35,9 @@ public class EquipmentManageWorkSiteAction {
 
 		Map<String, String> reqParameterMap = RequestUtil.readBodyFormRequset(request);
 
-		logger.info(reqParameterMap);
 
 		JSONObject result = equipmentManageWorkSiteService.selectResultByConditions(reqParameterMap);
 
-		logger.info(result);
 		StringUtils.ajaxOutput(response,result.toJSONString());
 		return null;
 	}

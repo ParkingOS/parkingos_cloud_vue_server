@@ -35,13 +35,9 @@ public class EquipmentManageCameraAction {
 	public String query(HttpServletRequest request, HttpServletResponse response) {
 
 		Map<String, String> reqParameterMap = RequestUtil.readBodyFormRequset(request);
-		//request中包含6个主要参数。fieldsstr(表单)、rp()、token()、page()、orderby()、orderfield()
 
-		logger.info(reqParameterMap);
-		System.out.println(reqParameterMap);
 		JSONObject result = equipmentManageCameraService.selectResultByConditions(reqParameterMap);
 
-		logger.info(result);
 		StringUtils.ajaxOutput(response,result.toJSONString());
 		return null;
 	}

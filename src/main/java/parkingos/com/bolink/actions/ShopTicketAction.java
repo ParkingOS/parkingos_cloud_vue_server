@@ -30,9 +30,7 @@ public class ShopTicketAction {
     public String addMoney(HttpServletRequest request, HttpServletResponse resp) {
 
         Map<String, String> reqParameterMap = RequestUtil.readBodyFormRequset( request );
-        logger.info( reqParameterMap );
         JSONObject result = ticketService.selectResultByConditions( reqParameterMap );
-        logger.info( result );
         StringUtils.ajaxOutput( resp, result.toJSONString() );
         return null;
     }
@@ -73,9 +71,7 @@ public class ShopTicketAction {
     public String getTicketLog(HttpServletRequest request, HttpServletResponse resp) {
 
         Map<String, String> reqParameterMap = RequestUtil.readBodyFormRequset( request );
-        logger.info( reqParameterMap );
         JSONObject result = ticketService.getTicketLog( reqParameterMap );
-        logger.info( result );
         StringUtils.ajaxOutput( resp, result.toJSONString() );
         return null;
     }
@@ -87,7 +83,6 @@ public class ShopTicketAction {
     @RequestMapping("/createticket")
     //优惠券查询
     public String createTicket(HttpServletRequest request, HttpServletResponse resp) {
-        logger.info("进入商户后台创建二维码的方法");
 //        Map<String, String> reqParameterMap = RequestUtil.readBodyFormRequset( request );
 //        logger.info( reqParameterMap );
         Long shop_id = RequestUtil.getLong(request,"shopid",-1L);
@@ -109,7 +104,6 @@ public class ShopTicketAction {
     //优惠券查询
     public String ifChangeCode(HttpServletRequest request, HttpServletResponse resp) {
 
-        logger.info("进入轮询查询是否自动更新的方法");
         Map<String,Object> mapResult = ticketService.ifChangeCode( request );
         StringUtils.ajaxOutput( resp, JSONObject.toJSONString(mapResult) );
         return null;

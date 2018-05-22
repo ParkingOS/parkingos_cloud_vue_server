@@ -46,7 +46,7 @@ public class ShopManageServiceImpl implements ShopManageService {
         double addmoney = RequestUtil.getDouble( request, "addmoney", 0.00 );
         //减免类型
         Integer ticket_type = Integer.parseInt( shopTb.getTicketType() + "" );
-        if(addmoney<=0){
+        if(addmoney<0){
             //有可能全免券和优惠券都为0
             return "{\"state\":0}";
         }

@@ -35,13 +35,8 @@ public class EquipmentManageLEDAction {
 
 		Map<String, String> reqParameterMap = RequestUtil.readBodyFormRequset(request);
 
-		logger.info(reqParameterMap);
-
 		JSONObject result = equipmentManageLEDService.selectResultByConditions(reqParameterMap);
 
-
-
-		logger.info(result);
 		StringUtils.ajaxOutput(response,result.toJSONString());
 		return null;
 	}

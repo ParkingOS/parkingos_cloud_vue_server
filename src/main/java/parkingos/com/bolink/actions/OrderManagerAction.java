@@ -37,7 +37,6 @@ public class OrderManagerAction {
         Map<String, String> reqParameterMap = RequestUtil.readBodyFormRequset(request);
 
         JSONObject result = orderService.selectResultByConditions(reqParameterMap);
-        logger.info(result);
         //把结果返回页面
         StringUtils.ajaxOutput(resp, result.toJSONString());
         return null;

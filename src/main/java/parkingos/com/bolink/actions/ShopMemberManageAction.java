@@ -24,7 +24,6 @@ public class ShopMemberManageAction {
     public String editpass(HttpServletRequest req, HttpServletResponse resp) {
 
         String result = shopMemberManageService.editpass( req );
-        logger.info( result );
         StringUtils.ajaxOutput( resp, result );
         return null;
     }
@@ -33,7 +32,6 @@ public class ShopMemberManageAction {
     public String delete(HttpServletRequest req, HttpServletResponse resp) {
 
         String result = shopMemberManageService.delete( req );
-        logger.info( result );
         StringUtils.ajaxOutput( resp, result );
         return null;
     }
@@ -43,7 +41,6 @@ public class ShopMemberManageAction {
     public String query(HttpServletRequest req, HttpServletResponse resp) {
 
         String result = shopMemberManageService.quickquery( req );
-        logger.info( result );
         StringUtils.ajaxOutput( resp, result );
         return null;
     }
@@ -51,7 +48,6 @@ public class ShopMemberManageAction {
     @RequestMapping(value = "/create")
     public String create(HttpServletRequest req, HttpServletResponse resp) {
         String result = shopMemberManageService.create( req );
-        logger.info( result );
         StringUtils.ajaxOutput( resp, result );
         return null;
     }
