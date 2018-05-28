@@ -2,6 +2,9 @@ package parkingos.com.bolink.actions;
 
 
 import com.alibaba.fastjson.JSONObject;
+import com.wordnik.swagger.annotations.Api;
+import com.wordnik.swagger.annotations.ApiImplicitParam;
+import com.wordnik.swagger.annotations.ApiOperation;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -19,7 +22,7 @@ import java.io.OutputStream;
 import java.text.ParseException;
 import java.util.List;
 import java.util.Map;
-
+@Api(value = "vip")
 @Controller
 @RequestMapping("/vip")
 public class VipManageAction {
@@ -54,8 +57,13 @@ public class VipManageAction {
         return null;
     }
 
-
-    @RequestMapping(value = "add")
+    @ApiOperation(value="获取指定id用户详细信息", notes="根据user的id来获取用户详细信息")
+    @ApiImplicitParam(name = "id",value = "用户id", dataType = "String", paramType = "path")
+    @RequestMapping(value = "/add")
+    /**
+     *
+     *
+     */
     public String add(HttpServletRequest req, HttpServletResponse resp) throws Exception{
 
         JSONObject result = vipService.createVip(req);
@@ -103,7 +111,7 @@ public class VipManageAction {
 
         List<List<String>> bodyList = vipService.exportExcel(reqParameterMap);
 //        String[] heards = new String[]{"编号","包月产品名称","车主手机"/*,"车主账户"*/,"名字","车牌号码","购买时间","开始时间","结束时间","金额","车型类型","单双日限行","备注"};
-        String[][] heards = new String[][]{{"编号","STR"},{"包月产品名称","STR"},{"车主手机","STR"}/*,"车主账户"*/,{"名字","STR"},{"车牌号码","STR"},{"购买时间","STR"},{"开始时间","STR"},{"结束时间","STR"},{"金额","STR"},{"车型类型","STR"},{"单双日限行","STR"},{"备注","STR"}};
+        String[][] heards = new String[][]{{"编号","STR"},{"包月产品名称","STR"},{"车主手机","STR"}/*,"车主账户"*/,{"名字","STR"},{"车牌号码","STR"},{"购买时间","STR"},{"开始时间","STR"},{"结束时间","STR"},{"金额","STR"},{"车位","STR"},{"车型类型","STR"},{"单双日限行","STR"},{"备注","STR"}};
 
         ExportDataExcel excel = new ExportDataExcel("会员数据", heards, "sheet1");
         String fname = "会员数据";

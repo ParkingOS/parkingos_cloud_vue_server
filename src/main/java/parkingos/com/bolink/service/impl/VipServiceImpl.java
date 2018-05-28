@@ -10,15 +10,14 @@ import parkingos.com.bolink.models.*;
 import parkingos.com.bolink.service.GetDataService;
 import parkingos.com.bolink.service.SupperSearchService;
 import parkingos.com.bolink.service.VipService;
-import parkingos.com.bolink.utils.OrmUtil;
-import parkingos.com.bolink.utils.RequestUtil;
-import parkingos.com.bolink.utils.StringUtils;
-import parkingos.com.bolink.utils.TimeTools;
+import parkingos.com.bolink.utils.*;
 
 import javax.servlet.http.HttpServletRequest;
 import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 
 @Service
@@ -107,10 +106,30 @@ public class VipServiceImpl implements VipService {
         Long nextid = commonDao.selectSequence(CarowerProduct.class);
         String cardId = String.valueOf(nextid);
 
-        Integer flag = RequestUtil.getInteger(req, "flag", -1);
+//        Integer flag = RequestUtil.getInteger(req, "flag", -1);
         //备注
         String remark = StringUtils.decodeUTF8(RequestUtil.processParams(req, "remark"));
         String carNumber = RequestUtil.processParams(req, "car_number");
+        String pLot = RequestUtil.processParams(req, "p_lot");
+        if(pLot!=null&&!"".equals(pLot)){
+            Pattern letter = Pattern.compile("[\u4e00-\u9fa5a-zA-Z0-9,/_-]+");
+            String[] bytes = pLot.split("");
+            boolean flag = true;
+            for(int i=1;i<bytes.length;i++){
+                Matcher matcher = letter.matcher(bytes[i]);
+                if(!matcher.matches()){
+                    flag = false;
+                    break;
+                }
+            }
+
+            if(!flag){
+                result.put("state", 0);
+                result.put("msg", "请输入正确的车位");
+                return result;
+            }
+        }
+
         logger.error("=======>>>>>carNumber" + carNumber);
         //实收金额
 //        String acttotal = RequestUtil.processParams(req, "act_total");
@@ -256,6 +275,7 @@ public class VipServiceImpl implements VipService {
         carowerProduct1.setRemark(remark);
         carowerProduct1.setName(name);
         carowerProduct1.setAddress(address);
+        carowerProduct1.setpLot(pLot);
         carowerProduct1.setActTotal(new BigDecimal(act_total + ""));
         carowerProduct1.setComId(comid);
         carowerProduct1.setCarNumber(carNumber.toUpperCase());
@@ -600,7 +620,7 @@ public class VipServiceImpl implements VipService {
         List<List<String>> bodyList = new ArrayList<List<String>>();
         if (viplist != null && viplist.size() > 0) {
 //            mongoDbUtils.saveLogs( request,0, 5, "导出会员数量："+list.size());
-            String[] f = new String[]{"id", "p_name", "mobile"/*,"uin"*/, "name", "car_number", "create_time", "b_time", "e_time", "total", "car_type_id", "limit_day_type", "remark"};
+            String[] f = new String[]{"id", "p_name", "mobile"/*,"uin"*/, "name", "car_number", "create_time", "b_time", "e_time", "total","p_lot", "car_type_id", "limit_day_type", "remark"};
             for (CarowerProduct carowerProduct : viplist) {
                 List<String> values = new ArrayList<String>();
                 OrmUtil<CarowerProduct> otm = new OrmUtil<>();
@@ -672,6 +692,28 @@ public class VipServiceImpl implements VipService {
 
         String mobile = StringUtils.decodeUTF8(RequestUtil.processParams(req, "mobile").trim());
 
+        String pLot = RequestUtil.processParams(req, "p_lot").trim();
+
+        if(!Check.isEmpty(pLot)){
+            Pattern letter = Pattern.compile("[\u4e00-\u9fa5a-zA-Z0-9,/_-]+");
+            String[] bytes = pLot.split("");
+            boolean flag = true;
+            for(int i=1;i<bytes.length;i++){
+                Matcher matcher = letter.matcher(bytes[i]);
+                if(!matcher.matches()){
+                    flag = false;
+                    break;
+                }
+            }
+
+            if(!flag){
+                result.put("state", 0);
+                result.put("msg", "请输入正确的车位");
+                return result;
+            }
+        }
+
+
         Long id = RequestUtil.getLong(req, "id", -1L);
 
         Integer limit_day_type = RequestUtil.getInteger(req, "limit_day_type", 0);
@@ -681,6 +723,7 @@ public class VipServiceImpl implements VipService {
         CarowerProduct carowerProduct = new CarowerProduct();
         carowerProduct.setId(id);
         carowerProduct.setMobile(mobile);
+        carowerProduct.setpLot(pLot);
         carowerProduct.setName(name);
         carowerProduct.setLimitDayType(limit_day_type);
         int ret = commonDao.updateByPrimaryKey(carowerProduct);

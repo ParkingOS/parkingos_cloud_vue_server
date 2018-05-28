@@ -112,7 +112,7 @@ public class GetParkInfoServiceImpl implements GetParkInfoService {
         //计算泊位使用率
         List<HashMap<String,Object>> parkidList = parkInfoMapper.getParkIdByGroupId(groupid);
         List<HashMap<String,Object>> ss =new ArrayList<HashMap<String,Object>>();
-        if(parkidList!=null) {
+        if(parkidList!=null&&parkidList.size()>0) {
             ss = parkInfoMapper.getBerthPercent(parkidList, tday);
         }
         if(ss!=null&&ss.size()>0) {
