@@ -31,7 +31,6 @@ public class LiftRodAction {
 
     @RequestMapping(value = "/query")
     public String query(HttpServletRequest request, HttpServletResponse resp) {
-        logger.error("======================");
         Map<String, String> reqParameterMap = RequestUtil.readBodyFormRequset(request);
 
         JSONObject result = liftRodService.selectResultByConditions(reqParameterMap);
@@ -51,8 +50,6 @@ public class LiftRodAction {
         if(id!=null&&!"undefined".equals(id)&&!"".equals(id)){
             comid = getComidByLift(Long.parseLong(id));
         }
-        logger.error("==========>>>>获取图片"+liftrodId);
-        logger.error("==========>>>>获取图片"+comid);
 
         byte[] content = liftRodService.getLiftRodPicture(comid, liftrodId);
 

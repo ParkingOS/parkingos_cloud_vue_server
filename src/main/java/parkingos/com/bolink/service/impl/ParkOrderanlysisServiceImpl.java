@@ -156,8 +156,8 @@ public class ParkOrderanlysisServiceImpl implements ParkOrderAnlysisService {
 
         if(backList.size()>0){
             Map sumMap = new HashMap();
-            sumMap.put("name","合计");
-            sumMap.put("sdate","合计");
+//            sumMap.put("name","合计");
+            sumMap.put("e_time","合计");
             sumMap.put("scount",totalCount);
             sumMap.put("amount_receivable",String.format("%.2f",StringUtils.formatDouble(totalMoney)));
             sumMap.put("cash_pay",String.format("%.2f",StringUtils.formatDouble(cashMoney)));
@@ -566,7 +566,7 @@ public class ParkOrderanlysisServiceImpl implements ParkOrderAnlysisService {
             for (Object object : resList) {
                 Map<String,Object> map = (Map)object;
                 List<Object> values = new ArrayList<Object>();
-                values.add(map.get("name"));
+                values.add(map.get("e_time"));
                 values.add(map.get("scount"));
                 values.add(map.get("amount_receivable"));
                 values.add(map.get("cash_pay"));

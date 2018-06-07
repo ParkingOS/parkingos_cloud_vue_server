@@ -6,6 +6,7 @@ import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
+import parkingos.com.bolink.service.CityOrderAnlysisService;
 import parkingos.com.bolink.service.CityParkOrderAnlysisService;
 import parkingos.com.bolink.utils.ExportExcelUtil;
 import parkingos.com.bolink.utils.RequestUtil;
@@ -20,13 +21,13 @@ import java.util.List;
 import java.util.Map;
 
 @Controller
-@RequestMapping("/cityparkorderanlysis")
-public class CityParkOrderanlysisAction {
+@RequestMapping("/cityorderanlysis")
+public class CityOrderanlysisAction {
 
-    Logger logger = Logger.getLogger(CityParkOrderanlysisAction.class);
+    Logger logger = Logger.getLogger(CityOrderanlysisAction.class);
 
     @Autowired
-    private CityParkOrderAnlysisService cityParkOrderanlysisService;
+    private CityOrderAnlysisService cityOrderanlysisService;
 
 
     /*
@@ -38,7 +39,7 @@ public class CityParkOrderanlysisAction {
 
         Map<String, String> reqParameterMap = RequestUtil.readBodyFormRequset(request);
 
-        JSONObject result = cityParkOrderanlysisService.selectResultByConditions(reqParameterMap);
+        JSONObject result = cityOrderanlysisService.selectResultByConditions(reqParameterMap);
         //把结果返回页面
         StringUtils.ajaxOutput(resp,result.toJSONString());
         return null;
@@ -50,16 +51,16 @@ public class CityParkOrderanlysisAction {
 
         Map<String, String> reqParameterMap = RequestUtil.readBodyFormRequset(request);
 
-        List<List<Object>> resList = cityParkOrderanlysisService.exportExcel(reqParameterMap);
-        String title = "车场日报统计";
+        List<List<Object>> resList = cityOrderanlysisService.exportExcel(reqParameterMap);
+        String title = "集团日报统计";
         String sheeatName = "sheet1";
-        String headers[] =  { "车场","日期","总订单数", "应收金额", "实收金额", "实收金额", "实收金额","减免金额" } ;
-        String dataType []={"STR","STR","STR","STR","STR","STR","STR","STR"};
+        String headers[] =  { "日期",  "应收金额", "实收金额", "实收金额", "实收金额","减免金额" } ;
+        String dataType []={"STR","STR","STR","STR","STR","STR"};
         String[] subHeads = new String[] {"现金支付", "电子支付", "合计"};
-        String[] headnum = new String[] { "1,2,0,0", "1,2,1,1","1,2,2,2","1,2,3,3","1,1,4,4","1,1,5,5","1,1,6,6","1,2,7,7"};
-        String[] subheadnum = new String[] { "2,2,4,4", "2,2,5,5", "2,2,6,6"};
-        ExportExcelUtil excelUtil = new ExportExcelUtil(title, headers, sheeatName, dataType, subHeads, headnum, subheadnum, new int[]{3,7});
-        String fname = "车场日报统计";
+        String[] headnum = new String[] { "1,2,0,0", "1,2,1,1","1,1,2,4","1,2,5,5"};
+        String[] subheadnum = new String[] { "2,2,2,2", "2,2,3,3", "2,2,4,4"};
+        ExportExcelUtil excelUtil = new ExportExcelUtil(title, headers, sheeatName, dataType, subHeads, headnum, subheadnum, new int[]{1,5});
+        String fname = "集团日报统计";
         fname = StringUtils.encodingFileName(fname)+".xls";
         try {
             OutputStream os = response.getOutputStream();

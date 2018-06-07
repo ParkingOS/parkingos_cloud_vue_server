@@ -45,6 +45,16 @@ public class ShopTb {
 
     private Integer supportType;
 
+    private Integer useLimit;
+
+    public Integer getUseLimit() {
+        return useLimit;
+    }
+
+    public void setUseLimit(Integer useLimit) {
+        this.useLimit = useLimit;
+    }
+
     public Integer getSupportType() {
         return supportType;
     }

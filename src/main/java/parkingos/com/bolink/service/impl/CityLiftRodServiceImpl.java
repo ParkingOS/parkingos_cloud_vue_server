@@ -44,6 +44,7 @@ public class CityLiftRodServiceImpl implements CityLiftRodService {
         List<Map<String, Object>> resList =new ArrayList<>();
 
         LiftRodTb liftRodTb = new LiftRodTb();
+        liftRodTb.setIsDelete(0);
 
         Map searchMap = supperSearchService.getGroupOrCitySearch(liftRodTb,reqmap);
         if(searchMap==null){

@@ -39,14 +39,13 @@ public class LiftRodServiceImpl implements LiftRodService {
     public JSONObject selectResultByConditions(Map<String, String> reqmap) {
         LiftRodTb liftRodTb = new LiftRodTb();
         liftRodTb.setComid(Long.parseLong(reqmap.get("comid")));
+        liftRodTb.setIsDelete(0);
         String cTime = reqmap.get("ctime");
-        logger.error("===>>>ctime"+cTime);
         //组装出场车辆时间参数   默认今天出场
         if(cTime==null||"undefined".equals(cTime)||"".equals(cTime)){
             reqmap.put("ctime","between");
             reqmap.put("ctime_start",(TimeTools.getToDayBeginTime()+""));
             reqmap.put("ctime_end",(TimeTools.getToDayBeginTime()+86399+""));
-            logger.error("=========..req"+reqmap.size());
         }
         String reason= reqmap.get("reason");
         if("-1".equals(reason)){//全部原因。

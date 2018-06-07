@@ -50,7 +50,7 @@ public class GroupMonthParkOrderanlysisAction {
         Map<String, String> reqParameterMap = RequestUtil.readBodyFormRequset(request);
 
         List<List<Object>> resList = groupMonthparkOrderanlysisService.exportExcel(reqParameterMap);
-        String title = "集团车场月报";
+        String title = "集团月报统计";
         String sheeatName = "sheet1";
         String headers[] =  { "日期", "订单总数", "应收金额", "实收金额", "实收金额", "实收金额","减免金额" } ;
         String dataType []={"STR","STR","STR","STR","STR","STR","STR"};
@@ -58,7 +58,7 @@ public class GroupMonthParkOrderanlysisAction {
         String[] headnum = new String[] { "1,2,0,0", "1,2,1,1","1,2,2,2","1,1,3,5","1,2,6,6"};
         String[] subheadnum = new String[] { "2,2,3,3", "2,2,4,4", "2,2,5,5"};
         ExportExcelUtil excelUtil = new ExportExcelUtil(title, headers, sheeatName, dataType, subHeads, headnum, subheadnum, new int[]{2,6});
-        String fname = "集团车场月报";
+        String fname = "集团月报统计";
         fname = StringUtils.encodingFileName(fname)+".xls";
         try {
             OutputStream os = response.getOutputStream();

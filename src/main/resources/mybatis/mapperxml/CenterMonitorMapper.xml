@@ -1,0 +1,209 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="parkingos.com.bolink.dao.mybatis.mapper.CenterMonitorMapper" >
+    <!--获取集团所有的确认订单-->
+    <select id="getConfirmOrdersByGroupid"  resultType="map">
+        <![CDATA[
+
+        SELECT
+        co.*
+        FROM
+        confirm_order_tb co,
+        carpic_tb cp
+        WHERE
+        co.comid = cp.comid
+        AND co.event_id = cp.event_id
+        AND co.groupid =#{groupid,jdbcType=VARCHAR}
+        AND co. STATE =0
+        ORDER BY
+        upload_time ASC
+
+    ]]>
+    </select>
+
+    <!--获取车场所有的确认订单-->
+    <select id="getConfirmOrdersByComid"  resultType="map">
+        <![CDATA[
+
+            SELECT
+            co.*
+            FROM
+            confirm_order_tb co,
+            carpic_tb cp
+            WHERE
+            co.comid = cp.comid
+            AND co.event_id = cp.event_id
+            AND co.comid =#{comid,jdbcType=VARCHAR}
+            AND co. STATE =0
+            ORDER BY
+            upload_time ASC
+    ]]>
+    </select>
+
+
+    <!--获取特定确认订单的图片-->
+    <select id="getPicMap"  resultType="map">
+        <![CDATA[
+
+        SELECT
+        *
+        FROM
+        carpic_tb
+        WHERE
+        event_id =#{eventid,jdbcType=VARCHAR}
+        AND comid =#{comid,jdbcType=VARCHAR}
+
+    ]]>
+    </select>
+
+
+    <!--获取特定确认订单的图片-->
+    <select id="matchPicMap"  resultType="map">
+        <![CDATA[
+
+        SELECT
+        *
+        FROM
+        carpic_tb
+        WHERE
+        order_id =#{orderid,jdbcType=VARCHAR}
+        AND comid =#{comid,jdbcType=VARCHAR}
+
+    ]]>
+    </select>
+
+    <!--模糊匹配获得车辆-->
+    <select id="getCarByNameLike"  resultType="map">
+
+        SELECT
+        *
+        FROM
+        order_tb
+        WHERE
+        comid =#{comid,jdbcType=BIGINT}
+        AND
+          <foreach collection="carnumlist" index="index" item="item" open="(" separator="or" close=")">
+             car_number like CONCAT('%',#{item},'%')
+          </foreach>
+
+        AND STATE =0
+        ORDER BY
+        create_time DESC
+
+    </select>
+
+    <!--获得指定的订单信息-->
+    <select id="getSelectOrder"  resultType="map">
+
+        SELECT
+        *
+        FROM
+        order_tb
+        WHERE
+        comid =#{comid,jdbcType=BIGINT}
+        AND
+        car_number = #{carNumber,jdbcType=VARCHAR}
+        ORDER BY
+        create_time DESC
+
+    </select>
+
+
+    <!--获得确认订单信息看是不是成功-->
+    <select id="getConfirmOrder"  resultType="map">
+
+        SELECT
+        *
+        FROM
+        confirm_order_tb
+        WHERE
+        comid =#{comid,jdbcType=BIGINT}
+        AND
+        event_id = #{eventid,jdbcType=VARCHAR}
+        AND
+        state = 0
+
+
+    </select>
+
+
+    <select id="getLiftRodInfo"  resultType="map">
+
+        SELECT
+        STATE
+        FROM
+        liftrod_info_tb
+        WHERE
+        channel_id =#{channelid,jdbcType=BIGINT}
+        AND operate =0
+        AND comid =#{comid,jdbcType=BIGINT}
+
+    </select>
+
+
+    <select id="getMonitorMap"  resultType="map">
+
+        SELECT
+        P .group_phone,
+        P .park_phone,
+        M .play_src,
+        M . ID
+        FROM
+        phone_info_tb P,
+        monitor_info_tb M
+        WHERE
+        M . ID = P .monitor_id
+        AND P .tele_phone = #{calleridnum,jdbcType=BIGINT}
+        AND M . STATE = 1
+        AND P . STATE = 1
+
+    </select>
+
+
+    <select id="getMonitorsByGroupid"  resultType="map">
+
+        SELECT
+        M .*
+        FROM
+        monitor_info_tb M
+        WHERE
+        M .groupid =#{groupid,jdbcType=VARCHAR}
+        AND M . STATE =1
+        AND "length"(M .play_src) > 0
+        ORDER BY
+        M .show_order ASC
+
+    </select>
+
+    <select id="getMonitorsByComid"  resultType="map">
+
+        SELECT
+        M .*
+        FROM
+        monitor_info_tb M
+        WHERE
+        M .comid =#{comid,jdbcType=VARCHAR}
+        AND M . STATE =1
+        AND "length"(M .play_src) > 0
+        ORDER BY
+        M .show_order ASC
+
+    </select>
+
+
+    <!--获得指定的订单信息-->
+    <select id="qryChannelByMonitId"  resultType="map">
+
+        SELECT
+            mi.*, cp.passname,
+            cp.channel_id AS channelid
+        FROM
+            monitor_info_tb mi,
+            com_pass_tb cp
+        WHERE
+            cp. ID = mi.channel_id
+        AND mi. ID =#{monitorid,jdbcType=BIGINT}
+
+    </select>
+
+</mapper>

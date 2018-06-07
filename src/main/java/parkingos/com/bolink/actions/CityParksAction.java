@@ -78,8 +78,24 @@ public class CityParksAction {
     public String setpark(HttpServletRequest request, HttpServletResponse resp) {
         Long comid = RequestUtil.getLong(request, "id", -1L);
 
-        System.out.println("设置车场:"+comid);
+
         JSONObject result = cityParkService.setpark(comid);
+        //把结果返回页面
+        StringUtils.ajaxOutput(resp, result.toJSONString());
+        return null;
+    }
+
+    /*
+    *
+    * 厂商可以重置车场订单和抬杆数据
+    *
+    * */
+    @RequestMapping(value = "/resetdata")
+    public String resetdata(HttpServletRequest request, HttpServletResponse resp) {
+        Long comid = RequestUtil.getLong(request, "id", -1L);
+        Long loginuin = RequestUtil.getLong(request,"loginuin",-1L);
+        String password = RequestUtil.getString(request,"password");
+        JSONObject result = cityParkService.resetParkData(comid,loginuin,password);
         //把结果返回页面
         StringUtils.ajaxOutput(resp, result.toJSONString());
         return null;

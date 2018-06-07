@@ -16,4 +16,6 @@ public interface CityParkService {
     JSONObject deletepark(ComInfoTb comInfoTb);
 
     JSONObject setpark(Long comid);
+
+    JSONObject resetParkData(Long comid, Long loginuin, String password);
 }

@@ -7,7 +7,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import parkingos.com.bolink.dao.spring.CommonDao;
 import parkingos.com.bolink.models.OrderTb;
-import parkingos.com.bolink.service.CityParkOrderAnlysisService;
+import parkingos.com.bolink.service.ParkCollectorOrderAnlysisService;
+import parkingos.com.bolink.service.ParkOrderAnlysisService;
 import parkingos.com.bolink.service.SupperSearchService;
 import parkingos.com.bolink.utils.Check;
 import parkingos.com.bolink.utils.StringUtils;
@@ -20,14 +21,12 @@ import java.util.List;
 import java.util.Map;
 
 @Service
-public class CityParkOrderanlysisServiceImpl implements CityParkOrderAnlysisService {
+public class ParkCollectorOrderanlysisServiceImpl implements ParkCollectorOrderAnlysisService {
 
-    Logger logger = Logger.getLogger(CityParkOrderanlysisServiceImpl.class);
+    Logger logger = Logger.getLogger(ParkCollectorOrderanlysisServiceImpl.class);
 
     @Autowired
     private CommonDao commonDao;
-    @Autowired
-    private CommonMethods commonMethods;
 
     @Autowired
     private SupperSearchService<OrderTb> supperSearchService;
@@ -38,62 +37,38 @@ public class CityParkOrderanlysisServiceImpl implements CityParkOrderAnlysisServ
         String str = "{\"page\":1,\"rows\":[]}";
         JSONObject result = JSONObject.parseObject(str);
 
-        String comidStr = reqmap.get("comid_start");
+        Long comid = Long.parseLong(reqmap.get("comid"));
 
-
-        SimpleDateFormat df2 = new SimpleDateFormat("yyyy-MM-dd");
-        String nowtime= df2.format(System.currentTimeMillis());
+        String date = reqmap.get("date");
+        Long start = null;
+        if(date==null||"".equals(date)){
+            start = TimeTools.getToDayBeginTime();
+        }else{
+            start = Long.parseLong(date);
+        }
+        Long end = start+24*60*60;
         String sql = "select count(*) scount,sum(amount_receivable) amount_receivable, " +
                 "sum(total) total , sum(cash_pay) cash_pay,sum(cash_prepay) cash_prepay, sum(electronic_pay) electronic_pay,sum(electronic_prepay) electronic_prepay, " +
-                "sum(reduce_amount) reduce_pay,comid from order_tb where comid";
-        String free_sql = "select count(*) scount,sum(amount_receivable-electronic_prepay-cash_prepay-reduce_amount) free_pay,comid from order_tb where comid";
-        String groupby = " group by comid";
+                "sum(reduce_amount) reduce_pay,out_uid from order_tb where end_time between " + start + " and " + end;
+        String free_sql = "select count(*) scount,sum(amount_receivable-electronic_prepay-cash_prepay-reduce_amount) free_pay,out_uid  from order_tb where end_time between "+ start + " and " + end;
+        String groupby = " group by out_uid";
 
-
-
-        if(Check.isNumber(comidStr)){
-            sql +=" = "+Long.parseLong(comidStr)+" and end_time ";
-            free_sql +=" = "+Long.parseLong(comidStr)+" and end_time ";
-        }else {
-            List parkList = commonMethods.getParks(Long.parseLong(reqmap.get("groupid")));
-            String preParams  ="";
-            if(parkList!=null&&!parkList.isEmpty()){
-                for(Object parkid : parkList){
-                    if(preParams.equals(""))
-                        preParams =parkid+"";
-                    else
-                        preParams += ","+parkid;
-                }
-                sql +=" in (" +preParams+" )  and end_time  ";
-                free_sql +=" in ( "+preParams+" )  and end_time  ";
-            }else{
-                return result;
-            }
+        String outUid = reqmap.get("out_uid");
+        Long out_uid = -1L;
+        if(!Check.isEmpty(outUid)){
+            out_uid=Long.parseLong(outUid);
+        }
+        if(out_uid==-1){
+            sql +=" and out_uid>-1 and state= 1  and ishd=0 and comid ="+comid;
+            free_sql +=" and out_uid>-1 and state= 1 and ishd=0 and comid ="+comid;
+        }else{
+            sql +=" and out_uid="+outUid+" and state= 1  and ishd=0 and comid ="+comid;
+            free_sql +=" and out_uid="+outUid+" and state= 1 and ishd=0 and comid ="+comid;
         }
 
 
-        String date = StringUtils.decodeUTF8(StringUtils.decodeUTF8(reqmap.get("date")));
 
-        Long btime = null;
-        Long etime = null;
-        String time = null;
-        if(date==null||"".equals(date)){
-            btime = TimeTools.getToDayBeginTime();
-        }else {
-            btime = Long.parseLong(date);
-        }
-        time = TimeTools.getTimeStr_yyyy_MM_dd(btime*1000);
-        etime =btime+86399;
-
-        logger.info("=====>>>>>>btime="+btime+"=====>>>etime="+etime);
-
-
-        sql +=" between "+btime+" and "+etime;
-        free_sql +=" between "+btime+" and "+etime;
-        sql +=" and state= 1 and out_uid > -1 and ishd=0 ";
-        free_sql +=" and state= 1 and out_uid >-1 and ishd=0 ";
-
-        //总订单集合
+//        //总订单集合
         List<Map<String, Object>> totalList =commonDao.getObjectBySql(sql +groupby);
         //免费订单集合
         List<Map<String, Object>> freeList = commonDao.getObjectBySql(free_sql +" and pay_type=8 "+groupby);//pgOnlyReadService.getAllMap(free_sql +" and pay_type=8 group by out_uid,comid order by scount desc ",params);
@@ -106,22 +81,23 @@ public class CityParkOrderanlysisServiceImpl implements CityParkOrderAnlysisServ
         List<Map<String, Object>> backList = new ArrayList<Map<String, Object>>();
         if(totalList != null && totalList.size() > 0) {
             for (Map<String, Object> totalOrder : totalList) {
-                if (totalOrder.containsKey("comid")) {
-                    Long comid = (Long) totalOrder.get("comid");
-                    List<Map<String, Object>> list = commonDao.getObjectBySql("select company_name from com_info_tb where id =" + comid);
-                    if(list!=null&&list.size()>0){
-                        totalOrder.put("comid", list.get(0).get("company_name"));
+                if (totalOrder.containsKey("out_uid")) {
+                    Long userid = (Long) totalOrder.get("out_uid");
+                    List<Map<String, Object>> list = commonDao.getObjectBySql("select nickname from user_info_tb where id =" + userid);
+//                    logger.error("=========车场:" + list.get(0));
+                    if(list!=null&&list.size()>0) {
+//
+                        totalOrder.put("name", list.get(0).get("nickname"));
+//
                     }else{
-                        totalOrder.put("comid", "");
+                        totalOrder.put("name", "");
                     }
                 }
-
-                totalOrder.put("time",time);
-
                 totalCount += Integer.parseInt(totalOrder.get("scount") + "");
 
                 totalMoney += Double.parseDouble(totalOrder.get("amount_receivable") + "");
 
+                totalOrder.put("sdate", totalOrder.get("e_time"));
                 //格式化应收
                 totalOrder.put("amount_receivable",String.format("%.2f",StringUtils.formatDouble(Double.parseDouble(totalOrder.get("amount_receivable")+""))));
 
@@ -140,9 +116,10 @@ public class CityParkOrderanlysisServiceImpl implements CityParkOrderAnlysisServ
                 //遍历免费集合
                 if (freeList != null && freeList.size() > 0) {
                     for (Map<String, Object> freeOrder : freeList) {
-                        if(freeOrder.get("comid").equals(totalOrder.get("comid"))){
+                        if(freeOrder.get("out_uid").equals(totalOrder.get("out_uid"))){
                             double freePay = StringUtils.formatDouble(Double.parseDouble((freeOrder.get("free_pay") == null ? "0.00" : freeOrder.get("free_pay") + "")));
                             actFreePay = freePay+reduceAmount;
+                            logger.error("========>>>>actFreePay"+actFreePay);
                         }
                     }
                 }
@@ -154,9 +131,8 @@ public class CityParkOrderanlysisServiceImpl implements CityParkOrderAnlysisServ
 
         if(backList.size()>0){
             Map sumMap = new HashMap();
-//            sumMap.put("time","合计");
-            sumMap.put("comid","合计");
-            sumMap.put("time",time);
+            sumMap.put("name","合计");
+            sumMap.put("sdate","合计");
             sumMap.put("scount",totalCount);
             sumMap.put("amount_receivable",String.format("%.2f",StringUtils.formatDouble(totalMoney)));
             sumMap.put("cash_pay",String.format("%.2f",StringUtils.formatDouble(cashMoney)));
@@ -164,11 +140,15 @@ public class CityParkOrderanlysisServiceImpl implements CityParkOrderAnlysisServ
             sumMap.put("act_total",String.format("%.2f",StringUtils.formatDouble((cashMoney+elecMoney))));
             sumMap.put("free_pay",String.format("%.2f",StringUtils.formatDouble(actFreeMoney)));
             backList.add(sumMap);
+
         }
 
         result.put("rows",JSON.toJSON(backList));
         return result;
+
+
     }
+
 
     @Override
     public List<List<Object>> exportExcel(Map<String, String> reqParameterMap) {
@@ -187,9 +167,7 @@ public class CityParkOrderanlysisServiceImpl implements CityParkOrderAnlysisServ
             for (Object object : resList) {
                 Map<String,Object> map = (Map)object;
                 List<Object> values = new ArrayList<Object>();
-//                values.add(map.get("time"));
-                values.add(map.get("comid"));
-                values.add(map.get("time"));
+                values.add(map.get("name"));
                 values.add(map.get("scount"));
                 values.add(map.get("amount_receivable"));
                 values.add(map.get("cash_pay"));

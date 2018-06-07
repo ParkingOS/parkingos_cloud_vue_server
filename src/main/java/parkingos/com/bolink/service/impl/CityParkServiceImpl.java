@@ -3,13 +3,16 @@ package parkingos.com.bolink.service.impl;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import org.apache.log4j.Logger;
+import org.aspectj.weaver.ast.Or;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import parkingos.com.bolink.dao.mybatis.mapper.ParkInfoMapper;
 import parkingos.com.bolink.dao.spring.CommonDao;
 import parkingos.com.bolink.enums.FieldOperator;
 import parkingos.com.bolink.models.ComInfoTb;
+import parkingos.com.bolink.models.LiftRodTb;
 import parkingos.com.bolink.models.OrderTb;
+import parkingos.com.bolink.models.UserInfoTb;
 import parkingos.com.bolink.qo.PageOrderConfig;
 import parkingos.com.bolink.qo.SearchBean;
 import parkingos.com.bolink.service.CityParkService;
@@ -43,7 +46,7 @@ public class CityParkServiceImpl implements CityParkService {
         List<Map<String, Object>> resList = new ArrayList<>();
 
         ComInfoTb comInfoTb = new ComInfoTb();
-//        comInfoTb.setState(0);
+        comInfoTb.setState(0);
 
 //        Map searchMap = supperSearchService.getGroupOrCitySearch(liftRodTb,reqmap);
 //        LiftRodTb baseQuery =(LiftRodTb)searchMap.get("base");
@@ -62,7 +65,10 @@ public class CityParkServiceImpl implements CityParkService {
 //                result.put("rows", JSON.toJSON(resList));
 //            }
 //        }
-
+        String groupidStart = reqmap.get("groupid_start");
+        if(!Check.isEmpty(groupidStart)){
+            comInfoTb.setGroupid(Long.parseLong(groupidStart));
+        }
         String groupid = reqmap.get("groupid");
         String cityid = reqmap.get("cityid");
         System.out.println("=====groupid:" + groupid + "===cityid:" + cityid);
@@ -99,19 +105,19 @@ public class CityParkServiceImpl implements CityParkService {
             searchBean.setFieldName("id");
             searchBean.setBasicValue(parks);
 
-            SearchBean searchBean1 = new SearchBean();
-            searchBean1.setOperator(FieldOperator.CONTAINS);
-            searchBean1.setFieldName("state");
-            ArrayList stateList = new ArrayList<Integer>();
-            stateList.add(0);
-            stateList.add(2);
-            searchBean1.setBasicValue(stateList);
+//            SearchBean searchBean1 = new SearchBean();
+//            searchBean1.setOperator(FieldOperator.CONTAINS);
+//            searchBean1.setFieldName("state");
+//            ArrayList stateList = new ArrayList<Integer>();
+//            stateList.add(0);
+//            stateList.add(2);
+//            searchBean1.setBasicValue(stateList);
 
             if (supperQuery == null) {
                 supperQuery = new ArrayList<>();
             }
             supperQuery.add(searchBean);
-            supperQuery.add(searchBean1);
+//            supperQuery.add(searchBean1);
 
             count = commonDao.selectCountByConditions(baseQuery, supperQuery);
             if (count > 0) {
@@ -127,9 +133,9 @@ public class CityParkServiceImpl implements CityParkService {
                         if(tokenList!=null&&tokenList.size()>0&&tokenList.get(0).get("beat_time")!=null){
                             map.put("beat_time",tokenList.get(0).get("beat_time"));
                             //更新车场的心跳时间
-                            comInfoTb1.setBeatTime(Long.parseLong(tokenList.get(0).get("beat_time")+""));
-                            int update = commonDao.updateByPrimaryKey(comInfoTb1);
-                            logger.error("更新车场心跳时间"+update);
+//                            comInfoTb1.setBeatTime(Long.parseLong(tokenList.get(0).get("beat_time")+""));
+//                            int update = commonDao.updateByPrimaryKey(comInfoTb1);
+//                            logger.error("更新车场心跳时间"+update);
                         }
 
 
@@ -483,6 +489,61 @@ public class CityParkServiceImpl implements CityParkService {
 //            parking_type = (Integer)parkList.get(0).get("parking_type");
             result.put("info", info);
         }
+        return result;
+    }
+
+    @Override
+    public JSONObject resetParkData(Long comid, Long loginuin, String password) {
+        JSONObject result = new JSONObject();
+        result.put("state",0);
+        result.put("msg","重置失败");
+
+        //根据登录厂商的账号查询密码 进行匹配
+        UserInfoTb userInfoTb = new UserInfoTb();
+        userInfoTb.setId(loginuin);
+        userInfoTb = (UserInfoTb)commonDao.selectObjectByConditions(userInfoTb);
+        if(userInfoTb!=null&&userInfoTb.getPassword()!=null){
+            if (!password.equals(userInfoTb.getPassword())){
+                result.put("msg","密码错误");
+                return result;
+            }
+        }else{
+            result.put("msg","用户不存在");
+            return result;
+        }
+
+        //密码正确，根据车场编号搜索需要重置的数据
+        try {
+            OrderTb orderTb = new OrderTb();
+            orderTb.setComid(comid);
+            orderTb.setIshd(0);
+            PageOrderConfig pageOrderConfig = new PageOrderConfig();
+            pageOrderConfig.setPageInfo(null,null);
+            List<OrderTb> orderTbList = commonDao.selectListByConditions(orderTb,pageOrderConfig);
+            if(orderTbList!=null&&orderTbList.size()>0){
+                for(OrderTb order:orderTbList){
+                    order.setIshd(1);
+                    commonDao.updateByPrimaryKey(order);
+                }
+            }
+            logger.error(comid+"重置订单完成,开始重置抬杆数据");
+            LiftRodTb liftRodTb = new LiftRodTb();
+            liftRodTb.setComid(comid);
+            liftRodTb.setIsDelete(0);
+            List<LiftRodTb> liftRodTbList = commonDao.selectListByConditions(liftRodTb,pageOrderConfig);
+            if(liftRodTbList!=null&&liftRodTbList.size()>0){
+                for(LiftRodTb liftRod:liftRodTbList){
+                    liftRod.setIsDelete(1);
+                    commonDao.updateByPrimaryKey(liftRod);
+                }
+            }
+            logger.error(comid+"重置抬杆数据完成");
+        }catch (Exception e){
+            result.put("msg","重置失败，重置过程出现异常");
+            return result;
+        }
+        result.put("state",1);
+        result.put("msg","重置数据成功！");
         return result;
     }
 

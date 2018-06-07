@@ -6,6 +6,7 @@ import com.alibaba.fastjson.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import parkingos.com.bolink.dao.mybatis.mapper.ParkInfoMapper;
+import parkingos.com.bolink.service.CityOrderAnlysisService;
 import parkingos.com.bolink.service.CityParkOrderAnlysisService;
 import parkingos.com.bolink.service.GetParkInfoService;
 import parkingos.com.bolink.service.ParkOrderAnlysisService;
@@ -22,7 +23,7 @@ public class GetParkInfoServiceImpl implements GetParkInfoService {
     @Autowired
     private ParkOrderAnlysisService parkOrderanlysisService;
     @Autowired
-    private CityParkOrderAnlysisService cityParkOrderanlysisService;
+    private CityOrderAnlysisService cityOrderanlysisService;
     DecimalFormat af1 = new DecimalFormat("0");
     @Override
     public String getInfo(int groupid) {
@@ -46,7 +47,7 @@ public class GetParkInfoServiceImpl implements GetParkInfoService {
         parammap.put("groupid",groupid+"");
         String todyyymmdd=TimeTools.getDate_YY_MM_DD();
         parammap.put("date",todyyymmdd+" 00:00:00至"+todyyymmdd+"23:59:59");
-        JSONObject retjson=cityParkOrderanlysisService.selectResultByConditions(parammap);
+        JSONObject retjson=cityOrderanlysisService.selectResultByConditions(parammap);
         JSONArray retarry = retjson.getJSONArray("rows");
         Double cashPay=0d;
         Double electronicPay=0d;

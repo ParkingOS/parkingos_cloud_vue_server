@@ -65,10 +65,8 @@ public class CityVipManageAction {
     public String importExcel(HttpServletRequest request, HttpServletResponse resp,@RequestParam("file")MultipartFile file) throws Exception{
 
 
-        System.out.println("===进入上传方法");
         Long groupid = RequestUtil.getLong(request,"groupid",-1L);
         Long cityid = RequestUtil.getLong(request,"cityid",-1L);
-        System.out.println("===进入上传方法groupid:"+groupid+"===cityid:"+cityid);
         JSONObject result = cityVipService.importExcel(file,groupid,cityid);
 
         StringUtils.ajaxOutput(resp,result.toJSONString());

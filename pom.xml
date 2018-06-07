@@ -297,7 +297,7 @@
     <dependency>
       <groupId>javax.servlet</groupId>
       <artifactId>javax.servlet-api</artifactId>
-      <version>3.0.1</version>
+      <version>4.0.0</version>
       <scope>provided</scope>
     </dependency>
 
@@ -423,6 +423,13 @@
       <groupId>com.google.zxing</groupId>
       <artifactId>javase</artifactId>
       <version>3.0.0</version>
+    </dependency>
+
+    <!--dwr中央监控jar-->
+    <dependency>
+      <groupId>dwr.bolink</groupId>
+      <artifactId>dwr</artifactId>
+      <version>1.0.4</version>
     </dependency>
 
   </dependencies>

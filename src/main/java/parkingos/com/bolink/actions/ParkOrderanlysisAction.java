@@ -44,6 +44,17 @@ public class ParkOrderanlysisAction {
         return null;
     }
 
+//    @RequestMapping(value = "/query")
+//    public String query(HttpServletRequest request, HttpServletResponse resp){
+//
+//        Map<String, String> reqParameterMap = RequestUtil.readBodyFormRequset(request);
+//
+//        JSONObject result = parkOrderanlysisService.selectResultByConditions(reqParameterMap);
+//        //把结果返回页面
+//        StringUtils.ajaxOutput(resp,result.toJSONString());
+//        return null;
+//    }
+
 
     /*
     * 点击收费员统计信息  暂时不用
@@ -94,7 +105,7 @@ public class ParkOrderanlysisAction {
         List<List<Object>> resList = parkOrderanlysisService.exportExcel(reqParameterMap);
         String title = "车场日报";
         String sheeatName = "sheet1";
-        String headers[] =  { "收费员", "订单总数", "应收金额", "实收金额", "实收金额", "实收金额","减免金额" } ;
+        String headers[] =  {  "日期","订单总数", "应收金额", "实收金额", "实收金额", "实收金额","减免金额" } ;
         String dataType []={"STR","STR","STR","STR","STR","STR","STR"};
         String[] subHeads = new String[] {"现金支付", "电子支付", "合计"};
         String[] headnum = new String[] { "1,2,0,0", "1,2,1,1","1,2,2,2","1,1,3,5","1,2,6,6"};

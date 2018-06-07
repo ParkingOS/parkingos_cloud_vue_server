@@ -65,14 +65,14 @@ public class CityUnorderServiceImpl implements CityUnorderService {
 
         logger.error("===>>>parking_type"+reqmap.get("parking_type"));
 
-//        String createTime = reqmap.get("create_time");
-//        logger.error("===>>>createTime"+createTime);
-        //组装 今天 参数
-//        if(createTime==null||"undefined".equals(createTime)||"".equals(createTime)){
-//            reqmap.put("create_time","1");
-//            reqmap.put("create_time_start",(TimeTools.getToDayBeginTime()+""));
-//            logger.error("=========..req"+reqmap.size());
-//        }
+        String createTime = reqmap.get("create_time");
+        logger.error("===>>>createTime"+createTime);
+//        组装 今天 参数
+        if(createTime==null||"undefined".equals(createTime)||"".equals(createTime)){
+            reqmap.put("create_time","1");
+            reqmap.put("create_time_start",(TimeTools.getToDayBeginTime()+""));
+            logger.error("=========..req"+reqmap.size());
+        }
 
 //        String groupid = reqmap.get("groupid");
 //        String cityid = reqmap.get("cityid");

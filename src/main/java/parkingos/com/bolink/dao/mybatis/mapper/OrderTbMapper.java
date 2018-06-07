@@ -6,9 +6,12 @@ import parkingos.com.bolink.dao.mybatis.OrderTbExample;
 import parkingos.com.bolink.models.OrderTb;
 
 import java.util.List;
+import java.util.Map;
 
 public interface OrderTbMapper {
     int countByExample(OrderTbExample example);
+
+    Map selectMoneyByExample(OrderTbExample example);
 
     int deleteByExample(OrderTbExample example);
 
