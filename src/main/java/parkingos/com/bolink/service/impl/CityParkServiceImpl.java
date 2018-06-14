@@ -246,8 +246,8 @@ public class CityParkServiceImpl implements CityParkService {
 
         //判断地图位置是否冲突
         ComInfoTb newCominfoTb = new ComInfoTb();
-        newCominfoTb.setLongitude(new BigDecimal(longitude));
-        newCominfoTb.setLatitude(new BigDecimal(latitude));
+        newCominfoTb.setLongitude(longitude);
+        newCominfoTb.setLatitude(latitude);
         int count = commonDao.selectCountByConditions(newCominfoTb);
         if (count > 0) {
             result.put("msg", "地理位置冲突，请重新标注!");
@@ -258,8 +258,8 @@ public class CityParkServiceImpl implements CityParkService {
         ComInfoTb comInfoTb = new ComInfoTb();
         comInfoTb.setState(state);
         comInfoTb.setCompanyName(company);
-        comInfoTb.setLatitude(new BigDecimal(latitude));
-        comInfoTb.setLongitude(new BigDecimal(longitude));
+        comInfoTb.setLatitude(latitude);
+        comInfoTb.setLongitude(longitude);
         comInfoTb.setAddress(address);
         comInfoTb.setCity(city);
         comInfoTb.setMobile(mobile);
@@ -338,7 +338,7 @@ public class CityParkServiceImpl implements CityParkService {
                 paramMap.put("rand", Math.random());
                 String ret = "";
                 try {
-                    logger.error(paramMap);
+                    logger.error(url+paramMap);
                     String linkParams = StringUtils.createLinkString(paramMap) + "key=" + union_key;
                     System.out.println(linkParams);
                     String sign = StringUtils.MD5(linkParams).toUpperCase();
@@ -371,7 +371,7 @@ public class CityParkServiceImpl implements CityParkService {
                                 result.put("msg", "新建车场失败,泊链运营集团编号错误");
                                 return result;
                             }
-                            result.put("msg", "新建车场成功,上传到泊链失败");
+                            result.put("msg", "新建车场失败,上传到泊链失败");
                         }
                     }
                 } catch (Exception e) {
@@ -432,8 +432,8 @@ public class CityParkServiceImpl implements CityParkService {
 
         //判断地图位置是否冲突
         ComInfoTb newCominfoTb = new ComInfoTb();
-        newCominfoTb.setLongitude(new BigDecimal(longitude));
-        newCominfoTb.setLatitude(new BigDecimal(latitude));
+        newCominfoTb.setLongitude(longitude);
+        newCominfoTb.setLatitude(latitude);
         int count = commonDao.selectCountByConditions(newCominfoTb);
         if (count > 0) {
             result.put("msg", "地理位置冲突，请重新标注!");

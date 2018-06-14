@@ -225,7 +225,7 @@ public class MybatisGeneratorSql {
         }else {
             sql.append(" * ");
         }
-        sql.append("FROM "+tableName);
+        sql.append(" FROM "+tableName);
         return sql.toString();
     }
 

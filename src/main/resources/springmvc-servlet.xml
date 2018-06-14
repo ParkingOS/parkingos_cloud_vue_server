@@ -18,8 +18,21 @@
         <context:exclude-filter type="annotation" expression="org.springframework.stereotype.Service" />
     </context:component-scan>
 
+    <bean id="multipartResolver"
+          class="org.springframework.web.multipart.commons.CommonsMultipartResolver">
+        <property name="defaultEncoding" value="UTF-8" />
+        <!-- 指定所上传文件的总大小,单位字节。注意maxUploadSize属性的限制不是针对单个文件，而是所有文件的容量之和 -->
+        <property name="maxUploadSize" value="10240000" />
+        <property name="maxInMemorySize" value="512" />
+    </bean>
+
     <!--开启注解-->
     <mvc:annotation-driven/>
+
+    <!-- 将 springSwaggerConfig加载到spring容器 -->
+    <bean class="com.mangofactory.swagger.configuration.SpringSwaggerConfig" />
+    <!-- 将自定义的swagger配置类加载到spring容器 -->
+    <bean class="parkingos.com.bolink.swagger.SwaggerConfig" />
 
     <!--配置视图解析器-->
     <bean class="org.springframework.web.servlet.view.InternalResourceViewResolver"
@@ -28,5 +41,8 @@
     <!-- 过滤静态资源 -->
     <mvc:resources mapping="/resources/**" location="/resources/**" />
     <mvc:resources mapping="/images/**" location="/images/**" />
+    <mvc:resources mapping="/1.3/**" location="/images/**" />
+    <!-- 静态资源文件，不会被Spring MVC拦截 -->
+    <mvc:resources mapping="/swagger/**" location="/swagger/" />
     <!-- end -->
 </beans> 

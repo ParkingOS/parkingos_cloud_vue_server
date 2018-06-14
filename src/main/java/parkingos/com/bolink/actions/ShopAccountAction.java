@@ -87,8 +87,8 @@ public class ShopAccountAction {
             StringUtils.ajaxOutput(response,"{\"state\":0,\"msg\":\"请输入正确的默认额度\"}");
             return null;
         }
-        if(defaultArr.length>3){
-            StringUtils.ajaxOutput(response,"{\"state\":0,\"msg\":\"最多支持三个默认额度\"}");
+        if(defaultArr.length>11){
+            StringUtils.ajaxOutput(response,"{\"state\":0,\"msg\":\"最多支持十一个默认额度\"}");
             return null;
 
         }

@@ -389,10 +389,34 @@ public class GetDataServiceImpl implements GetDataService {
         comInfoTb = (ComInfoTb)commonDao.selectObjectByConditions(comInfoTb);
         if(comInfoTb!=null){
             if(comInfoTb.getSuperimposed()==0){
-                result.put("superimposed","不支持");
+                result.put("superimposed","限制一张");
             }else if(comInfoTb.getSuperimposed()==1){
-                result.put("superimposed","支持");
+                result.put("superimposed","不限制");
             }
+            else if(comInfoTb.getSuperimposed()==2){
+                result.put("superimposed","限制两张");
+            }
+            else if(comInfoTb.getSuperimposed()==3){
+                result.put("superimposed","限制三张");
+            }
+            else if(comInfoTb.getSuperimposed()==4){
+                result.put("superimposed","限制四张");
+            }
+            else if(comInfoTb.getSuperimposed()==5){
+                result.put("superimposed","限制五张");
+            }
+            else if(comInfoTb.getSuperimposed()==6){
+                result.put("superimposed","限制六张");
+            }
+            else if(comInfoTb.getSuperimposed()==7){
+                result.put("superimposed","限制七张");
+            }
+            else if(comInfoTb.getSuperimposed()==8){
+                result.put("superimposed","限制八张");
+            }else if(comInfoTb.getSuperimposed()==9){
+                result.put("superimposed","限制九张");
+            }
+
         }
         return result.toString();
     }

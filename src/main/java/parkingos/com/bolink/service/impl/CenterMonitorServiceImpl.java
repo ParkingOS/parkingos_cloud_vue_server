@@ -377,7 +377,7 @@ public class CenterMonitorServiceImpl implements CenterMonitorService {
         logger.error("balanceOrderInfo message:" + message);
 //        String url = "http://127.0.0.1/zld/centermonitor.do?action=balanceOrderInfo&" + message;
         //测试代码
-        String url = "http://test.bolink.club/zld/centermonitor.do?action=balanceOrderInfo&"+message;
+        String url = "http://"+CustomDefind.getValue("DOMAIN")+"/zld/centermonitor.do?action=balanceOrderInfo&"+message;
 //        String url = "http://test.bolink.club/zld/centermonitor.do";
         logger.error("balanceOrderInfo url:" + url);
         String result = new HttpProxy().doGet(url);
@@ -446,7 +446,7 @@ public class CenterMonitorServiceImpl implements CenterMonitorService {
             HttpProxy httpProxy = new HttpProxy();
 //            String url = "http://127.0.0.1/zld/sendmsgtopark.do?action=sendliftrodmsg";
             //测试代码
-            String url = "http://test.bolink.club/zld/sendmsgtopark.do?action=sendliftrodmsg";
+            String url = "http://"+CustomDefind.getValue("DOMAIN")+"/zld/sendmsgtopark.do?action=sendliftrodmsg";
             Map<String, Object> params = new HashMap<String, Object>();
             params.put("comid", comid);
             params.put("channelName", StringUtils.decodeUTF8(channel_name));

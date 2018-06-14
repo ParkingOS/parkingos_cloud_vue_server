@@ -21,9 +21,9 @@ public class ComInfoTb {
 
     private Long createTime;
 
-    private BigDecimal longitude;
+    private Double longitude;
 
-    private BigDecimal latitude;
+    private Double latitude;
 
     private Integer parkingType;
 
@@ -238,19 +238,19 @@ public class ComInfoTb {
         this.createTime = createTime;
     }
 
-    public BigDecimal getLongitude() {
+    public Double getLongitude() {
         return longitude;
     }
 
-    public void setLongitude(BigDecimal longitude) {
+    public void setLongitude(Double longitude) {
         this.longitude = longitude;
     }
 
-    public BigDecimal getLatitude() {
+    public Double getLatitude() {
         return latitude;
     }
 
-    public void setLatitude(BigDecimal latitude) {
+    public void setLatitude(Double latitude) {
         this.latitude = latitude;
     }
 

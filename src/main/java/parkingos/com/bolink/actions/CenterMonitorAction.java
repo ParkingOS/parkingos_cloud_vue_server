@@ -149,7 +149,7 @@ public class CenterMonitorAction {
     public String balanceOrderInfo(HttpServletRequest request, HttpServletResponse response) throws Exception {
 
         String orderId = RequestUtil.getString(request, "order_id");
-        String carNumber = RequestUtil.getString(request, "car_number");
+        String carNumber =  StringUtils.decodeUTF8(RequestUtil.getString(request, "car_number"));
         String channel_id = RequestUtil.getString(request, "channel_id");
         String event_id = RequestUtil.getString(request, "event_id");
         String comid = URLDecoder.decode(RequestUtil.getString(request, "comid"), "UTF-8");

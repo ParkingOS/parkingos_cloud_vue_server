@@ -152,8 +152,33 @@ public class ShopManageServiceImpl implements ShopManageService {
         Integer ticket_type = RequestUtil.getInteger( request, "ticket_type", 1 );
         Integer handInputEnable = RequestUtil.getInteger( request, "hand_input_enable", 0 );
         Integer supportType = RequestUtil.getInteger(request,"support_type",1);
-        System.out.println("全免券是否支持:"+supportType);
-        System.out.println("====是否可手输额度:"+handInputEnable);
+
+        Long comid = RequestUtil.getLong(request,"comid",-1L);
+        if(comid==-1){
+            return "{\"state\":0,\"msg\":\"车场不存在\"}";
+        }
+        ComInfoTb con = new ComInfoTb();
+        con.setId(comid);
+        ComInfoTb comInfoTb = (ComInfoTb) commonDao.selectObjectByConditions(con);
+        Integer sup = comInfoTb.getSuperimposed();
+
+        Integer useLimit = RequestUtil.getInteger(request,"use_limit",0);
+        //和车场比较这个用券限制，不能超过车场的设置
+        if(sup!=1){
+            if(sup==0){
+                if(useLimit>1){
+                    return "{\"state\":0,\"msg\":\"叠加限制不能超过车场\"}";
+                }
+            }else{
+                if(useLimit>0){
+                    if(useLimit>sup){
+                        return "{\"state\":0,\"msg\":\"叠加限制不能超过车场\"}";
+                    }
+                }
+            }
+        }
+
+
         String default_limit = RequestUtil.getString( request, "default_limit" );
         System.out.println("====默认显示额度:"+default_limit);
         if(default_limit.endsWith(",")){
@@ -164,8 +189,8 @@ public class ShopManageServiceImpl implements ShopManageService {
         if(defaultArr.length<1){
             return "{\"state\":0,\"msg\":\"请输入正确的默认额度\"}";
         }
-        if(defaultArr.length>3){
-            return "{\"state\":0,\"msg\":\"最多支持三个默认额度\"}";
+        if(defaultArr.length>11){
+            return "{\"state\":0,\"msg\":\"最多支持十一个默认额度\"}";
         }
         for(String str:defaultArr){
             if(!Check.isNumber(str)){
@@ -194,6 +219,7 @@ public class ShopManageServiceImpl implements ShopManageService {
         shopTb.setFreeMoney( new BigDecimal( free_money ) );
         shopTb.setHandInputEnable(handInputEnable);
         shopTb.setSupportType(supportType);
+        shopTb.setUseLimit(useLimit);
 
         shopTb.setComid( RequestUtil.getLong( request, "comid", -1L ) );
         int update = 0;
