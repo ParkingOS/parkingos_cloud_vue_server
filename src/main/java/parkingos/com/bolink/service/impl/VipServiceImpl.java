@@ -467,14 +467,23 @@ public class VipServiceImpl implements VipService {
         Long ntime = System.currentTimeMillis() / 1000;
 //        Long btime = TimeTools.getLongMilliSecondFrom_HHMMDD(b_time)/1000+86400;
         Long btime = RequestUtil.getLong(req, "b_time", ntime);
-        System.out.println("chenbowen+++>>>:" + btime);
+
         Calendar calendar = Calendar.getInstance();
         calendar.setTimeInMillis((btime + 1) * 1000);
         calendar.set(Calendar.MONTH, calendar.get(Calendar.MONTH) + months);
         Long etime = calendar.getTimeInMillis() / 1000 - 1;
 
         //金额
-        Double total = Double.parseDouble(getDataService.getprodsum(pid, months));
+//        Double total = Double.parseDouble(getDataService.getprodsum(pid, months));
+        Double total = 0.0;
+        try{
+            total =  Double.parseDouble(RequestUtil.getString(req,"total"));
+        }catch (Exception e){
+            logger.error(comid+" total error:");
+            result.put("msg", "请填写正确金额");
+            return result;
+        }
+
         ProductPackageTb productPackageTb = new ProductPackageTb();
         productPackageTb.setId(pid);
         productPackageTb = (ProductPackageTb) commonDao.selectObjectByConditions(productPackageTb);
@@ -489,7 +498,7 @@ public class VipServiceImpl implements VipService {
             }
         }
 
-        Double act_total = total;
+        Double act_total = 0.0;
         if (!acttotal.equals("")) {
             try {
                 act_total = StringUtils.formatDouble(Double.valueOf(acttotal));

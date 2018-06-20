@@ -23,7 +23,7 @@ public interface CenterMonitorMapper {
 
     Map getLiftRodInfo(@Param("channelid")String channel_id, @Param("comid")String comid);
 
-    Map<String,Object> getMonitorMap(@Param("calleridnum")String callerid_num);
+    Map<String,Object> getMonitorMap(@Param("calleridnum")Long callerid_num);
 
     List<Map<String,Object>> getMonitorsByGroupid(@Param("groupid")String groupid);
 

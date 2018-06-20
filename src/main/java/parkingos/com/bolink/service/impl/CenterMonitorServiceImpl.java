@@ -30,6 +30,7 @@ import parkingos.com.bolink.utils.*;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.*;
+import java.net.InetAddress;
 import java.net.URLEncoder;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
@@ -488,9 +489,9 @@ public class CenterMonitorServiceImpl implements CenterMonitorService {
     }
 
     @Override
-    public void callInform(String callerid_num, String exten,HttpServletResponse response) {
+    public void callInform(Integer fromOther,String callerid_num, String exten,HttpServletResponse response) {
 //        Map<String, Object> monMap = daService.getMap("select p.group_phone,p.park_phone, m.play_src,m.id from phone_info_tb p, monitor_info_tb m where m.id=p.monitor_id and p.tele_phone= ? and m.state= ? and p.state= ?", new Object[]{Long.parseLong(callerid_num), 1, 1});
-        Map<String, Object> monMap  = centerMonitorMapper.getMonitorMap(callerid_num);
+        Map<String, Object> monMap  = centerMonitorMapper.getMonitorMap(Long.parseLong(callerid_num));
         if (monMap == null || monMap.isEmpty()) {
             StringUtils.ajaxOutput(response, "-1");
             return ;
@@ -517,6 +518,31 @@ public class CenterMonitorServiceImpl implements CenterMonitorService {
             Collection<ScriptSession> sessions = DWRScriptSessionListener.getScriptSessions();
             if (sessions != null && sessions.size() > 0) {//有dwr监听事件再推送消息
                 Push.popCenteVideo(gson.toJson(message), sessions);
+            }
+            String ip ="";
+            try{
+                ip =  InetAddress.getLocalHost().getHostAddress();
+            }catch (Exception e){
+
+            }
+            logger.error("现在服务器的地址是"+ip);
+            if(fromOther==0){
+                if(ip.contains("53")){//yun web1
+                    //去另一台服务器推送消息
+                    logger.error("现在服务器的地址是要跳转到201");
+                    HttpProxy httpProxy = new HttpProxy();
+                    String result = httpProxy.doGet("http://120.79.98.201/cloud/centermonitor/callinform?callerid_num="+callerid_num+"&exten="+exten+"&fromother=1");
+                    logger.error("现在服务器的地址是发送结果"+result);
+//                      response.sendRedirect("http://120.79.98.201/tcbcloud/monitor.do?action=callinform&callerid_num="+callerid_num+"&exten="+exten+"&fromother=1");
+                }else if(ip.contains("33")){//yun web2
+                    logger.error("现在服务器的地址是要跳转到182");
+                    HttpProxy httpProxy = new HttpProxy();
+                    String result = httpProxy.doGet("http://120.76.158.182/cloud/centermonitor/callinform?callerid_num="+callerid_num+"&exten="+exten+"&fromother=1");
+                    logger.error("现在服务器的地址是发送结果"+result);
+//                        response.sendRedirect("http://120.76.158.182/tcbcloud/monitor.do?action=callinform&callerid_num="+callerid_num+"&exten="+exten+"&fromother=1");
+                }
+            }else{
+                logger.error("=====>>>>>>已经跳过一次了 再跳就多了");
             }
         }
     }

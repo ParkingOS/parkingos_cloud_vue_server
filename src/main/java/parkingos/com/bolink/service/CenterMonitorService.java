@@ -19,7 +19,7 @@ public interface CenterMonitorService {
 
     void liftRodMessage(String channel_id, String channel_name, String comid, HttpServletResponse response) throws Exception;
 
-    void callInform(String callerid_num, String exten,HttpServletResponse response);
+    void callInform(Integer fromOther,String callerid_num, String exten,HttpServletResponse response);
 
     Map qryChannelByMonitId(Long monitor_id);
 }
