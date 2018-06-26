@@ -3,6 +3,7 @@ package parkingos.com.bolink.service;
 import com.alibaba.fastjson.JSONObject;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.util.List;
 import java.util.Map;
 
@@ -13,7 +14,11 @@ public interface TicketService {
 
     JSONObject getTicketLog(Map<String, String> reqParameterMap);
 
-    Map<String,Object> createTicket(Long shopid,Integer reduce,Integer type,Integer isauto);
+    Map<String,Object> createTicket(Long shopid,Integer reduce,Integer type,Integer isauto,Integer number);
 
     Map<String,Object> ifChangeCode(HttpServletRequest request);
+
+    List<String> getCodeList(Long shopId, Integer reduce, Integer type, Integer number,String code,String serverpath);
+
+    void exportCode(String code, HttpServletRequest request, HttpServletResponse resp);
 }

@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import parkingos.com.bolink.service.TicketService;
+import parkingos.com.bolink.utils.Check;
 import parkingos.com.bolink.utils.ExportDataExcel;
 import parkingos.com.bolink.utils.RequestUtil;
 import parkingos.com.bolink.utils.StringUtils;
@@ -15,6 +16,8 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.text.ParseException;
+import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -90,7 +93,7 @@ public class ShopTicketAction {
         Integer type = RequestUtil.getInteger(request, "type", 3);
         //判断页面是不是选中自动更新选项
         Integer isAuto = RequestUtil.getInteger(request,"isauto",0);
-        Map<String,Object> mapResult = ticketService.createTicket(shop_id,reduce,type,isAuto);
+        Map<String,Object> mapResult = ticketService.createTicket(shop_id,reduce,type,isAuto,1);
         StringUtils.ajaxOutput( resp, JSONObject.toJSONString(mapResult) );
         return null;
     }
@@ -110,5 +113,55 @@ public class ShopTicketAction {
     }
 
 
+    /*
+    *  导出二维码图片
+    *
+    * */
+    @RequestMapping("/exportcode")
+    //优惠券查询
+    public String exportCode(HttpServletRequest request, HttpServletResponse resp) {
+        Map<String,Object> mapResult = new HashMap<>();
+        Long shopId = RequestUtil.getLong(request,"shop_id",-1L);
+        String num = RequestUtil.getString(request,"number");
+//        Integer number = RequestUtil.getInteger(request,"number",1);
+        Integer reduce = RequestUtil.getInteger(request, "reduce", 0);
+        Integer type = RequestUtil.getInteger(request, "type", 3);
+        logger.info("导出二维码===>>>"+shopId+num+reduce+type);
+        if(Check.isEmpty(num)||!Check.isNumber(num)||"0".equals(num)){
+            mapResult.put("state",0);
+            mapResult.put("error","请输入正确的优惠券数量");
+            StringUtils.ajaxOutput( resp, JSONObject.toJSONString(mapResult) );
+            return null;
+        }
 
+        mapResult = ticketService.createTicket(shopId,reduce,type,0,Integer.parseInt(num));
+        if(mapResult.get("state")!=1){
+            StringUtils.ajaxOutput( resp, JSONObject.toJSONString(mapResult) );
+            return null;
+        }else{
+            String code = mapResult.get("code")+"";
+            String serverPath = request.getSession().getServletContext().getRealPath("/resource/images/"+code);
+//            logger.info("diyige code"+serverPath);
+            List<String> codeList = ticketService.getCodeList(shopId,reduce,type,Integer.parseInt(num),code,serverPath);
+            mapResult.put("codeList",codeList);
+//            ticketService.exportCode(codeList,request,resp);
+            StringUtils.ajaxOutput( resp, JSONObject.toJSONString(mapResult) );
+            return null;
+        }
+//        return null;
+    }
+
+    @RequestMapping("/export")
+    //优惠券查询
+    public String export(HttpServletRequest request, HttpServletResponse resp) {
+//        String code = request.getParameter("codelist");
+//        logger.info("========>>>>>>>>>>>>>>>>>>"+code);
+//        String[] codearr = code.split(",");
+//        List<String> codeList = Arrays.asList(codearr);
+//        logger.info("========>>>>>>>>>>>>>>>>>>codeList"+codeList);
+        String code = request.getParameter("code");
+        logger.info("====>>>>>code"+code);
+        ticketService.exportCode(code,request,resp);
+        return null;
+    }
 }

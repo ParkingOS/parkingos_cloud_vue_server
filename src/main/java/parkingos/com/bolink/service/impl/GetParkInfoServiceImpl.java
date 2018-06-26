@@ -7,7 +7,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import parkingos.com.bolink.dao.mybatis.mapper.ParkInfoMapper;
 import parkingos.com.bolink.service.CityOrderAnlysisService;
-import parkingos.com.bolink.service.CityParkOrderAnlysisService;
 import parkingos.com.bolink.service.GetParkInfoService;
 import parkingos.com.bolink.service.ParkOrderAnlysisService;
 import parkingos.com.bolink.utils.TimeTools;

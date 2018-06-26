@@ -15,10 +15,7 @@ import parkingos.com.bolink.service.OrderService;
 import parkingos.com.bolink.service.SupperSearchService;
 import parkingos.com.bolink.utils.*;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Service("orderSpring")
 public class OrderServiceImpl implements OrderService {
@@ -41,53 +38,45 @@ public class OrderServiceImpl implements OrderService {
         logger.error("======>>...订单comid:"+Long.parseLong(reqmap.get("comid")));
 
         //查询在场订单数量  车辆数量  空闲车位
-        Map<String,String> newReqmap = new HashMap<>();
-        OrderTb newOrder = new OrderTb();
-        newOrder.setComid(Long.parseLong(reqmap.get("comid")));
-        newOrder.setState(0);
-        newOrder.setIshd(0);
-        //不用高级查询条件 只需要基本条件  新建map
-        JSONObject newResult = supperSearchService.supperSearch(newOrder, newReqmap);
-        Integer total = (Integer) JSON.parse(newResult.get("total")+"");
-        logger.error("=======>>>在场车辆"+total);
-
-        ComInfoTb comInfoTb = new ComInfoTb();
-        comInfoTb.setId(Long.parseLong(reqmap.get("comid")));
-        comInfoTb = (ComInfoTb) commonDao.selectObjectByConditions(comInfoTb);
-        Integer parktotal = 0;
-        Integer blank = 0;
-        if(comInfoTb!=null){
-            Integer parking_total = 0;
-            if(comInfoTb.getParkingTotal()!= null){
-                parking_total=comInfoTb.getParkingTotal();//车场车位数
-            }
-            Integer shareNumber = 0;
-            if(comInfoTb.getShareNumber() != null){
-                shareNumber=comInfoTb.getShareNumber();//车场车位分享数
-            }
-            if(shareNumber > 0){
-                parktotal = shareNumber;
-            }else{
-                parktotal = parking_total;
-            }
-        }
-        blank = parktotal -total;
-        if(blank<=0){
-            blank = 0;
-        }
+//        Map<String,String> newReqmap = new HashMap<>();
+//        OrderTb newOrder = new OrderTb();
+//        newOrder.setComid(Long.parseLong(reqmap.get("comid")));
+//        newOrder.setState(0);
+//        newOrder.setIshd(0);
+//        //不用高级查询条件 只需要基本条件  新建map
+//        JSONObject newResult = supperSearchService.supperSearch(newOrder, newReqmap);
+//        Integer total = (Integer) JSON.parse(newResult.get("total")+"");
+//        logger.error("=======>>>在场车辆"+total);
+//
+//        ComInfoTb comInfoTb = new ComInfoTb();
+//        comInfoTb.setId(Long.parseLong(reqmap.get("comid")));
+//        comInfoTb = (ComInfoTb) commonDao.selectObjectByConditions(comInfoTb);
+//        Integer parktotal = 0;
+//        Integer blank = 0;
+//        if(comInfoTb!=null){
+//            Integer parking_total = 0;
+//            if(comInfoTb.getParkingTotal()!= null){
+//                parking_total=comInfoTb.getParkingTotal();//车场车位数
+//            }
+//            Integer shareNumber = 0;
+//            if(comInfoTb.getShareNumber() != null){
+//                shareNumber=comInfoTb.getShareNumber();//车场车位分享数
+//            }
+//            if(shareNumber > 0){
+//                parktotal = shareNumber;
+//            }else{
+//                parktotal = parking_total;
+//            }
+//        }
+//        blank = parktotal -total;
+//        if(blank<=0){
+//            blank = 0;
+//        }
 
         //查询三天的数据显示
         logger.error("=========..req"+reqmap.size());
         OrderTb orderTb = new OrderTb();
         orderTb.setComid(Long.parseLong(reqmap.get("comid")));
-        orderTb.setIshd(0);
-        //判断是不是设置了订单功能
-//        if(reqmap.get("ishdorder")!=null&&!"".equals(reqmap.get("ishdorder"))){
-//            int ishd = Integer.parseInt(reqmap.get("ishdorder"));
-//            if(ishd==1){
-//                orderTb.setIshd(0);
-//            }
-//        }
         String createTime = reqmap.get("create_time");
         String endTime = reqmap.get("end_time");
         logger.error("===>>>createTime"+createTime+"~~~~endTime:"+endTime);
@@ -114,32 +103,13 @@ public class OrderServiceImpl implements OrderService {
             } else {
                 map.put("duration","");
             }
-//            try{
-//                Long uid = (Long)map.get("uid");
-//                if(uid==-1){
-//                    map.put("uid","无");
-//                }
-//            }
-//            catch (Exception e){
-//                map.put("uid",map.get("uid"));
-//            }
-//            try{
-//                Long uid = (Long)map.get("out_uid");
-//                if(uid==-1){
-//                    map.put("out_uid","无");
-//                }
-//            }
-//            catch (Exception e){
-//                map.put("out_uid",map.get("out_uid"));
-//            }
-
             resList.add(map);
         }
         result.remove("rows");
         result.put("rows",JSON.toJSON(resList));
         //车位数据
-        result.put("parktotal",total);
-        result.put("blank",blank);
+//        result.put("parktotal",total);
+//        result.put("blank",blank);
 
         logger.error("============>>>>>返回数据"+result);
         return result;
@@ -154,14 +124,46 @@ public class OrderServiceImpl implements OrderService {
         DB db = MongoClientFactory.getInstance().getMongoDBBuilder("zld");
         //根据订单编号查询出mongodb中存入的对应个表名
         //Map map = daService.getMap("select * from order_tb where order_id_local=? and comid=?", new Object[]{orderid,comid});
-        OrderTb orderTb = new OrderTb();
-        orderTb.setOrderIdLocal(orderid + "");
-        orderTb.setComid(comid);
-        orderTb = (OrderTb) commonDao.selectObjectByConditions(orderTb);
-        String collectionName = "";
-        if (orderTb != null && orderTb.getCarpicTableName() != null) {
-            collectionName = orderTb.getCarpicTableName();
+//        OrderTb orderTb = new OrderTb();
+//        orderTb.setOrderIdLocal(orderid + "");
+//        orderTb.setComid(comid);
+//        orderTb = (OrderTb) commonDao.selectObjectByConditions(orderTb);
+
+        Calendar calendar=Calendar.getInstance();
+        //获得当前时间的月份，月份从0开始所以结果要加1
+        int month=calendar.get(Calendar.MONTH)+1;
+        logger.info("这是今年的"+month);
+        String monthStr = "";
+        if(month<10){
+            monthStr="0"+month;
+        }else{
+            monthStr = month+"";
         }
+        String sql = "select * from order_tb_2018_"+monthStr+" where comid="+comid+" and ishd = 0"+" and order_id_local = '"+orderid+"'";
+        List<Map<String,Object>> list = commonDao.getObjectBySql(sql);
+        if(list==null||list.isEmpty()){
+            month=month-1;
+            if(month<10){
+                monthStr="0"+month;
+            }else{
+                monthStr = month+"";
+            }
+            sql = "select * from order_tb_2018_"+monthStr+" where comid="+comid+" and ishd = 0"+" and order_id_local = '"+orderid+"'";
+            logger.info("==============sql2"+sql);
+            list = commonDao.getObjectBySql(sql);
+        }
+
+        String collectionName = "";
+//        if (orderTb != null && orderTb.getCarpicTableName() != null) {
+//            collectionName = orderTb.getCarpicTableName();
+//        }
+
+        if(list!=null&&list.size()>0){
+            if(list.get(0).get("carpic_table_name")!=null){
+                collectionName=list.get(0).get("carpic_table_name")+"";
+            }
+        }
+
         logger.error("====>>获得订单图片..collectionName" + collectionName);
         DBCollection collection = db.getCollection("collectionName");
 //        DBCollection collection = db.getCollection(collectionName);
