@@ -5,6 +5,8 @@ import com.alibaba.fastjson.JSONObject;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import parkingos.com.bolink.dao.mybatis.OrderTbExample;
+import parkingos.com.bolink.dao.mybatis.mapper.OrderMapper;
 import parkingos.com.bolink.dao.spring.CommonDao;
 import parkingos.com.bolink.models.ComInfoTb;
 import parkingos.com.bolink.models.ComPassTb;
@@ -14,11 +16,9 @@ import parkingos.com.bolink.qo.PageOrderConfig;
 import parkingos.com.bolink.qo.SearchBean;
 import parkingos.com.bolink.service.CityUnorderService;
 import parkingos.com.bolink.service.SupperSearchService;
-import parkingos.com.bolink.utils.Check;
-import parkingos.com.bolink.utils.OrmUtil;
-import parkingos.com.bolink.utils.StringUtils;
-import parkingos.com.bolink.utils.TimeTools;
+import parkingos.com.bolink.utils.*;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -35,6 +35,8 @@ public class CityUnorderServiceImpl implements CityUnorderService {
     private SupperSearchService<OrderTb> supperSearchService;
     @Autowired
     private CommonMethods commonMethods;
+    @Autowired
+    private OrderMapper orderMapper;
 
 
     @Override
@@ -49,21 +51,17 @@ public class CityUnorderServiceImpl implements CityUnorderService {
 
         //查询今天的数据显示
         logger.error("=========..req"+reqmap.size());
-        OrderTb orderTb = new OrderTb();
 
-        orderTb.setState(0);
-        orderTb.setIshd(0);
-
-        String comidStr = reqmap.get("comid_start");
-
-        if(comidStr!=null&&!"".equals(comidStr)){
-            Long comid = Long.parseLong(comidStr);
-            if(comid>-1){
-                orderTb.setComid(comid);
-            }
+        String groupIdStr = reqmap.get("groupid");
+        Long cityID = -1L;
+        if(!Check.isEmpty(groupIdStr)){
+            Long groupId = Long.parseLong(groupIdStr);
+            cityID = orderMapper.getCityIdByGroupId(groupId);
+        }
+        if(cityID>-1){
+            reqmap.put("cityid",cityID+"");
         }
 
-        logger.error("===>>>parking_type"+reqmap.get("parking_type"));
 
         String createTime = reqmap.get("create_time");
         logger.error("===>>>createTime"+createTime);
@@ -74,25 +72,9 @@ public class CityUnorderServiceImpl implements CityUnorderService {
             logger.error("=========..req"+reqmap.size());
         }
 
-//        String groupid = reqmap.get("groupid");
-//        String cityid = reqmap.get("cityid");
-//        System.out.println("=====groupid:"+groupid+"===cityid:"+cityid);
-
-        Map searchMap = supperSearchService.getGroupOrCitySearch(orderTb,reqmap);
-        if(searchMap==null){
-            return result;
-        }
-        OrderTb baseQuery =(OrderTb)searchMap.get("base");
-        List<SearchBean> supperQuery =(List<SearchBean>)searchMap.get("supper");
-        PageOrderConfig config = (PageOrderConfig)searchMap.get("config");
-
-        count = commonDao.selectCountByConditions(baseQuery,supperQuery);
+        count = getOrdersCountByGroupid(reqmap);
         if(count>0){
-            if(config==null){
-                config = new PageOrderConfig();
-                config.setPageInfo(null,null);
-            }
-            list = commonDao.selectListByConditions(baseQuery,supperQuery,config);
+            list = getOrdersListByGroupid(reqmap);
             if (list != null && !list.isEmpty()) {
                 for (OrderTb orderTb1 : list) {
                     OrmUtil<OrderTb> otm = new OrmUtil<>();
@@ -109,53 +91,6 @@ public class CityUnorderServiceImpl implements CityUnorderService {
             }
         }
 
-
-//        Map searchMap = supperSearchService.getBaseSearch(orderTb,reqmap);
-//        logger.info(searchMap);
-//        if(searchMap!=null&&!searchMap.isEmpty()){
-//            OrderTb baseQuery =(OrderTb)searchMap.get("base");
-//            List<SearchBean> supperQuery = null;
-//            if(searchMap.containsKey("supper"))
-//                supperQuery = (List<SearchBean>)searchMap.get("supper");
-//            PageOrderConfig config = null;
-//            if(searchMap.containsKey("config"))
-//                config = (PageOrderConfig)searchMap.get("config");
-//
-//            List parks =new ArrayList();
-//
-//            if(groupid !=null&&!"".equals(groupid)){
-//                parks = commonMethods.getParks(Long.parseLong(groupid));
-//            }else if(cityid !=null&&!"".equals(cityid)){
-//                parks = commonMethods.getparks(Long.parseLong(cityid));
-//            }
-//
-//            System.out.println("=======parks:"+parks);
-//
-//            //封装searchbean  要求同一级账号登录员工可以看到相同的内容
-//            SearchBean searchBean = new SearchBean();
-//            searchBean.setOperator(FieldOperator.CONTAINS);
-//            searchBean.setFieldName("comid");
-//            searchBean.setBasicValue(parks);
-//
-//            if (supperQuery == null) {
-//                supperQuery = new ArrayList<>();
-//            }
-//            supperQuery.add( searchBean );
-//
-//
-//            count = commonDao.selectCountByConditions(baseQuery,supperQuery);
-//            if(count>0){
-//                list = commonDao.selectListByConditions(baseQuery,supperQuery,config);
-//                if (list != null && !list.isEmpty()) {
-//                    for (OrderTb order : list) {
-//                        OrmUtil<OrderTb> otm = new OrmUtil<>();
-//                        Map<String, Object> map = otm.pojoToMap(order);
-//                        resList.add(map);
-//                    }
-//                    result.put("rows", JSON.toJSON(resList));
-//                }
-//            }
-//        }
         result.put("total",count);
         if(reqmap.get("page")!=null){
             result.put("page",Integer.parseInt(reqmap.get("page")));
@@ -164,13 +99,34 @@ public class CityUnorderServiceImpl implements CityUnorderService {
         return result;
     }
 
+    private List<OrderTb> getOrdersListByGroupid(Map<String, String> reqmap) {
+        OrderTbExample example = new OrderTbExample();
+        example.createCriteria().andIshdEqualTo(0);
+        example.createCriteria().andStateEqualTo(0);
+
+        example = ExampleUtis.createOrderExample(example,reqmap);
+        logger.info("example~~~~~~~~"+example);
+        List<OrderTb> orders = orderMapper.selectOrders(example);
+        return orders;
+    }
+
+    private int getOrdersCountByGroupid(Map<String, String> reqmap) {
+        OrderTbExample example = new OrderTbExample();
+        example.createCriteria().andIshdEqualTo(0);
+        example.createCriteria().andStateEqualTo(0);
+        reqmap.remove("rp");
+        example = ExampleUtis.createOrderExample(example,reqmap);
+        int count = orderMapper.selectOrdersCount(example);
+        logger.info("count~~~~~~~~"+count);
+        return count;
+    }
 
 
     @Override
     public List<List<Object>> exportExcel(Map<String, String> reqParameterMap) {
 
         //删除分页条件  查询该条件下所有  不然为一页数据
-        reqParameterMap.remove("orderby");
+        reqParameterMap.remove("rp");
 
         //获得要导出的结果
         JSONObject result = selectResultByConditions(reqParameterMap);

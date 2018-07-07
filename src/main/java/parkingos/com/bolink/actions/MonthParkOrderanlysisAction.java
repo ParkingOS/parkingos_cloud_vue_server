@@ -30,7 +30,7 @@ public class MonthParkOrderanlysisAction {
 
 
     /*
-    * 查询统计 月报
+    * 车场 统计分析  车场月报
     *
     * */
     @RequestMapping(value = "/query")

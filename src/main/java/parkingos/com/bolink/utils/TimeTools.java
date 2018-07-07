@@ -58,6 +58,10 @@ public class TimeTools {
 		return getLongMilliSecondFromStrDate(strDate, "yyyy-MM-dd");
 	}
 
+	public static Long getLongMilliSecondFrom_YYYYMM(String strDate) {
+		return getLongMilliSecondFromStrDate(strDate, "yyyy-MM");
+	}
+
 	/**
 	 * @param strDate
 	 * @return 根据字符串时间得到相应秒数

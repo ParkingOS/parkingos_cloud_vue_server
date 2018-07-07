@@ -31,7 +31,7 @@ public class CityOrderanlysisAction {
 
 
     /*
-    * 查询统计
+    * 集团  统计分析  集团日报
     *
     * */
     @RequestMapping(value = "/query")

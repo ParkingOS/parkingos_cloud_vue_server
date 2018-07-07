@@ -30,7 +30,7 @@ public class CityParkOrderanlysisAction {
 
 
     /*
-    * 查询统计
+    *   集团  统计分析   车场日报
     *
     * */
     @RequestMapping(value = "/query")

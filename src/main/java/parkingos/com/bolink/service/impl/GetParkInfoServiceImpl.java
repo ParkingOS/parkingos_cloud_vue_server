@@ -5,6 +5,7 @@ import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import parkingos.com.bolink.dao.mybatis.mapper.OrderMapper;
 import parkingos.com.bolink.dao.mybatis.mapper.ParkInfoMapper;
 import parkingos.com.bolink.service.CityOrderAnlysisService;
 import parkingos.com.bolink.service.GetParkInfoService;
@@ -23,9 +24,12 @@ public class GetParkInfoServiceImpl implements GetParkInfoService {
     private ParkOrderAnlysisService parkOrderanlysisService;
     @Autowired
     private CityOrderAnlysisService cityOrderanlysisService;
+    @Autowired
+    private OrderMapper orderMapper;
     DecimalFormat af1 = new DecimalFormat("0");
     @Override
     public String getInfo(int groupid) {
+        Long cityid = orderMapper.getCityIdByGroupId(Long.parseLong(groupid+""));
         HashMap<String, Object> retMap = new HashMap<String, Object>();
         Calendar calendar = Calendar.getInstance();
         calendar.setTime(new Date());
@@ -34,8 +38,8 @@ public class GetParkInfoServiceImpl implements GetParkInfoService {
         calendar.set(Calendar.SECOND, 0);
         long tday = calendar.getTimeInMillis() / 1000;
         //获取进场和离场数据
-        List<HashMap<String, Object>> entryCarList = parkInfoMapper.getEntryCar(tday, Long.parseLong(groupid + ""));
-        List<HashMap<String, Object>> outCarList = parkInfoMapper.getExitCar(tday, Long.parseLong(groupid + ""));
+        List<HashMap<String, Object>> entryCarList = parkInfoMapper.getEntryCar(tday, Long.parseLong(groupid + ""),cityid);
+        List<HashMap<String, Object>> outCarList = parkInfoMapper.getExitCar(tday, Long.parseLong(groupid + ""),cityid);
         Collections.reverse(entryCarList);
         Collections.reverse(outCarList);
         parseTmtoDate(entryCarList);
@@ -55,15 +59,12 @@ public class GetParkInfoServiceImpl implements GetParkInfoService {
             JSONObject object =(JSONObject)retarry.get(retarry.size()-1);
             if(object.getString("cash_pay")!=null&&!"".equals(object.getString("cash_pay"))) {
                 cashPay = Double.parseDouble(object.getString("cash_pay"));
-                System.out.print("cashpay"+cashPay);
             }
             if(object.getString("electronic_pay")!=null&&!"".equals(object.getString("electronic_pay"))) {
                 electronicPay = Double.parseDouble(object.getString("electronic_pay"));
-                System.out.print("electronicPay"+electronicPay);
             }
             if(object.getString("free_pay")!=null&&!"".equals(object.getString("free_pay"))) {
                 freePay = Double.parseDouble(object.getString("free_pay"));
-                System.out.print("electronicPay"+electronicPay);
             }
         };
        /* Double cashPay  = parkInfoMapper.getCashPay(tday, groupid);
@@ -97,14 +98,14 @@ public class GetParkInfoServiceImpl implements GetParkInfoService {
         totalIncomPie.add(electronicPaymap);
         totalIncomPie.add(reduceamap);
         //获取收费排行数据
-        List<HashMap<String, Object>> parkRankList = parkInfoMapper.getParkRank(tday, groupid);
+        List<HashMap<String, Object>> parkRankList = parkInfoMapper.getParkRank(tday, groupid,cityid);
         for(HashMap<String, Object> map:parkRankList){
             map.put("total",af1.format(map.get("total")));
         }
         //获取车辆进场，离场，在场的数量统计
-        int inCars = parkInfoMapper.getEntryCount(tday, groupid);
-        int outCars = parkInfoMapper.getExitCount(tday, groupid);
-        int inPark = parkInfoMapper.getInparkCount(tday, groupid);
+        int inCars = parkInfoMapper.getEntryCount(tday, groupid,cityid);
+        int outCars = parkInfoMapper.getExitCount(tday, groupid,cityid);
+        int inPark = parkInfoMapper.getInparkCount(tday, groupid,cityid);
         HashMap<String, Object> countMap = new HashMap<String, Object>();
         countMap.put("inCars", inCars);
         countMap.put("outCars", outCars);
@@ -160,6 +161,13 @@ public class GetParkInfoServiceImpl implements GetParkInfoService {
 
     @Override
     public String getInfoByComid(int comid) {
+        Long groupid = orderMapper.getGroupIdByComId(Long.parseLong(comid+""));
+        Long cityid=-1L;
+        if(groupid!=null&&groupid>-1){
+            cityid = orderMapper.getCityIdByGroupId(groupid);
+        }else {
+            cityid = orderMapper.getCityIdByComId(Long.parseLong(comid+""));
+        }
         HashMap<String, Object> retMap = new HashMap<String, Object>();
         Calendar calendar = Calendar.getInstance();
         calendar.setTime(new Date());
@@ -168,8 +176,8 @@ public class GetParkInfoServiceImpl implements GetParkInfoService {
         calendar.set(Calendar.SECOND, 0);
         long tday = calendar.getTimeInMillis() / 1000;
         //获取进场和离场数据
-        List<HashMap<String, Object>> entryCarList = parkInfoMapper.getEntryCarByComid(tday, comid);
-        List<HashMap<String, Object>> outCarList = parkInfoMapper.getExitCarByComid(tday, comid);
+        List<HashMap<String, Object>> entryCarList = parkInfoMapper.getEntryCarByComid(tday, comid,cityid);
+        List<HashMap<String, Object>> outCarList = parkInfoMapper.getExitCarByComid(tday, comid,cityid);
         Collections.reverse(entryCarList);
         Collections.reverse(outCarList);
         parseTmtoDate(entryCarList);
@@ -189,15 +197,12 @@ public class GetParkInfoServiceImpl implements GetParkInfoService {
             JSONObject object =(JSONObject)retarry.get(retarry.size()-1);
             if(object.getString("cash_pay")!=null&&!"".equals(object.getString("cash_pay"))) {
                 cashPay = Double.parseDouble(object.getString("cash_pay"));
-                System.out.print("cashpay"+cashPay);
-            }
-            if(object.getString("electronic_pay")!=null&&!"".equals(object.getString("electronic_pay"))) {
-                electronicPay = Double.parseDouble(object.getString("electronic_pay"));
-                System.out.print("electronicPay"+electronicPay);
             }
             if(object.getString("free_pay")!=null&&!"".equals(object.getString("free_pay"))) {
                 freePay = Double.parseDouble(object.getString("free_pay"));
-                System.out.print("electronicPay"+electronicPay);
+            }
+            if(object.getString("electronic_pay")!=null&&!"".equals(object.getString("electronic_pay"))) {
+                electronicPay = Double.parseDouble(object.getString("electronic_pay"));
             }
         };
        /* Double cashPay  = parkInfoMapper.getCashPaybc(tday, comid);
@@ -231,7 +236,7 @@ public class GetParkInfoServiceImpl implements GetParkInfoService {
         totalIncomPie.add(electronicPaymap);
         totalIncomPie.add(reduceamap);
         //获取收费排行数据
-        List<HashMap<String, Object>> parkRankList = parkInfoMapper.getRankByout(tday, comid);
+        List<HashMap<String, Object>> parkRankList = parkInfoMapper.getRankByout(tday, comid,cityid);
         if(parkRankList !=null && parkRankList.size()>0){
             for (HashMap<String, Object> map:parkRankList){
                 map.put("total",af1.format(map.get("total")));
@@ -249,9 +254,9 @@ public class GetParkInfoServiceImpl implements GetParkInfoService {
             }
         }
         //获取车辆进场，离场，在场的数量统计
-        int inCars = parkInfoMapper.getEntryCountbc(tday, comid);
-        int outCars = parkInfoMapper.getExitCountbc(tday, comid);
-        int inPark = parkInfoMapper.getInparkCountbc(tday, comid);
+        int inCars = parkInfoMapper.getEntryCountbc(tday, comid,cityid);
+        int outCars = parkInfoMapper.getExitCountbc(tday, comid,cityid);
+        int inPark = parkInfoMapper.getInparkCountbc(tday, comid,cityid);
         HashMap<String, Object> countMap = new HashMap<String, Object>();
         countMap.put("inCars", inCars);
         countMap.put("outCars", outCars);

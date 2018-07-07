@@ -30,7 +30,7 @@ public class GroupMonthParkOrderanlysisAction {
 
 
     /*
-    * 查询统计 月报
+    * 集团   统计分析   集团月报
     *
     * */
     @RequestMapping(value = "/query")

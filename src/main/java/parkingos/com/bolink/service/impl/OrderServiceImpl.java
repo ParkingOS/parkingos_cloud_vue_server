@@ -9,12 +9,15 @@ import com.mongodb.DBObject;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import parkingos.com.bolink.dao.mybatis.OrderTbExample;
+import parkingos.com.bolink.dao.mybatis.mapper.OrderMapper;
 import parkingos.com.bolink.dao.spring.CommonDao;
 import parkingos.com.bolink.models.*;
 import parkingos.com.bolink.service.OrderService;
 import parkingos.com.bolink.service.SupperSearchService;
 import parkingos.com.bolink.utils.*;
 
+import java.math.BigDecimal;
 import java.util.*;
 
 @Service("orderSpring")
@@ -26,6 +29,8 @@ public class OrderServiceImpl implements OrderService {
     private CommonDao commonDao;
     @Autowired
     private SupperSearchService<OrderTb> supperSearchService;
+    @Autowired
+    private OrderMapper orderMapper;
 
     @Override
     public int selectCountByConditions(OrderTb orderTb) {
@@ -35,7 +40,9 @@ public class OrderServiceImpl implements OrderService {
     @Override
     public JSONObject selectResultByConditions(Map<String, String> reqmap) {
 
-        logger.error("======>>...订单comid:"+Long.parseLong(reqmap.get("comid")));
+
+        JSONObject result = new JSONObject();
+        logger.error("======>>...订单comid:" + Long.parseLong(reqmap.get("comid")));
 
         //查询在场订单数量  车辆数量  空闲车位
 //        Map<String,String> newReqmap = new HashMap<>();
@@ -74,45 +81,90 @@ public class OrderServiceImpl implements OrderService {
 //        }
 
         //查询三天的数据显示
-        logger.error("=========..req"+reqmap.size());
-        OrderTb orderTb = new OrderTb();
-        orderTb.setComid(Long.parseLong(reqmap.get("comid")));
+        logger.error("=========..req" + reqmap.size());
+        Long comid = Long.parseLong(reqmap.get("comid"));
+        //根据comid获取 cityid  命中分表 约束
+        Long groupid = orderMapper.getGroupIdByComId(comid);
+        Long cityid = -1L;
+        if (groupid != null && groupid > 0) {
+            cityid = orderMapper.getCityIdByGroupId(groupid);
+        } else {
+            cityid = orderMapper.getCityIdByComId(comid);
+        }
+        logger.info("select city by comid:" + cityid);
+        if (cityid != null && cityid > -1) {
+            reqmap.put("cityid", cityid + "");
+        }
+
+//        OrderTb orderTb = new OrderTb();
+//        orderTb.setComid(comid);
         String createTime = reqmap.get("create_time");
         String endTime = reqmap.get("end_time");
-        logger.error("===>>>createTime"+createTime+"~~~~endTime:"+endTime);
+        logger.error("===>>>createTime" + createTime + "~~~~endTime:" + endTime);
         //组装 一个月 参数
-        if(endTime==null||"".equals(endTime)){
-            if(createTime==null||"undefined".equals(createTime)||"".equals(createTime)){
-                reqmap.put("create_time","1");
-                reqmap.put("create_time_start",(TimeTools.getToDayBeginTime()-2*86400)+"");
-                logger.error("=========..req"+reqmap.size());
+        if (endTime == null || "".equals(endTime)) {
+            if (createTime == null || "undefined".equals(createTime) || "".equals(createTime)) {
+                reqmap.put("create_time", "1");
+                reqmap.put("create_time_start", (TimeTools.getToDayBeginTime() - 2 * 86400) + "");
+                logger.error("=========..req" + reqmap.size());
             }
         }
-        JSONObject result = supperSearchService.supperSearch(orderTb, reqmap);
+//        JSONObject result = supperSearchService.supperSearch(orderTb, reqmap);
 
         //时长重新处理  收款人和收费员重新处理
-        List<OrderTb> orderList = JSON.parseArray(result.get("rows").toString(), OrderTb.class);
-        List<Map<String, Object>> resList =new ArrayList<>();
-        for(OrderTb order : orderList){
-            OrmUtil<OrderTb> om = new OrmUtil<>();
-            Map map = om.pojoToMap(order);
-            Long start = (Long) map.get("create_time");
-            Long end = (Long) map.get("end_time");
-            if (start != null && end != null) {
-                map.put("duration",StringUtils.getTimeString(start, end));
-            } else {
-                map.put("duration","");
+//        List<OrderTb> orderList = JSON.parseArray(result.get("rows").toString(), OrderTb.class);
+
+        int count = getOrdersCountByComid(reqmap);
+        List<OrderTb> orderList =new ArrayList<>();
+        List<Map<String, Object>> resList = new ArrayList<>();
+        if(count>0) {
+            orderList = getOrderListByComid(reqmap);
+            if (orderList != null && orderList.size() > 0) {
+                for (OrderTb order : orderList) {
+                    OrmUtil<OrderTb> om = new OrmUtil<>();
+                    Map map = om.pojoToMap(order);
+                    Long start = (Long) map.get("create_time");
+                    Long end = (Long) map.get("end_time");
+                    if (start != null && end != null) {
+                        map.put("duration", StringUtils.getTimeString(start, end));
+                    } else {
+                        map.put("duration", "");
+                    }
+                    resList.add(map);
+                }
             }
-            resList.add(map);
         }
         result.remove("rows");
-        result.put("rows",JSON.toJSON(resList));
+        result.put("rows", JSON.toJSON(resList));
+        result.put("total",count);
+//        result.put("",);
         //车位数据
 //        result.put("parktotal",total);
 //        result.put("blank",blank);
 
-        logger.error("============>>>>>返回数据"+result);
+        logger.error("============>>>>>返回数据" + result);
         return result;
+    }
+
+    private int getOrdersCountByComid(Map<String, String> reqmap) {
+        OrderTbExample example = new OrderTbExample();
+        example.createCriteria().andIshdEqualTo(0);
+        example.createCriteria().andComidEqualTo(Long.valueOf(reqmap.get("comid")));
+        reqmap.remove("rp");
+        example = ExampleUtis.createOrderExample(example,reqmap);
+        int count = orderMapper.selectOrdersCount(example);
+        logger.info("count~~~~~~~~"+count);
+        return count;
+    }
+
+    private List<OrderTb> getOrderListByComid(Map<String, String> reqmap) {
+        OrderTbExample example = new OrderTbExample();
+        example.createCriteria().andIshdEqualTo(0);
+        example.createCriteria().andComidEqualTo(Long.valueOf(reqmap.get("comid")));
+        example = ExampleUtis.createOrderExample(example,reqmap);
+        logger.info("example~~~~~~~~"+example);
+        List<OrderTb> orders = orderMapper.selectOrders(example);
+        return orders;
     }
 
     @Override
@@ -120,6 +172,14 @@ public class OrderServiceImpl implements OrderService {
 
         String str = "{\"in\":[],\"out\":[]}";
         JSONObject result = JSONObject.parseObject(str);
+
+        Long groupId = orderMapper.getGroupIdByComId(comid);
+        Long cityid = -1L;
+        if(groupId!=null&&groupId>-1){
+            cityid = orderMapper.getCityIdByGroupId(groupId);
+        }else {
+            cityid = orderMapper.getCityIdByComId(comid);
+        }
 
         DB db = MongoClientFactory.getInstance().getMongoDBBuilder("zld");
         //根据订单编号查询出mongodb中存入的对应个表名
@@ -129,38 +189,39 @@ public class OrderServiceImpl implements OrderService {
 //        orderTb.setComid(comid);
 //        orderTb = (OrderTb) commonDao.selectObjectByConditions(orderTb);
 
-        Calendar calendar=Calendar.getInstance();
-        //获得当前时间的月份，月份从0开始所以结果要加1
-        int month=calendar.get(Calendar.MONTH)+1;
-        logger.info("这是今年的"+month);
-        String monthStr = "";
-        if(month<10){
-            monthStr="0"+month;
-        }else{
-            monthStr = month+"";
-        }
-        String sql = "select * from order_tb_2018_"+monthStr+" where comid="+comid+" and ishd = 0"+" and order_id_local = '"+orderid+"'";
-        List<Map<String,Object>> list = commonDao.getObjectBySql(sql);
-        if(list==null||list.isEmpty()){
-            month=month-1;
-            if(month<10){
-                monthStr="0"+month;
-            }else{
-                monthStr = month+"";
-            }
-            sql = "select * from order_tb_2018_"+monthStr+" where comid="+comid+" and ishd = 0"+" and order_id_local = '"+orderid+"'";
-            logger.info("==============sql2"+sql);
-            list = commonDao.getObjectBySql(sql);
-        }
+//        Calendar calendar = Calendar.getInstance();
+//        //获得当前时间的月份，月份从0开始所以结果要加1
+//        int month = calendar.get(Calendar.MONTH) + 1;
+//        logger.info("这是今年的" + month);
+//        String monthStr = "";
+//        if (month < 10) {
+//            monthStr = "0" + month;
+//        } else {
+//            monthStr = month + "";
+//        }
+//        String sql = "select * from order_tb_2018_" + monthStr + " where comid=" + comid + " and ishd = 0" + " and order_id_local = '" + orderid + "'";
+//        List<Map<String, Object>> list = commonDao.getObjectBySql(sql);
+//        if (list == null || list.isEmpty()) {
+//            month = month - 1;
+//            if (month < 10) {
+//                monthStr = "0" + month;
+//            } else {
+//                monthStr = month + "";
+//            }
+//            sql = "select * from order_tb_2018_" + monthStr + " where comid=" + comid + " and ishd = 0" + " and order_id_local = '" + orderid + "'";
+//            logger.info("==============sql2" + sql);
+//            list = commonDao.getObjectBySql(sql);
+//        }
+
 
         String collectionName = "";
 //        if (orderTb != null && orderTb.getCarpicTableName() != null) {
 //            collectionName = orderTb.getCarpicTableName();
 //        }
-
-        if(list!=null&&list.size()>0){
-            if(list.get(0).get("carpic_table_name")!=null){
-                collectionName=list.get(0).get("carpic_table_name")+"";
+        List<Map<String, Object>> list = orderMapper.qryOrdersByComidAndOrderId(comid,orderid,cityid);
+        if (list != null && list.size() > 0) {
+            if (list.get(0).get("carpic_table_name") != null) {
+                collectionName = list.get(0).get("carpic_table_name") + "";
             }
         }
 
@@ -173,7 +234,7 @@ public class OrderServiceImpl implements OrderService {
         List<String> outlist = new ArrayList<>();
         inlist.add("/order/carpicsup?comid=" + comid + "&typeNew=in&orderid=" + orderid);
         outlist.add("/order/carpicsup?comid=" + comid + "&typeNew=out&orderid=" + orderid);
-        logger.error("=======>>>获取订单图片..inlist..outlist"+inlist.size()+"==>>"+outlist.size());
+        logger.error("=======>>>获取订单图片..inlist..outlist" + inlist.size() + "==>>" + outlist.size());
         if (collection != null) {
             BasicDBObject document = new BasicDBObject();
             document.put("parkid", String.valueOf(comid));
@@ -258,8 +319,7 @@ public class OrderServiceImpl implements OrderService {
     public List<List<Object>> exportExcel(Map<String, String> reqParameterMap) {
 
         //删除分页条件  查询该条件下所有  不然为一页数据
-        reqParameterMap.remove("orderfield");
-        reqParameterMap.remove("orderby");
+        reqParameterMap.remove("rp");
 
         //获得要导出的结果
         JSONObject result = selectResultByConditions(reqParameterMap);
@@ -272,7 +332,7 @@ public class OrderServiceImpl implements OrderService {
         List<List<Object>> bodyList = new ArrayList<List<Object>>();
 //        List<List<String>> bodyList = new ArrayList<List<String>>();
         if (orderlist != null && orderlist.size() > 0) {
-            String[] f = new String[]{"c_type", "car_number","car_type", "create_time", "end_time", "duration", "pay_type", "freereasons","amount_receivable", "total", "electronic_prepay", "cash_prepay", "electronic_pay", "cash_pay", "reduce_amount", "uid", "out_uid", "state", "in_passid", "out_passid","order_id_local"};
+            String[] f = new String[]{"c_type", "car_number", "car_type", "create_time", "end_time", "duration", "pay_type", "freereasons", "amount_receivable", "total", "electronic_prepay", "cash_prepay", "electronic_pay", "cash_pay", "reduce_amount", "uid", "out_uid", "state", "in_passid", "out_passid", "order_id_local"};
             Map<Long, String> uinNameMap = new HashMap<Long, String>();
             Map<Integer, String> passNameMap = new HashMap<Integer, String>();
             for (OrderTb orderTb : orderlist) {
@@ -404,19 +464,19 @@ public class OrderServiceImpl implements OrderService {
     public Long getComidByOrder(Long id) {
         OrderTb orderTb = new OrderTb();
         orderTb.setId(id);
-        orderTb = (OrderTb)commonDao.selectObjectByConditions(orderTb);
-        if(orderTb!=null&&orderTb.getComid()!=null){
+        orderTb = (OrderTb) commonDao.selectObjectByConditions(orderTb);
+        if (orderTb != null && orderTb.getComid() != null) {
             return orderTb.getComid();
         }
         return -1L;
     }
 
-    private String getPassName(Long comId,Integer passId) {
+    private String getPassName(Long comId, Integer passId) {
         ComPassTb comPassTb = new ComPassTb();
         comPassTb.setComid(comId);
         comPassTb.setId(passId.longValue());
-        comPassTb = (ComPassTb)commonDao.selectObjectByConditions(comPassTb);
-        if(comPassTb!=null&&comPassTb.getPassname()!=null){
+        comPassTb = (ComPassTb) commonDao.selectObjectByConditions(comPassTb);
+        if (comPassTb != null && comPassTb.getPassname() != null) {
             return comPassTb.getPassname();
         }
         return "";
@@ -425,10 +485,10 @@ public class OrderServiceImpl implements OrderService {
     private String getUinName(Long uin) {
         UserInfoTb userInfoTb = new UserInfoTb();
         userInfoTb.setId(uin);
-        userInfoTb = (UserInfoTb)commonDao.selectObjectByConditions(userInfoTb);
+        userInfoTb = (UserInfoTb) commonDao.selectObjectByConditions(userInfoTb);
 
         String uinName = "";
-        if(userInfoTb!=null&&userInfoTb.getNickname()!=null){
+        if (userInfoTb != null && userInfoTb.getNickname() != null) {
             return userInfoTb.getNickname();
         }
         return uinName;

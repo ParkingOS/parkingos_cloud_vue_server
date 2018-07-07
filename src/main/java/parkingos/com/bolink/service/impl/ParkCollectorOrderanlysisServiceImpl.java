@@ -5,6 +5,7 @@ import com.alibaba.fastjson.JSONObject;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import parkingos.com.bolink.dao.mybatis.mapper.OrderMapper;
 import parkingos.com.bolink.dao.spring.CommonDao;
 import parkingos.com.bolink.models.OrderTb;
 import parkingos.com.bolink.service.ParkCollectorOrderAnlysisService;
@@ -27,6 +28,8 @@ public class ParkCollectorOrderanlysisServiceImpl implements ParkCollectorOrderA
 
     @Autowired
     private CommonDao commonDao;
+    @Autowired
+    private OrderMapper orderMapper;
 
     @Autowired
     private SupperSearchService<OrderTb> supperSearchService;
@@ -38,6 +41,14 @@ public class ParkCollectorOrderanlysisServiceImpl implements ParkCollectorOrderA
         JSONObject result = JSONObject.parseObject(str);
 
         Long comid = Long.parseLong(reqmap.get("comid"));
+
+        Long groupId = orderMapper.getGroupIdByComId(comid);
+        Long cityId = -1L;
+        if(groupId!=null&&groupId>-1){
+            cityId = orderMapper.getCityIdByGroupId(groupId);
+        }else{
+            cityId = orderMapper.getGroupIdByComId(comid);
+        }
 
         String date = reqmap.get("date");
         Long start = null;
@@ -64,6 +75,11 @@ public class ParkCollectorOrderanlysisServiceImpl implements ParkCollectorOrderA
         }else{
             sql +=" and out_uid="+outUid+" and state= 1  and ishd=0 and comid ="+comid;
             free_sql +=" and out_uid="+outUid+" and state= 1 and ishd=0 and comid ="+comid;
+        }
+
+        if(cityId!=null&&cityId>-1){
+            sql +=" and mod(cityid,10)="+cityId%10;
+            free_sql +=" and mod(cityid,10)="+cityId%10;
         }
 
 

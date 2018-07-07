@@ -1,0 +1,141 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="parkingos.com.bolink.dao.mybatis.mapper.OrderMapper" >
+  <resultMap id="BaseMap" type="parkingos.com.bolink.models.OrderTb" >
+    <id column="id" property="id" jdbcType="BIGINT" />
+    <result column="create_time" property="createTime" jdbcType="BIGINT" />
+    <result column="comid" property="comid" jdbcType="BIGINT" />
+    <result column="uin" property="uin" jdbcType="BIGINT" />
+    <result column="total" property="total" jdbcType="NUMERIC" />
+    <result column="state" property="state" jdbcType="INTEGER" />
+    <result column="end_time" property="endTime" jdbcType="BIGINT" />
+    <result column="auto_pay" property="autoPay" jdbcType="INTEGER" />
+    <result column="pay_type" property="payType" jdbcType="INTEGER" />
+    <result column="nfc_uuid" property="nfcUuid" jdbcType="VARCHAR" />
+    <result column="uid" property="uid" jdbcType="BIGINT" />
+    <result column="car_number" property="carNumber" jdbcType="VARCHAR" />
+    <result column="imei" property="imei" jdbcType="VARCHAR" />
+    <result column="pid" property="pid" jdbcType="INTEGER" />
+    <result column="pre_state" property="preState" jdbcType="INTEGER" />
+    <result column="type" property="type" jdbcType="INTEGER" />
+    <result column="need_sync" property="needSync" jdbcType="INTEGER" />
+    <result column="ishd" property="ishd" jdbcType="INTEGER" />
+    <result column="isclick" property="isclick" jdbcType="INTEGER" />
+    <result column="prepaid" property="prepaid" jdbcType="NUMERIC" />
+    <result column="prepaid_pay_time" property="prepaidPayTime" jdbcType="BIGINT" />
+    <result column="berthnumber" property="berthnumber" jdbcType="BIGINT" />
+    <result column="berthsec_id" property="berthsecId" jdbcType="BIGINT" />
+    <result column="groupid" property="groupid" jdbcType="BIGINT" />
+    <result column="out_uid" property="outUid" jdbcType="BIGINT" />
+    <result column="is_union_user" property="isUnionUser" jdbcType="INTEGER" />
+    <result column="car_type_zh" property="carTypeZh" jdbcType="VARCHAR" />
+    <result column="order_id_local" property="orderIdLocal" jdbcType="VARCHAR" />
+    <result column="duration" property="duration" jdbcType="BIGINT" />
+    <result column="pay_type_en" property="payTypeEn" jdbcType="VARCHAR" />
+    <result column="freereasons_local" property="freereasonsLocal" jdbcType="VARCHAR" />
+    <result column="islocked" property="islocked" jdbcType="SMALLINT" />
+    <result column="lock_key" property="lockKey" jdbcType="VARCHAR" />
+    <result column="in_passid" property="inPassid" jdbcType="VARCHAR" />
+    <result column="out_passid" property="outPassid" jdbcType="VARCHAR" />
+    <result column="amount_receivable" property="amountReceivable" jdbcType="NUMERIC" />
+    <result column="electronic_prepay" property="electronicPrepay" jdbcType="NUMERIC" />
+    <result column="electronic_pay" property="electronicPay" jdbcType="NUMERIC" />
+    <result column="cash_prepay" property="cashPrepay" jdbcType="NUMERIC" />
+    <result column="cash_pay" property="cashPay" jdbcType="NUMERIC" />
+    <result column="reduce_amount" property="reduceAmount" jdbcType="NUMERIC" />
+    <result column="c_type" property="cType" jdbcType="VARCHAR" />
+    <result column="car_type" property="carType" jdbcType="VARCHAR" />
+    <result column="freereasons" property="freereasons" jdbcType="VARCHAR" />
+    <result column="remark" property="remark" jdbcType="VARCHAR" />
+    <result column="carpic_table_name" property="carpicTableName" jdbcType="VARCHAR" />
+    <result column="work_station_uuid" property="workStationUuid" jdbcType="VARCHAR" />
+  </resultMap>
+  <sql id="Example_Where_Clause_" >
+    <where >
+      <foreach collection="oredCriteria" item="criteria" separator="and" >
+        <if test="criteria.valid" >
+          <trim prefix="(" suffix=")" prefixOverrides="and" >
+            <foreach collection="criteria.criteria" item="criterion" >
+              <choose >
+                <when test="criterion.noValue" >
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue" >
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue" >
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue" >
+                  and ${criterion.condition}
+                  <foreach collection="criterion.value" item="listItem" open="(" close=")" separator="," >
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+
+  <sql id="Base_Column" >
+    id, create_time, comid, uin, total, state, end_time, auto_pay, pay_type, nfc_uuid, 
+    uid, car_number, imei, pid, pre_state, type, need_sync, ishd, isclick, prepaid, prepaid_pay_time, 
+    berthnumber, berthsec_id, groupid, out_uid, is_union_user, car_type_zh, order_id_local, 
+    duration, pay_type_en, freereasons_local, islocked, lock_key, in_passid, out_passid, 
+    amount_receivable, electronic_prepay, electronic_pay, cash_prepay, cash_pay, reduce_amount, 
+    c_type, car_type, freereasons, remark, carpic_table_name, work_station_uuid
+  </sql>
+
+  <select id="qryOrdersByComidAndOrderId" resultType="map">
+    SELECT
+    *
+    FROM
+    order_tb
+    WHERE
+    order_id_local = #{orderIdLocal,jdbcType=VARCHAR}
+    AND comid = #{comid,jdbcType=BIGINT}
+    AND MOD (cityid, 10) = #{cityid}%10
+    AND ishd = 0
+
+  </select>
+
+
+
+
+  <select id="selectOrders" resultMap="BaseMap" parameterType="parkingos.com.bolink.dao.mybatis.OrderTbExample" >
+    select
+    *
+    from order_tb
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause_" />
+    </if>
+    AND MOD (cityid, 10) = #{cityid}%10
+    <if test="orderByClause != null" >
+      order by ${orderByClause} ${orderType}
+    </if>
+    <if test="limit != null" >
+      limit ${limit} offset ${offset}
+    </if>
+
+
+  </select>
+
+
+  <select id="selectOrdersCount" resultType="int" parameterType="parkingos.com.bolink.dao.mybatis.OrderTbExample" >
+    select
+    count(*)
+    from order_tb
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause_" />
+    </if>
+    AND MOD (cityid, 10) = #{cityid}%10
+
+  </select>
+
+
+
+
+</mapper>

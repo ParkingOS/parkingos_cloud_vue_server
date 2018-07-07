@@ -15,6 +15,7 @@
     and a.groupid= #{groupid,jdbcType=BIGINT}
     and a.state = 0
     and a.ishd = 0
+    and mod(a.cityid,10)=#{cityid,jdbcType=BIGINT}%10
     ORDER BY a.create_time DESC
     limit  10
     ]]>
@@ -34,6 +35,7 @@
         and a.state in(1,2)
         and b.state = 0
         and a.ishd = 0
+        and mod(a.cityid,10)=#{cityid,jdbcType=BIGINT}%10
         ORDER BY a.end_time DESC
         limit  10
         ]]>
@@ -49,6 +51,7 @@
      and a.ishd = 0
      and b.state= 0
      and total >0
+     and mod(a.cityid,10)=#{cityid,jdbcType=BIGINT}%10
      GROUP BY a.comid, b.company_name
       ORDER BY  total desc
       limit 5
@@ -99,6 +102,7 @@
         where a.create_time > #{create_time,jdbcType=BIGINT}
         and a.groupid= #{groupid,jdbcType=BIGINT}
         and a.ishd = 0
+        and mod(a.cityid,10)=#{cityid,jdbcType=BIGINT}%10
     </select>
     <!--获取今日离场总数-->
     <select id="getExitCount"  resultType="java.lang.Integer">
@@ -107,6 +111,7 @@
         where a.end_time > #{end_time,jdbcType=BIGINT}
         and a.groupid= #{groupid,jdbcType=BIGINT}
         and a.ishd = 0
+        and mod(a.cityid,10)=#{cityid,jdbcType=BIGINT}%10
     </select>
     <!--获取今日在场总数-->
     <select id="getInparkCount"  resultType="java.lang.Integer">
@@ -116,6 +121,7 @@
         and end_time is null
         and a.groupid= #{groupid,jdbcType=BIGINT}
         and a.ishd = 0
+        and mod(a.cityid,10)=#{cityid,jdbcType=BIGINT}%10
     </select>
     <!--获取集团下所有车场的id-->
     <select id="getParkIdByGroupId"  resultType="map">
@@ -165,6 +171,7 @@ and a.is_delete = 0
     and a.comid= #{comid,jdbcType=BIGINT}
     and a.state = 0
     and a.ishd = 0
+    and mod(a.cityid,10)=#{cityid,jdbcType=BIGINT}%10
     ORDER BY a.create_time DESC
     limit  10
     ]]>
@@ -182,6 +189,7 @@ and a.is_delete = 0
         and a.comid = #{comid,jdbcType=BIGINT}
         and a.state in(1,2)
         and a.ishd = 0
+        and mod(a.cityid,10)=#{cityid,jdbcType=BIGINT}%10
         ORDER BY a.end_time DESC
         limit  10
         ]]>
@@ -200,6 +208,7 @@ and a.is_delete = 0
     and total >0
     and uid <> -1
     and a.ishd = 0
+    and mod(a.cityid,10)=#{cityid,jdbcType=BIGINT}%10
     group by a.out_uid
     ORDER BY total desc
     limit  5
@@ -246,6 +255,7 @@ and a.is_delete = 0
         where a.create_time > #{create_time,jdbcType=BIGINT}
        and a.comid= #{comid,jdbcType=BIGINT}
        and a.ishd = 0
+       and mod(a.cityid,10)=#{cityid,jdbcType=BIGINT}%10
     </select>
     <!--获取今日离场总数-->
     <select id="getExitCountbc"  resultType="java.lang.Integer">
@@ -254,6 +264,7 @@ and a.is_delete = 0
         where a.end_time > #{end_time,jdbcType=BIGINT}
         and a.comid= #{comid,jdbcType=BIGINT}
         and a.ishd = 0
+        and mod(a.cityid,10)=#{cityid,jdbcType=BIGINT}%10
     </select>
     <!--获取今日在场总数-->
     <select id="getInparkCountbc"  resultType="java.lang.Integer">
@@ -263,6 +274,7 @@ and a.is_delete = 0
         and state =0
         and a.comid= #{comid,jdbcType=BIGINT}
         and a.ishd = 0
+        and mod(a.cityid,10)=#{cityid,jdbcType=BIGINT}%10
     </select>
 
     <!--获取总的车位-->

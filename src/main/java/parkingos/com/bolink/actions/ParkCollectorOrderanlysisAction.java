@@ -31,7 +31,7 @@ public class ParkCollectorOrderanlysisAction {
 
 
     /*
-    * 查询统计
+    * 车场统计分析  收费员日报
     *
     * */
     @RequestMapping(value = "/query")

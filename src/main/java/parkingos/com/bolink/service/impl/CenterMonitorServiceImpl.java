@@ -14,6 +14,7 @@ import org.directwebremoting.ScriptSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import parkingos.com.bolink.dao.mybatis.mapper.CenterMonitorMapper;
+import parkingos.com.bolink.dao.mybatis.mapper.OrderMapper;
 import parkingos.com.bolink.dao.mybatis.mapper.ParkInfoMapper;
 import parkingos.com.bolink.dao.spring.CommonDao;
 import parkingos.com.bolink.dwr.DWRScriptSessionListener;
@@ -51,6 +52,8 @@ public class CenterMonitorServiceImpl implements CenterMonitorService {
     private CityParkOrderAnlysisService cityParkOrderanlysisService;
     @Autowired
     private ParkOrderAnlysisService parkOrderanlysisService;
+    @Autowired
+    private OrderMapper orderMapper;
     DecimalFormat af1 = new DecimalFormat("0");
 
     private Gson gson = new GsonBuilder().setDateFormat("yyyy-MM-dd HH:mm:ss").create();
@@ -73,6 +76,7 @@ public class CenterMonitorServiceImpl implements CenterMonitorService {
         Map<String, Object> videoMap = new HashMap<String, Object>();//需要返回的播放列表
         List<Map<String, Object>> list =new ArrayList<>();
         if (groupid > 0) {
+            Long cityid = orderMapper.getCityIdByGroupId(groupid);
             //获取今日电子支付，现金支付，减免金额的统计
             Map<String, String> parammap = new HashMap<String, String>();
             parammap.put("groupid", groupid + "");
@@ -105,9 +109,9 @@ public class CenterMonitorServiceImpl implements CenterMonitorService {
             totalIncomemap.put("freePay", af1.format(freePay));
 
             //获取车辆进场，离场，在场的数量统计
-            int inCars = parkInfoMapper.getEntryCount(tday, groupid.intValue());
-            int outCars = parkInfoMapper.getExitCount(tday, groupid.intValue());
-            int inPark = parkInfoMapper.getInparkCount(tday, groupid.intValue());
+            int inCars = parkInfoMapper.getEntryCount(tday, groupid.intValue(),cityid);
+            int outCars = parkInfoMapper.getExitCount(tday, groupid.intValue(),cityid);
+            int inPark = parkInfoMapper.getInparkCount(tday, groupid.intValue(),cityid);
             countMap = new HashMap<String, Object>();
             countMap.put("inCars", inCars);
             countMap.put("outCars", outCars);
@@ -143,7 +147,13 @@ public class CenterMonitorServiceImpl implements CenterMonitorService {
 
         } else if (comid > 0) {
 
-
+            Long cityid=-1L;
+            Long groupId = orderMapper.getGroupIdByComId(comid);
+            if(groupId!=null&&groupId>-1){
+                cityid = orderMapper.getCityIdByGroupId(groupid);
+            }else {
+                cityid = orderMapper.getCityIdByComId(comid);
+            }
             //获取今日电子支付，现金支付，减免金额的统计
             Map<String, String> parammap = new HashMap<String, String>();
             parammap.put("comid", comid + "");
@@ -176,9 +186,9 @@ public class CenterMonitorServiceImpl implements CenterMonitorService {
 
 
             //获取车辆进场，离场，在场的数量统计
-            int inCars = parkInfoMapper.getEntryCountbc(tday, comid.intValue());
-            int outCars = parkInfoMapper.getExitCountbc(tday, comid.intValue());
-            int inPark = parkInfoMapper.getInparkCountbc(tday, comid.intValue());
+            int inCars = parkInfoMapper.getEntryCountbc(tday, comid.intValue(),cityid);
+            int outCars = parkInfoMapper.getExitCountbc(tday, comid.intValue(),cityid);
+            int inPark = parkInfoMapper.getInparkCountbc(tday, comid.intValue(),cityid);
             countMap = new HashMap<String, Object>();
             countMap.put("inCars", inCars);
             countMap.put("outCars", outCars);
@@ -355,8 +365,14 @@ public class CenterMonitorServiceImpl implements CenterMonitorService {
 
     @Override
     public Map getSelectOrder(String comid, String carNumber) {
-
-        Map ordermap = centerMonitorMapper.getSelectOrder(Long.parseLong(comid),carNumber);
+        Long cityid =-1L;
+        Long groupid = orderMapper.getGroupIdByComId(Long.parseLong(comid));
+        if(groupid!=null&&groupid>-1){
+            cityid = orderMapper.getCityIdByGroupId(groupid);
+        }else {
+            cityid = orderMapper.getCityIdByComId(Long.parseLong(comid));
+        }
+        Map ordermap = centerMonitorMapper.getSelectOrder(Long.parseLong(comid),carNumber,cityid);
         return ordermap;
     }
 
@@ -555,6 +571,13 @@ public class CenterMonitorServiceImpl implements CenterMonitorService {
 
     private List<Map<String,Object>> queryBlurOrdersByCarnumber(long comid, String carNumber) {
 
+        Long groupid = orderMapper.getGroupIdByComId(comid);
+        Long cityid = -1L;
+        if(groupid!=null&&groupid>-1){
+            cityid = orderMapper.getCityIdByGroupId(groupid);
+        }else {
+            cityid = orderMapper.getCityIdByComId(comid);
+        }
 
         System.out.println("进来获取集合");
         List<Object> params = new ArrayList<Object>();
@@ -569,14 +592,14 @@ public class CenterMonitorServiceImpl implements CenterMonitorService {
         List<String> carNumberList = new ArrayList<>();
         carNumberList.add(carNumber.substring(1));
 
-        list = centerMonitorMapper.getCarByNameLike(comid,carNumberList);
+        list = centerMonitorMapper.getCarByNameLike(comid,carNumberList,cityid);
 
         if (list == null || list.size() == 0) {
             // 2 模糊匹配除去两位
             carNumberList.clear();
             carNumberList.add(carNumber.substring(1, carNumber.length() - 1));
             carNumberList.add(carNumber.substring(2));
-            list = centerMonitorMapper.getCarByNameLike(comid,carNumberList);
+            list = centerMonitorMapper.getCarByNameLike(comid,carNumberList,cityid);
 
             if (list == null || list.size() == 0) {
                 //3  模糊匹配除去三位
@@ -585,7 +608,7 @@ public class CenterMonitorServiceImpl implements CenterMonitorService {
                 carNumberList.add(carNumber.substring(1, carNumber.length() - 2));
                 carNumberList.add(carNumber.substring(2, carNumber.length() - 1));
                 carNumberList.add(carNumber.substring(3));
-                list = centerMonitorMapper.getCarByNameLike(comid,carNumberList);
+                list = centerMonitorMapper.getCarByNameLike(comid,carNumberList,cityid);
 
                 if (list == null || list.size() == 0) {
                     //4 模糊匹配除去四位
@@ -595,7 +618,7 @@ public class CenterMonitorServiceImpl implements CenterMonitorService {
                     carNumberList.add(carNumber.substring(2, carNumber.length() - 2));
                     carNumberList.add(carNumber.substring(3, carNumber.length() - 1));
                     carNumberList.add(carNumber.substring(4, carNumber.length()));
-                    list = centerMonitorMapper.getCarByNameLike(comid,carNumberList);
+                    list = centerMonitorMapper.getCarByNameLike(comid,carNumberList,cityid);
 
                 }
             }

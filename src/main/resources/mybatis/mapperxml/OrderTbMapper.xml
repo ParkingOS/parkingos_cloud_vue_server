@@ -146,10 +146,8 @@
     <if test="_parameter != null" >
       <include refid="Example_Where_Clause" />
     </if>
+    AND MOD (cityid, 10) = #{cityid}%10
     limit 20 offset 0
-    <if test="orderByClause != null" >
-      order by ${orderByClause}
-    </if>
   </select>
 
 
