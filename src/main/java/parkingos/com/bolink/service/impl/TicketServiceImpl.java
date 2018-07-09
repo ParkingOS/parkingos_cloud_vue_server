@@ -366,8 +366,11 @@ public class TicketServiceImpl implements TicketService {
         //未设置有效期,默认24小时
         Integer validite_time = shopInfo.getValiditeTime() == null ? 24 : shopInfo.getValiditeTime();
         Long btime = System.currentTimeMillis() / 1000;
+
+        logger.info("=======btime"+btime+"~~~~"+validite_time+"~~~"+validite_time.longValue());
         //截止有效时间
-        Long etime = btime + validite_time * 60 * 60;
+        Long etime = btime + validite_time.longValue() * 60 * 60;
+        logger.info("=======etime"+etime);
         //判断商户额度是否可以发劵
         if (type == 3) {//优惠券-时长
             if (reduce <= 0) {

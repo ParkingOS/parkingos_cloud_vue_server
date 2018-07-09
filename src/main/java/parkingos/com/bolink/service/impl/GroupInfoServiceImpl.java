@@ -49,6 +49,9 @@ public class GroupInfoServiceImpl implements GroupInfoService {
         JSONObject result = JSONObject.parseObject(str);
 
         Long groupid = RequestUtil.getLong(request, "groupid", -1L);
+        if(groupid==-1){
+            groupid=RequestUtil.getLong(request, "id", -1L);
+        }
         String name = StringUtils.decodeUTF8(RequestUtil.processParams(request, "name"));
         Integer type = RequestUtil.getInteger(request, "type", 0);
         Long uin = RequestUtil.getLong(request,"loginuin",-1L);
