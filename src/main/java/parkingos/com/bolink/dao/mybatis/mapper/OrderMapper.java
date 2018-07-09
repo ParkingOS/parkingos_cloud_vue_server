@@ -12,13 +12,13 @@ import java.util.Map;
 
 public interface OrderMapper {
     @Select("select cityid from com_info_tb where id =#{comid} and state=0")
-    Long getCityIdByComId(Long comid);
+    Long getCityIdByComId(@Param("comid")Long comid);
 
     @Select("select cityid from org_group_tb where id =#{groupid} and state=0")
-    Long getCityIdByGroupId(Long groupid);
+    Long getCityIdByGroupId(@Param("groupid") Long groupid);
 
     @Select("select groupid from com_info_tb where id =#{comid} and state=0")
-    Long getGroupIdByComId(Long comid);
+    Long getGroupIdByComId(@Param("comid")Long comid);
 
     List<OrderTb> selectOrders(OrderTbExample example);
 

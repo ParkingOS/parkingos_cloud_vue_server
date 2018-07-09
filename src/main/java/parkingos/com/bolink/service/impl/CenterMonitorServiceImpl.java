@@ -150,7 +150,7 @@ public class CenterMonitorServiceImpl implements CenterMonitorService {
             Long cityid=-1L;
             Long groupId = orderMapper.getGroupIdByComId(comid);
             if(groupId!=null&&groupId>-1){
-                cityid = orderMapper.getCityIdByGroupId(groupid);
+                cityid = orderMapper.getCityIdByGroupId(groupId);
             }else {
                 cityid = orderMapper.getCityIdByComId(comid);
             }
@@ -186,6 +186,7 @@ public class CenterMonitorServiceImpl implements CenterMonitorService {
 
 
             //获取车辆进场，离场，在场的数量统计
+            logger.error("centermonitor 189 cityid:"+cityid+"~~comid:"+comid+"tday");
             int inCars = parkInfoMapper.getEntryCountbc(tday, comid.intValue(),cityid);
             int outCars = parkInfoMapper.getExitCountbc(tday, comid.intValue(),cityid);
             int inPark = parkInfoMapper.getInparkCountbc(tday, comid.intValue(),cityid);
