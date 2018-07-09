@@ -102,10 +102,10 @@ public class LoginServiceImpl implements LoginService {
                         result.put("msg", "车场不存在或者车场未通过审核！");
                         return result;
                     } else {
-//                        comInfoTb = (ComInfoTb)commonDao.selectObjectByConditions(comInfoTb);
-//                        if(comInfoTb!=null&&comInfoTb.getSuperimposed()!=null){
-//                            user.put("superimposed",comInfoTb.getSuperimposed());
-//                        }
+                        comInfoTb = (ComInfoTb)commonDao.selectObjectByConditions(comInfoTb);
+                        if(comInfoTb!=null){
+                            user.put("name",comInfoTb.getCompanyName());
+                        }
 
 
 //                        Map<String, Object> comMap = daService.getMap("select chanid from com_info_tb where id=? ",
@@ -156,6 +156,11 @@ public class LoginServiceImpl implements LoginService {
                         result.put("state", false);
                         result.put("msg", "集团不存在！");
                         return result;
+                    }else{
+                        orgGroupTb=(OrgGroupTb) commonDao.selectObjectByConditions(orgGroupTb);
+                        if(orgGroupTb!=null){
+                            user.put("name",orgGroupTb.getName());
+                        }
                     }
                 } else if (orgname.contains("城市")) {
                     user.put("isadmin", 1);
@@ -170,6 +175,11 @@ public class LoginServiceImpl implements LoginService {
                         result.put("state", false);
                         result.put("msg", "城市不存在！");
                         return result;
+                    }else{
+                        orgCityMerchants = (OrgCityMerchants)commonDao.selectObjectByConditions(orgCityMerchants);
+                        if(orgCityMerchants!=null){
+                            user.put("name",orgCityMerchants.getName());
+                        }
                     }
                 }else if (orgname.contains("商户")) {
                     user.put("isadmin", 1);
@@ -182,6 +192,11 @@ public class LoginServiceImpl implements LoginService {
                         result.put("state", false);
                         result.put("msg", "商户不存在！");
                         return result;
+                    }else{
+                        shopTb=(ShopTb)commonDao.selectObjectByConditions(shopTb);
+                        if(shopTb!=null){
+                            user.put("name",shopTb.getName());
+                        }
                     }
                 }
             }
@@ -306,8 +321,8 @@ public class LoginServiceImpl implements LoginService {
         String nickname = "";
         if (userInfoTb.getNickname() != null) {
             nickname = userInfoTb.getNickname();
-            user.put("nickname", nickname);
         }
+        user.put("nickname", nickname);
 
         user.put("userid", userId);
         user.put("lastlogin", System.currentTimeMillis() / 1000);
