@@ -71,9 +71,16 @@ public class CityUnorderServiceImpl implements CityUnorderService {
             reqmap.put("create_time_start",(TimeTools.getToDayBeginTime()+""));
             logger.error("=========..req"+reqmap.size());
         }
+        String rp = "20";
+        if(reqmap.get("rp")!=null){
+            rp = reqmap.get("rp");
+        }
 
         count = getOrdersCountByGroupid(reqmap);
         if(count>0){
+            if(reqmap.get("export")==null){//不是导出
+                reqmap.put("rp",rp);
+            }
             list = getOrdersListByGroupid(reqmap);
             if (list != null && !list.isEmpty()) {
                 for (OrderTb orderTb1 : list) {
@@ -127,6 +134,8 @@ public class CityUnorderServiceImpl implements CityUnorderService {
 
         //删除分页条件  查询该条件下所有  不然为一页数据
         reqParameterMap.remove("rp");
+        //标记为导出
+        reqParameterMap.put("export","1");
 
         //获得要导出的结果
         JSONObject result = selectResultByConditions(reqParameterMap);

@@ -83,6 +83,11 @@ public class CityOrderServiceImpl implements CityOrderService {
             logger.error("=========..req"+reqmap.size());
         }
 
+        String rp = "20";
+        if(reqmap.get("rp")!=null){
+            rp = reqmap.get("rp");
+        }
+
 //        count = commonDao.selectCountByConditions(baseQuery,supperQuery);
         count = getOrdersCountByGroupid(reqmap);
         Map moneymap = new HashMap();
@@ -90,6 +95,9 @@ public class CityOrderServiceImpl implements CityOrderService {
             //价格统计不需要分页  要查询所有
             moneymap = getMoneyMap(reqmap);
                 //带分页的 要显示在页面  的数据list
+            if(reqmap.get("export")==null){//不是导出
+                reqmap.put("rp",rp);
+            }
             list = getOrdersListByGroupid(reqmap);
             if (list != null && !list.isEmpty()) {
                 for (OrderTb orderTb1 : list) {
@@ -158,6 +166,8 @@ public class CityOrderServiceImpl implements CityOrderService {
 
         //删除分页条件  查询该条件下所有  不然为一页数据
         reqParameterMap.remove("rp");
+        //标记为导出
+        reqParameterMap.put("export","1");
 
         //获得要导出的结果
         JSONObject result = selectResultByConditions(reqParameterMap);

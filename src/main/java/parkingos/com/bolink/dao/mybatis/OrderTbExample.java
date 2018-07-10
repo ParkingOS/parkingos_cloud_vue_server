@@ -868,7 +868,7 @@ public class OrderTbExample {
         }
 
         public Criteria andCarNumberLike(String value) {
-            addCriterion("car_number like", value, "carNumber");
+            addCriterion("car_number like", "%"+value+"%", "carNumber");
             return (Criteria) this;
         }
 

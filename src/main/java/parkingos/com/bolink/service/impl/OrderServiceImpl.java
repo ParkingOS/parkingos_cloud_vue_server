@@ -17,6 +17,7 @@ import parkingos.com.bolink.service.OrderService;
 import parkingos.com.bolink.service.SupperSearchService;
 import parkingos.com.bolink.utils.*;
 
+import javax.persistence.criteria.CriteriaBuilder;
 import java.math.BigDecimal;
 import java.util.*;
 
@@ -113,11 +114,18 @@ public class OrderServiceImpl implements OrderService {
 
         //时长重新处理  收款人和收费员重新处理
 //        List<OrderTb> orderList = JSON.parseArray(result.get("rows").toString(), OrderTb.class);
+        String rp = "20";
+        if(reqmap.get("rp")!=null){
+            rp = reqmap.get("rp");
+        }
 
         int count = getOrdersCountByComid(reqmap);
         List<OrderTb> orderList =new ArrayList<>();
         List<Map<String, Object>> resList = new ArrayList<>();
         if(count>0) {
+            if(reqmap.get("export")==null){//不是导出
+                reqmap.put("rp",rp);
+            }
             orderList = getOrderListByComid(reqmap);
             if (orderList != null && orderList.size() > 0) {
                 for (OrderTb order : orderList) {
@@ -147,6 +155,7 @@ public class OrderServiceImpl implements OrderService {
     }
 
     private int getOrdersCountByComid(Map<String, String> reqmap) {
+        logger.info("~~~~~reamap 1"+reqmap);
         OrderTbExample example = new OrderTbExample();
         example.createCriteria().andIshdEqualTo(0);
         example.createCriteria().andComidEqualTo(Long.valueOf(reqmap.get("comid")));
@@ -158,6 +167,7 @@ public class OrderServiceImpl implements OrderService {
     }
 
     private List<OrderTb> getOrderListByComid(Map<String, String> reqmap) {
+        logger.info("~~~~~reamap 2"+reqmap);
         OrderTbExample example = new OrderTbExample();
         example.createCriteria().andIshdEqualTo(0);
         example.createCriteria().andComidEqualTo(Long.valueOf(reqmap.get("comid")));
@@ -320,6 +330,8 @@ public class OrderServiceImpl implements OrderService {
 
         //删除分页条件  查询该条件下所有  不然为一页数据
         reqParameterMap.remove("rp");
+        //标记为导出
+        reqParameterMap.put("export","1");
 
         //获得要导出的结果
         JSONObject result = selectResultByConditions(reqParameterMap);

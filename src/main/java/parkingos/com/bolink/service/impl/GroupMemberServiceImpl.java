@@ -169,10 +169,10 @@ public class GroupMemberServiceImpl implements GroupMemberService {
             result.put("msg","电话长度不大于15位");
             return result;
         }
-//        Long auth_flag =-1L;
-//        if(reqParameterMap.get("auth_flag")!=null&&!"".equals(reqParameterMap.get("auth_flag"))){
-//            auth_flag =Long.parseLong(reqParameterMap.get("auth_flag"));
-//        }
+        Long auth_flag =-1L;
+        if(reqParameterMap.get("auth_flag")!=null&&!"".equals(reqParameterMap.get("auth_flag"))){
+            auth_flag =Long.parseLong(reqParameterMap.get("auth_flag"));
+        }
         String loginuin = reqParameterMap.get("loginuin");
 
         Long role_id =-1L;
@@ -239,7 +239,7 @@ public class GroupMemberServiceImpl implements GroupMemberService {
         user.setRegTime(time);
         user.setMobile(mobile);
         user.setPhone(phone);
-//        user.setAuthFlag(auth_flag);
+        user.setAuthFlag(auth_flag);
 //        user.setComid(comId);
         user.setRoleId(role_id);
         user.setIsview(isview);
