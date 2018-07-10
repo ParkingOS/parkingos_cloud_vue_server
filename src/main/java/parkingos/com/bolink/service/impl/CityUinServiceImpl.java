@@ -10,6 +10,9 @@ import parkingos.com.bolink.models.UserInfoTb;
 import parkingos.com.bolink.service.CityUinService;
 import parkingos.com.bolink.service.SupperSearchService;
 
+import java.util.HashMap;
+import java.util.Map;
+
 @Service
 public class CityUinServiceImpl implements CityUinService {
 
@@ -55,6 +58,38 @@ public class CityUinServiceImpl implements CityUinService {
             result.put("msg","添加成功");
         }
         return result;
+    }
+
+    @Override
+    public JSONObject editSetting(Long cityid, Integer state) {
+        JSONObject result = new JSONObject();
+        OrgCityMerchants orgCityMerchants = new OrgCityMerchants();
+        orgCityMerchants.setId(cityid);
+        orgCityMerchants.setSelfRefillSetting(state);
+        int count = commonDao.updateByPrimaryKey(orgCityMerchants);
+        if(count ==1){
+            result.put("state",1);
+            return result;
+        }
+        result.put("state",0);
+        result.put("errmsg","修改失败");
+        return result;
+    }
+
+    @Override
+    public JSONObject querySetting(Long cityid) {
+        JSONObject result = new JSONObject();
+        OrgCityMerchants orgCityMerchants = new OrgCityMerchants();
+        orgCityMerchants.setId(cityid);
+        orgCityMerchants.setState(0);
+        orgCityMerchants =(OrgCityMerchants)commonDao.selectObjectByConditions(orgCityMerchants);
+        Map<String,Object> map = new HashMap<>();
+        if(orgCityMerchants!=null){
+            map.put("self_setting",orgCityMerchants.getSelfRefillSetting());
+            result.put("self_setting",map);
+            return result;
+        }
+        return null;
     }
 
 

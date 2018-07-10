@@ -105,21 +105,34 @@ public class LoginServiceImpl implements LoginService {
                         comInfoTb = (ComInfoTb)commonDao.selectObjectByConditions(comInfoTb);
                         if(comInfoTb!=null){
                             user.put("name",comInfoTb.getCompanyName());
+                            if(comInfoTb.getCityid()!=null&&comInfoTb.getCityid()>-1){
+                                Long cityid = comInfoTb.getCityid();
+                                OrgCityMerchants orgCityMerchants = new OrgCityMerchants();
+                                orgCityMerchants.setId(cityid);
+                                orgCityMerchants.setState(0);
+                                orgCityMerchants = (OrgCityMerchants)commonDao.selectObjectByConditions(orgCityMerchants);
+                                if(orgCityMerchants!=null&&orgCityMerchants.getSelfRefillSetting()!=null){
+                                    user.put("self_setting",orgCityMerchants.getSelfRefillSetting());
+                                }
+                            }else{
+                                Long groupid = comInfoTb.getGroupid();
+                                OrgGroupTb orgGroupTb = new OrgGroupTb();
+                                orgGroupTb.setId(groupid);
+                                orgGroupTb.setState(0);
+                                orgGroupTb= (OrgGroupTb)commonDao.selectObjectByConditions(orgGroupTb);
+                                if (orgGroupTb!=null&&orgGroupTb.getCityid()!=null){
+                                    Long cityid = orgGroupTb.getCityid();
+                                    OrgCityMerchants orgCityMerchants = new OrgCityMerchants();
+                                    orgCityMerchants.setId(cityid);
+                                    orgCityMerchants.setState(0);
+                                    orgCityMerchants = (OrgCityMerchants)commonDao.selectObjectByConditions(orgCityMerchants);
+                                    if(orgCityMerchants!=null&&orgCityMerchants.getSelfRefillSetting()!=null){
+                                        user.put("self_setting",orgCityMerchants.getSelfRefillSetting());
+                                    }
+                                }
+                            }
                         }
 
-
-//                        Map<String, Object> comMap = daService.getMap("select chanid from com_info_tb where id=? ",
-//                                new Object[]{user.get("comid")});
-//                        if(comMap != null && comMap.get("chanid") != null){
-//                            Long chanid = (Long)comMap.get("chanid");
-//                            if(chanid > 0){
-//                                Map<String, Object> map = daService.getMap("select * from logo_tb where type=? and orgid=? ",
-//                                        new Object[]{0, chanid});
-//                                if(map != null&& map.get("url_fir") != null){
-//                                    logourl = "cloudlogo.do?action=downloadlogo&type=0&orgid="+chanid+"&number=0&r="+Math.random();
-//                                }
-//                            }
-//                        }
                         user.put("comid", userInfoTb.getComid());
                         user.put("parkid", userInfoTb.getComid());
                     }

@@ -46,6 +46,16 @@ public class OrgCityMerchants {
 
     private String appsecert;
 
+    private Integer selfRefillSetting;
+
+    public Integer getSelfRefillSetting() {
+        return selfRefillSetting;
+    }
+
+    public void setSelfRefillSetting(Integer selfRefillSetting) {
+        this.selfRefillSetting = selfRefillSetting;
+    }
+
     @Override
     public String toString() {
         return "OrgCityMerchants{" +

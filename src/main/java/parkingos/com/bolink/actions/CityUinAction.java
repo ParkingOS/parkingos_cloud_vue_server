@@ -30,4 +30,31 @@ public class CityUinAction {
         StringUtils.ajaxOutput(resp, result.toJSONString());
         return null;
     }
+
+
+    /*
+    * 自定义设置，可以修改月卡续费时间
+    *
+    * */
+    @RequestMapping(value = "/edit")
+    public String editSetting(Long cityid,Integer state,HttpServletResponse resp) {
+        logger.error("自定义设置"+cityid+"~~~~~"+state);
+
+        JSONObject result = cityUinService.editSetting(cityid,state);
+        StringUtils.ajaxOutput(resp, result.toJSONString());
+        return null;
+    }
+
+    /*
+    * 查询自定义设置
+    *
+    * */
+    @RequestMapping(value = "/query")
+    public String querySetting(Long cityid,HttpServletResponse resp) {
+        logger.error("查询自定义设置"+cityid);
+        JSONObject result = cityUinService.querySetting(cityid);
+        StringUtils.ajaxOutput(resp, result.toJSONString());
+        return null;
+    }
+
 }
