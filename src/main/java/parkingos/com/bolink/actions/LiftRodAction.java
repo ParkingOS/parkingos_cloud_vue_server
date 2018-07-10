@@ -54,7 +54,7 @@ public class LiftRodAction {
         byte[] content = liftRodService.getLiftRodPicture(comid, liftrodId);
 
         if (content.length == 0) {
-            System.out.println("==========>>>>获取图片"+CustomDefind.IMAGEURL);
+            logger.info("==========>>>>获取图片"+CustomDefind.IMAGEURL);
             //测试用  之后读配置文件
             response.sendRedirect(CustomDefind.IMAGEURL+"/images/nopic.jpg");
 //            response.sendRedirect("http://120.25.121.204:8080/cloud/images/nopic.jpg");

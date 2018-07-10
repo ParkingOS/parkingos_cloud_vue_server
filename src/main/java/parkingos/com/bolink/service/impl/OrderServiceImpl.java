@@ -154,7 +154,7 @@ public class OrderServiceImpl implements OrderService {
 //        result.put("parktotal",total);
 //        result.put("blank",blank);
 
-        logger.error("============>>>>>返回数据" + result);
+        //logger.error("============>>>>>返回数据" + result);
         return result;
     }
 
@@ -176,7 +176,7 @@ public class OrderServiceImpl implements OrderService {
         example.createCriteria().andIshdEqualTo(0);
         example.createCriteria().andComidEqualTo(Long.valueOf(reqmap.get("comid")));
         example = ExampleUtis.createOrderExample(example,reqmap);
-        logger.info("example~~~~~~~~"+example);
+        //logger.info("example~~~~~~~~"+example);
         List<OrderTb> orders = orderMapper.selectOrders(example);
         return orders;
     }
@@ -240,8 +240,8 @@ public class OrderServiceImpl implements OrderService {
         }
 
         logger.error("====>>获得订单图片..collectionName" + collectionName);
-        DBCollection collection = db.getCollection("collectionName");
-//        DBCollection collection = db.getCollection(collectionName);
+//        DBCollection collection = db.getCollection("collectionName");
+        DBCollection collection = db.getCollection(collectionName);
         logger.error("======>>>>.获取订单图片...collection" + collection);
 
         List<String> inlist = new ArrayList<>();
