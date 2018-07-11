@@ -35,77 +35,77 @@ public class MemberServiceImpl implements MemberService {
     @Override
     public JSONObject selectResultByConditions(Map<String, String> reqmap) {
 
-//        String str = "{\"total\":12,\"page\":1,\"rows\":[]}";
-//        JSONObject result = JSONObject.parseObject(str);
+        String str = "{\"total\":12,\"page\":1,\"rows\":[]}";
+        JSONObject result = JSONObject.parseObject(str);
 
         UserInfoTb userInfoTb = new UserInfoTb();
         userInfoTb.setComid(Long.parseLong(reqmap.get("comid")));
         userInfoTb.setState(0);
 
 
-//        Map<String,Object> searchMap = supperSearchService.getBaseSearch(userInfoTb,reqmap);
-//        int count =0;
-//        List<UserInfoTb> list =null;
-//        List<Map<String, Object>> resList =new ArrayList<>();
-//        if(searchMap!=null&&!searchMap.isEmpty()){
-//            List<SearchBean> supperQuery = null;
-//            if(searchMap.containsKey("supper"))
-//                supperQuery = (List<SearchBean>)searchMap.get("supper");
-//
-//            //组装查询bean   FieldOperator.NOT = not in;  auth_flag 不等于14,15
-//            SearchBean bean = new SearchBean();
-//            bean.setOperator(FieldOperator.NOT);
-//            bean.setFieldName("auth_flag");
-//            //参数集合形式
-//            List<Integer> paramList = new ArrayList<>();
-//            paramList.add(14);
-//            paramList.add(15);
-//            bean.setBasicValue(paramList);
-//
-//            // auth_flag >0
-////            SearchBean searchBean = new SearchBean();
-////            searchBean.setFieldName("auth_flag");
-////            searchBean.setStartValue(0);
-////            searchBean.setOperator(FieldOperator.GREATER_THAN);
-//
-//
-//            //把bean对象放到高级查询中
-//            if(supperQuery==null){
-//                supperQuery = new ArrayList<>();
-//            }
-//            supperQuery.add(bean);
-////            supperQuery.add(searchBean);
-//
-//            PageOrderConfig config = null;
-//            if(searchMap.containsKey("config"))
-//                config = (PageOrderConfig)searchMap.get("config");
-//            count = commonDao.selectCountByConditions(userInfoTb,supperQuery);
-//            logger.error("======>>>>>"+count);
-//            if(count>0){
-//                if(config==null){
-//                    config = new PageOrderConfig();
-//                    config.setPageInfo(1,Integer.MAX_VALUE);
-//                }
-//                list = commonDao.selectListByConditions(userInfoTb,supperQuery,config);
-//
-//                if (list != null && !list.isEmpty()) {
-//                    for (UserInfoTb user : list) {
-//                        OrmUtil<UserInfoTb> otm = new OrmUtil<>();
-//                        Map<String, Object> map = otm.pojoToMap(user);
-//                        resList.add(map);
-//                    }
-//                    result.put("rows", JSON.toJSON(resList));
-//                }
-//            }
-//        }
+        Map<String,Object> searchMap = supperSearchService.getBaseSearch(userInfoTb,reqmap);
+        int count =0;
+        List<UserInfoTb> list =null;
+        List<Map<String, Object>> resList =new ArrayList<>();
+        if(searchMap!=null&&!searchMap.isEmpty()){
+            List<SearchBean> supperQuery = null;
+            if(searchMap.containsKey("supper"))
+                supperQuery = (List<SearchBean>)searchMap.get("supper");
 
-        JSONObject result = supperSearchService.supperSearch(userInfoTb,reqmap);
-        return result;
-//        result.put("total",count);
-//        if(reqmap.get("page")!=null){
-//            result.put("page",Integer.parseInt(reqmap.get("page")));
-//        }
+            //组装查询bean   FieldOperator.NOT = not in;  auth_flag 不等于14,15
+            SearchBean bean = new SearchBean();
+            bean.setOperator(FieldOperator.NOT);
+            bean.setFieldName("auth_flag");
+            //参数集合形式
+            List<Integer> paramList = new ArrayList<>();
+            paramList.add(14);
+            paramList.add(15);
+            bean.setBasicValue(paramList);
+
+            // auth_flag >0
+            SearchBean searchBean = new SearchBean();
+            searchBean.setFieldName("auth_flag");
+            searchBean.setStartValue(0);
+            searchBean.setOperator(FieldOperator.GREATER_THAN);
+
+
+            //把bean对象放到高级查询中
+            if(supperQuery==null){
+                supperQuery = new ArrayList<>();
+            }
+            supperQuery.add(bean);
+            supperQuery.add(searchBean);
+
+            PageOrderConfig config = null;
+            if(searchMap.containsKey("config"))
+                config = (PageOrderConfig)searchMap.get("config");
+            count = commonDao.selectCountByConditions(userInfoTb,supperQuery);
+            logger.error("======>>>>>"+count);
+            if(count>0){
+                if(config==null){
+                    config = new PageOrderConfig();
+                    config.setPageInfo(1,Integer.MAX_VALUE);
+                }
+                list = commonDao.selectListByConditions(userInfoTb,supperQuery,config);
+
+                if (list != null && !list.isEmpty()) {
+                    for (UserInfoTb user : list) {
+                        OrmUtil<UserInfoTb> otm = new OrmUtil<>();
+                        Map<String, Object> map = otm.pojoToMap(user);
+                        resList.add(map);
+                    }
+                    result.put("rows", JSON.toJSON(resList));
+                }
+            }
+        }
+
+//        JSONObject result = supperSearchService.supperSearch(userInfoTb,reqmap);
 //        return result;
+        result.put("total",count);
+        if(reqmap.get("page")!=null){
+            result.put("page",Integer.parseInt(reqmap.get("page")));
+        }
+        return result;
     }
 
     @Override
@@ -156,10 +156,10 @@ public class MemberServiceImpl implements MemberService {
             result.put("msg","电话长度不大于15位");
             return result;
         }
-//        Long auth_flag =-1L;
-//        if(reqParameterMap.get("auth_flag")!=null&&!"".equals(reqParameterMap.get("auth_flag"))){
-//            auth_flag =Long.parseLong(reqParameterMap.get("auth_flag"));
-//        }
+        Long auth_flag =-1L;
+        if(reqParameterMap.get("auth_flag")!=null&&!"".equals(reqParameterMap.get("auth_flag"))){
+            auth_flag =Long.parseLong(reqParameterMap.get("auth_flag"));
+        }
         String loginuin = reqParameterMap.get("loginuin");
 
         Long role_id =-1L;
@@ -213,13 +213,13 @@ public class MemberServiceImpl implements MemberService {
         if(reqParameterMap.get("cityid")!=null&&!"undefined".equals(reqParameterMap.get("cityid"))&&!"".equals(reqParameterMap.get("cityid"))){
             cityid = Long.parseLong(reqParameterMap.get("cityid"));
         }
-//        if(auth_flag==1){//总后台设置的管理员，默认为后台车场管理员
-//            role_id=30L;
-//        }else if(auth_flag==-1)
-//            auth_flag=2L;
-//        if(role_id == 30){
-//            auth_flag = 1L;
-//        }
+        if(auth_flag==1){//总后台设置的管理员，默认为后台车场管理员
+            role_id=30L;
+        }else if(auth_flag==-1)
+            auth_flag=2L;
+        if(role_id == 30){
+            auth_flag = 1L;
+        }
 
         UserInfoTb user= new UserInfoTb();
         user.setId(nextid);
@@ -230,7 +230,7 @@ public class MemberServiceImpl implements MemberService {
         user.setRegTime(time);
         user.setMobile(mobile);
         user.setPhone(phone);
-//        user.setAuthFlag(auth_flag);
+        user.setAuthFlag(auth_flag);
         user.setComid(comId);
         user.setRoleId(role_id);
         user.setIsview(isview);
