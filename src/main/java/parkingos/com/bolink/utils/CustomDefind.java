@@ -20,6 +20,7 @@ public class CustomDefind {
 	Logger logger = Logger.getLogger(CustomDefind.class);
 	//private static String PATH = ;
 
+	public static String MESSAGESIGN = getValue("MESSAGESIGN");
 	public static String CUSTOMPARKIDS = getValue("CUSTOMPARKIDS");
 	public static String ISLOTTERY = getValue("ISLOTTERY");
 	public static String MONGOADDRESS = getValue("MONGOADDRESS");

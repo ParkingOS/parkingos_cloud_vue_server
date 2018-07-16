@@ -205,7 +205,9 @@ public class SuperSearchServiceImp<T> implements SupperSearchService<T> {
 
                 if(Check.isEmpty(value))
                     continue;
-
+                if("car_number".equals(key)){
+                    value = StringUtils.decodeUTF8(value);
+                }
 
                 //高级查询如果查询 带% 或者_ 这种通配符
                 if(value.indexOf("%")!=-1){
@@ -219,7 +221,11 @@ public class SuperSearchServiceImp<T> implements SupperSearchService<T> {
                 SearchBean bean = new SearchBean();
                 bean.setFieldName(key);
                 bean.setOperator( FieldOperator.LIKE);
-                bean.setBasicValue(value);
+                if("car_number".equals(key)){
+                    bean.setBasicValue(value.toUpperCase());
+                }else{
+                    bean.setBasicValue(value);
+                }
                 resultList.add(bean);
             }
             /**

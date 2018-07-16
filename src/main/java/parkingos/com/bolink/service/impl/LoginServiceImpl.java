@@ -7,10 +7,7 @@ import org.springframework.stereotype.Service;
 import parkingos.com.bolink.dao.spring.CommonDao;
 import parkingos.com.bolink.models.*;
 import parkingos.com.bolink.service.LoginService;
-import parkingos.com.bolink.utils.Check;
-import parkingos.com.bolink.utils.CustomDefind;
-import parkingos.com.bolink.utils.StringUtils;
-import parkingos.com.bolink.utils.ZLDType;
+import parkingos.com.bolink.utils.*;
 
 import java.util.List;
 import java.util.Map;
@@ -340,6 +337,142 @@ public class LoginServiceImpl implements LoginService {
         user.put("userid", userId);
         user.put("lastlogin", System.currentTimeMillis() / 1000);
         result.put("user", user);
+        return result;
+    }
+
+    @Override
+    public JSONObject getCkey(String userId, String mobile, Integer userType) {
+        //根据手机号查询车场,匹配用户id
+        JSONObject result = new JSONObject();
+        UserInfoTb userInfoTb = new UserInfoTb();
+        Long id = -1L;
+        try{
+            id=Long.parseLong(userId);
+        }catch(Exception e){
+            logger.error("userid 解析异常"+userId,e);
+        }
+        if(id!=null&&id>-1){
+            userInfoTb.setId(id);
+        }else {
+            userInfoTb.setStrid(userId);
+        }
+
+        userInfoTb  = (UserInfoTb)commonDao.selectObjectByConditions(userInfoTb);
+        if(userInfoTb!=null){
+            if(mobile.equals(userInfoTb.getMobile())){
+                long code = Math.round(Math.random()*(9999-1000+1)+1000);
+//                memcacheUtils.setCache(mobile+code, code+"", 300);
+                String encode = Encryption.encryptToAESPKCS5(code+"", Encryption.KEY);
+                logger.error("ckey:"+code+" encode:"+encode);
+                result.put("state", 1);
+                result.put("ckey", encode);
+                result.put("userid",userInfoTb.getId());
+            }else{
+                result.put("state", 0);
+                result.put("errmsg", "该手机号不是您绑定的手机");
+            }
+        }else{
+            result.put("state",0);
+            result.put("errmsg","用户不存在");
+        }
+        return result;
+    }
+
+    @Override
+    public JSONObject regUser(String mobile, Long userid) {
+
+        JSONObject result = new JSONObject();
+        result.put("state", 0);
+
+        //生成code,存库
+        Long cTime = System.currentTimeMillis()/1000;
+        Long code = Math.round(Math.random()*(9999-1000+1)+1000);
+        logger.error("reguser>>>生成验证码:"+code);
+        logger.error("验证码写入数据库");
+        //存入数据库
+        VerificationCodeTb verificationCodeTb = new VerificationCodeTb();
+        verificationCodeTb.setMobile(mobile);
+        verificationCodeTb = (VerificationCodeTb)commonDao.selectObjectByConditions(verificationCodeTb);
+        VerificationCodeTb con = new VerificationCodeTb();
+        int update = 0;
+        if(verificationCodeTb!=null){
+            con.setVerificationCode(code.intValue());
+            con.setCreateTime(cTime);
+            update = commonDao.updateByConditions(con,verificationCodeTb);
+        }else{
+            verificationCodeTb = new VerificationCodeTb();
+            verificationCodeTb.setMobile(mobile);
+            verificationCodeTb.setCreateTime(cTime);
+            verificationCodeTb.setState(1L);
+            verificationCodeTb.setUin(userid);
+            verificationCodeTb.setVerificationCode(code.intValue());
+            update = commonDao.insert(verificationCodeTb);
+        }
+
+        if(update==0){
+            result.put("errmsg", "验证码错误");
+            return result;
+        }
+
+        //4.发送验证码【泊链联盟】
+        String content = CustomDefind.MESSAGESIGN+code+" (请完成验证,有效期5分钟),如非本人操作,请忽略本短信。";
+        try {
+            MessageUtils.sendMsg(mobile, content);
+            logger.error("reguser>>>验证码已发送:"+code);
+            result.put("state", 1);
+        } catch (Exception e) {
+            logger.error(e.getMessage());
+        }
+        return result;
+    }
+
+    @Override
+    public JSONObject checkCode(String mobile, String code) {
+
+        JSONObject result = new JSONObject();
+        result.put("state", 0);
+        //从数据库中查
+        VerificationCodeTb con = new VerificationCodeTb();
+        con.setMobile(mobile);
+        con = (VerificationCodeTb) commonDao.selectObjectByConditions(con);
+        Long creTime = null;
+        Long curTime = System.currentTimeMillis()/1000;
+        if (con!=null){
+            creTime = con.getCreateTime();
+        }else{
+            result.put("errmsg", "验证码错误");
+            return result;
+        }
+
+        if(curTime-creTime>3000){
+            //过期
+            result.put("errmsg", "验证码已过期");
+            return result;
+        }
+        Integer _code =  con.getVerificationCode();
+        if(code.equals(_code+"")){
+            result.put("state", 1);
+            return result;
+        }else{
+            result.put("state", 2);//验证码错误
+            result.put("errmsg", "验证码错误");
+            return result;
+        }
+    }
+
+    @Override
+    public JSONObject resetPwd(String passwd, Long userId) {
+
+        JSONObject result = new JSONObject();
+        result.put("state",0);
+        UserInfoTb userInfoTb = new UserInfoTb();
+        userInfoTb.setPassword(passwd);
+        userInfoTb.setId(userId);
+        int update = commonDao.updateByPrimaryKey(userInfoTb);
+
+        if(update==1){
+            result.put("state",1);
+        }
         return result;
     }
 }

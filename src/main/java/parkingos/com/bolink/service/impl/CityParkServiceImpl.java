@@ -3,7 +3,6 @@ package parkingos.com.bolink.service.impl;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import org.apache.log4j.Logger;
-import org.aspectj.weaver.ast.Or;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import parkingos.com.bolink.dao.mybatis.mapper.ParkInfoMapper;
@@ -190,7 +189,6 @@ public class CityParkServiceImpl implements CityParkService {
         result.put("msg", "创建车场失败");
 
         String bolinkid = RequestUtil.getString(request, "bolink_id");
-        System.out.println("创建车场===bolinkid:" + bolinkid);
         if (bolinkid != null && !"".equals(bolinkid)) {
             ComInfoTb infoTb = new ComInfoTb();
             infoTb.setBolinkId(bolinkid);
@@ -217,12 +215,10 @@ public class CityParkServiceImpl implements CityParkService {
         Long id = RequestUtil.getLong(request, "id", -1L);
         Long cityid = RequestUtil.getLong(request, "cityid", -1L);
 
-        System.out.println("==============chenbowen:" + cityid);
         Long groupId = RequestUtil.getLong(request, "groupid", -1L);
         if (groupId == -1) {
             groupId = RequestUtil.getLong(request, "group_id", -1L);
         }
-        System.out.println("==============chenbowen:" + groupId);
         String company = RequestUtil.processParams(request, "company_name");
         company = company.replace("\r", "").replace("\n", "");
         String address = StringUtils.decodeUTF8(RequestUtil.processParams(request, "address"));
@@ -246,8 +242,10 @@ public class CityParkServiceImpl implements CityParkService {
 
         //判断地图位置是否冲突
         ComInfoTb newCominfoTb = new ComInfoTb();
-        newCominfoTb.setLongitude(longitude);
-        newCominfoTb.setLatitude(latitude);
+
+//        logger.info("park zuobiao:"+longitude+"~~"+new BigDecimal(longitude).setScale(6, BigDecimal.ROUND_HALF_UP));
+        newCominfoTb.setLongitude(new BigDecimal(longitude).setScale(6, BigDecimal.ROUND_HALF_UP));
+        newCominfoTb.setLatitude(new BigDecimal(latitude).setScale(6, BigDecimal.ROUND_HALF_UP));
         int count = commonDao.selectCountByConditions(newCominfoTb);
         if (count > 0) {
             result.put("msg", "地理位置冲突，请重新标注!");
@@ -258,8 +256,8 @@ public class CityParkServiceImpl implements CityParkService {
         ComInfoTb comInfoTb = new ComInfoTb();
         comInfoTb.setState(state);
         comInfoTb.setCompanyName(company);
-        comInfoTb.setLatitude(latitude);
-        comInfoTb.setLongitude(longitude);
+        comInfoTb.setLatitude(new BigDecimal(latitude));
+        comInfoTb.setLongitude(new BigDecimal(longitude));
         comInfoTb.setAddress(address);
         comInfoTb.setCity(city);
         comInfoTb.setMobile(mobile);
@@ -432,8 +430,8 @@ public class CityParkServiceImpl implements CityParkService {
 
         //判断地图位置是否冲突
         ComInfoTb newCominfoTb = new ComInfoTb();
-        newCominfoTb.setLongitude(longitude);
-        newCominfoTb.setLatitude(latitude);
+        newCominfoTb.setLongitude(new BigDecimal(longitude).setScale(6, BigDecimal.ROUND_HALF_UP));
+        newCominfoTb.setLatitude(new BigDecimal(latitude).setScale(6, BigDecimal.ROUND_HALF_UP));
         int count = commonDao.selectCountByConditions(newCominfoTb);
         if (count > 0) {
             result.put("msg", "地理位置冲突，请重新标注!");

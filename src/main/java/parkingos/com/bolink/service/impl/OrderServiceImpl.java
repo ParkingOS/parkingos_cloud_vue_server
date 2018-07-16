@@ -10,7 +10,10 @@ import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import parkingos.com.bolink.dao.spring.CommonDao;
-import parkingos.com.bolink.models.*;
+import parkingos.com.bolink.models.CarpicTb;
+import parkingos.com.bolink.models.ComPassTb;
+import parkingos.com.bolink.models.OrderTb;
+import parkingos.com.bolink.models.UserInfoTb;
 import parkingos.com.bolink.service.OrderService;
 import parkingos.com.bolink.service.SupperSearchService;
 import parkingos.com.bolink.utils.*;
@@ -35,51 +38,12 @@ public class OrderServiceImpl implements OrderService {
     @Override
     public JSONObject selectResultByConditions(Map<String, String> reqmap) {
 
-        logger.error("======>>...订单comid:"+Long.parseLong(reqmap.get("comid")));
-
-        //查询在场订单数量  车辆数量  空闲车位
-//        Map<String,String> newReqmap = new HashMap<>();
-//        OrderTb newOrder = new OrderTb();
-//        newOrder.setComid(Long.parseLong(reqmap.get("comid")));
-//        newOrder.setState(0);
-//        newOrder.setIshd(0);
-//        //不用高级查询条件 只需要基本条件  新建map
-//        JSONObject newResult = supperSearchService.supperSearch(newOrder, newReqmap);
-//        Integer total = (Integer) JSON.parse(newResult.get("total")+"");
-//        logger.error("=======>>>在场车辆"+total);
-//
-//        ComInfoTb comInfoTb = new ComInfoTb();
-//        comInfoTb.setId(Long.parseLong(reqmap.get("comid")));
-//        comInfoTb = (ComInfoTb) commonDao.selectObjectByConditions(comInfoTb);
-//        Integer parktotal = 0;
-//        Integer blank = 0;
-//        if(comInfoTb!=null){
-//            Integer parking_total = 0;
-//            if(comInfoTb.getParkingTotal()!= null){
-//                parking_total=comInfoTb.getParkingTotal();//车场车位数
-//            }
-//            Integer shareNumber = 0;
-//            if(comInfoTb.getShareNumber() != null){
-//                shareNumber=comInfoTb.getShareNumber();//车场车位分享数
-//            }
-//            if(shareNumber > 0){
-//                parktotal = shareNumber;
-//            }else{
-//                parktotal = parking_total;
-//            }
-//        }
-//        blank = parktotal -total;
-//        if(blank<=0){
-//            blank = 0;
-//        }
-
         //查询三天的数据显示
-        logger.error("=========..req"+reqmap.size());
+        logger.error("=========..req"+reqmap);
         OrderTb orderTb = new OrderTb();
         orderTb.setComid(Long.parseLong(reqmap.get("comid")));
         String createTime = reqmap.get("create_time");
         String endTime = reqmap.get("end_time");
-        logger.error("===>>>createTime"+createTime+"~~~~endTime:"+endTime);
         //组装 一个月 参数
         if(endTime==null||"".equals(endTime)){
             if(createTime==null||"undefined".equals(createTime)||"".equals(createTime)){
