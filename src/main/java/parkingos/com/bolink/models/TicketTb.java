@@ -51,6 +51,16 @@ public class TicketTb {
 
     private String remark;
 
+    private Long useTime;
+
+    public Long getUseTime() {
+        return useTime;
+    }
+
+    public void setUseTime(Long useTime) {
+        this.useTime = useTime;
+    }
+
     public Long getId() {
         return id;
     }

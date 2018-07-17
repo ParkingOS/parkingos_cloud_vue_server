@@ -3,7 +3,6 @@ package parkingos.com.bolink.service.impl;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import org.apache.log4j.Logger;
-import org.apache.poi.ss.formula.functions.T;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import parkingos.com.bolink.dao.spring.CommonDao;
@@ -15,11 +14,13 @@ import parkingos.com.bolink.service.FixCodeService;
 import parkingos.com.bolink.service.SupperSearchService;
 import parkingos.com.bolink.service.TicketService;
 import parkingos.com.bolink.utils.CustomDefind;
+import parkingos.com.bolink.utils.ExecutorsUtil;
 import parkingos.com.bolink.utils.OrmUtil;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ExecutorService;
 
 @Service
 public class FixCodeServiceImpl implements FixCodeService {
@@ -44,6 +45,7 @@ public class FixCodeServiceImpl implements FixCodeService {
         int count =0;
         List<FixCodeTb> list =null;
         List<Map<String, Object>> resList =new ArrayList<>();
+        final List<Map<String, Object>> updateList =new ArrayList<>();
         Map searchMap = supperSearchService.getBaseSearch(fixCodeTb,params);
         logger.info(searchMap);
         if(searchMap!=null&&!searchMap.isEmpty()){
@@ -65,9 +67,10 @@ public class FixCodeServiceImpl implements FixCodeService {
                     for (FixCodeTb fixCodeTb1 : list) {
                         OrmUtil<FixCodeTb> otm = new OrmUtil<>();
                         Map<String, Object> map = otm.pojoToMap(fixCodeTb1);
-                        if(map.get("end_time")!=null){
+                        if(map.get("end_time")!=null&&map.get("state")!=2){
                             if(Long.parseLong(map.get("end_time")+"")<System.currentTimeMillis()/1000){//已过期
                                 map.put("state",2);
+                                updateList.add(map);
                             }
                         }
                         resList.add(map);
@@ -76,6 +79,26 @@ public class FixCodeServiceImpl implements FixCodeService {
                 }
             }
         }
+        //开线程处理
+        ExecutorService es = ExecutorsUtil.getExecutorService();
+        es.execute(new Runnable() {
+            @Override
+            public void run() {
+//                logger.info("begin new exe:"+updateList.size());
+                if(updateList.size()>0){
+                    for(int i =0;i<updateList.size();i++){
+                        Map<String,Object> newMap = updateList.get(i);
+//                        logger.info("begin new exe:"+newMap);
+                        if(newMap.get("state")==2){
+                            FixCodeTb fixCodeTb1 = new FixCodeTb();
+                            fixCodeTb1.setId((Long)newMap.get("id"));
+                            fixCodeTb1.setState(2);
+                            commonDao.updateByPrimaryKey(fixCodeTb1);
+                        }
+                    }
+                }
+            }
+        });
         result.put("total",count);
         //result.put("page",Integer.parseInt(params.get("page")));
         if(params.get("page")!=null){

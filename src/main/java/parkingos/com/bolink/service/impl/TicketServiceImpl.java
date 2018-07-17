@@ -269,19 +269,28 @@ public class TicketServiceImpl implements TicketService {
         ticketTb.setShopId(Long.parseLong(reqmap.get("shopid")));
 
 
-        String date = StringUtils.decodeUTF8(StringUtils.decodeUTF8(reqmap.get("date")));
-        System.out.println("日期====" + date);
+        String date = StringUtils.decodeUTF8(StringUtils.decodeUTF8(reqmap.get("create_time")));
 
-        Long start = null;
-        Long end = null;
-        if (date == null || "".equals(date)) {
-            start = TimeTools.getToDayBeginTime();
-            end = TimeTools.getToDayBeginTime() + 86399;
-        } else {
-            start = TimeTools.getLongMilliSecondFrom_HHMMDDHHmmss(date.split("至")[0]);
-            end = TimeTools.getLongMilliSecondFrom_HHMMDDHHmmss(date.split("至")[1]);
+        if(date==null|| "".equals(date)){
+            reqmap.put("create_time","between");
+            reqmap.put("create_time_start",TimeTools.getToDayBeginTime()+"");
+            reqmap.put("create_time_end",TimeTools.getToDayBeginTime()+86399+"");
         }
-        System.out.println("开始时间和结束时间" + start + end);
+
+        String state = reqmap.get("state");
+        if("-1".equals(state)){
+            reqmap.remove("state");
+        }
+//        Long start = null;
+//        Long end = null;
+//        if (date == null || "".equals(date)) {
+//            start = TimeTools.getToDayBeginTime();
+//            end = TimeTools.getToDayBeginTime() + 86399;
+//        }
+//        else {
+//            start = TimeTools.getLongMilliSecondFrom_HHMMDDHHmmss(date.split("至")[0]);
+//            end = TimeTools.getLongMilliSecondFrom_HHMMDDHHmmss(date.split("至")[1]);
+//        }
         int count = 0;
         List<TicketTb> list = null;
         List<Map<String, Object>> resList = new ArrayList<>();
@@ -298,16 +307,16 @@ public class TicketServiceImpl implements TicketService {
 
 
             //封装searchbean  集团或城市下面所有车场
-            SearchBean searchBean = new SearchBean();
-            searchBean.setOperator(FieldOperator.BETWEEN);
-            searchBean.setFieldName("create_time");
-            searchBean.setStartValue(start);
-            searchBean.setEndValue(end);
+//            SearchBean searchBean = new SearchBean();
+//            searchBean.setOperator(FieldOperator.BETWEEN);
+//            searchBean.setFieldName("create_time");
+//            searchBean.setStartValue(start);
+//            searchBean.setEndValue(end);
 
-            if (supperQuery == null) {
-                supperQuery = new ArrayList<>();
-            }
-            supperQuery.add(searchBean);
+//            if (supperQuery == null) {
+//                supperQuery = new ArrayList<>();
+//            }
+//            supperQuery.add(searchBean);
 
 
             count = commonDao.selectCountByConditions(baseQuery, supperQuery);

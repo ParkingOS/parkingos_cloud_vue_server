@@ -163,6 +163,10 @@ public class SuperSearchServiceImp<T> implements SupperSearchService<T> {
             PageOrderConfig config = null;
             if(searchMap.containsKey("config"))
                 config = (PageOrderConfig)searchMap.get("config");
+
+
+
+
             count = commonDao.selectCountByConditions(t1,supperQuery);
             if(count>0){
                 if (config == null) {
@@ -362,9 +366,18 @@ public class SuperSearchServiceImp<T> implements SupperSearchService<T> {
                     }else if(type.contains(FieldTypes._LONG)){
 //                        field.set(t,Long.valueOf(value));
                         if(value.length()>10){
-                            field.set(t,Long.valueOf(value)/1000);
+                            try{
+                                field.set(t,Long.valueOf(value)/1000L);
+                            }catch (Exception e){
+                                field.set(t,-10000L);
+                            }
+
                         }else{
-                            field.set(t,Long.valueOf(value));
+                            try{
+                                field.set(t,Long.valueOf(value));
+                            }catch (Exception e){
+                                field.set(t,-10000L);
+                            }
                         }
                     }else if(type.contains(FieldTypes._STRING)){
 
