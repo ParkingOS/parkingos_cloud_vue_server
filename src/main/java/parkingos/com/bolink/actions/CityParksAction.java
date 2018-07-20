@@ -7,7 +7,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import parkingos.com.bolink.models.ComInfoTb;
+import parkingos.com.bolink.models.ParkLogTb;
 import parkingos.com.bolink.service.CityParkService;
+import parkingos.com.bolink.service.SaveLogService;
 import parkingos.com.bolink.utils.RequestUtil;
 import parkingos.com.bolink.utils.StringUtils;
 
@@ -23,6 +25,8 @@ public class CityParksAction {
 
     @Autowired
     private CityParkService cityParkService;
+    @Autowired
+    private SaveLogService saveLogService;
 
     @RequestMapping(value = "/query")
     public String query(HttpServletRequest request, HttpServletResponse resp) {
@@ -40,9 +44,7 @@ public class CityParksAction {
     * */
     @RequestMapping(value = "/editpark")
     public String addpark(HttpServletRequest request, HttpServletResponse resp) {
-//        System.out.println("创建车场:"+comInfoTb);
 
-        System.out.println("进入创建车场");
         JSONObject result = cityParkService.createPark(request);
         //把结果返回页面
         StringUtils.ajaxOutput(resp, result.toJSONString());
@@ -60,14 +62,29 @@ public class CityParksAction {
 
     @RequestMapping(value = "/deletepark")
     public String deletepark(HttpServletRequest request, HttpServletResponse resp) {
+
+        Long groupid = RequestUtil.getLong(request,"groupid",-1L);
+        String nickname = StringUtils.decodeUTF8(RequestUtil.getString(request,"nickname1"));
+        Long uin = RequestUtil.getLong(request, "loginuin", -1L);
+
         Long id = Long.parseLong(request.getParameter("id"));
-        System.out.println("删除车场id:"+id);
         ComInfoTb comInfoTb = new ComInfoTb();
         comInfoTb.setId(id);
         comInfoTb.setState(1);
         JSONObject result = null;
         if(id!=null){
             result = cityParkService.deletepark(comInfoTb);
+        }
+
+        if((Integer)result.get("state")==1&&groupid>0){
+            ParkLogTb parkLogTb = new ParkLogTb();
+            parkLogTb.setOperateUser(nickname);
+            parkLogTb.setOperateTime(System.currentTimeMillis()/1000);
+            parkLogTb.setOperateType(3);
+            parkLogTb.setContent(uin+"("+nickname+")"+"删除了车场"+id);
+            parkLogTb.setType("parkinfo");
+            parkLogTb.setGroupId(groupid);
+            saveLogService.saveLog(parkLogTb);
         }
         //把结果返回页面
         StringUtils.ajaxOutput(resp, result.toJSONString());

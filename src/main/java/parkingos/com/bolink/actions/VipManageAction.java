@@ -10,6 +10,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import parkingos.com.bolink.dao.spring.CommonDao;
+import parkingos.com.bolink.models.ParkLogTb;
+import parkingos.com.bolink.service.SaveLogService;
 import parkingos.com.bolink.service.VipService;
 import parkingos.com.bolink.utils.ExportDataExcel;
 import parkingos.com.bolink.utils.RequestUtil;
@@ -32,6 +34,8 @@ public class VipManageAction {
 
     @Autowired
     private VipService vipService;
+    @Autowired
+    private SaveLogService saveLogService;
 
     @Autowired
     private CommonDao commonDao;
@@ -49,9 +53,21 @@ public class VipManageAction {
 
     @RequestMapping(value = "renewproduct")
     public String renewproduct(HttpServletRequest req, HttpServletResponse resp){
-
+        Long comid = RequestUtil.getLong(req,"comid",-1L);
+        String nickname = StringUtils.decodeUTF8(RequestUtil.getString(req,"nickname1"));
+        Long uin = RequestUtil.getLong(req, "loginuin", -1L);
         JSONObject result = vipService.renewProduct(req);
 
+        if((Integer)result.get("state")==1){
+            ParkLogTb parkLogTb = new ParkLogTb();
+            parkLogTb.setOperateUser(nickname);
+            parkLogTb.setOperateTime(System.currentTimeMillis()/1000);
+            parkLogTb.setOperateType(2);
+            parkLogTb.setContent(uin+"("+nickname+")"+"续费了月卡会员"+StringUtils.decodeUTF8(req.getParameter("card_id")));
+            parkLogTb.setType("vip");
+            parkLogTb.setParkId(comid);
+            saveLogService.saveLog(parkLogTb);
+        }
         StringUtils.ajaxOutput(resp,result.toJSONString());
 
         return null;
@@ -66,8 +82,20 @@ public class VipManageAction {
      */
     public String add(HttpServletRequest req, HttpServletResponse resp) throws Exception{
 
+        Long comid = RequestUtil.getLong(req,"comid",-1L);
+        String nickname = StringUtils.decodeUTF8(RequestUtil.getString(req,"nickname1"));
+        Long uin = RequestUtil.getLong(req, "loginuin", -1L);
         JSONObject result = vipService.createVip(req);
-
+        if((Integer)result.get("state")==1){
+            ParkLogTb parkLogTb = new ParkLogTb();
+            parkLogTb.setOperateUser(nickname);
+            parkLogTb.setOperateTime(System.currentTimeMillis()/1000);
+            parkLogTb.setOperateType(1);
+            parkLogTb.setContent(uin+"("+nickname+")"+"新建了月卡会员"+result.get("id")+req.getParameter("name")+",车牌:"+req.getParameter("car_number").toUpperCase());
+            parkLogTb.setType("vip");
+            parkLogTb.setParkId(comid);
+            saveLogService.saveLog(parkLogTb);
+        }
         StringUtils.ajaxOutput(resp,result.toJSONString());
 
         return null;
@@ -76,9 +104,20 @@ public class VipManageAction {
 
     @RequestMapping(value = "edit")
     public String edit(HttpServletRequest req, HttpServletResponse resp) throws Exception{
-
+        Long comid = RequestUtil.getLong(req,"comid",-1L);
+        String nickname = StringUtils.decodeUTF8(RequestUtil.getString(req,"nickname1"));
+        Long uin = RequestUtil.getLong(req, "loginuin", -1L);
         JSONObject result = vipService.editVip(req);
-
+        if((Integer)result.get("state")==1){
+            ParkLogTb parkLogTb = new ParkLogTb();
+            parkLogTb.setOperateUser(nickname);
+            parkLogTb.setOperateTime(System.currentTimeMillis()/1000);
+            parkLogTb.setOperateType(2);
+            parkLogTb.setContent(uin+"("+nickname+")"+"修改了月卡会员"+req.getParameter("card_id"));
+            parkLogTb.setType("vip");
+            parkLogTb.setParkId(comid);
+            saveLogService.saveLog(parkLogTb);
+        }
         StringUtils.ajaxOutput(resp,result.toJSONString());
 
         return null;
@@ -86,27 +125,56 @@ public class VipManageAction {
 
     @RequestMapping(value = "delete")
     public String delete(HttpServletRequest req, HttpServletResponse resp){
+
+        String nickname = StringUtils.decodeUTF8(RequestUtil.getString(req,"nickname1"));
+        Long uin = RequestUtil.getLong(req, "loginuin", -1L);
         Long id = RequestUtil.getLong(req, "id", -1L);
         Long comid = RequestUtil.getLong(req,"comid",-1L);
 
         JSONObject result = vipService.deleteCarowerProById(id,comid);
+        if((Integer)result.get("state")==1){
+            ParkLogTb parkLogTb = new ParkLogTb();
+            parkLogTb.setOperateUser(nickname);
+            parkLogTb.setOperateTime(System.currentTimeMillis()/1000);
+            parkLogTb.setOperateType(3);
+            parkLogTb.setContent(uin+"("+nickname+")"+"删除了月卡会员"+req.getParameter("card_id"));
+            parkLogTb.setType("vip");
+            parkLogTb.setParkId(comid);
+            saveLogService.saveLog(parkLogTb);
+        }
         StringUtils.ajaxOutput(resp,result.toJSONString());
         return null;
     }
 
     @RequestMapping(value = "editCarNum")
     public String editCarNum(HttpServletRequest request, HttpServletResponse resp){
+        Long comid = RequestUtil.getLong(request,"comid",-1L);
+        String nickname = StringUtils.decodeUTF8(RequestUtil.getString(request,"nickname1"));
+        Long uin = RequestUtil.getLong(request, "loginuin", -1L);
+        String oldCarNumber = StringUtils.decodeUTF8(RequestUtil.getString(request, "old_carnumber"));
         String carNumber = StringUtils.decodeUTF8(RequestUtil.getString(request, "carnumber"));
         logger.error("======>>>>>修改车牌"+carNumber);
         Long id = RequestUtil.getLong(request, "id", -1L);
-        Long comid = RequestUtil.getLong(request,"comid",-1L);
         JSONObject result = vipService.editCarNum(id,carNumber,comid);
+        if((Integer)result.get("state")==1){
+            ParkLogTb parkLogTb = new ParkLogTb();
+            parkLogTb.setOperateUser(nickname);
+            parkLogTb.setOperateTime(System.currentTimeMillis()/1000);
+            parkLogTb.setOperateType(2);
+            parkLogTb.setContent(uin+"("+nickname+")"+"修改车牌号码"+oldCarNumber+"为"+carNumber);
+            parkLogTb.setType("vip");
+            parkLogTb.setParkId(comid);
+            saveLogService.saveLog(parkLogTb);
+        }
         StringUtils.ajaxOutput(resp,result.toJSONString());
         return null;
     }
 
     @RequestMapping(value = "/exportExcel")
     public String exportExcel(HttpServletRequest request, HttpServletResponse response) {
+        Long comid = RequestUtil.getLong(request,"comid",-1L);
+        String nickname = StringUtils.decodeUTF8(RequestUtil.getString(request,"nickname1"));
+        Long uin = RequestUtil.getLong(request, "loginuin", -1L);
         Map<String, String> reqParameterMap = RequestUtil.readBodyFormRequset(request);
 
         List<List<String>> bodyList = vipService.exportExcel(reqParameterMap);
@@ -126,23 +194,15 @@ public class VipManageAction {
         } catch (ParseException e) {
             e.printStackTrace();
         }
+        ParkLogTb parkLogTb = new ParkLogTb();
+        parkLogTb.setOperateUser(nickname);
+        parkLogTb.setOperateTime(System.currentTimeMillis()/1000);
+        parkLogTb.setOperateType(4);
+        parkLogTb.setContent(uin+"("+nickname+")"+"导出了月卡会员");
+        parkLogTb.setType("vip");
+        parkLogTb.setParkId(comid);
+        saveLogService.saveLog(parkLogTb);
 
-
-//        String fname = "会员数据" + TimeTools.getDate_YY_MM_DD();
-//        fname = StringUtils.encodingFileName(fname);
-//        java.io.OutputStream os;
-//        try {
-//            response.reset();
-//            response.setHeader("Content-disposition", "attachment; filename="
-//                    + fname + ".xls");
-//            response.setContentType("application/x-download");
-//            os = response.getOutputStream();
-//            ExportExcelUtil importExcel = new ExportExcelUtil("会员数据",
-//                    heards, bodyList);
-//            importExcel.createExcelFile(os);
-//        } catch (IOException e) {
-//            e.printStackTrace();
-//        }
         return null;
     }
 

@@ -15,4 +15,6 @@ public interface EquipmentManageIntercomService {
     public Integer updateResultByConditions(PhoneInfoTb phoneInfoTb);
 
     public Integer removeResultByConditions(PhoneInfoTb phoneInfoTb);
+
+    Long getId();
 }

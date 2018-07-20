@@ -66,5 +66,10 @@ public class EquipmentManageIntercomServiceImpl implements EquipmentManageInterc
         return result;
     }
 
+    @Override
+    public Long getId() {
+        return commonDao.selectSequence(PhoneInfoTb.class);
+    }
+
 
 }

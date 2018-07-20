@@ -7,7 +7,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import parkingos.com.bolink.models.MonitorInfoTb;
+import parkingos.com.bolink.models.ParkLogTb;
 import parkingos.com.bolink.service.EquipmentManageMonitorService;
+import parkingos.com.bolink.service.SaveLogService;
 import parkingos.com.bolink.utils.RequestUtil;
 import parkingos.com.bolink.utils.StringUtils;
 
@@ -24,6 +26,8 @@ public class EquipmentManageMonitorAction {
 
 	@Autowired
 	private EquipmentManageMonitorService equipmentManageMonitorService;
+	@Autowired
+	private SaveLogService saveLogService;
 	/**
 	 *
 	 * @param request
@@ -50,7 +54,11 @@ public class EquipmentManageMonitorAction {
 	@RequestMapping(value = "/add")
 	public String add(HttpServletRequest request, HttpServletResponse response) {
 
-		//Long id = RequestUtil.getLong(request,"id",null);
+		Long comid = RequestUtil.getLong(request,"comid",-1L);
+		String nickname = StringUtils.decodeUTF8(RequestUtil.getString(request,"nickname1"));
+		Long uin = RequestUtil.getLong(request, "loginuin", -1L);
+
+		Long id = equipmentManageMonitorService.getId();
 		String name = RequestUtil.processParams(request,"name");
 		Long channelId = RequestUtil.getLong(request,"channel_id",null);
 		Integer netStatus = RequestUtil.getInteger(request,"net_status",null);
@@ -58,21 +66,29 @@ public class EquipmentManageMonitorAction {
 		Integer showOrder = RequestUtil.getInteger(request,"show_order",null);
 		String playSrc = RequestUtil.processParams(request,"play_src");
 
-		Map<String, String> reqParameterMap = RequestUtil.readBodyFormRequset(request);
-		String comid = reqParameterMap.get("comid");
 
 		MonitorInfoTb monitorInfoTb = new MonitorInfoTb();
-		//monitorInfoTb.setId(id);
+		monitorInfoTb.setId(id);
 		monitorInfoTb.setName(name);
 		monitorInfoTb.setChannelId(channelId);
 		monitorInfoTb.setNetStatus(netStatus);
 		monitorInfoTb.setIsShow(isShow);
 		monitorInfoTb.setShowOrder(showOrder);
 		monitorInfoTb.setPlaySrc(playSrc);
-		monitorInfoTb.setComid(comid);
+		monitorInfoTb.setComid(comid+"");
 		monitorInfoTb.setState(1);
 
 		String result = equipmentManageMonitorService.insertResultByConditions(monitorInfoTb).toString();
+		if("1".equals(result)){
+			ParkLogTb parkLogTb = new ParkLogTb();
+			parkLogTb.setOperateUser(nickname);
+			parkLogTb.setOperateTime(System.currentTimeMillis()/1000);
+			parkLogTb.setOperateType(1);
+			parkLogTb.setContent(uin+"("+nickname+")"+"增加了监控"+id+name);
+			parkLogTb.setType("equipment");
+			parkLogTb.setParkId(comid);
+			saveLogService.saveLog(parkLogTb);
+		}
 
 		StringUtils.ajaxOutput(response,result);
 
@@ -87,6 +103,10 @@ public class EquipmentManageMonitorAction {
 	@RequestMapping(value = "/edit")
 	public String update(HttpServletRequest request, HttpServletResponse response) {
 
+		Long comid = RequestUtil.getLong(request,"comid",-1L);
+		String nickname = StringUtils.decodeUTF8(RequestUtil.getString(request,"nickname1"));
+		Long uin = RequestUtil.getLong(request, "loginuin", -1L);
+
 		Long id = RequestUtil.getLong(request,"id",null);
 		String name = RequestUtil.getString(request,"name");
 		//Long monitorId = RequestUtil.getLong(request,"monitor_id",null);
@@ -96,8 +116,6 @@ public class EquipmentManageMonitorAction {
 		Integer showOrder = RequestUtil.getInteger(request,"show_order",null);
 		String playSrc = RequestUtil.processParams(request,"play_src");
 
-		Map<String, String> reqParameterMap = RequestUtil.readBodyFormRequset(request);
-		String comid = reqParameterMap.get("comid").toString();
 
 		MonitorInfoTb monitorInfoTb = new MonitorInfoTb();
 		monitorInfoTb.setId(id);
@@ -108,9 +126,20 @@ public class EquipmentManageMonitorAction {
 		monitorInfoTb.setIsShow(isShow);
 		monitorInfoTb.setShowOrder(showOrder);
 		monitorInfoTb.setPlaySrc(playSrc);
-		monitorInfoTb.setComid(comid);
+		monitorInfoTb.setComid(comid+"");
 
 		String result = equipmentManageMonitorService.updateResultByConditions(monitorInfoTb).toString();
+		if("1".equals(result)){
+			ParkLogTb parkLogTb = new ParkLogTb();
+			parkLogTb.setOperateUser(nickname);
+			parkLogTb.setOperateTime(System.currentTimeMillis()/1000);
+			parkLogTb.setOperateType(2);
+			parkLogTb.setContent(uin+"("+nickname+")"+"修改了监控"+id);
+			parkLogTb.setType("equipment");
+			parkLogTb.setParkId(comid);
+			saveLogService.saveLog(parkLogTb);
+		}
+
 		StringUtils.ajaxOutput(response,result);
 
 		return null;
@@ -123,6 +152,11 @@ public class EquipmentManageMonitorAction {
 	 */
 	@RequestMapping("/remove")
 	public String remove(HttpServletRequest request,HttpServletResponse response){
+
+		Long comid = RequestUtil.getLong(request,"comid",-1L);
+		String nickname = StringUtils.decodeUTF8(RequestUtil.getString(request,"nickname1"));
+		Long uin = RequestUtil.getLong(request, "loginuin", -1L);
+
 		Long id = RequestUtil.getLong(request,"id",-1l);
 
 		MonitorInfoTb monitorInfoTb = new MonitorInfoTb();
@@ -130,6 +164,17 @@ public class EquipmentManageMonitorAction {
 		monitorInfoTb.setState(0);
 
 		String result = equipmentManageMonitorService.removeResultByConditions(monitorInfoTb).toString();
+
+		if("1".equals(result)){
+			ParkLogTb parkLogTb = new ParkLogTb();
+			parkLogTb.setOperateUser(nickname);
+			parkLogTb.setOperateTime(System.currentTimeMillis()/1000);
+			parkLogTb.setOperateType(3);
+			parkLogTb.setContent(uin+"("+nickname+")"+"删除了监控"+id);
+			parkLogTb.setType("equipment");
+			parkLogTb.setParkId(comid);
+			saveLogService.saveLog(parkLogTb);
+		}
 
 		StringUtils.ajaxOutput(response,result);
 		return null;

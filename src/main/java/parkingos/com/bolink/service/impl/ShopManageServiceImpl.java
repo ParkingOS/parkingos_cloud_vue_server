@@ -7,13 +7,16 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import parkingos.com.bolink.dao.spring.CommonDao;
 import parkingos.com.bolink.models.ComInfoTb;
+import parkingos.com.bolink.models.ParkLogTb;
 import parkingos.com.bolink.models.ShopAccountTb;
 import parkingos.com.bolink.models.ShopTb;
 import parkingos.com.bolink.qo.PageOrderConfig;
+import parkingos.com.bolink.service.SaveLogService;
 import parkingos.com.bolink.service.ShopManageService;
 import parkingos.com.bolink.utils.Check;
 import parkingos.com.bolink.utils.OrmUtil;
 import parkingos.com.bolink.utils.RequestUtil;
+import parkingos.com.bolink.utils.StringUtils;
 
 import javax.servlet.http.HttpServletRequest;
 import java.math.BigDecimal;
@@ -28,9 +31,16 @@ public class ShopManageServiceImpl implements ShopManageService {
 
     @Autowired
     private CommonDao commonDao;
+    @Autowired
+    private SaveLogService saveLogService;
 
     @Override
     public String addMoney(HttpServletRequest request) {
+
+        Long comid = RequestUtil.getLong(request,"comid",-1L);
+        String nickname = StringUtils.decodeUTF8(RequestUtil.getString(request,"nickname1"));
+        Long uin = RequestUtil.getLong(request, "loginuin", -1L);
+
         Long shoppingmarket_id = RequestUtil.getLong( request, "shop_id", -1L );
 
         if (shoppingmarket_id == -1) {
@@ -84,6 +94,17 @@ public class ShopManageServiceImpl implements ShopManageService {
         shopAccountTb.setOperator( RequestUtil.getLong( request, "operator", -1L ) );
         int insert = commonDao.insert( shopAccountTb );
 
+        if(insert==1){
+            ParkLogTb parkLogTb = new ParkLogTb();
+            parkLogTb.setOperateUser(nickname);
+            parkLogTb.setOperateTime(System.currentTimeMillis()/1000);
+            parkLogTb.setOperateType(2);
+            parkLogTb.setContent(uin+"("+nickname+")给商户"+shoppingmarket_id+"续费"+addmoney+"元");
+            parkLogTb.setType("shop");
+            parkLogTb.setParkId(comid);
+            saveLogService.saveLog(parkLogTb);
+        }
+
         return "{\"state\":" + insert + "}";
     }
 
@@ -94,6 +115,10 @@ public class ShopManageServiceImpl implements ShopManageService {
 
     @Override
     public String delete(HttpServletRequest request) {
+        Long comid = RequestUtil.getLong(request,"comid",-1L);
+        String nickname = StringUtils.decodeUTF8(RequestUtil.getString(request,"nickname1"));
+        Long uin = RequestUtil.getLong(request, "loginuin", -1L);
+
         Long id = RequestUtil.getLong( request, "id", -1L );
         int delete = 0;
         if (id > 0) {
@@ -104,6 +129,16 @@ public class ShopManageServiceImpl implements ShopManageService {
             delete = commonDao.updateByPrimaryKey( shopTb );
         }
 
+        if(delete==1){
+            ParkLogTb parkLogTb = new ParkLogTb();
+            parkLogTb.setOperateUser(nickname);
+            parkLogTb.setOperateTime(System.currentTimeMillis()/1000);
+            parkLogTb.setOperateType(3);
+            parkLogTb.setContent(uin+"("+nickname+")"+"删除了商户"+id);
+            parkLogTb.setType("shop");
+            parkLogTb.setParkId(comid);
+            saveLogService.saveLog(parkLogTb);
+        }
         return "{\"state\":" + delete + "}";
     }
 
@@ -143,6 +178,11 @@ public class ShopManageServiceImpl implements ShopManageService {
 
     @Override
     public String create(HttpServletRequest request) {
+
+        Long comid = RequestUtil.getLong(request,"comid",-1L);
+        String nickname = StringUtils.decodeUTF8(RequestUtil.getString(request,"nickname1"));
+        Long uin = RequestUtil.getLong(request, "loginuin", -1L);
+
         //接收参数
         Long id = RequestUtil.getLong( request, "id", -1L );
         String name = RequestUtil.processParams( request, "name" );
@@ -153,7 +193,6 @@ public class ShopManageServiceImpl implements ShopManageService {
         Integer handInputEnable = RequestUtil.getInteger( request, "hand_input_enable", 0 );
         Integer supportType = RequestUtil.getInteger(request,"support_type",1);
 
-        Long comid = RequestUtil.getLong(request,"comid",-1L);
         if(comid==-1){
             return "{\"state\":0,\"msg\":\"车场不存在\"}";
         }
@@ -223,17 +262,31 @@ public class ShopManageServiceImpl implements ShopManageService {
 
         shopTb.setComid( RequestUtil.getLong( request, "comid", -1L ) );
         int update = 0;
+
+        ParkLogTb parkLogTb = new ParkLogTb();
+        parkLogTb.setOperateUser(nickname);
+        parkLogTb.setOperateTime(System.currentTimeMillis()/1000);
+        parkLogTb.setType("shop");
+        parkLogTb.setParkId(comid);
+
         if (id < 0) {
             //添加操作
+            id = commonDao.selectSequence(ShopTb.class);
             Long create_time = System.currentTimeMillis() / 1000;
             shopTb.setCreateTime( create_time );
+            shopTb.setId(id);
             update = commonDao.insert( shopTb );
+            parkLogTb.setOperateType(1);
+            parkLogTb.setContent(uin+"("+nickname+")"+"增加了商户"+id+name);
+
         } else {
             //修改操作
             shopTb.setId( id );
             update = commonDao.updateByPrimaryKey( shopTb );
+            parkLogTb.setOperateType(2);
+            parkLogTb.setContent(uin+"("+nickname+")"+"修改了商户"+id);
         }
-
+        saveLogService.saveLog(parkLogTb);
         return "{\"state\":" + update + "}";
     }
 }

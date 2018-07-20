@@ -244,6 +244,7 @@ public class MemberServiceImpl implements MemberService {
 
             result.put("state",1);
             result.put("msg","增加成功");
+            result.put("id",nextid);
             //不支持ETCPark,支持的话再加
             insertSysn(user,0);
         }

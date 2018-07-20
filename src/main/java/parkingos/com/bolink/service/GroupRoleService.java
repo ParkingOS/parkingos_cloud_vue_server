@@ -18,4 +18,6 @@ public interface GroupRoleService {
     String getAuth(Long loginRoleId, Long id);
 
     JSONObject editRoleAuth(Long id, String auths);
+
+    Long getId();
 }

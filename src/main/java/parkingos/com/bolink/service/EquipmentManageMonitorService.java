@@ -15,4 +15,6 @@ public interface EquipmentManageMonitorService {
     public Integer removeResultByConditions(MonitorInfoTb monitorInfoTb);
 
     JSONObject selectGroupMonitors(Map<String, String> reqParameterMap);
+
+    Long getId();
 }

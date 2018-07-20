@@ -8,13 +8,11 @@ import org.springframework.stereotype.Service;
 import parkingos.com.bolink.dao.mybatis.mapper.ParkInfoMapper;
 import parkingos.com.bolink.dao.spring.CommonDao;
 import parkingos.com.bolink.enums.FieldOperator;
-import parkingos.com.bolink.models.ComInfoTb;
-import parkingos.com.bolink.models.LiftRodTb;
-import parkingos.com.bolink.models.OrderTb;
-import parkingos.com.bolink.models.UserInfoTb;
+import parkingos.com.bolink.models.*;
 import parkingos.com.bolink.qo.PageOrderConfig;
 import parkingos.com.bolink.qo.SearchBean;
 import parkingos.com.bolink.service.CityParkService;
+import parkingos.com.bolink.service.SaveLogService;
 import parkingos.com.bolink.service.SupperSearchService;
 import parkingos.com.bolink.utils.*;
 
@@ -35,6 +33,9 @@ public class CityParkServiceImpl implements CityParkService {
     private CommonMethods commonMethods;
     @Autowired
     private ParkInfoMapper parkInfoMapper;
+    @Autowired
+    private SaveLogService saveLogService;
+
     @Override
     public JSONObject selectResultByConditions(Map<String, String> reqmap) {
         String str = "{\"total\":0,\"page\":1,\"rows\":[]}";
@@ -219,6 +220,10 @@ public class CityParkServiceImpl implements CityParkService {
         if (groupId == -1) {
             groupId = RequestUtil.getLong(request, "group_id", -1L);
         }
+
+        String nickname = StringUtils.decodeUTF8(RequestUtil.getString(request,"nickname1"));
+        Long uin = RequestUtil.getLong(request, "loginuin", -1L);
+
         String company = RequestUtil.processParams(request, "company_name");
         company = company.replace("\r", "").replace("\n", "");
         String address = StringUtils.decodeUTF8(RequestUtil.processParams(request, "address"));
@@ -360,6 +365,19 @@ public class CityParkServiceImpl implements CityParkService {
                             logger.error("上传车场个数:" + uploadCount + "云平台新建车场:" + insert);
                             result.put("state", 1);
                             result.put("msg", "新建车场成功,上传到泊链成功");
+
+                            if(groupId>0){
+                                ParkLogTb parkLogTb = new ParkLogTb();
+                                parkLogTb.setOperateUser(nickname);
+                                parkLogTb.setOperateTime(System.currentTimeMillis()/1000);
+                                parkLogTb.setOperateType(1);
+                                parkLogTb.setContent(uin+"("+nickname+")"+"新建了车场"+comid+company);
+                                parkLogTb.setType("parkinfo");
+                                parkLogTb.setGroupId(groupId);
+                                saveLogService.saveLog(parkLogTb);
+                            }
+
+
                             return result;
                         } else {
                             result.put("state", 0);
@@ -410,6 +428,17 @@ public class CityParkServiceImpl implements CityParkService {
             if (update == 1) {
                 result.put("state", 1);
                 result.put("msg", "修改车场成功");
+
+                if(groupId>0){
+                    ParkLogTb parkLogTb = new ParkLogTb();
+                    parkLogTb.setOperateUser(nickname);
+                    parkLogTb.setOperateTime(System.currentTimeMillis()/1000);
+                    parkLogTb.setOperateType(2);
+                    parkLogTb.setContent(uin+"("+nickname+")"+"修改了车场"+id);
+                    parkLogTb.setType("parkinfo");
+                    parkLogTb.setGroupId(groupId);
+                    saveLogService.saveLog(parkLogTb);
+                }
             }
         }
         return result;

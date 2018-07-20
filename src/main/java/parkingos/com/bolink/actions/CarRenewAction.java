@@ -5,7 +5,9 @@ import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
+import parkingos.com.bolink.models.ParkLogTb;
 import parkingos.com.bolink.service.CarRenewService;
+import parkingos.com.bolink.service.SaveLogService;
 import parkingos.com.bolink.utils.ExportDataExcel;
 import parkingos.com.bolink.utils.RequestUtil;
 import parkingos.com.bolink.utils.StringUtils;
@@ -28,6 +30,8 @@ public class CarRenewAction {
 
     @Autowired
     private CarRenewService carRenewService;
+    @Autowired
+    private SaveLogService saveLogService;
 
     @RequestMapping(value = "/query")
     public String query(HttpServletRequest request, HttpServletResponse response) {
@@ -41,13 +45,15 @@ public class CarRenewAction {
 
     @RequestMapping(value = "/exportExcel")
     public String exportExcel(HttpServletRequest request, HttpServletResponse response) {
+
+        Long comid = RequestUtil.getLong(request,"comid",-1L);
+        String nickname = StringUtils.decodeUTF8(RequestUtil.getString(request,"nickname1"));
+        Long uin = RequestUtil.getLong(request, "loginuin", -1L);
+
         Map<String, String> reqParameterMap = RequestUtil.readBodyFormRequset(request);
 
-//        String[]  heards = new String[]{"编号", "购买流水号", "月卡编号", "月卡续费时间", "应收金额", "实收金额", "收费员", "缴费类型", "车牌号", "用户编号", "有效期", "备注"};
         String[][]  heards = new String[][]{{"购买流水号","STR"}, {"月卡编号","STR"}, {"月卡续费时间","STR"}, {"应收金额","STR"}, {"实收金额","STR"}, {"收费员","STR"}, {"缴费类型","STR"}, {"车牌号","STR"}, {"用户编号","STR"}, {"开始时间","STR"},{"结束时间","STR"}, {"备注","STR"}};
         logger.info(reqParameterMap);
-        //获取要到处的数据
-//        List<List<String>> bodyList = carRenewService.exportExcel(reqParameterMap);
         List<List<Object>> bodyList = carRenewService.exportExcel(reqParameterMap);
 
 
@@ -65,22 +71,14 @@ public class CarRenewAction {
             e.printStackTrace();
         }
 
-        //调用导出工具类导出...组装导出头 等
-//        String fname = "月卡续费记录" + TimeTools.getDate_YY_MM_DD();
-//        fname = StringUtils.encodingFileName(fname);
-//        java.io.OutputStream os;
-//        try {
-//            response.reset();
-//            response.setHeader("Content-disposition", "attachment; filename="
-//                    + fname + ".xls");
-//            response.setContentType("application/x-download");
-//            os = response.getOutputStream();
-//            ExportExcelUtil importExcel = new ExportExcelUtil("月卡续费记录",
-//                    heards, bodyList);
-//            importExcel.createExcelFile(os);
-//        } catch (IOException e) {
-//            e.printStackTrace();
-//        }
+        ParkLogTb parkLogTb = new ParkLogTb();
+        parkLogTb.setOperateUser(nickname);
+        parkLogTb.setOperateTime(System.currentTimeMillis()/1000);
+        parkLogTb.setOperateType(4);
+        parkLogTb.setContent(uin+"("+nickname+")"+"导出了月卡续费记录");
+        parkLogTb.setType("carrenew");
+        parkLogTb.setParkId(comid);
+        saveLogService.saveLog(parkLogTb);
 
         return null;
     }

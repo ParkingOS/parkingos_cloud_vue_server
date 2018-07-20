@@ -643,6 +643,7 @@ public class CityVipServiceImpl implements CityVipService {
                 logger.error("批量下发："+r);
                 errmsg +="</br>下发"+r+"条";
             }
+            result.put("state",1);
             logger.error(errmsg);
         }
         result.put("msg",errmsg);

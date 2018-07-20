@@ -6,9 +6,11 @@ import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import parkingos.com.bolink.dao.spring.CommonDao;
+import parkingos.com.bolink.models.ParkLogTb;
 import parkingos.com.bolink.models.UserInfoTb;
 import parkingos.com.bolink.models.UserRoleTb;
 import parkingos.com.bolink.qo.PageOrderConfig;
+import parkingos.com.bolink.service.SaveLogService;
 import parkingos.com.bolink.service.ShopMemberManageService;
 import parkingos.com.bolink.utils.CustomDefind;
 import parkingos.com.bolink.utils.OrmUtil;
@@ -16,7 +18,6 @@ import parkingos.com.bolink.utils.RequestUtil;
 import parkingos.com.bolink.utils.StringUtils;
 
 import javax.servlet.http.HttpServletRequest;
-import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -28,6 +29,8 @@ public class ShopMemberManageServiceImpl implements ShopMemberManageService {
 
     @Autowired
     private CommonDao commonDao;
+    @Autowired
+    private SaveLogService saveLogService;
 
     @Override
     public String quickquery(HttpServletRequest req) {
@@ -70,13 +73,16 @@ public class ShopMemberManageServiceImpl implements ShopMemberManageService {
 
     @Override
     public String editpass(HttpServletRequest request) {
+        Long comid = RequestUtil.getLong(request,"comid",-1L);
+        String nickname = StringUtils.decodeUTF8(RequestUtil.getString(request,"nickname1"));
+        Long uin = RequestUtil.getLong(request, "loginuin", -1L);
 
-        String uin = RequestUtil.processParams( request, "id" );
+        String id = RequestUtil.processParams( request, "id" );
         String newPass = RequestUtil.processParams( request, "newpass" );
         String confirmPass = RequestUtil.processParams( request, "confirmpass" );
 
         UserInfoTb userInfoTb = new UserInfoTb();
-        userInfoTb.setId( Long.valueOf( uin ) );
+        userInfoTb.setId( Long.valueOf( id ) );
         userInfoTb.setPassword( newPass );
 
         int update = 0;
@@ -89,6 +95,17 @@ public class ShopMemberManageServiceImpl implements ShopMemberManageService {
             }
             userInfoTb.setMd5pass( md5Pass );
             update = commonDao.updateByPrimaryKey( userInfoTb );
+            if(update==1){
+                ParkLogTb parkLogTb = new ParkLogTb();
+                parkLogTb.setOperateUser(nickname);
+                parkLogTb.setOperateTime(System.currentTimeMillis()/1000);
+                parkLogTb.setOperateType(2);
+                parkLogTb.setContent(uin+"("+nickname+")"+"修改了员工密码"+id);
+                parkLogTb.setType("shop");
+                parkLogTb.setParkId(comid);
+                saveLogService.saveLog(parkLogTb);
+            }
+
         }
         return "{\"state\":" + update + "}";
     }
@@ -97,17 +114,15 @@ public class ShopMemberManageServiceImpl implements ShopMemberManageService {
     @Override
     public String create(HttpServletRequest request) {
 
-//        String nickname = RequestUtil.processParams( request, "nickname" );
-//        try {
-//            nickname = new String( nickname.getBytes( "ISO-8859-1" ), "UTF-8" );
-//        } catch (UnsupportedEncodingException e) {
-//            e.printStackTrace();
-//        }
+
+        Long comid = RequestUtil.getLong(request,"comid",-1L);
+        String nickname1 = StringUtils.decodeUTF8(RequestUtil.getString(request,"nickname1"));
+        Long uin = RequestUtil.getLong(request, "loginuin", -1L);
+
         String nickname = StringUtils.decodeUTF8(StringUtils.decodeUTF8(RequestUtil.getString(request,"nickname")));
 
         String phone = RequestUtil.processParams( request, "phone" );
         String mobile = RequestUtil.processParams( request, "mobile" );
-        Long comid = Long.valueOf( RequestUtil.processParams( request, "comid" ) );
         Long role = RequestUtil.getLong( request, "auth_flag", 15L );//14:负责人 15：工作人员
         Long shop_id = RequestUtil.getLong( request, "shop_id", -1L );
         if (nickname.equals( "" )) nickname = null;
@@ -127,6 +142,15 @@ public class ShopMemberManageServiceImpl implements ShopMemberManageService {
         userInfoTb.setAuthFlag( role );
 
         int count = 0;
+
+
+        ParkLogTb parkLogTb = new ParkLogTb();
+        parkLogTb.setOperateUser(nickname1);
+        parkLogTb.setOperateTime(System.currentTimeMillis()/1000);
+        parkLogTb.setType("shop");
+        parkLogTb.setParkId(comid);
+
+
         if (userid == -1) {
             //添加操作
             Long squen = commonDao.selectSequence( UserInfoTb.class );
@@ -155,16 +179,29 @@ public class ShopMemberManageServiceImpl implements ShopMemberManageService {
             }
             userInfoTb.setMd5pass( md5Pass );
             count = commonDao.insert( userInfoTb );
+
+            parkLogTb.setOperateType(1);
+            parkLogTb.setContent(uin+"("+nickname1+")"+"增加了商户员工"+strid);
+
         } else {
             //修改操作
             userInfoTb.setId( userid );
             count = commonDao.updateByPrimaryKey( userInfoTb );
+
+            parkLogTb.setOperateType(2);
+            parkLogTb.setContent(uin+"("+nickname1+")"+"修改了商户员工"+userid);
         }
+        saveLogService.saveLog(parkLogTb);
         return "{\"state\":" + count + "}";
     }
 
     @Override
     public String delete(HttpServletRequest req) {
+
+        Long comid = RequestUtil.getLong(req,"comid",-1L);
+        String nickname1 = StringUtils.decodeUTF8(RequestUtil.getString(req,"nickname1"));
+        Long uin = RequestUtil.getLong(req, "loginuin", -1L);
+
         Long id = RequestUtil.getLong( req, "id", -1L );
         int delete = 0;
         if (id > 0) {
@@ -173,6 +210,16 @@ public class ShopMemberManageServiceImpl implements ShopMemberManageService {
             userInfoTb.setState( 1 );
             //删除操作将state状态修改为1
             delete = commonDao.updateByPrimaryKey( userInfoTb );
+            if(delete==1) {
+                ParkLogTb parkLogTb = new ParkLogTb();
+                parkLogTb.setOperateUser(nickname1);
+                parkLogTb.setOperateTime(System.currentTimeMillis() / 1000);
+                parkLogTb.setOperateType(3);
+                parkLogTb.setContent(uin + "(" + nickname1 + ")" + "删除了商户员工" + id);
+                parkLogTb.setType("shop");
+                parkLogTb.setParkId(comid);
+                saveLogService.saveLog(parkLogTb);
+            }
         }
         return "{\"state\":" + delete + "}";
     }

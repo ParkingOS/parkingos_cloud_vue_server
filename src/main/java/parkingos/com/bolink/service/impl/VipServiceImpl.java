@@ -314,6 +314,7 @@ public class VipServiceImpl implements VipService {
         if (ret == 1 && renew == 1) {
             result.put("state", 1);
             result.put("msg", "添加成功");
+            result.put("id",nextid);
             int ins = insertSysn(carowerProduct1, 0, comid);
             int reNew = insertCardSysn(cardRenewTb, 0, comid);
             if (ins != 1) {

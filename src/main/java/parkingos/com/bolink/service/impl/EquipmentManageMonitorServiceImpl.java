@@ -139,5 +139,10 @@ public class EquipmentManageMonitorServiceImpl implements EquipmentManageMonitor
         return result;
     }
 
+    @Override
+    public Long getId() {
+        return commonDao.selectSequence(MonitorInfoTb.class);
+    }
+
 
 }

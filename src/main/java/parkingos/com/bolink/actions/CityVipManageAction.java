@@ -9,7 +9,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
 import parkingos.com.bolink.dao.spring.CommonDao;
+import parkingos.com.bolink.models.ParkLogTb;
 import parkingos.com.bolink.service.CityVipService;
+import parkingos.com.bolink.service.SaveLogService;
 import parkingos.com.bolink.utils.ExportDataExcel;
 import parkingos.com.bolink.utils.RequestUtil;
 import parkingos.com.bolink.utils.StringUtils;
@@ -31,6 +33,8 @@ public class CityVipManageAction {
 
     @Autowired
     private CityVipService cityVipService;
+    @Autowired
+    private SaveLogService saveLogService;
 
     @Autowired
     private CommonDao commonDao;
@@ -63,19 +67,35 @@ public class CityVipManageAction {
 
     @RequestMapping(value = "/importExcel")
     public String importExcel(HttpServletRequest request, HttpServletResponse resp,@RequestParam("file")MultipartFile file) throws Exception{
-
+        String nickname = StringUtils.decodeUTF8(RequestUtil.getString(request,"nickname1"));
+        Long uin = RequestUtil.getLong(request, "loginuin", -1L);
 
         Long groupid = RequestUtil.getLong(request,"groupid",-1L);
         Long cityid = RequestUtil.getLong(request,"cityid",-1L);
         JSONObject result = cityVipService.importExcel(file,groupid,cityid);
 
-        StringUtils.ajaxOutput(resp,result.toJSONString());
 
+        StringUtils.ajaxOutput(resp,result.toJSONString());
+        if((Integer)result.get("state")==1){
+            ParkLogTb parkLogTb = new ParkLogTb();
+            parkLogTb.setOperateUser(nickname);
+            parkLogTb.setOperateTime(System.currentTimeMillis()/1000);
+            parkLogTb.setOperateType(1);
+            parkLogTb.setContent(uin+"("+nickname+")"+"导入月卡会员成功");
+            parkLogTb.setType("vip");
+            parkLogTb.setGroupId(groupid);
+            saveLogService.saveLog(parkLogTb);
+        }
         return null;
     }
 
     @RequestMapping(value = "/exportExcel")
     public String exportExcel(HttpServletRequest request, HttpServletResponse response) {
+        String nickname = StringUtils.decodeUTF8(RequestUtil.getString(request,"nickname1"));
+        Long uin = RequestUtil.getLong(request, "loginuin", -1L);
+        Long groupid = RequestUtil.getLong(request,"groupid",-1L);
+
+
         Map<String, String> reqParameterMap = RequestUtil.readBodyFormRequset(request);
 
         List<List<String>> bodyList = cityVipService.exportExcel(reqParameterMap);
@@ -95,6 +115,14 @@ public class CityVipManageAction {
             e.printStackTrace();
         }
 
+        ParkLogTb parkLogTb = new ParkLogTb();
+        parkLogTb.setOperateUser(nickname);
+        parkLogTb.setOperateTime(System.currentTimeMillis()/1000);
+        parkLogTb.setOperateType(4);
+        parkLogTb.setContent(uin+"("+nickname+")"+"导出了集团会员数据");
+        parkLogTb.setType("vip");
+        parkLogTb.setGroupId(groupid);
+        saveLogService.saveLog(parkLogTb);
         return null;
     }
 

@@ -20,4 +20,6 @@ public interface AdminRoleService {
     String getAuth(Long loginRoleId, Long id);
 
     JSONObject editRoleAuth(Long id, String auths);
+
+    Long getId();
 }

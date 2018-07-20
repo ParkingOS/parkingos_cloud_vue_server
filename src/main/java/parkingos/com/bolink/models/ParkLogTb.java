@@ -17,6 +17,26 @@ public class ParkLogTb {
 
     private Long parkId;
 
+    private Long groupId;
+
+    private Integer operateType;
+
+    public Integer getOperateType() {
+        return operateType;
+    }
+
+    public void setOperateType(Integer operateType) {
+        this.operateType = operateType;
+    }
+
+    public Long getGroupId() {
+        return groupId;
+    }
+
+    public void setGroupId(Long groupId) {
+        this.groupId = groupId;
+    }
+
     public Long getId() {
         return id;
     }

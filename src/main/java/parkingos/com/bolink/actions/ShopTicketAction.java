@@ -5,6 +5,8 @@ import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
+import parkingos.com.bolink.models.ParkLogTb;
+import parkingos.com.bolink.service.SaveLogService;
 import parkingos.com.bolink.service.TicketService;
 import parkingos.com.bolink.utils.Check;
 import parkingos.com.bolink.utils.ExportDataExcel;
@@ -16,7 +18,6 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.text.ParseException;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -27,6 +28,8 @@ public class ShopTicketAction {
     Logger logger = Logger.getLogger( ShopTicketAction.class );
     @Autowired
     private TicketService ticketService;
+    @Autowired
+    private SaveLogService saveLogService;
 
     @RequestMapping("/quickquery")
     //优惠券查询
@@ -41,6 +44,10 @@ public class ShopTicketAction {
     @RequestMapping("/exportExcel")
     //优惠券导出
     public String exportExcel(HttpServletRequest request, HttpServletResponse resp) {
+
+        Long comid = RequestUtil.getLong(request,"comid",-1L);
+        String nickname = StringUtils.decodeUTF8(RequestUtil.getString(request,"nickname1"));
+        Long uin = RequestUtil.getLong(request, "loginuin", -1L);
 
         Map<String, String> reqParameterMap = RequestUtil.readBodyFormRequset( request );
 
@@ -60,7 +67,14 @@ public class ShopTicketAction {
         } catch (ParseException e) {
             e.printStackTrace();
         }
-
+        ParkLogTb parkLogTb = new ParkLogTb();
+        parkLogTb.setOperateUser(nickname);
+        parkLogTb.setOperateTime(System.currentTimeMillis()/1000);
+        parkLogTb.setOperateType(4);
+        parkLogTb.setContent(uin+"("+nickname+")"+"导出了优惠券数据");
+        parkLogTb.setType("ticket");
+        parkLogTb.setParkId(comid);
+        saveLogService.saveLog(parkLogTb);
         return null;
     }
 

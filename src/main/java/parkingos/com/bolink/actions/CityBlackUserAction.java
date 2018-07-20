@@ -6,7 +6,9 @@ import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
+import parkingos.com.bolink.models.ParkLogTb;
 import parkingos.com.bolink.service.CityBlackUserService;
+import parkingos.com.bolink.service.SaveLogService;
 import parkingos.com.bolink.utils.ExportDataExcel;
 import parkingos.com.bolink.utils.RequestUtil;
 import parkingos.com.bolink.utils.StringUtils;
@@ -27,6 +29,8 @@ public class CityBlackUserAction {
 
     @Autowired
     private CityBlackUserService cityBlackUserService;
+    @Autowired
+    private SaveLogService saveLogService;
 
     @RequestMapping(value = "/query")
     public String query(HttpServletRequest request, HttpServletResponse resp) {
@@ -45,8 +49,24 @@ public class CityBlackUserAction {
         Long id = RequestUtil.getLong(request, "id", -1L);
         Integer state = RequestUtil.getInteger(request, "state", -1);
 
-
+        Long groupid = RequestUtil.getLong(request,"groupid",-1L);
+        String nickname = StringUtils.decodeUTF8(RequestUtil.getString(request,"nickname1"));
+        Long uin = RequestUtil.getLong(request, "loginuin", -1L);
         JSONObject result = cityBlackUserService.editBlackUser(id,state);
+        if((Integer)result.get("state")==1){
+            ParkLogTb parkLogTb = new ParkLogTb();
+            parkLogTb.setOperateUser(nickname);
+            parkLogTb.setOperateTime(System.currentTimeMillis()/1000);
+            parkLogTb.setOperateType(2);
+            if(state==1){
+                parkLogTb.setContent(uin+"("+nickname+")"+"还原了黑名单"+id);
+            }else{
+                parkLogTb.setContent(uin+"("+nickname+")"+"漂白了黑名单"+id);
+            }
+            parkLogTb.setType("blackuser");
+            parkLogTb.setGroupId(groupid);
+            saveLogService.saveLog(parkLogTb);
+        }
 //        把结果返回页面
         StringUtils.ajaxOutput(resp, result.toJSONString());
         return null;
@@ -55,6 +75,11 @@ public class CityBlackUserAction {
 
     @RequestMapping(value = "/exportExcel")
     public String exportExcel(HttpServletRequest request, HttpServletResponse response) {
+
+        Long groupid = RequestUtil.getLong(request,"groupid",-1L);
+        String nickname = StringUtils.decodeUTF8(RequestUtil.getString(request,"nickname1"));
+        Long uin = RequestUtil.getLong(request, "loginuin", -1L);
+
         Map<String, String> reqParameterMap = RequestUtil.readBodyFormRequset(request);
 
         List<List<Object>> bodyList = cityBlackUserService.exportExcel(reqParameterMap);
@@ -72,6 +97,15 @@ public class CityBlackUserAction {
         } catch (ParseException e) {
             e.printStackTrace();
         }
+        ParkLogTb parkLogTb = new ParkLogTb();
+        parkLogTb.setOperateUser(nickname);
+        parkLogTb.setOperateTime(System.currentTimeMillis()/1000);
+        parkLogTb.setOperateType(4);
+        parkLogTb.setContent(uin+"("+nickname+")"+"导出了黑名单");
+        parkLogTb.setType("blackuser");
+        parkLogTb.setGroupId(groupid);
+        saveLogService.saveLog(parkLogTb);
+
         return null;
     }
 

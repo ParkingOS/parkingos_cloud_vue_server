@@ -6,7 +6,9 @@ import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
+import parkingos.com.bolink.models.ParkLogTb;
 import parkingos.com.bolink.service.LiftRodService;
+import parkingos.com.bolink.service.SaveLogService;
 import parkingos.com.bolink.utils.CustomDefind;
 import parkingos.com.bolink.utils.ExportDataExcel;
 import parkingos.com.bolink.utils.RequestUtil;
@@ -28,6 +30,8 @@ public class LiftRodAction {
 
     @Autowired
     private LiftRodService liftRodService;
+    @Autowired
+    private SaveLogService saveLogService;
 
     @RequestMapping(value = "/query")
     public String query(HttpServletRequest request, HttpServletResponse resp) {
@@ -54,10 +58,8 @@ public class LiftRodAction {
         byte[] content = liftRodService.getLiftRodPicture(comid, liftrodId);
 
         if (content.length == 0) {
-            System.out.println("==========>>>>获取图片"+CustomDefind.IMAGEURL);
             //测试用  之后读配置文件
             response.sendRedirect(CustomDefind.IMAGEURL+"/images/nopic.jpg");
-//            response.sendRedirect("http://120.25.121.204:8080/cloud/images/nopic.jpg");
             return null;
         } else {
             response.setDateHeader("Expires", System.currentTimeMillis() + 12 * 60 * 60 * 1000);
@@ -77,12 +79,15 @@ public class LiftRodAction {
 
     @RequestMapping(value = "/exportExcel")
     public String exportExcel(HttpServletRequest request, HttpServletResponse response) {
+
+        Long comid = RequestUtil.getLong(request,"comid",-1L);
+        String nickname = StringUtils.decodeUTF8(RequestUtil.getString(request,"nickname1"));
+        Long uin = RequestUtil.getLong(request, "loginuin", -1L);
+
         Map<String, String> reqParameterMap = RequestUtil.readBodyFormRequset(request);
 
-//        String [] heards = new String[]{"编号","抬杆编号","时间","收费员","通道","原因","备注"};
         String [][] heards = new String[][]{{"编号","STR"},{"抬杆编号","STR"},{"时间","STR"},{"收费员","STR"},{"通道","STR"},{"原因","STR"},{"备注","STR"}};
         //获取要到处的数据
-//        List<List<String>> bodyList = liftRodService.exportExcel(reqParameterMap);
         List<List<Object>> bodyList = liftRodService.exportExcel(reqParameterMap);
 
         ExportDataExcel excel = new ExportDataExcel("抬杆记录", heards, "sheet1");
@@ -98,21 +103,15 @@ public class LiftRodAction {
         } catch (ParseException e) {
             e.printStackTrace();
         }
-//        String fname = "抬杆记录" + TimeTools.getDate_YY_MM_DD();
-//        fname = StringUtils.encodingFileName(fname);
-//        java.io.OutputStream os;
-//        try {
-//            response.reset();
-//            response.setHeader("Content-disposition", "attachment; filename="
-//                    + fname + ".xls");
-//            response.setContentType("application/x-download");
-//            os = response.getOutputStream();
-//            ExportExcelUtil importExcel = new ExportExcelUtil("抬杆记录",
-//                    heards, bodyList);
-//            importExcel.createExcelFile(os);
-//        } catch (IOException e) {
-//            e.printStackTrace();
-//        }
+        ParkLogTb parkLogTb = new ParkLogTb();
+        parkLogTb.setOperateUser(nickname);
+        parkLogTb.setOperateTime(System.currentTimeMillis()/1000);
+        parkLogTb.setOperateType(4);
+        parkLogTb.setContent(uin+"("+nickname+")"+"导出了抬杆数据");
+        parkLogTb.setType("liftrod");
+        parkLogTb.setParkId(comid);
+        saveLogService.saveLog(parkLogTb);
+
         return null;
     }
 

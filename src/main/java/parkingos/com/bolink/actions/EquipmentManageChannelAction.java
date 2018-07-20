@@ -7,7 +7,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import parkingos.com.bolink.models.ComPassTb;
+import parkingos.com.bolink.models.ParkLogTb;
 import parkingos.com.bolink.service.EquipmentManageChannelService;
+import parkingos.com.bolink.service.SaveLogService;
 import parkingos.com.bolink.utils.RequestUtil;
 import parkingos.com.bolink.utils.StringUtils;
 
@@ -24,6 +26,8 @@ public class EquipmentManageChannelAction {
 
 	@Autowired
 	private EquipmentManageChannelService equipmentManageChannelService;
+	@Autowired
+	private SaveLogService saveLogService;
 	/**
 	 *
 	 * @param request
@@ -59,6 +63,9 @@ public class EquipmentManageChannelAction {
 
 		Map<String, String> reqParameterMap = RequestUtil.readBodyFormRequset(request);
 		Long comid = Long.valueOf(Integer.valueOf(reqParameterMap.get("comid")));
+		String nickname = StringUtils.decodeUTF8(RequestUtil.getString(request,"nickname1"));
+		Long uin = RequestUtil.getLong(request, "loginuin", -1L);
+
 
 		Long id= equipmentManageChannelService.getId();
 		ComPassTb comPassTb = new ComPassTb();
@@ -75,6 +82,17 @@ public class EquipmentManageChannelAction {
 
 		String result = equipmentManageChannelService.insertResultByConditions(comPassTb).toString();
 
+		if("1".equals(result)){
+			ParkLogTb parkLogTb = new ParkLogTb();
+			parkLogTb.setOperateUser(nickname);
+			parkLogTb.setOperateTime(System.currentTimeMillis()/1000);
+			parkLogTb.setOperateType(1);
+			parkLogTb.setContent(uin+"("+nickname+")"+"增加了通道"+id+passname);
+			parkLogTb.setType("equipment");
+			parkLogTb.setParkId(comid);
+			saveLogService.saveLog(parkLogTb);
+		}
+
 		StringUtils.ajaxOutput(response,result);
 
 		return null;
@@ -87,6 +105,10 @@ public class EquipmentManageChannelAction {
 	 */
 	@RequestMapping(value = "/edit")
 	public String update(HttpServletRequest request, HttpServletResponse response) {
+		Long comid = RequestUtil.getLong(request,"comid",-1L);
+		String nickname = StringUtils.decodeUTF8(RequestUtil.getString(request,"nickname1"));
+		Long uin = RequestUtil.getLong(request, "loginuin", -1L);
+
 
 		Long id = RequestUtil.getLong(request,"id",null);
 		String passname = RequestUtil.processParams(request,"passname");
@@ -106,7 +128,16 @@ public class EquipmentManageChannelAction {
 		comPassTb.setDescription(description);
 
 		String result = equipmentManageChannelService.updateResultByConditions(comPassTb).toString();
-
+		if("1".equals(result)){
+			ParkLogTb parkLogTb = new ParkLogTb();
+			parkLogTb.setOperateUser(nickname);
+			parkLogTb.setOperateTime(System.currentTimeMillis()/1000);
+			parkLogTb.setOperateType(2);
+			parkLogTb.setContent(uin+"("+nickname+")"+"修改了通道"+id);
+			parkLogTb.setType("equipment");
+			parkLogTb.setParkId(comid);
+			saveLogService.saveLog(parkLogTb);
+		}
 		StringUtils.ajaxOutput(response,result);
 
 		return null;
@@ -120,6 +151,11 @@ public class EquipmentManageChannelAction {
 	 */
 	@RequestMapping("/remove")
 	public String remove(HttpServletRequest request,HttpServletResponse response){
+
+		Long comid = RequestUtil.getLong(request,"comid",-1L);
+		String nickname = StringUtils.decodeUTF8(RequestUtil.getString(request,"nickname1"));
+		Long uin = RequestUtil.getLong(request, "loginuin", -1L);
+
 		Long id = RequestUtil.getLong(request,"id",null);
 
 		ComPassTb comPassTb = new ComPassTb();
@@ -128,6 +164,16 @@ public class EquipmentManageChannelAction {
 
 		String result = equipmentManageChannelService.removeResultByConditions(comPassTb).toString();
 
+		if("1".equals(result)){
+			ParkLogTb parkLogTb = new ParkLogTb();
+			parkLogTb.setOperateUser(nickname);
+			parkLogTb.setOperateTime(System.currentTimeMillis()/1000);
+			parkLogTb.setOperateType(3);
+			parkLogTb.setContent(uin+"("+nickname+")"+"删除了通道"+id);
+			parkLogTb.setType("equipment");
+			parkLogTb.setParkId(comid);
+			saveLogService.saveLog(parkLogTb);
+		}
 		StringUtils.ajaxOutput(response,result);
 		return null;
 	}

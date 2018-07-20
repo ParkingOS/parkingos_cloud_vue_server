@@ -6,7 +6,9 @@ import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
+import parkingos.com.bolink.models.ParkLogTb;
 import parkingos.com.bolink.service.CityParkOrderAnlysisService;
+import parkingos.com.bolink.service.SaveLogService;
 import parkingos.com.bolink.utils.ExportExcelUtil;
 import parkingos.com.bolink.utils.RequestUtil;
 import parkingos.com.bolink.utils.StringUtils;
@@ -27,7 +29,8 @@ public class CityParkOrderanlysisAction {
 
     @Autowired
     private CityParkOrderAnlysisService cityParkOrderanlysisService;
-
+    @Autowired
+    private SaveLogService saveLogService;
 
     /*
     * 查询统计
@@ -47,7 +50,9 @@ public class CityParkOrderanlysisAction {
 
     @RequestMapping(value = "/exportExcel")
     public String exportExcel(HttpServletRequest request, HttpServletResponse response){
-
+        Long groupid = RequestUtil.getLong(request,"groupid",-1L);
+        String nickname = StringUtils.decodeUTF8(RequestUtil.getString(request,"nickname1"));
+        Long uin = RequestUtil.getLong(request, "loginuin", -1L);
         Map<String, String> reqParameterMap = RequestUtil.readBodyFormRequset(request);
 
         List<List<Object>> resList = cityParkOrderanlysisService.exportExcel(reqParameterMap);
@@ -71,6 +76,15 @@ public class CityParkOrderanlysisAction {
         } catch (ParseException e) {
             e.printStackTrace();
         }
+
+        ParkLogTb parkLogTb = new ParkLogTb();
+        parkLogTb.setOperateUser(nickname);
+        parkLogTb.setOperateTime(System.currentTimeMillis()/1000);
+        parkLogTb.setOperateType(4);
+        parkLogTb.setContent(uin+"("+nickname+")"+"导出了车场日报统计");
+        parkLogTb.setType("order");
+        parkLogTb.setGroupId(groupid);
+        saveLogService.saveLog(parkLogTb);
         return null;
     }
 

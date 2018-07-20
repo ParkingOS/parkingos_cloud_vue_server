@@ -6,7 +6,9 @@ import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
+import parkingos.com.bolink.models.ParkLogTb;
 import parkingos.com.bolink.service.OrderService;
+import parkingos.com.bolink.service.SaveLogService;
 import parkingos.com.bolink.utils.ExportDataExcel;
 import parkingos.com.bolink.utils.RequestUtil;
 import parkingos.com.bolink.utils.StringUtils;
@@ -30,6 +32,8 @@ public class OrderManagerAction {
 //    @Resource(name = "mybatis")
     @Resource(name = "orderSpring")
     private OrderService orderService;
+    @Autowired
+    private SaveLogService saveLogService;
 
     @RequestMapping(value = "/query")
     public String query(HttpServletRequest request, HttpServletResponse resp) {
@@ -83,6 +87,10 @@ public class OrderManagerAction {
 
     @RequestMapping(value = "/exportExcel")
     public String exportExcel(HttpServletRequest request, HttpServletResponse response) {
+        Long comid = RequestUtil.getLong(request,"comid",-1L);
+        String nickname1 = StringUtils.decodeUTF8(RequestUtil.getString(request,"nickname1"));
+        Long uin = RequestUtil.getLong(request, "loginuin", -1L);
+
         Map<String, String> reqParameterMap = RequestUtil.readBodyFormRequset(request);
 
 //        List<List<String>> bodyList = orderService.exportExcel(reqParameterMap);
@@ -102,21 +110,15 @@ public class OrderManagerAction {
         } catch (ParseException e) {
             e.printStackTrace();
         }
-//        String fname = "订单数据" + TimeTools.getDate_YY_MM_DD();
-//        fname = StringUtils.encodingFileName(fname);
-//        java.io.OutputStream os;
-//        try {
-//            response.reset();
-//            response.setHeader("Content-disposition", "attachment; filename="
-//                    + fname + ".xls");
-//            response.setContentType("application/x-download");
-//            os = response.getOutputStream();
-//            ExportExcelUtil importExcel = new ExportExcelUtil("订单数据",
-//                    heards, bodyList);
-//            importExcel.createExcelFile(os);
-//        } catch (IOException e) {
-//            e.printStackTrace();
-//        }
+
+        ParkLogTb parkLogTb = new ParkLogTb();
+        parkLogTb.setOperateUser(nickname1);
+        parkLogTb.setOperateTime(System.currentTimeMillis()/1000);
+        parkLogTb.setOperateType(4);
+        parkLogTb.setContent(uin+"("+nickname1+")"+"导出了订单数据");
+        parkLogTb.setType("order");
+        parkLogTb.setParkId(comid);
+        saveLogService.saveLog(parkLogTb);
         return null;
     }
 }

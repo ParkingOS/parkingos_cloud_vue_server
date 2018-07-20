@@ -13,4 +13,6 @@ public interface EquipmentManageWorkSiteService {
     public Integer updateResultByConditions(ComWorksiteTb comWorksiteTb);
 
     public Integer removeResultByConditions(ComWorksiteTb comWorksiteTb);
+
+    Long getId();
 }

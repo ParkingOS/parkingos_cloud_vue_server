@@ -57,4 +57,9 @@ public class EquipmentManageWorkSiteServiceImpl implements EquipmentManageWorkSi
         return result;
     }
 
+    @Override
+    public Long getId() {
+        return commonDao.selectSequence(ComWorksiteTb.class);
+    }
+
 }

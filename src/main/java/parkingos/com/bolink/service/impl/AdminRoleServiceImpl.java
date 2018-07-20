@@ -106,25 +106,6 @@ public class AdminRoleServiceImpl implements AdminRoleService {
         String str = "{\"state\":0,\"msg\":\"保存失败\"}";
         JSONObject result = JSONObject.parseObject(str);
 
-        int is_inspect = 0;
-        int is_collector = 0;
-        int is_opencard = 0;
-        switch (func) {
-            case 1:
-                is_collector = 1;
-                break;
-            case 2:
-                is_inspect = 1;
-                break;
-            case 3:
-                is_opencard = 1;
-                break;
-            default:
-                break;
-        }
-        userRoleTb.setIsCollector(is_collector);
-        userRoleTb.setIsInspect(is_inspect);
-        userRoleTb.setIsOpencard(is_opencard);
         logger.error("=======>>>>>" + userRoleTb);
         int ret = commonDao.insert(userRoleTb);
         if (ret == 1) {
@@ -546,5 +527,10 @@ public class AdminRoleServiceImpl implements AdminRoleService {
             result.put("msg", "修改成功");
         }
         return result;
+    }
+
+    @Override
+    public Long getId() {
+        return commonDao.selectSequence(UserRoleTb.class);
     }
 }

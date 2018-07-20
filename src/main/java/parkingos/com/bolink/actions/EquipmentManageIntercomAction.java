@@ -6,8 +6,10 @@ import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
+import parkingos.com.bolink.models.ParkLogTb;
 import parkingos.com.bolink.models.PhoneInfoTb;
 import parkingos.com.bolink.service.EquipmentManageIntercomService;
+import parkingos.com.bolink.service.SaveLogService;
 import parkingos.com.bolink.utils.RequestUtil;
 import parkingos.com.bolink.utils.StringUtils;
 
@@ -24,6 +26,8 @@ public class EquipmentManageIntercomAction {
 
 	@Autowired
 	private EquipmentManageIntercomService equipmentManageIntercomService;
+	@Autowired
+	private SaveLogService saveLogService;
 
 	/**
 	 * 查询监视器名称
@@ -70,26 +74,39 @@ public class EquipmentManageIntercomAction {
 	@RequestMapping(value = "/add")
 	public String add(HttpServletRequest request, HttpServletResponse response) {
 
-		//Long id = RequestUtil.getLong(request,"id",-1l);
+		Long comid = RequestUtil.getLong(request,"comid",-1L);
+		String nickname = StringUtils.decodeUTF8(RequestUtil.getString(request,"nickname1"));
+		Long uin = RequestUtil.getLong(request, "loginuin", -1L);
+
+
+		Long id = equipmentManageIntercomService.getId();
 		String name = RequestUtil.processParams(request,"name");
 		Long telePhone = RequestUtil.getLong(request,"tele_phone",null);
 		Long parkPhone = RequestUtil.getLong(request,"park_phone",null);
 		Long groupPhone = RequestUtil.getLong(request,"group_phone",null);
 		Long monitorId = RequestUtil.getLong(request,"monitor_id",null);
 
-		Map<String, String> reqParameterMap = RequestUtil.readBodyFormRequset(request);
-		String comid = reqParameterMap.get("comid");
-
 		PhoneInfoTb phoneInfoTb = new PhoneInfoTb();
-		//phoneInfoTb.setId(id);
+		phoneInfoTb.setId(id);
 		phoneInfoTb.setName(name);
 		phoneInfoTb.setTelePhone(telePhone);
 		phoneInfoTb.setParkPhone(parkPhone);
 		phoneInfoTb.setGroupPhone(groupPhone);
 		phoneInfoTb.setMonitorId(monitorId);
-		phoneInfoTb.setComid(comid);
+		phoneInfoTb.setComid(comid+"");
 		phoneInfoTb.setState(1);
 		String result = equipmentManageIntercomService.insertResultByConditions(phoneInfoTb).toString();
+
+		if("1".equals(result)){
+			ParkLogTb parkLogTb = new ParkLogTb();
+			parkLogTb.setOperateUser(nickname);
+			parkLogTb.setOperateTime(System.currentTimeMillis()/1000);
+			parkLogTb.setOperateType(1);
+			parkLogTb.setContent(uin+"("+nickname+")"+"增加了对讲"+id+name);
+			parkLogTb.setType("equipment");
+			parkLogTb.setParkId(comid);
+			saveLogService.saveLog(parkLogTb);
+		}
 
 		StringUtils.ajaxOutput(response,result);
 
@@ -103,6 +120,11 @@ public class EquipmentManageIntercomAction {
 	 */
 	@RequestMapping(value = "/edit")
 	public String update(HttpServletRequest request, HttpServletResponse response) {
+
+		Long comid = RequestUtil.getLong(request,"comid",-1L);
+		String nickname = StringUtils.decodeUTF8(RequestUtil.getString(request,"nickname1"));
+		Long uin = RequestUtil.getLong(request, "loginuin", -1L);
+
 		Long id = RequestUtil.getLong(request,"id",-1l);
 		String name = RequestUtil.processParams(request,"name");
 		Long telePhone = RequestUtil.getLong(request,"tele_phone",null);
@@ -121,6 +143,18 @@ public class EquipmentManageIntercomAction {
 		phoneInfoTb.setMonitorId(monitorId);
 
 		String result = equipmentManageIntercomService.updateResultByConditions(phoneInfoTb).toString();
+
+		if("1".equals(result)){
+			ParkLogTb parkLogTb = new ParkLogTb();
+			parkLogTb.setOperateUser(nickname);
+			parkLogTb.setOperateTime(System.currentTimeMillis()/1000);
+			parkLogTb.setOperateType(2);
+			parkLogTb.setContent(uin+"("+nickname+")"+"修改了对讲"+id);
+			parkLogTb.setType("equipment");
+			parkLogTb.setParkId(comid);
+			saveLogService.saveLog(parkLogTb);
+		}
+
 		StringUtils.ajaxOutput(response,result);
 
 		return null;
@@ -133,6 +167,11 @@ public class EquipmentManageIntercomAction {
 	 */
 	@RequestMapping("/remove")
 	public String remove(HttpServletRequest request,HttpServletResponse response){
+
+		Long comid = RequestUtil.getLong(request,"comid",-1L);
+		String nickname = StringUtils.decodeUTF8(RequestUtil.getString(request,"nickname1"));
+		Long uin = RequestUtil.getLong(request, "loginuin", -1L);
+
 		Long id = RequestUtil.getLong(request,"id",-1l);
 
 		PhoneInfoTb phoneInfoTb = new PhoneInfoTb();
@@ -141,6 +180,16 @@ public class EquipmentManageIntercomAction {
 
 		String result = equipmentManageIntercomService.removeResultByConditions(phoneInfoTb).toString();
 
+		if("1".equals(result)){
+			ParkLogTb parkLogTb = new ParkLogTb();
+			parkLogTb.setOperateUser(nickname);
+			parkLogTb.setOperateTime(System.currentTimeMillis()/1000);
+			parkLogTb.setOperateType(3);
+			parkLogTb.setContent(uin+"("+nickname+")"+"删除了对讲"+id);
+			parkLogTb.setType("equipment");
+			parkLogTb.setParkId(comid);
+			saveLogService.saveLog(parkLogTb);
+		}
 		StringUtils.ajaxOutput(response,result);
 		return null;
 	}

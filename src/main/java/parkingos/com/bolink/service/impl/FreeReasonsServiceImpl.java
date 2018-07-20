@@ -45,6 +45,7 @@ public class FreeReasonsServiceImpl implements FreeReasonsService {
         if(ret==1){
             result.put("state",1);
             result.put("msg","添加成功");
+            result.put("id",id);
             insertSysn(freeReasonsTb,0);
         }
         return result;

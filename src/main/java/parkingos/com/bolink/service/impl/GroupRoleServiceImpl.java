@@ -522,4 +522,9 @@ public class GroupRoleServiceImpl implements GroupRoleService {
         }
         return result;
     }
+
+    @Override
+    public Long getId() {
+        return commonDao.selectSequence(UserRoleTb.class);
+    }
 }

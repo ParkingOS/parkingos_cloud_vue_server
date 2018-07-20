@@ -6,8 +6,10 @@ import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
+import parkingos.com.bolink.models.ParkLogTb;
 import parkingos.com.bolink.models.PriceTb;
 import parkingos.com.bolink.service.PriceService;
+import parkingos.com.bolink.service.SaveLogService;
 import parkingos.com.bolink.utils.RequestUtil;
 import parkingos.com.bolink.utils.StringUtils;
 
@@ -23,6 +25,8 @@ public class PriceAction {
 
     @Autowired
     private PriceService priceService;
+    @Autowired
+    private SaveLogService saveLogService;
 
     @RequestMapping(value = "/query")
     public String query(HttpServletRequest request, HttpServletResponse resp){
@@ -37,10 +41,13 @@ public class PriceAction {
 
     @RequestMapping(value = "/add")
     public String createPrice(HttpServletRequest request, HttpServletResponse resp){
+        Long comid = RequestUtil.getLong(request,"comid",-1L);
+        String nickname = StringUtils.decodeUTF8(RequestUtil.getString(request,"nickname1"));
+        Long uin = RequestUtil.getLong(request, "loginuin", -1L);
+
         Long createTime = System.currentTimeMillis()/1000;
         String describe =RequestUtil.getString(request,"describe");
         String carTypeZh =RequestUtil.getString(request,"car_type_zh");
-        Long comid = Long.valueOf(request.getParameter("comid"));
         Long id  = priceService.getId();
         PriceTb priceTb = new PriceTb();
         priceTb.setComid(comid);
@@ -51,6 +58,17 @@ public class PriceAction {
         priceTb.setPriceId(id+"");
 
         JSONObject result = priceService.createPrice(priceTb);
+
+        if((Integer)result.get("state")==1){
+            ParkLogTb parkLogTb = new ParkLogTb();
+            parkLogTb.setOperateUser(nickname);
+            parkLogTb.setOperateTime(System.currentTimeMillis()/1000);
+            parkLogTb.setOperateType(1);
+            parkLogTb.setContent(uin+"("+nickname+")"+"增加了价格"+id);
+            parkLogTb.setType("price");
+            parkLogTb.setParkId(comid);
+            saveLogService.saveLog(parkLogTb);
+        }
         StringUtils.ajaxOutput(resp,result.toJSONString());
         return null;
     }
@@ -58,6 +76,10 @@ public class PriceAction {
 
     @RequestMapping(value = "/edit")
     public String editPrice(HttpServletRequest request, HttpServletResponse resp){
+        Long comid = RequestUtil.getLong(request,"comid",-1L);
+        String nickname = StringUtils.decodeUTF8(RequestUtil.getString(request,"nickname1"));
+        Long uin = RequestUtil.getLong(request, "loginuin", -1L);
+
         Long id = RequestUtil.getLong(request,"id",-1L);
         String describe =RequestUtil.getString(request,"describe");
         String carTypeZh =RequestUtil.getString(request,"car_type_zh");
@@ -70,12 +92,27 @@ public class PriceAction {
         priceTb.setUpdateTime(updateTime);
 
         JSONObject result = priceService.updatePrice(priceTb);
+        if((Integer)result.get("state")==1){
+            ParkLogTb parkLogTb = new ParkLogTb();
+            parkLogTb.setOperateUser(nickname);
+            parkLogTb.setOperateTime(System.currentTimeMillis()/1000);
+            parkLogTb.setOperateType(2);
+            parkLogTb.setContent(uin+"("+nickname+")"+"修改了价格"+id);
+            parkLogTb.setType("price");
+            parkLogTb.setParkId(comid);
+            saveLogService.saveLog(parkLogTb);
+        }
+
         StringUtils.ajaxOutput(resp,result.toJSONString());
         return null;
     }
 
     @RequestMapping(value = "/delete")
     public String deletePrice(HttpServletRequest request, HttpServletResponse resp){
+        Long comid = RequestUtil.getLong(request,"comid",-1L);
+        String nickname = StringUtils.decodeUTF8(RequestUtil.getString(request,"nickname1"));
+        Long uin = RequestUtil.getLong(request, "loginuin", -1L);
+
         Long id = RequestUtil.getLong(request,"id",-1L);
 
         PriceTb priceTb = new PriceTb();
@@ -83,6 +120,16 @@ public class PriceAction {
         priceTb.setIsDelete(1L);
 
         JSONObject result = priceService.deletePrice(priceTb);
+        if((Integer)result.get("state")==1){
+            ParkLogTb parkLogTb = new ParkLogTb();
+            parkLogTb.setOperateUser(nickname);
+            parkLogTb.setOperateTime(System.currentTimeMillis()/1000);
+            parkLogTb.setOperateType(3);
+            parkLogTb.setContent(uin+"("+nickname+")"+"删除了价格"+id);
+            parkLogTb.setType("price");
+            parkLogTb.setParkId(comid);
+            saveLogService.saveLog(parkLogTb);
+        }
         StringUtils.ajaxOutput(resp,result.toJSONString());
         return null;
     }

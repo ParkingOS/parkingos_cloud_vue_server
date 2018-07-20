@@ -7,7 +7,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import parkingos.com.bolink.models.CarTypeTb;
+import parkingos.com.bolink.models.ParkLogTb;
 import parkingos.com.bolink.service.CarTypeService;
+import parkingos.com.bolink.service.SaveLogService;
 import parkingos.com.bolink.utils.RequestUtil;
 import parkingos.com.bolink.utils.StringUtils;
 
@@ -24,6 +26,8 @@ public class CarTypeAction {
 
     @Autowired
     private CarTypeService carTypeService;
+    @Autowired
+    private SaveLogService saveLogService;
 
     @RequestMapping(value = "/query")
     public String query(HttpServletRequest request, HttpServletResponse resp){
@@ -40,6 +44,10 @@ public class CarTypeAction {
     @RequestMapping(value = "/add")
 //    public String add(sting, HttpServletResponse resp){
     public String add(HttpServletRequest request, HttpServletResponse resp){
+        String nickname = StringUtils.decodeUTF8(RequestUtil.getString(request,"nickname1"));
+
+        Long uin = RequestUtil.getLong(request, "loginuin", -1L);
+
         Long comid = RequestUtil.getLong(request,"comid",-1L);
         String name =RequestUtil.getString(request, "name");
         Integer sort = RequestUtil.getInteger(request, "sort", 0);
@@ -56,12 +64,30 @@ public class CarTypeAction {
         carTypeTb.setCartypeId(cartypeId);
 
         JSONObject result = carTypeService.createCarType(carTypeTb);
+
+        if((Integer)result.get("state")==1){
+            ParkLogTb parkLogTb = new ParkLogTb();
+            parkLogTb.setOperateUser(nickname);
+            parkLogTb.setOperateTime(System.currentTimeMillis()/1000);
+            parkLogTb.setOperateType(1);
+            parkLogTb.setContent(uin+"("+nickname+")"+"增加了车型"+id+name);
+            parkLogTb.setType("cartype");
+            parkLogTb.setParkId(comid);
+            saveLogService.saveLog(parkLogTb);
+        }
+
         //把结果返回页面
         StringUtils.ajaxOutput(resp,result.toJSONString());
         return null;
     }
     @RequestMapping(value = "/edit")
     public String edit(HttpServletRequest request, HttpServletResponse resp){
+
+        String nickname = StringUtils.decodeUTF8(RequestUtil.getString(request,"nickname1"));
+
+        Long uin = RequestUtil.getLong(request, "loginuin", -1L);
+
+        Long comid = RequestUtil.getLong(request,"comid",-1L);
 
         String name =RequestUtil.getString(request, "name");
         Integer sort = RequestUtil.getInteger(request, "sort", 0);
@@ -73,6 +99,16 @@ public class CarTypeAction {
         carTypeTb.setSort(sort);
 
         JSONObject result = carTypeService.updateCarType(carTypeTb);
+        if((Integer)result.get("state")==1){
+            ParkLogTb parkLogTb = new ParkLogTb();
+            parkLogTb.setOperateUser(nickname);
+            parkLogTb.setOperateTime(System.currentTimeMillis()/1000);
+            parkLogTb.setOperateType(2);
+            parkLogTb.setContent(uin+"("+nickname+")"+"修改了车型"+id+name);
+            parkLogTb.setType("cartype");
+            parkLogTb.setParkId(comid);
+            saveLogService.saveLog(parkLogTb);
+        }
         //把结果返回页面
         StringUtils.ajaxOutput(resp,result.toJSONString());
         return null;
@@ -80,11 +116,26 @@ public class CarTypeAction {
 
     @RequestMapping(value = "/delete")
     public String delete(HttpServletRequest request, HttpServletResponse resp){
+        String nickname = StringUtils.decodeUTF8(RequestUtil.getString(request,"nickname1"));
+
+        Long uin = RequestUtil.getLong(request, "loginuin", -1L);
+
+        Long comid = RequestUtil.getLong(request,"comid",-1L);
         Long id = RequestUtil.getLong(request,"id",-1L);
         CarTypeTb carTypeTb = new CarTypeTb();
         carTypeTb.setId(id);
         carTypeTb.setIsDelete(1);
         JSONObject result = carTypeService.deleteCarType(carTypeTb);
+        if((Integer)result.get("state")==1){
+            ParkLogTb parkLogTb = new ParkLogTb();
+            parkLogTb.setOperateUser(nickname);
+            parkLogTb.setOperateTime(System.currentTimeMillis()/1000);
+            parkLogTb.setOperateType(3);
+            parkLogTb.setContent(uin+"("+nickname+")"+"删除了车型"+id);
+            parkLogTb.setType("cartype");
+            parkLogTb.setParkId(comid);
+            saveLogService.saveLog(parkLogTb);
+        }
         //把结果返回页面
         StringUtils.ajaxOutput(resp,result.toJSONString());
         return null;

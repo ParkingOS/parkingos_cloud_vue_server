@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 import parkingos.com.bolink.dao.spring.CommonDao;
 import parkingos.com.bolink.models.*;
 import parkingos.com.bolink.service.LoginService;
+import parkingos.com.bolink.service.SaveLogService;
 import parkingos.com.bolink.utils.*;
 
 import java.util.List;
@@ -19,6 +20,8 @@ public class LoginServiceImpl implements LoginService {
 
     @Autowired
     private CommonDao commonDao;
+    @Autowired
+    private SaveLogService saveLogService;
 
 
     @Override
@@ -28,10 +31,11 @@ public class LoginServiceImpl implements LoginService {
         JSONObject user = JSONObject.parseObject("{}");
         result.put("state", true);
 
+        ParkLogTb parkLogTb = new ParkLogTb();
+
         UserInfoTb userInfoTb = new UserInfoTb();
         userInfoTb.setState(0);
         userInfoTb.setPassword(cpasswd);
-        System.out.println("======"+userId+cpasswd);
         if (Check.checkUin(userId)) {
             userInfoTb.setId(Long.valueOf(userId));
         } else {
@@ -39,13 +43,20 @@ public class LoginServiceImpl implements LoginService {
         }
         userInfoTb = (UserInfoTb) commonDao.selectObjectByConditions(userInfoTb);
         if (userInfoTb == null) {
-
             if("admin".equals(userId)){
-                result.put("state", true);
-                result.put("msg", "新建账号");
-                user.put("oid", CustomDefind.getValue("UNIONADMIN"));//开源云之后新建admin账号
-                result.put("user",user);
-                return result;
+                userInfoTb.setPassword(null);
+                userInfoTb = (UserInfoTb) commonDao.selectObjectByConditions(userInfoTb);
+                if(userInfoTb==null){
+                    result.put("state", true);
+                    result.put("msg", "新建账号");
+                    user.put("oid", CustomDefind.getValue("UNIONADMIN"));//开源云之后新建admin账号
+                    result.put("user",user);
+                    return result;
+                }else{
+                    result.put("state", false);
+                    result.put("msg", "账号或密码错误");
+                    return result;
+                }
             }
             result.put("state", false);
             result.put("msg", "账号或密码错误");
@@ -130,6 +141,8 @@ public class LoginServiceImpl implements LoginService {
                             }
                         }
 
+                        parkLogTb.setParkId(userInfoTb.getComid());
+
                         user.put("comid", userInfoTb.getComid());
                         user.put("parkid", userInfoTb.getComid());
                     }
@@ -167,6 +180,7 @@ public class LoginServiceImpl implements LoginService {
                         result.put("msg", "集团不存在！");
                         return result;
                     }else{
+                        parkLogTb.setGroupId(userInfoTb.getGroupid());
                         orgGroupTb=(OrgGroupTb) commonDao.selectObjectByConditions(orgGroupTb);
                         if(orgGroupTb!=null){
                             user.put("name",orgGroupTb.getName());
@@ -337,6 +351,15 @@ public class LoginServiceImpl implements LoginService {
         user.put("userid", userId);
         user.put("lastlogin", System.currentTimeMillis() / 1000);
         result.put("user", user);
+
+        //写日志
+        parkLogTb.setOperateUser(nickname);
+        parkLogTb.setOperateTime(System.currentTimeMillis()/1000);
+        parkLogTb.setOperateType(0);
+        parkLogTb.setContent(userInfoTb.getId()+"("+nickname+")"+"登录了yun平台");
+        parkLogTb.setType("login");
+        saveLogService.saveLog(parkLogTb);
+
         return result;
     }
 
