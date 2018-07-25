@@ -93,11 +93,10 @@
     SELECT
     *
     FROM
-    order_tb
+    ${tableName}
     WHERE
     order_id_local = #{orderIdLocal,jdbcType=VARCHAR}
     AND comid = #{comid,jdbcType=BIGINT}
-    AND MOD (cityid, 10) = #{cityid}%10
     AND ishd = 0
 
   </select>
@@ -108,11 +107,10 @@
   <select id="selectOrders" resultMap="BaseMap" parameterType="parkingos.com.bolink.dao.mybatis.OrderTbExample" >
     select
     *
-    from order_tb
+    from ${tableName}
     <if test="_parameter != null" >
       <include refid="Example_Where_Clause_" />
     </if>
-    AND MOD (cityid, 10) = #{cityid}%10
     <if test="orderByClause != null" >
       order by ${orderByClause} ${orderType}
     </if>
@@ -127,11 +125,11 @@
   <select id="selectOrdersCount" resultType="int" parameterType="parkingos.com.bolink.dao.mybatis.OrderTbExample" >
     select
     count(*)
-    from order_tb
+    from ${tableName}
     <if test="_parameter != null" >
       <include refid="Example_Where_Clause_" />
     </if>
-    AND MOD (cityid, 10) = #{cityid}%10
+
 
   </select>
 

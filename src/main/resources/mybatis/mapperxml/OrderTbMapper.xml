@@ -142,12 +142,11 @@
   <select id="selectMoneyByExample" resultType="map" parameterType="parkingos.com.bolink.dao.mybatis.OrderTbExample" >
     select
       sum(amount_receivable) total,sum(cash_prepay+cash_pay) cashpay,sum(electronic_prepay+electronic_pay) elepay
-    from order_tb
+    from order_tb_new
     <if test="_parameter != null" >
       <include refid="Example_Where_Clause" />
     </if>
-    AND MOD (cityid, 10) = #{cityid}%10
-    limit 20 offset 0
+    AND MOD (cityid, 100) = #{cityid}%100
   </select>
 
 

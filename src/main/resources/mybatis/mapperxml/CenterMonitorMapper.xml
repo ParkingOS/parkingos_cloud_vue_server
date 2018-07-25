@@ -78,7 +78,7 @@
         SELECT
         *
         FROM
-        order_tb
+        ${tableName}
         WHERE
         comid =#{comid,jdbcType=BIGINT}
         AND
@@ -87,7 +87,6 @@
           </foreach>
 
         AND STATE =0
-        AND mod(cityid,10)=#{cityid,jdbcType=BIGINT}%10
         ORDER BY
         create_time DESC
 
@@ -99,12 +98,11 @@
         SELECT
         *
         FROM
-        order_tb
+        ${tableName}
         WHERE
         comid =#{comid,jdbcType=BIGINT}
         AND
         car_number = #{carNumber,jdbcType=VARCHAR}
-        AND mod(cityid,10)=#{cityid,jdbcType=BIGINT}%10
         ORDER BY
         create_time DESC
 
