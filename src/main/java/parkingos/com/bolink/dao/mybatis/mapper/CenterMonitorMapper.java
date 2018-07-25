@@ -13,11 +13,11 @@ public interface CenterMonitorMapper {
 
     Map getPicMap(@Param("eventid")String eventId, @Param("comid")String comid);
 
-    List<Map<String,Object>> getCarByNameLike(@Param("comid") long comid, @Param("carnumlist") List<String> list,@Param("cityid") long cityid);
+    List<Map<String,Object>> getCarByNameLike(@Param("comid") long comid, @Param("carnumlist") List<String> list,@Param("tableName") String tableName);
 
     Map matchPicMap(@Param("orderid")String orderid, @Param("comid")String comid);
 
-    Map getSelectOrder(@Param("comid")long comid, @Param("carNumber")String carNumber,@Param("cityid") long cityid);
+    Map getSelectOrder(@Param("comid")long comid, @Param("carNumber")String carNumber,@Param("tableName") String tableName);
 
     Map getConfirmOrder(@Param("eventid")String event_id, @Param("comid")String comid);
 

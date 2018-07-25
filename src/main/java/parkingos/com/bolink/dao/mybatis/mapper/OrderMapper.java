@@ -6,7 +6,6 @@ import org.apache.ibatis.annotations.Select;
 import parkingos.com.bolink.dao.mybatis.OrderTbExample;
 import parkingos.com.bolink.models.OrderTb;
 
-
 import java.util.List;
 import java.util.Map;
 
@@ -24,5 +23,5 @@ public interface OrderMapper {
 
     int selectOrdersCount(OrderTbExample example);
 
-    List<Map<String,Object>> qryOrdersByComidAndOrderId(@Param("comid") Long comid, @Param("orderIdLocal") String orderIdLocal, @Param("cityid") Long cityid);
+    List<Map<String,Object>> qryOrdersByComidAndOrderId(@Param("comid") Long comid, @Param("orderIdLocal") String orderIdLocal, @Param("tableName") String tableName);
 }

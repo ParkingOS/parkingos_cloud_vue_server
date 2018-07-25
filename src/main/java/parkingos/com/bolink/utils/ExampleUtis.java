@@ -4,8 +4,6 @@ import parkingos.com.bolink.dao.mybatis.OrderTbExample;
 
 import java.math.BigDecimal;
 import java.util.Map;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 /**
  *把map转成生成example 对象
@@ -37,8 +35,9 @@ public class ExampleUtis {
                     }
                     break;
 
-                case "cityid":
-                    example.setCityid(Long.parseLong(reqmap.get("cityid")));
+                case "tableName":
+//                    example.setCityid(Long.parseLong(reqmap.get("cityid")));
+                    example.setTableName(reqmap.get("tableName"));
                     break;
                 case "rp":
                     example.setLimit(Integer.parseInt(reqmap.get("rp")));

@@ -5,6 +5,7 @@ import com.alibaba.fastjson.JSONObject;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import parkingos.com.bolink.dao.mybatis.mapper.OrderMapper;
 import parkingos.com.bolink.dao.spring.CommonDao;
 import parkingos.com.bolink.models.OrderTb;
 import parkingos.com.bolink.service.GroupMonthParkOrderAnlysisService;
@@ -14,7 +15,10 @@ import parkingos.com.bolink.utils.StringUtils;
 import parkingos.com.bolink.utils.TimeTools;
 
 import java.text.SimpleDateFormat;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 @Service
 public class GroupMonthParkOrderanlysisServiceImpl implements GroupMonthParkOrderAnlysisService {
@@ -28,6 +32,8 @@ public class GroupMonthParkOrderanlysisServiceImpl implements GroupMonthParkOrde
 
     @Autowired
     private SupperSearchService<OrderTb> supperSearchService;
+    @Autowired
+    private OrderMapper orderMapper;
 
     @Override
     public JSONObject selectResultByConditions(Map<String, String> reqmap) throws Exception{
@@ -37,6 +43,12 @@ public class GroupMonthParkOrderanlysisServiceImpl implements GroupMonthParkOrde
 
 
         Long groupid = Long.parseLong(reqmap.get("groupid"));
+
+        Long cityid = orderMapper.getCityIdByGroupId(groupid);
+        String tableName = "order_tb_new";
+        if(cityid>-1){
+            tableName += "_"+cityid;
+        }
 
         SimpleDateFormat df2 = new SimpleDateFormat("yyyy-MM");
         String nowtime = df2.format(System.currentTimeMillis());
@@ -70,8 +82,8 @@ public class GroupMonthParkOrderanlysisServiceImpl implements GroupMonthParkOrde
 
         String sql = "select count(*) scount,sum(amount_receivable) amount_receivable, " +
                 "sum(total) total , sum(cash_pay) cash_pay,sum(cash_prepay) cash_prepay, sum(electronic_pay) electronic_pay,sum(electronic_prepay) electronic_prepay, " +
-                "sum(reduce_amount) reduce_pay,to_char(to_timestamp(end_time),'yyyy-MM') e_time from order_tb where groupid="+groupid;
-        String free_sql = "select count(*) scount,sum(amount_receivable-electronic_prepay-cash_prepay-reduce_amount) free_pay,to_char(to_timestamp(end_time),'yyyy-MM') e_time from order_tb where groupid="+groupid;
+                "sum(reduce_amount) reduce_pay,to_char(to_timestamp(end_time),'yyyy-MM') e_time from "+tableName+" where groupid="+groupid;
+        String free_sql = "select count(*) scount,sum(amount_receivable-electronic_prepay-cash_prepay-reduce_amount) free_pay,to_char(to_timestamp(end_time),'yyyy-MM') e_time from "+tableName+" where groupid="+groupid;
 
 //            List parkList = commonMethods.getParks(Long.parseLong(reqmap.get("groupid")));
 //            String preParams  ="";

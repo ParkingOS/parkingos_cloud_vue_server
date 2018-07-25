@@ -6,18 +6,17 @@ import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import parkingos.com.bolink.dao.mybatis.OrderTbExample;
-import parkingos.com.bolink.dao.mybatis.mapper.CityOrderTbMapper;
 import parkingos.com.bolink.dao.mybatis.mapper.OrderMapper;
 import parkingos.com.bolink.dao.mybatis.mapper.OrderTbMapper;
 import parkingos.com.bolink.dao.spring.CommonDao;
-import parkingos.com.bolink.models.*;
-import parkingos.com.bolink.qo.PageOrderConfig;
-import parkingos.com.bolink.qo.SearchBean;
+import parkingos.com.bolink.models.ComInfoTb;
+import parkingos.com.bolink.models.ComPassTb;
+import parkingos.com.bolink.models.OrderTb;
+import parkingos.com.bolink.models.UserInfoTb;
 import parkingos.com.bolink.service.CityOrderService;
 import parkingos.com.bolink.service.SupperSearchService;
 import parkingos.com.bolink.utils.*;
 
-import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -72,7 +71,9 @@ public class CityOrderServiceImpl implements CityOrderService {
         }
 
         if(cityid!=null&&cityid>-1){
-            reqmap.put("cityid",cityid+"");
+            reqmap.put("tableName","order_tb_new_"+cityid);
+        }else{
+            reqmap.put("tableName","order_tb_new");
         }
         String endTime = reqmap.get("end_time");
         logger.error("===>>>endTime"+endTime);
@@ -93,6 +94,7 @@ public class CityOrderServiceImpl implements CityOrderService {
         Map moneymap = new HashMap();
         if(count>0){
             //价格统计不需要分页  要查询所有
+//            logger.info("///////////"+reqmap);
             moneymap = getMoneyMap(reqmap);
                 //带分页的 要显示在页面  的数据list
             if(reqmap.get("export")==null){//不是导出

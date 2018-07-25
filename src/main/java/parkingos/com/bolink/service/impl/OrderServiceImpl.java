@@ -98,7 +98,9 @@ public class OrderServiceImpl implements OrderService {
         }
         logger.info("select city by comid:" + cityid);
         if (cityid != null && cityid > -1) {
-            reqmap.put("cityid", cityid + "");
+            reqmap.put("tableName","order_tb_new_"+cityid);
+        }else{
+            reqmap.put("tableName","order_tb_new");
         }
 
 //        OrderTb orderTb = new OrderTb();
@@ -232,7 +234,13 @@ public class OrderServiceImpl implements OrderService {
 //        if (orderTb != null && orderTb.getCarpicTableName() != null) {
 //            collectionName = orderTb.getCarpicTableName();
 //        }
-        List<Map<String, Object>> list = orderMapper.qryOrdersByComidAndOrderId(comid,orderid,cityid);
+        String tableName = "";
+        if(cityid>-1){
+            tableName = "order_tb_new_"+cityid;
+        }else{
+            tableName="order_tb_new";
+        }
+        List<Map<String, Object>> list = orderMapper.qryOrdersByComidAndOrderId(comid,orderid,tableName);
         if (list != null && list.size() > 0) {
             if (list.get(0).get("carpic_table_name") != null) {
                 collectionName = list.get(0).get("carpic_table_name") + "";

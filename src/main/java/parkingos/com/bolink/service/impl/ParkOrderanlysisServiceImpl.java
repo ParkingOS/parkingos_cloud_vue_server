@@ -50,20 +50,25 @@ public class ParkOrderanlysisServiceImpl implements ParkOrderAnlysisService {
             cityId = orderMapper.getGroupIdByComId(comid);
         }
 
+        String tableName = "order_tb_new";
+        if(cityId>-1){
+            tableName += "_"+cityId;
+        }
+
         String out_uid = reqmap.get("out_uid");
 
         SimpleDateFormat df2 = new SimpleDateFormat("yyyy-MM-dd");
         String nowtime= df2.format(System.currentTimeMillis());
         String sql = "select count(*) scount,sum(amount_receivable) amount_receivable, " +
                 "sum(total) total , sum(cash_pay) cash_pay,sum(cash_prepay) cash_prepay, sum(electronic_pay) electronic_pay,sum(electronic_prepay) electronic_prepay, " +
-                "sum(reduce_amount) reduce_pay,to_char(to_timestamp(end_time),'yyyy-MM-dd') e_time from order_tb where out_uid";
-        String free_sql = "select count(*) scount,sum(amount_receivable-electronic_prepay-cash_prepay-reduce_amount) free_pay,to_char(to_timestamp(end_time),'yyyy-MM-dd') e_time from order_tb where out_uid";
+                "sum(reduce_amount) reduce_pay,to_char(to_timestamp(end_time),'yyyy-MM-dd') e_time from "+tableName+" where out_uid";
+        String free_sql = "select count(*) scount,sum(amount_receivable-electronic_prepay-cash_prepay-reduce_amount) free_pay,to_char(to_timestamp(end_time),'yyyy-MM-dd') e_time from "+tableName+" where out_uid";
         String groupby = " group by to_char(to_timestamp(end_time),'yyyy-MM-dd')";
         if(Check.isNumber(out_uid)){
             sql = "select count(*) scount,sum(amount_receivable) amount_receivable, " +
                     "sum(total) total , sum(cash_pay) cash_pay,sum(cash_prepay) cash_prepay, sum(electronic_pay) electronic_pay,sum(electronic_prepay) electronic_prepay, " +
-                    "sum(reduce_amount) reduce_pay,to_char(to_timestamp(end_time),'yyyy-MM-dd') e_time,out_uid from order_tb where out_uid";
-            free_sql = "select count(*) scount,sum(amount_receivable-electronic_prepay-cash_prepay-reduce_amount) free_pay,to_char(to_timestamp(end_time),'yyyy-MM-dd') e_time,out_uid from order_tb where out_uid";
+                    "sum(reduce_amount) reduce_pay,to_char(to_timestamp(end_time),'yyyy-MM-dd') e_time,out_uid from "+tableName+" where out_uid";
+            free_sql = "select count(*) scount,sum(amount_receivable-electronic_prepay-cash_prepay-reduce_amount) free_pay,to_char(to_timestamp(end_time),'yyyy-MM-dd') e_time,out_uid from "+tableName+" where out_uid";
             groupby = " group by to_char(to_timestamp(end_time),'yyyy-MM-dd'),out_uid";
         }
 
@@ -100,10 +105,6 @@ public class ParkOrderanlysisServiceImpl implements ParkOrderAnlysisService {
         sql +=" and state= 1  and ishd=0 and comid ="+comid;
         free_sql +=" and state= 1 and ishd=0 and comid ="+comid;
 
-        if(cityId!=null&&cityId>-1){
-            sql +=" and mod(cityid,10)="+cityId%10;
-            free_sql +=" and mod(cityid,10)="+cityId%10;
-        }
 
         logger.error("====groupby:"+groupby);
         logger.error("====sql:"+sql);
@@ -178,7 +179,7 @@ public class ParkOrderanlysisServiceImpl implements ParkOrderAnlysisService {
             sumMap.put("free_pay",String.format("%.2f",StringUtils.formatDouble(actFreeMoney)));
             backList.add(sumMap);
         }
-
+        logger.info("========="+backList);
         result.put("rows",JSON.toJSON(backList));
         return result;
 
@@ -257,12 +258,12 @@ public class ParkOrderanlysisServiceImpl implements ParkOrderAnlysisService {
             //总的订单数和总的金额
             String allsql = "select count(*) ordertotal,sum(amount_receivable) amount_receivable, " +
                     "sum(total) total , sum(cash_pay) cash_pay,sum(cash_prepay) cash_prepay, sum(electronic_pay) electronic_pay,sum(electronic_prepay) electronic_prepay, " +
-                    "sum(reduce_amount) reduce_pay from order_tb where end_time between "+start_time+" and  " +
+                    "sum(reduce_amount) reduce_pay from order_tb_new where end_time between "+start_time+" and  " +
                     end_time+" and state= 1 and out_uid = "+uid+" and ishd=? and comid= "+comid;
             alllist = commonDao.getObjectBySql(allsql);
 
             //月卡订单数
-            String monthsql = "select count(*) ordertotal from order_tb where end_time between "+start_time+" and " + end_time +
+            String monthsql = "select count(*) ordertotal from order_tb_new where end_time between "+start_time+" and " + end_time +
                     " and state= 1 and out_uid = "+uid+" and pay_type =3 and ishd=0 and comid="+comid;
             Map monthList = (Map) commonDao.getObjectBySql(monthsql).get(0);
 
@@ -299,7 +300,7 @@ public class ParkOrderanlysisServiceImpl implements ParkOrderAnlysisService {
                 work.put("reduce_pay", StringUtils.formatDouble(oMap.get("reduce_pay")));
             }
             //免费订单集合
-            String freesql = "select sum(amount_receivable-electronic_prepay-cash_prepay-reduce_amount) free_pay from order_tb where end_time between "+start_time+" and ? " +end_time+
+            String freesql = "select sum(amount_receivable-electronic_prepay-cash_prepay-reduce_amount) free_pay from order_tb_new where end_time between "+start_time+" and ? " +end_time+
                     " and state= 1 and out_uid = "+uid+" and pay_type =8 and ishd=0 and comid="+comid;
             Map freelist = (Map)commonDao.getObjectBySql(freesql).get(0);
             //免费支付
@@ -325,11 +326,11 @@ public class ParkOrderanlysisServiceImpl implements ParkOrderAnlysisService {
         JSONObject result = JSONObject.parseObject(str);
 
 
-        String sql = "select *,(amount_receivable-electronic_prepay-cash_prepay-reduce_amount) free_pay from order_tb  ";
+        String sql = "select *,(amount_receivable-electronic_prepay-cash_prepay-reduce_amount) free_pay from order_tb_new  ";
         //统计总订单数，金额，电子和现金支付
         String countsql = "select count(*) ordertotal,sum(amount_receivable) amount_receivable, " +
                 "sum(total) total , sum(cash_prepay) cash_prepay,sum(cash_pay) cash_pay, sum(electronic_pay) electronic_pay," +
-                "sum(electronic_prepay) electronic_prepay,sum(reduce_amount) reduce_pay from order_tb";
+                "sum(electronic_prepay) electronic_prepay,sum(reduce_amount) reduce_pay from order_tb_new";
 
         Long b = TimeTools.getToDayBeginTime();
         Long e = System.currentTimeMillis()/1000;

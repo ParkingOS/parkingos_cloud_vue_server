@@ -12,13 +12,10 @@ import parkingos.com.bolink.models.ComInfoTb;
 import parkingos.com.bolink.models.ComPassTb;
 import parkingos.com.bolink.models.OrderTb;
 import parkingos.com.bolink.models.UserInfoTb;
-import parkingos.com.bolink.qo.PageOrderConfig;
-import parkingos.com.bolink.qo.SearchBean;
 import parkingos.com.bolink.service.CityUnorderService;
 import parkingos.com.bolink.service.SupperSearchService;
 import parkingos.com.bolink.utils.*;
 
-import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -59,7 +56,9 @@ public class CityUnorderServiceImpl implements CityUnorderService {
             cityID = orderMapper.getCityIdByGroupId(groupId);
         }
         if(cityID>-1){
-            reqmap.put("cityid",cityID+"");
+            reqmap.put("tableName","order_tb_new_"+cityID);
+        }else{
+            reqmap.put("tableName","order_tb_new");
         }
 
 

@@ -9,7 +9,6 @@ import parkingos.com.bolink.dao.mybatis.mapper.OrderMapper;
 import parkingos.com.bolink.dao.spring.CommonDao;
 import parkingos.com.bolink.models.OrderTb;
 import parkingos.com.bolink.service.CityOrderAnlysisService;
-import parkingos.com.bolink.service.CityParkOrderAnlysisService;
 import parkingos.com.bolink.service.SupperSearchService;
 import parkingos.com.bolink.utils.Check;
 import parkingos.com.bolink.utils.StringUtils;
@@ -42,23 +41,28 @@ public class CityOrderanlysisServiceImpl implements CityOrderAnlysisService {
         JSONObject result = JSONObject.parseObject(str);
 
         String comidStr = reqmap.get("comid_start");
+        Long groupid = Long.parseLong(reqmap.get("groupid"));
+        Long cityid=orderMapper.getCityIdByGroupId(groupid);
+        String tableName = "order_tb_new";
+        if(cityid>-1){
+            tableName +="_"+cityid;
+        }
 
         SimpleDateFormat df2 = new SimpleDateFormat("yyyy-MM-dd");
         String nowtime= df2.format(System.currentTimeMillis());
         String sql = "select count(*) scount,sum(amount_receivable) amount_receivable, " +
                 "sum(total) total , sum(cash_pay) cash_pay,sum(cash_prepay) cash_prepay, sum(electronic_pay) electronic_pay,sum(electronic_prepay) electronic_prepay, " +
-                "sum(reduce_amount) reduce_pay,to_char(to_timestamp(end_time),'yyyy-MM-dd') e_time from order_tb where ";
-        String free_sql = "select count(*) scount,sum(amount_receivable-electronic_prepay-cash_prepay-reduce_amount) free_pay,to_char(to_timestamp(end_time),'yyyy-MM-dd') e_time from order_tb where ";
+                "sum(reduce_amount) reduce_pay,to_char(to_timestamp(end_time),'yyyy-MM-dd') e_time from "+tableName+" where ";
+        String free_sql = "select count(*) scount,sum(amount_receivable-electronic_prepay-cash_prepay-reduce_amount) free_pay,to_char(to_timestamp(end_time),'yyyy-MM-dd') e_time from "+tableName+" where ";
         String groupby = " group by to_char(to_timestamp(end_time),'yyyy-MM-dd')";
         if(Check.isNumber(comidStr)){
             sql = "select count(*) scount,sum(amount_receivable) amount_receivable, " +
                     "sum(total) total , sum(cash_pay) cash_pay,sum(cash_prepay) cash_prepay, sum(electronic_pay) electronic_pay,sum(electronic_prepay) electronic_prepay, " +
-                    "sum(reduce_amount) reduce_pay,to_char(to_timestamp(end_time),'yyyy-MM-dd') e_time,comid from order_tb where ";
-            free_sql = "select count(*) scount,sum(amount_receivable-electronic_prepay-cash_prepay-reduce_amount) free_pay,to_char(to_timestamp(end_time),'yyyy-MM-dd') e_time,comid from order_tb where ";
+                    "sum(reduce_amount) reduce_pay,to_char(to_timestamp(end_time),'yyyy-MM-dd') e_time,comid from "+tableName+" where ";
+            free_sql = "select count(*) scount,sum(amount_receivable-electronic_prepay-cash_prepay-reduce_amount) free_pay,to_char(to_timestamp(end_time),'yyyy-MM-dd') e_time,comid from "+tableName+" where ";
             groupby = " group by to_char(to_timestamp(end_time),'yyyy-MM-dd'),comid";
         }
-        Long groupid = Long.parseLong(reqmap.get("groupid"));
-        Long cityid=orderMapper.getCityIdByGroupId(groupid);
+
         if(Check.isNumber(comidStr)){
             sql +="comid = "+Long.parseLong(comidStr)+" and end_time ";
             free_sql +="comid = "+Long.parseLong(comidStr)+" and end_time ";
@@ -89,8 +93,8 @@ public class CityOrderanlysisServiceImpl implements CityOrderAnlysisService {
 
         sql +=" between "+btime+" and "+etime;
         free_sql +=" between "+btime+" and "+etime;
-        sql +=" and state= 1 and out_uid > -1 and ishd=0 and mod(cityid,10)="+cityid%10;
-        free_sql +=" and state= 1 and out_uid >-1 and ishd=0 and mod(cityid,10)="+cityid%10;
+        sql +=" and state= 1 and out_uid > -1 and ishd=0 ";
+        free_sql +=" and state= 1 and out_uid >-1 and ishd=0 ";
 
 
         logger.error("====groupby:"+groupby);

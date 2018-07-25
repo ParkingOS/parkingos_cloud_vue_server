@@ -199,7 +199,6 @@ public class GetDataAction {
         if(comid==null||"".equals(comid)){
             return null;
         }
-        System.out.println("是不是支持叠加用券=====comid:"+comid);
         String result = getDataService.getSuperimposed(comid);
         StringUtils.ajaxOutput(resp,result);
         return null;

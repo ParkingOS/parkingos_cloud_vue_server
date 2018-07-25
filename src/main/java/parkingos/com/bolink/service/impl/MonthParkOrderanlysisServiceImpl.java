@@ -14,8 +14,10 @@ import parkingos.com.bolink.utils.Check;
 import parkingos.com.bolink.utils.StringUtils;
 import parkingos.com.bolink.utils.TimeTools;
 
-import java.text.SimpleDateFormat;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 @Service
 public class MonthParkOrderanlysisServiceImpl implements MonthParkOrderAnlysisService {
@@ -46,7 +48,10 @@ public class MonthParkOrderanlysisServiceImpl implements MonthParkOrderAnlysisSe
         }else {
             cityid = orderMapper.getCityIdByComId(comid);
         }
-
+        String tableName = "order_tb_new";
+        if(cityid>-1){
+            tableName += "_"+cityid;
+        }
         String btime = reqmap.get("btime");
         String etime = reqmap.get("etime");
         Long b= null;
@@ -83,12 +88,12 @@ public class MonthParkOrderanlysisServiceImpl implements MonthParkOrderAnlysisSe
 
             String sql = "select count(*) scount,sum(amount_receivable) amount_receivable, " +
                     "sum(total) total , sum(cash_pay) cash_pay,sum(cash_prepay) cash_prepay, sum(electronic_pay) electronic_pay,sum(electronic_prepay) electronic_prepay, " +
-                    "sum(reduce_amount) reduce_pay,to_char(to_timestamp(end_time),'yyyy-MM') e_time from order_tb  ";
-            String free_sql = "select count(*) scount,sum(amount_receivable-electronic_prepay-cash_prepay-reduce_amount) free_pay,to_char(to_timestamp(end_time),'yyyy-MM') e_time from order_tb";
+                    "sum(reduce_amount) reduce_pay,to_char(to_timestamp(end_time),'yyyy-MM') e_time from "+tableName;
+            String free_sql = "select count(*) scount,sum(amount_receivable-electronic_prepay-cash_prepay-reduce_amount) free_pay,to_char(to_timestamp(end_time),'yyyy-MM') e_time from "+tableName;
 
 
-            sql += " where end_time between "+ b + " and "+e +" and comid="+comid+" and state= 1 and out_uid> -1 and ishd=0 and mod(cityid,10)="+cityid%10+" group by e_time limit 12";
-            free_sql += " where end_time between "+ b + " and "+e+" and comid="+comid+" and state= 1 and out_uid> -1 and ishd=0 and pay_type=8 and mod(cityid,10)="+cityid%10+" group by e_time limit 12";
+            sql += " where end_time between "+ b + " and "+e +" and comid="+comid+" and state= 1 and out_uid> -1 and ishd=0  group by e_time order by e_time limit 12";
+            free_sql += " where end_time between "+ b + " and "+e+" and comid="+comid+" and state= 1 and out_uid> -1 and ishd=0 and pay_type=8  group by e_time order by  e_time limit 12  ";
 
 
             //总订单集合
