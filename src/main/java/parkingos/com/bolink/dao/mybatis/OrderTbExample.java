@@ -7,9 +7,71 @@ import java.util.List;
 public class OrderTbExample {
     protected String orderByClause;
 
+    @Override
+    public String toString() {
+        return "OrderTbExample{" +
+                "orderByClause='" + orderByClause + '\'' +
+                ", distinct=" + distinct +
+                ", orderType='" + orderType + '\'' +
+                ", limit=" + limit +
+                ", offset=" + offset +
+                ", cityid=" + cityid +
+                '}';
+    }
+
     protected boolean distinct;
 
     protected List<Criteria> oredCriteria;
+
+    private String orderType = "desc";
+
+    private Integer limit ;
+
+    private Integer offset;
+
+    private Long cityid;
+
+    public String getTableName() {
+        return tableName;
+    }
+
+    public void setTableName(String tableName) {
+        this.tableName = tableName;
+    }
+
+    private String tableName;
+
+    public Long getCityid() {
+        return cityid;
+    }
+
+    public void setCityid(Long cityid) {
+        this.cityid = cityid;
+    }
+
+    public String getOrderType() {
+        return orderType;
+    }
+
+    public void setOrderType(String orderType) {
+        this.orderType = orderType;
+    }
+
+    public Integer getLimit() {
+        return limit;
+    }
+
+    public void setLimit(Integer limit) {
+        this.limit = limit;
+    }
+
+    public Integer getOffset() {
+        return offset;
+    }
+
+    public void setOffset(Integer offset) {
+        this.offset = offset;
+    }
 
     public OrderTbExample() {
         oredCriteria = new ArrayList<Criteria>();
@@ -816,7 +878,7 @@ public class OrderTbExample {
         }
 
         public Criteria andCarNumberLike(String value) {
-            addCriterion("car_number like", value, "carNumber");
+            addCriterion("car_number like", "%"+value+"%", "carNumber");
             return (Criteria) this;
         }
 

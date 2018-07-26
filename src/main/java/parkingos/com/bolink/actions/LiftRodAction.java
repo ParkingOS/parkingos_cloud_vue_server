@@ -60,6 +60,7 @@ public class LiftRodAction {
         if (content.length == 0) {
             //测试用  之后读配置文件
             response.sendRedirect(CustomDefind.IMAGEURL+"/images/nopic.jpg");
+//            response.sendRedirect("http://120.25.121.204:8080/cloud/images/nopic.jpg");
             return null;
         } else {
             response.setDateHeader("Expires", System.currentTimeMillis() + 12 * 60 * 60 * 1000);
@@ -86,8 +87,10 @@ public class LiftRodAction {
 
         Map<String, String> reqParameterMap = RequestUtil.readBodyFormRequset(request);
 
+//        String [] heards = new String[]{"编号","抬杆编号","时间","收费员","通道","原因","备注"};
         String [][] heards = new String[][]{{"编号","STR"},{"抬杆编号","STR"},{"时间","STR"},{"收费员","STR"},{"通道","STR"},{"原因","STR"},{"备注","STR"}};
         //获取要到处的数据
+//        List<List<String>> bodyList = liftRodService.exportExcel(reqParameterMap);
         List<List<Object>> bodyList = liftRodService.exportExcel(reqParameterMap);
 
         ExportDataExcel excel = new ExportDataExcel("抬杆记录", heards, "sheet1");

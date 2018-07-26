@@ -5,16 +5,15 @@ import com.alibaba.fastjson.JSONObject;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import parkingos.com.bolink.dao.mybatis.mapper.OrderMapper;
 import parkingos.com.bolink.dao.spring.CommonDao;
 import parkingos.com.bolink.models.OrderTb;
 import parkingos.com.bolink.service.ParkCollectorOrderAnlysisService;
-import parkingos.com.bolink.service.ParkOrderAnlysisService;
 import parkingos.com.bolink.service.SupperSearchService;
 import parkingos.com.bolink.utils.Check;
 import parkingos.com.bolink.utils.StringUtils;
 import parkingos.com.bolink.utils.TimeTools;
 
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -27,6 +26,8 @@ public class ParkCollectorOrderanlysisServiceImpl implements ParkCollectorOrderA
 
     @Autowired
     private CommonDao commonDao;
+    @Autowired
+    private OrderMapper orderMapper;
 
     @Autowired
     private SupperSearchService<OrderTb> supperSearchService;
@@ -39,6 +40,18 @@ public class ParkCollectorOrderanlysisServiceImpl implements ParkCollectorOrderA
 
         Long comid = Long.parseLong(reqmap.get("comid"));
 
+        Long groupId = orderMapper.getGroupIdByComId(comid);
+        Long cityId = -1L;
+        if(groupId!=null&&groupId>-1){
+            cityId = orderMapper.getCityIdByGroupId(groupId);
+        }else{
+            cityId = orderMapper.getGroupIdByComId(comid);
+        }
+        String tableName = "order_tb_new";
+        if(cityId>-1){
+            tableName = "order_tb_new_"+cityId;
+        }
+
         String date = reqmap.get("date");
         Long start = null;
         if(date==null||"".equals(date)){
@@ -49,8 +62,8 @@ public class ParkCollectorOrderanlysisServiceImpl implements ParkCollectorOrderA
         Long end = start+24*60*60;
         String sql = "select count(*) scount,sum(amount_receivable) amount_receivable, " +
                 "sum(total) total , sum(cash_pay) cash_pay,sum(cash_prepay) cash_prepay, sum(electronic_pay) electronic_pay,sum(electronic_prepay) electronic_prepay, " +
-                "sum(reduce_amount) reduce_pay,out_uid from order_tb where end_time between " + start + " and " + end;
-        String free_sql = "select count(*) scount,sum(amount_receivable-electronic_prepay-cash_prepay-reduce_amount) free_pay,out_uid  from order_tb where end_time between "+ start + " and " + end;
+                "sum(reduce_amount) reduce_pay,out_uid from "+tableName+" where end_time between " + start + " and " + end;
+        String free_sql = "select count(*) scount,sum(amount_receivable-electronic_prepay-cash_prepay-reduce_amount) free_pay,out_uid  from "+tableName+" where end_time between "+ start + " and " + end;
         String groupby = " group by out_uid";
 
         String outUid = reqmap.get("out_uid");
@@ -65,6 +78,11 @@ public class ParkCollectorOrderanlysisServiceImpl implements ParkCollectorOrderA
             sql +=" and out_uid="+outUid+" and state= 1  and ishd=0 and comid ="+comid;
             free_sql +=" and out_uid="+outUid+" and state= 1 and ishd=0 and comid ="+comid;
         }
+
+//        if(cityId!=null&&cityId>-1){
+//            sql +=" and mod(cityid,100)="+cityId%100;
+//            free_sql +=" and mod(cityid,100)="+cityId%100;
+//        }
 
 
 

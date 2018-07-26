@@ -5,10 +5,10 @@ import com.alibaba.fastjson.JSONObject;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import parkingos.com.bolink.dao.mybatis.mapper.OrderMapper;
 import parkingos.com.bolink.dao.spring.CommonDao;
 import parkingos.com.bolink.models.OrderTb;
 import parkingos.com.bolink.service.CityOrderAnlysisService;
-import parkingos.com.bolink.service.CityParkOrderAnlysisService;
 import parkingos.com.bolink.service.SupperSearchService;
 import parkingos.com.bolink.utils.Check;
 import parkingos.com.bolink.utils.StringUtils;
@@ -29,9 +29,10 @@ public class CityOrderanlysisServiceImpl implements CityOrderAnlysisService {
     private CommonDao commonDao;
     @Autowired
     private CommonMethods commonMethods;
-
     @Autowired
     private SupperSearchService<OrderTb> supperSearchService;
+    @Autowired
+    private OrderMapper orderMapper;
 
     @Override
     public JSONObject selectResultByConditions(Map<String, String> reqmap) {
@@ -40,41 +41,34 @@ public class CityOrderanlysisServiceImpl implements CityOrderAnlysisService {
         JSONObject result = JSONObject.parseObject(str);
 
         String comidStr = reqmap.get("comid_start");
-        System.out.println("CityParkOrderanlysis>>>>comidStr:"+comidStr);
+        Long groupid = Long.parseLong(reqmap.get("groupid"));
+        Long cityid=orderMapper.getCityIdByGroupId(groupid);
+        String tableName = "order_tb_new";
+        if(cityid>-1){
+            tableName +="_"+cityid;
+        }
 
         SimpleDateFormat df2 = new SimpleDateFormat("yyyy-MM-dd");
         String nowtime= df2.format(System.currentTimeMillis());
         String sql = "select count(*) scount,sum(amount_receivable) amount_receivable, " +
                 "sum(total) total , sum(cash_pay) cash_pay,sum(cash_prepay) cash_prepay, sum(electronic_pay) electronic_pay,sum(electronic_prepay) electronic_prepay, " +
-                "sum(reduce_amount) reduce_pay,to_char(to_timestamp(end_time),'yyyy-MM-dd') e_time from order_tb where comid";
-        String free_sql = "select count(*) scount,sum(amount_receivable-electronic_prepay-cash_prepay-reduce_amount) free_pay,to_char(to_timestamp(end_time),'yyyy-MM-dd') e_time from order_tb where comid";
+                "sum(reduce_amount) reduce_pay,to_char(to_timestamp(end_time),'yyyy-MM-dd') e_time from "+tableName+" where ";
+        String free_sql = "select count(*) scount,sum(amount_receivable-electronic_prepay-cash_prepay-reduce_amount) free_pay,to_char(to_timestamp(end_time),'yyyy-MM-dd') e_time from "+tableName+" where ";
         String groupby = " group by to_char(to_timestamp(end_time),'yyyy-MM-dd')";
         if(Check.isNumber(comidStr)){
             sql = "select count(*) scount,sum(amount_receivable) amount_receivable, " +
                     "sum(total) total , sum(cash_pay) cash_pay,sum(cash_prepay) cash_prepay, sum(electronic_pay) electronic_pay,sum(electronic_prepay) electronic_prepay, " +
-                    "sum(reduce_amount) reduce_pay,to_char(to_timestamp(end_time),'yyyy-MM-dd') e_time,comid from order_tb where comid";
-            free_sql = "select count(*) scount,sum(amount_receivable-electronic_prepay-cash_prepay-reduce_amount) free_pay,to_char(to_timestamp(end_time),'yyyy-MM-dd') e_time,comid from order_tb where comid";
+                    "sum(reduce_amount) reduce_pay,to_char(to_timestamp(end_time),'yyyy-MM-dd') e_time,comid from "+tableName+" where ";
+            free_sql = "select count(*) scount,sum(amount_receivable-electronic_prepay-cash_prepay-reduce_amount) free_pay,to_char(to_timestamp(end_time),'yyyy-MM-dd') e_time,comid from "+tableName+" where ";
             groupby = " group by to_char(to_timestamp(end_time),'yyyy-MM-dd'),comid";
         }
 
         if(Check.isNumber(comidStr)){
-            sql +=" = "+Long.parseLong(comidStr)+" and end_time ";
-            free_sql +=" = "+Long.parseLong(comidStr)+" and end_time ";
+            sql +="comid = "+Long.parseLong(comidStr)+" and end_time ";
+            free_sql +="comid = "+Long.parseLong(comidStr)+" and end_time ";
         }else {
-            List parkList = commonMethods.getParks(Long.parseLong(reqmap.get("groupid")));
-            String preParams  ="";
-            if(parkList!=null&&!parkList.isEmpty()){
-                for(Object parkid : parkList){
-                    if(preParams.equals(""))
-                        preParams =parkid+"";
-                    else
-                        preParams += ","+parkid;
-                }
-                sql +=" in (" +preParams+" )  and end_time  ";
-                free_sql +=" in ( "+preParams+" )  and end_time  ";
-            }else{
-                return result;
-            }
+            sql +="groupid = "+groupid+" and end_time ";
+            free_sql +="groupid = "+groupid+" and end_time ";
         }
 
 
@@ -88,46 +82,14 @@ public class CityOrderanlysisServiceImpl implements CityOrderAnlysisService {
             etime =TimeTools.getToDayBeginTime()+86399;
         }else {
             String[] dateArr = date.split("至");
-            System.out.println("陈博文"+dateArr.length);
             String start =dateArr[0];
             String end = dateArr[1];
             btime = TimeTools.getLongMilliSecondFrom_HHMMDDHHmmss(start);
             etime = TimeTools.getLongMilliSecondFrom_HHMMDDHHmmss(end);
         }
-//        if(date!=null&&!Check.isEmpty(date)){
-//            String start = reqmap.get("time_start");//RequestUtil.getString(request, "ctime_start");
-//            String end = reqmap.get("time_end");//RequestUtil.getString(request, "ctime_end");
-//            System.out.println("默认开始时间:"+start+"默认结束时间:"+end);
-//            if("3".equals(date)&&Check.isEmpty(start)&&Check.isEmpty(end)){
-//                date="between";
-//            }else{
-//                btime = Check.isLong(start)?Long.valueOf(start)/1000:TimeTools.getToDayBeginTime();
-//                etime = Check.isLong(end)?Long.valueOf(end)/1000:TimeTools.getToDayBeginTime();
-//            }
-//
-//        }
+
         logger.info("=====>>>>>>btime="+btime+"=====>>>etime="+etime);
 
-//        if("between".equals(date)){
-//            sql +=" between "+btime+" and "+etime;
-//            free_sql +=" between "+btime+" and "+etime;
-//
-//        }else if("1".equals(date)){
-//            sql +=" >= "+btime;
-//            free_sql +=" >= "+btime;
-//        }else if("2".equals(date)){
-//            sql +=" <= "+etime;
-//            free_sql +=" <= "+etime;
-//        }else if("3".equals(date)){
-////            String stime = TimeTools.getTimeStr_yyyy_MM_dd(btime*1000);
-////            btime = TimeTools.getStrDateToSecond(stime+" 00:00:00");
-//            logger.info(btime);
-//            sql +=" = "+btime;
-//            free_sql +=" = "+btime;
-//        }else {
-//            sql +=" between "+btime+" and "+etime;
-//            free_sql +=" between "+btime+" and "+etime;
-//        }
 
         sql +=" between "+btime+" and "+etime;
         free_sql +=" between "+btime+" and "+etime;
@@ -187,7 +149,6 @@ public class CityOrderanlysisServiceImpl implements CityOrderAnlysisService {
                         if(freeOrder.get("e_time").equals(totalOrder.get("e_time"))){
                             double freePay = StringUtils.formatDouble(Double.parseDouble((freeOrder.get("free_pay") == null ? "0.00" : freeOrder.get("free_pay") + "")));
                             actFreePay = freePay+reduceAmount;
-                            logger.error("========>>>>actFreePay"+actFreePay);
                         }
                     }
                 }

@@ -33,7 +33,7 @@ public class ParkOrderanlysisAction {
     private SaveLogService saveLogService;
 
     /*
-    * 查询统计
+    * 车场统计分析  车场日报
     *
     * */
     @RequestMapping(value = "/query")

@@ -3,34 +3,19 @@ package parkingos.com.bolink.actions;
 
 import com.alibaba.fastjson.JSONObject;
 import org.apache.log4j.Logger;
-import org.apache.poi.hssf.usermodel.HSSFClientAnchor;
-import org.apache.poi.hssf.usermodel.HSSFPatriarch;
-import org.apache.poi.hssf.usermodel.HSSFSheet;
-import org.apache.poi.hssf.usermodel.HSSFWorkbook;
-import org.apache.poi.hssf.util.HSSFColor;
-import org.apache.poi.ss.usermodel.Cell;
-import org.apache.poi.ss.usermodel.CellStyle;
-import org.apache.poi.ss.usermodel.Font;
-import org.apache.poi.ss.usermodel.Row;
-import org.apache.poi.ss.util.CellRangeAddress;
-import org.joda.time.LocalDate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import parkingos.com.bolink.service.CenterMonitorService;
-import parkingos.com.bolink.service.CityLogService;
-import parkingos.com.bolink.service.GetParkInfoService;
-import parkingos.com.bolink.utils.*;
-import parkingos.com.bolink.utils.payutils.HttpUtil;
+import parkingos.com.bolink.utils.RequestUtil;
+import parkingos.com.bolink.utils.StringUtils;
 
-import javax.imageio.ImageIO;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.awt.image.BufferedImage;
 import java.io.*;
 import java.net.URLDecoder;
-import java.net.URLEncoder;
-import java.util.*;
+import java.util.Date;
+import java.util.Map;
 
 @Controller
 @RequestMapping("/centermonitor")
@@ -163,9 +148,9 @@ public class CenterMonitorAction {
 
         String orderId = RequestUtil.getString(request, "order_id");
         String carNumber =  StringUtils.decodeUTF8(RequestUtil.getString(request, "car_number"));
-        String channel_id = RequestUtil.getString(request, "channel_id");
-        String event_id = RequestUtil.getString(request, "event_id");
-        String comid = URLDecoder.decode(RequestUtil.getString(request, "comid"), "UTF-8");
+        String channel_id = StringUtils.decodeUTF8(RequestUtil.getString(request, "channel_id"));
+        String event_id = StringUtils.decodeUTF8(RequestUtil.getString(request, "event_id"));
+        String comid = RequestUtil.getString(request, "comid");
 
         logger.error("确认订单通知车场" + "~~~" + orderId + "~~~" + carNumber + "~~~" + channel_id + "~~~" + event_id + "~~~" + comid);
 

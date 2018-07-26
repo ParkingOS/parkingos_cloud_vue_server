@@ -5,6 +5,7 @@ import com.alibaba.fastjson.JSONObject;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import parkingos.com.bolink.dao.mybatis.mapper.OrderMapper;
 import parkingos.com.bolink.dao.spring.CommonDao;
 import parkingos.com.bolink.models.OrderTb;
 import parkingos.com.bolink.service.CityParkOrderAnlysisService;
@@ -28,6 +29,8 @@ public class CityParkOrderanlysisServiceImpl implements CityParkOrderAnlysisServ
     private CommonDao commonDao;
     @Autowired
     private CommonMethods commonMethods;
+    @Autowired
+    private OrderMapper orderMapper;
 
     @Autowired
     private SupperSearchService<OrderTb> supperSearchService;
@@ -40,37 +43,31 @@ public class CityParkOrderanlysisServiceImpl implements CityParkOrderAnlysisServ
 
         String comidStr = reqmap.get("comid_start");
 
+        Long groupid = Long.parseLong(reqmap.get("groupid"));
+        Long cityid=orderMapper.getCityIdByGroupId(groupid);
+        logger.info("select cityid result:"+cityid);
+
+        String tableName = "order_tb_new";
+        if(cityid>-1){
+            tableName += "_"+cityid;
+        }
 
         SimpleDateFormat df2 = new SimpleDateFormat("yyyy-MM-dd");
         String nowtime= df2.format(System.currentTimeMillis());
         String sql = "select count(*) scount,sum(amount_receivable) amount_receivable, " +
                 "sum(total) total , sum(cash_pay) cash_pay,sum(cash_prepay) cash_prepay, sum(electronic_pay) electronic_pay,sum(electronic_prepay) electronic_prepay, " +
-                "sum(reduce_amount) reduce_pay,comid from order_tb where comid";
-        String free_sql = "select count(*) scount,sum(amount_receivable-electronic_prepay-cash_prepay-reduce_amount) free_pay,comid from order_tb where comid";
+                "sum(reduce_amount) reduce_pay,comid from "+tableName+" where";
+        String free_sql = "select count(*) scount,sum(amount_receivable-electronic_prepay-cash_prepay-reduce_amount) free_pay,comid from "+tableName+" where";
         String groupby = " group by comid";
 
 
-
         if(Check.isNumber(comidStr)){
-            sql +=" = "+Long.parseLong(comidStr)+" and end_time ";
-            free_sql +=" = "+Long.parseLong(comidStr)+" and end_time ";
+            sql +=" comid = "+Long.parseLong(comidStr)+" and end_time ";
+            free_sql +=" comid = "+Long.parseLong(comidStr)+" and end_time ";
         }else {
-            List parkList = commonMethods.getParks(Long.parseLong(reqmap.get("groupid")));
-            String preParams  ="";
-            if(parkList!=null&&!parkList.isEmpty()){
-                for(Object parkid : parkList){
-                    if(preParams.equals(""))
-                        preParams =parkid+"";
-                    else
-                        preParams += ","+parkid;
-                }
-                sql +=" in (" +preParams+" )  and end_time  ";
-                free_sql +=" in ( "+preParams+" )  and end_time  ";
-            }else{
-                return result;
-            }
+            sql +=" groupid = "+groupid+" and end_time ";
+            free_sql +=" groupid = "+groupid+" and end_time ";
         }
-
 
         String date = StringUtils.decodeUTF8(StringUtils.decodeUTF8(reqmap.get("date")));
 
@@ -86,7 +83,6 @@ public class CityParkOrderanlysisServiceImpl implements CityParkOrderAnlysisServ
         etime =btime+86399;
 
         logger.info("=====>>>>>>btime="+btime+"=====>>>etime="+etime);
-
 
         sql +=" between "+btime+" and "+etime;
         free_sql +=" between "+btime+" and "+etime;

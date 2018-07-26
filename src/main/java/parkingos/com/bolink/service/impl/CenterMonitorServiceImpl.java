@@ -14,24 +14,24 @@ import org.directwebremoting.ScriptSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import parkingos.com.bolink.dao.mybatis.mapper.CenterMonitorMapper;
+import parkingos.com.bolink.dao.mybatis.mapper.OrderMapper;
 import parkingos.com.bolink.dao.mybatis.mapper.ParkInfoMapper;
 import parkingos.com.bolink.dao.spring.CommonDao;
 import parkingos.com.bolink.dwr.DWRScriptSessionListener;
 import parkingos.com.bolink.dwr.Push;
-import parkingos.com.bolink.enums.FieldOperator;
-import parkingos.com.bolink.models.LiftRodTb;
 import parkingos.com.bolink.models.LiftrodInfoTb;
-import parkingos.com.bolink.models.ParkLogTb;
-import parkingos.com.bolink.qo.PageOrderConfig;
-import parkingos.com.bolink.qo.SearchBean;
-import parkingos.com.bolink.service.*;
+import parkingos.com.bolink.service.CenterMonitorService;
+import parkingos.com.bolink.service.CityParkOrderAnlysisService;
+import parkingos.com.bolink.service.ParkOrderAnlysisService;
 import parkingos.com.bolink.utils.*;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.*;
+import java.io.ByteArrayInputStream;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.InputStream;
 import java.net.InetAddress;
-import java.net.URLEncoder;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -51,6 +51,8 @@ public class CenterMonitorServiceImpl implements CenterMonitorService {
     private CityParkOrderAnlysisService cityParkOrderanlysisService;
     @Autowired
     private ParkOrderAnlysisService parkOrderanlysisService;
+    @Autowired
+    private OrderMapper orderMapper;
     DecimalFormat af1 = new DecimalFormat("0");
 
     private Gson gson = new GsonBuilder().setDateFormat("yyyy-MM-dd HH:mm:ss").create();
@@ -73,7 +75,13 @@ public class CenterMonitorServiceImpl implements CenterMonitorService {
         Map<String, Object> videoMap = new HashMap<String, Object>();//需要返回的播放列表
         List<Map<String, Object>> list =new ArrayList<>();
         if (groupid > 0) {
+            Long cityid = orderMapper.getCityIdByGroupId(groupid);
             //获取今日电子支付，现金支付，减免金额的统计
+            String tableName = "order_tb_new";
+            if(cityid>-1){
+                tableName+= "_"+cityid;
+            }
+
             Map<String, String> parammap = new HashMap<String, String>();
             parammap.put("groupid", groupid + "");
             String todyyymmdd = TimeTools.getDate_YY_MM_DD();
@@ -105,9 +113,9 @@ public class CenterMonitorServiceImpl implements CenterMonitorService {
             totalIncomemap.put("freePay", af1.format(freePay));
 
             //获取车辆进场，离场，在场的数量统计
-            int inCars = parkInfoMapper.getEntryCount(tday, groupid.intValue());
-            int outCars = parkInfoMapper.getExitCount(tday, groupid.intValue());
-            int inPark = parkInfoMapper.getInparkCount(tday, groupid.intValue());
+            int inCars = parkInfoMapper.getEntryCount(tday, groupid.intValue(),tableName);
+            int outCars = parkInfoMapper.getExitCount(tday, groupid.intValue(),tableName);
+            int inPark = parkInfoMapper.getInparkCount(tday, groupid.intValue(),tableName);
             countMap = new HashMap<String, Object>();
             countMap.put("inCars", inCars);
             countMap.put("outCars", outCars);
@@ -143,7 +151,17 @@ public class CenterMonitorServiceImpl implements CenterMonitorService {
 
         } else if (comid > 0) {
 
-
+            Long cityid=-1L;
+            Long groupId = orderMapper.getGroupIdByComId(comid);
+            if(groupId!=null&&groupId>-1){
+                cityid = orderMapper.getCityIdByGroupId(groupId);
+            }else {
+                cityid = orderMapper.getCityIdByComId(comid);
+            }
+            String tableName = "order_tb_new";
+            if(cityid>-1){
+                tableName+="_"+cityid;
+            }
             //获取今日电子支付，现金支付，减免金额的统计
             Map<String, String> parammap = new HashMap<String, String>();
             parammap.put("comid", comid + "");
@@ -176,9 +194,10 @@ public class CenterMonitorServiceImpl implements CenterMonitorService {
 
 
             //获取车辆进场，离场，在场的数量统计
-            int inCars = parkInfoMapper.getEntryCountbc(tday, comid.intValue());
-            int outCars = parkInfoMapper.getExitCountbc(tday, comid.intValue());
-            int inPark = parkInfoMapper.getInparkCountbc(tday, comid.intValue());
+            logger.error("centermonitor 189 cityid:"+cityid+"~~comid:"+comid+"tday");
+            int inCars = parkInfoMapper.getEntryCountbc(tday, comid.intValue(),tableName);
+            int outCars = parkInfoMapper.getExitCountbc(tday, comid.intValue(),tableName);
+            int inPark = parkInfoMapper.getInparkCountbc(tday, comid.intValue(),tableName);
             countMap = new HashMap<String, Object>();
             countMap.put("inCars", inCars);
             countMap.put("outCars", outCars);
@@ -355,8 +374,18 @@ public class CenterMonitorServiceImpl implements CenterMonitorService {
 
     @Override
     public Map getSelectOrder(String comid, String carNumber) {
-
-        Map ordermap = centerMonitorMapper.getSelectOrder(Long.parseLong(comid),carNumber);
+        Long cityid =-1L;
+        Long groupid = orderMapper.getGroupIdByComId(Long.parseLong(comid));
+        if(groupid!=null&&groupid>-1){
+            cityid = orderMapper.getCityIdByGroupId(groupid);
+        }else {
+            cityid = orderMapper.getCityIdByComId(Long.parseLong(comid));
+        }
+        String tableName = "order_tb_new";
+        if(cityid>-1){
+            tableName+= "_"+cityid;
+        }
+        Map ordermap = centerMonitorMapper.getSelectOrder(Long.parseLong(comid),carNumber,tableName);
         return ordermap;
     }
 
@@ -366,10 +395,10 @@ public class CenterMonitorServiceImpl implements CenterMonitorService {
         Map<String, Object> params = new HashMap<String, Object>();
         params.put("comid", comid + "");
         params.put("inform_time", TimeTools.getLongMilliSeconds());
-        params.put("channel_id", StringUtils.decodeUTF8(channel_id));
+        params.put("channel_id", StringUtils.encodeUTF8(StringUtils.encodeUTF8(channel_id)));
         params.put("order_id", orderId);
-        params.put("event_id", StringUtils.decodeUTF8(event_id));
-        params.put("car_number", StringUtils.decodeUTF8(carNumber));
+        params.put("event_id", StringUtils.encodeUTF8(StringUtils.encodeUTF8(event_id)));
+        params.put("car_number", StringUtils.encodeUTF8(StringUtils.encodeUTF8(carNumber)));
 //        params.put("action", "balanceOrderInfo");
         logger.error(params);
 
@@ -555,7 +584,17 @@ public class CenterMonitorServiceImpl implements CenterMonitorService {
 
     private List<Map<String,Object>> queryBlurOrdersByCarnumber(long comid, String carNumber) {
 
-
+        Long groupid = orderMapper.getGroupIdByComId(comid);
+        Long cityid = -1L;
+        if(groupid!=null&&groupid>-1){
+            cityid = orderMapper.getCityIdByGroupId(groupid);
+        }else {
+            cityid = orderMapper.getCityIdByComId(comid);
+        }
+        String tableName = "order_tb_new";
+        if(cityid>-1){
+            tableName+= "_"+cityid;
+        }
         System.out.println("进来获取集合");
         List<Object> params = new ArrayList<Object>();
         params.add(comid);
@@ -569,14 +608,14 @@ public class CenterMonitorServiceImpl implements CenterMonitorService {
         List<String> carNumberList = new ArrayList<>();
         carNumberList.add(carNumber.substring(1));
 
-        list = centerMonitorMapper.getCarByNameLike(comid,carNumberList);
+        list = centerMonitorMapper.getCarByNameLike(comid,carNumberList,tableName);
 
         if (list == null || list.size() == 0) {
             // 2 模糊匹配除去两位
             carNumberList.clear();
             carNumberList.add(carNumber.substring(1, carNumber.length() - 1));
             carNumberList.add(carNumber.substring(2));
-            list = centerMonitorMapper.getCarByNameLike(comid,carNumberList);
+            list = centerMonitorMapper.getCarByNameLike(comid,carNumberList,tableName);
 
             if (list == null || list.size() == 0) {
                 //3  模糊匹配除去三位
@@ -585,7 +624,7 @@ public class CenterMonitorServiceImpl implements CenterMonitorService {
                 carNumberList.add(carNumber.substring(1, carNumber.length() - 2));
                 carNumberList.add(carNumber.substring(2, carNumber.length() - 1));
                 carNumberList.add(carNumber.substring(3));
-                list = centerMonitorMapper.getCarByNameLike(comid,carNumberList);
+                list = centerMonitorMapper.getCarByNameLike(comid,carNumberList,tableName);
 
                 if (list == null || list.size() == 0) {
                     //4 模糊匹配除去四位
@@ -595,7 +634,7 @@ public class CenterMonitorServiceImpl implements CenterMonitorService {
                     carNumberList.add(carNumber.substring(2, carNumber.length() - 2));
                     carNumberList.add(carNumber.substring(3, carNumber.length() - 1));
                     carNumberList.add(carNumber.substring(4, carNumber.length()));
-                    list = centerMonitorMapper.getCarByNameLike(comid,carNumberList);
+                    list = centerMonitorMapper.getCarByNameLike(comid,carNumberList,tableName);
 
                 }
             }

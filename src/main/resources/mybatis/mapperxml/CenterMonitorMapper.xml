@@ -78,7 +78,7 @@
         SELECT
         *
         FROM
-        order_tb
+        ${tableName}
         WHERE
         comid =#{comid,jdbcType=BIGINT}
         AND
@@ -98,7 +98,7 @@
         SELECT
         *
         FROM
-        order_tb
+        ${tableName}
         WHERE
         comid =#{comid,jdbcType=BIGINT}
         AND
