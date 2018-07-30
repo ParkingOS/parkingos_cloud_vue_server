@@ -79,8 +79,14 @@ public class CenterMonitorServiceImpl implements CenterMonitorService {
             //获取今日电子支付，现金支付，减免金额的统计
             String tableName = "order_tb_new";
             if(cityid>-1){
-                tableName+= "_"+cityid;
+                tableName+= "_"+cityid%100;
             }
+
+            List<Map<String,Object>> tableList =  commonDao.getObjectBySql("select count(*) from pg_class where relname ="+tableName);
+            if(tableList.get(0).get("count")==0){
+
+            }
+
 
             Map<String, String> parammap = new HashMap<String, String>();
             parammap.put("groupid", groupid + "");
@@ -160,7 +166,7 @@ public class CenterMonitorServiceImpl implements CenterMonitorService {
             }
             String tableName = "order_tb_new";
             if(cityid>-1){
-                tableName+="_"+cityid;
+                tableName+="_"+cityid%100;
             }
             //获取今日电子支付，现金支付，减免金额的统计
             Map<String, String> parammap = new HashMap<String, String>();
@@ -383,7 +389,7 @@ public class CenterMonitorServiceImpl implements CenterMonitorService {
         }
         String tableName = "order_tb_new";
         if(cityid>-1){
-            tableName+= "_"+cityid;
+            tableName+= "_"+cityid%100;
         }
         Map ordermap = centerMonitorMapper.getSelectOrder(Long.parseLong(comid),carNumber,tableName);
         return ordermap;
@@ -593,7 +599,7 @@ public class CenterMonitorServiceImpl implements CenterMonitorService {
         }
         String tableName = "order_tb_new";
         if(cityid>-1){
-            tableName+= "_"+cityid;
+            tableName+= "_"+cityid%100;
         }
         System.out.println("进来获取集合");
         List<Object> params = new ArrayList<Object>();

@@ -47,7 +47,7 @@ public class GroupMonthParkOrderanlysisServiceImpl implements GroupMonthParkOrde
         Long cityid = orderMapper.getCityIdByGroupId(groupid);
         String tableName = "order_tb_new";
         if(cityid>-1){
-            tableName += "_"+cityid;
+            tableName += "_"+cityid%100;
         }
 
         SimpleDateFormat df2 = new SimpleDateFormat("yyyy-MM");
@@ -133,20 +133,20 @@ public class GroupMonthParkOrderanlysisServiceImpl implements GroupMonthParkOrde
                     //每一行的合计 = 现金支付+电子支付
                     totalList.get(i).put("act_total", String.format("%.2f", StringUtils.formatDouble(Double.parseDouble(totalList.get(i).get("cash_pay") + "") + Double.parseDouble(totalList.get(i).get("electronic_pay") + ""))));
 
-                    //免费支付
-                    totalList.get(i).put("free_pay", String.format("%.2f", 0.00));
+                    //减免支付
+                    double reduceAmount = StringUtils.formatDouble(Double.parseDouble((totalList.get(i).get("reduce_pay") == null ? "0.00" : totalList.get(i).get("reduce_pay") + "")));
+                    double actFreePay = reduceAmount;
                     //遍历免费集合
                     if (freeList != null && freeList.size() > 0) {
                         for (Map<String, Object> freeOrder : freeList) {
                             if(freeOrder.get("e_time").equals(totalList.get(i).get("e_time"))){
                                 double freePay = StringUtils.formatDouble(Double.parseDouble((freeOrder.get("free_pay") == null ? "0.00" : freeOrder.get("free_pay") + "")));
-                                double reduceAmount = StringUtils.formatDouble(Double.parseDouble((totalList.get(i).get("reduce_pay") == null ? "0.00" : totalList.get(i).get("reduce_pay") + "")));
-                                double actFreePay = freePay + reduceAmount;
-                                totalList.get(i).put("free_pay", String.format("%.2f", StringUtils.formatDouble(actFreePay)));
-                                actFreeMoney += actFreePay;
+                                actFreePay = freePay+reduceAmount;
                             }
                         }
                     }
+                    actFreeMoney += actFreePay;
+                    totalList.get(i).put("free_pay",  String.format("%.2f",actFreePay));
                     backList.add(totalList.get(i));
                 }
             }

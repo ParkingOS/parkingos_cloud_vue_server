@@ -49,7 +49,7 @@ public class ParkCollectorOrderanlysisServiceImpl implements ParkCollectorOrderA
         }
         String tableName = "order_tb_new";
         if(cityId>-1){
-            tableName = "order_tb_new_"+cityId;
+            tableName = "order_tb_new_"+cityId%100;
         }
 
         String date = reqmap.get("date");
@@ -141,8 +141,8 @@ public class ParkCollectorOrderanlysisServiceImpl implements ParkCollectorOrderA
                         }
                     }
                 }
-                actFreeMoney+=actFreePay;
                 totalOrder.put("free_pay",  String.format("%.2f",actFreePay));
+                actFreeMoney+=actFreePay;
                 backList.add(totalOrder);
             }
         }

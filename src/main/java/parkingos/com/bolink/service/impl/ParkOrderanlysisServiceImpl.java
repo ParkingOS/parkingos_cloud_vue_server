@@ -47,12 +47,12 @@ public class ParkOrderanlysisServiceImpl implements ParkOrderAnlysisService {
         if(groupId!=null&&groupId>-1){
             cityId = orderMapper.getCityIdByGroupId(groupId);
         }else{
-            cityId = orderMapper.getGroupIdByComId(comid);
+            cityId = orderMapper.getCityIdByComId(comid);
         }
 
         String tableName = "order_tb_new";
         if(cityId>-1){
-            tableName += "_"+cityId;
+            tableName += "_"+cityId%100;
         }
 
         String out_uid = reqmap.get("out_uid");
@@ -108,7 +108,7 @@ public class ParkOrderanlysisServiceImpl implements ParkOrderAnlysisService {
 
         logger.error("====groupby:"+groupby);
         logger.error("====sql:"+sql);
-        logger.error("====free_sql:"+free_sql);
+        logger.info("~~~~~~~~~~~~free"+free_sql +" and pay_type=8 "+groupby);
         //总订单集合
         List<Map<String, Object>> totalList =commonDao.getObjectBySql(sql +groupby+" order by  e_time ");
         //免费订单集合

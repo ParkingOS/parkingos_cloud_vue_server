@@ -1,5 +1,7 @@
 package parkingos.com.bolink.dao.mybatis;
 
+import parkingos.com.bolink.utils.StringUtils;
+
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
@@ -878,7 +880,7 @@ public class OrderTbExample {
         }
 
         public Criteria andCarNumberLike(String value) {
-            addCriterion("car_number like", "%"+value+"%", "carNumber");
+            addCriterion("car_number like", "%"+ StringUtils.decodeUTF8(value).toUpperCase()+"%", "carNumber");
             return (Criteria) this;
         }
 

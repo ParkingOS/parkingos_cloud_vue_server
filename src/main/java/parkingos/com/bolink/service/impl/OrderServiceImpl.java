@@ -98,7 +98,7 @@ public class OrderServiceImpl implements OrderService {
         }
         logger.info("select city by comid:" + cityid);
         if (cityid != null && cityid > -1) {
-            reqmap.put("tableName","order_tb_new_"+cityid);
+            reqmap.put("tableName","order_tb_new_"+cityid%100);
         }else{
             reqmap.put("tableName","order_tb_new");
         }
@@ -167,7 +167,12 @@ public class OrderServiceImpl implements OrderService {
         example.createCriteria().andComidEqualTo(Long.valueOf(reqmap.get("comid")));
         reqmap.remove("rp");
         example = ExampleUtis.createOrderExample(example,reqmap);
-        int count = orderMapper.selectOrdersCount(example);
+        int count = 0;
+        try{
+            count = orderMapper.selectOrdersCount(example);
+        }catch(Exception e){
+            logger.error("查询失败。。。",e);
+        }
         logger.info("count~~~~~~~~"+count);
         return count;
     }
@@ -236,7 +241,7 @@ public class OrderServiceImpl implements OrderService {
 //        }
         String tableName = "";
         if(cityid>-1){
-            tableName = "order_tb_new_"+cityid;
+            tableName = "order_tb_new_"+cityid%100;
         }else{
             tableName="order_tb_new";
         }

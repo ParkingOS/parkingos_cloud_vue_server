@@ -49,7 +49,7 @@ public class CityParkOrderanlysisServiceImpl implements CityParkOrderAnlysisServ
 
         String tableName = "order_tb_new";
         if(cityid>-1){
-            tableName += "_"+cityid;
+            tableName += "_"+cityid%100;
         }
 
         SimpleDateFormat df2 = new SimpleDateFormat("yyyy-MM-dd");
@@ -88,6 +88,8 @@ public class CityParkOrderanlysisServiceImpl implements CityParkOrderAnlysisServ
         free_sql +=" between "+btime+" and "+etime;
         sql +=" and state= 1 and out_uid > -1 and ishd=0 ";
         free_sql +=" and state= 1 and out_uid >-1 and ishd=0 ";
+//        logger.info("~~~~~~~~~~~~sql"+sql +groupby);
+//        logger.info("~~~~~~~~~~~~"+free_sql +" and pay_type=8 "+groupby);
 
         //总订单集合
         List<Map<String, Object>> totalList =commonDao.getObjectBySql(sql +groupby);
@@ -102,8 +104,9 @@ public class CityParkOrderanlysisServiceImpl implements CityParkOrderAnlysisServ
         List<Map<String, Object>> backList = new ArrayList<Map<String, Object>>();
         if(totalList != null && totalList.size() > 0) {
             for (Map<String, Object> totalOrder : totalList) {
+                Long comid =-1L;
                 if (totalOrder.containsKey("comid")) {
-                    Long comid = (Long) totalOrder.get("comid");
+                    comid = (Long) totalOrder.get("comid");
                     List<Map<String, Object>> list = commonDao.getObjectBySql("select company_name from com_info_tb where id =" + comid);
                     if(list!=null&&list.size()>0){
                         totalOrder.put("comid", list.get(0).get("company_name"));
@@ -136,8 +139,10 @@ public class CityParkOrderanlysisServiceImpl implements CityParkOrderAnlysisServ
                 //遍历免费集合
                 if (freeList != null && freeList.size() > 0) {
                     for (Map<String, Object> freeOrder : freeList) {
-                        if(freeOrder.get("comid").equals(totalOrder.get("comid"))){
+//                        logger.info("~~~~~~~"+freeOrder.get("comid")+"~~~~"+comid+"~~~"+((freeOrder.get("comid")+"").equals(comid+"")));
+                        if((freeOrder.get("comid")+"").equals(comid+"")){
                             double freePay = StringUtils.formatDouble(Double.parseDouble((freeOrder.get("free_pay") == null ? "0.00" : freeOrder.get("free_pay") + "")));
+//                            logger.info("~~~~~~~"+freePay);
                             actFreePay = freePay+reduceAmount;
                         }
                     }

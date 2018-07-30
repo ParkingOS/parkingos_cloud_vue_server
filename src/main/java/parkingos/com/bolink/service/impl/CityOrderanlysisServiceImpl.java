@@ -45,7 +45,7 @@ public class CityOrderanlysisServiceImpl implements CityOrderAnlysisService {
         Long cityid=orderMapper.getCityIdByGroupId(groupid);
         String tableName = "order_tb_new";
         if(cityid>-1){
-            tableName +="_"+cityid;
+            tableName +="_"+cityid%100;
         }
 
         SimpleDateFormat df2 = new SimpleDateFormat("yyyy-MM-dd");
