@@ -53,6 +53,16 @@ public class TicketTb {
 
     private Long useTime;
 
+    private Integer timeRange;
+
+    public Integer getTimeRange() {
+        return timeRange;
+    }
+
+    public void setTimeRange(Integer timeRange) {
+        this.timeRange = timeRange;
+    }
+
     public Long getUseTime() {
         return useTime;
     }

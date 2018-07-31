@@ -47,6 +47,16 @@ public class ShopTb {
 
     private Integer useLimit;
 
+    private Integer freeLimitTimes;
+
+    public Integer getFreeLimitTimes() {
+        return freeLimitTimes;
+    }
+
+    public void setFreeLimitTimes(Integer freeLimitTimes) {
+        this.freeLimitTimes = freeLimitTimes;
+    }
+
     public Integer getUseLimit() {
         return useLimit;
     }

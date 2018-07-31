@@ -192,6 +192,8 @@ public class ShopManageServiceImpl implements ShopManageService {
         Integer ticket_type = RequestUtil.getInteger( request, "ticket_type", 1 );
         Integer handInputEnable = RequestUtil.getInteger( request, "hand_input_enable", 0 );
         Integer supportType = RequestUtil.getInteger(request,"support_type",1);
+        Integer freeLimitTimes = RequestUtil.getInteger(request,"free_limit_times",0);
+
 
         if(comid==-1){
             return "{\"state\":0,\"msg\":\"车场不存在\"}";
@@ -259,6 +261,7 @@ public class ShopManageServiceImpl implements ShopManageService {
         shopTb.setHandInputEnable(handInputEnable);
         shopTb.setSupportType(supportType);
         shopTb.setUseLimit(useLimit);
+        shopTb.setFreeLimitTimes(freeLimitTimes);
 
         shopTb.setComid( RequestUtil.getLong( request, "comid", -1L ) );
         int update = 0;
