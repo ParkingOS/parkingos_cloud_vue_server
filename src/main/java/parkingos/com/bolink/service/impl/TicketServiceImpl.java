@@ -351,7 +351,7 @@ public class TicketServiceImpl implements TicketService {
     }
 
     @Override
-    public Map<String, Object> createTicket(Long shop_id, Integer reduce, Integer type, Integer isAuto, Integer number,Integer timeRange) {
+    public Map<String, Object> createTicket(Long shop_id, Integer reduce, Integer type, Integer isAuto, Integer number,Integer timeRange,Long uin) {
 
 
         logger.info("后台创建优惠券:" + isAuto + "~~~~" + type + "~~~~" + reduce);
@@ -445,6 +445,7 @@ public class TicketServiceImpl implements TicketService {
             ticketTb.setState(0);
             ticketTb.setComid(shopInfo.getComid());
             ticketTb.setType(type);
+            ticketTb.setUin(uin);
             ticketTb.setShopId(shop_id);
             ticketTb.setTimeRange(timeRange);
             Integer insertTicket = commonDao.insert(ticketTb);
@@ -532,7 +533,7 @@ public class TicketServiceImpl implements TicketService {
     }
 
     @Override
-    public List<String> getCodeList(Long shopId, Integer reduce, Integer type, Integer number, String code, String serverPath,Integer timeRange) {
+    public List<String> getCodeList(Long shopId, Integer reduce, Integer type, Integer number, String code, String serverPath,Integer timeRange,Long uin) {
 
         List<String> codeList = new ArrayList<>();
         codeList.add(code);
@@ -547,7 +548,7 @@ public class TicketServiceImpl implements TicketService {
         }
         if (number > 1) {
             for (int i = 0; i < number - 1; i++) {
-                Map map = createTicket(shopId, reduce, type, 0, 1,timeRange);
+                Map map = createTicket(shopId, reduce, type, 0, 1,timeRange,uin);
                 code = map.get("code") + "";
                 codeList.add(code);
                 url = CustomDefind.getValue("TICKETURL") + code;

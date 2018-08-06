@@ -75,7 +75,7 @@ public class AdminRoleAction {
         JSONObject result = adminRoleService.addRole(userRoleTb,func);
 
         logger.error("=========>>>"+((Integer)result.get("state")==1));
-        if(((Integer)result.get("state"))==1){
+        if(((Integer)result.get("state"))==1&&oid!=10){//商户的暂时不加
             ParkLogTb parkLogTb = new ParkLogTb();
             parkLogTb.setOperateUser(nickname);
             parkLogTb.setOperateTime(System.currentTimeMillis()/1000);
@@ -104,6 +104,9 @@ public class AdminRoleAction {
         String name = StringUtils.decodeUTF8(RequestUtil.getString(request, "role_name"));
         String resume = StringUtils.decodeUTF8(RequestUtil.getString(request, "resume"));
         Integer func = RequestUtil.getInteger(request, "func", -1);
+
+        Long oid = RequestUtil.getLong(request, "oid", -1L);
+
         UserRoleTb userRoleTb = new UserRoleTb();
         userRoleTb.setId(id);
         userRoleTb.setRoleName(name);
@@ -113,7 +116,7 @@ public class AdminRoleAction {
 
         logger.error("=========>>>edit:"+((Integer)result.get("state")==1));
 
-        if((Integer)result.get("state")==1){
+        if((Integer)result.get("state")==1&&oid!=10){
             ParkLogTb parkLogTb = new ParkLogTb();
             parkLogTb.setOperateUser(nickname);
             parkLogTb.setOperateTime(System.currentTimeMillis()/1000);
@@ -138,12 +141,14 @@ public class AdminRoleAction {
 
         Long id = RequestUtil.getLong(request,"id",-1L);
 
+        Long oid = RequestUtil.getLong(request, "oid", -1L);
+
         UserRoleTb userRoleTb = new UserRoleTb();
         userRoleTb.setId(id);
         userRoleTb.setState(1);
         JSONObject result = adminRoleService.deleteRole(userRoleTb);
 
-        if((Integer)result.get("state")==1){
+        if((Integer)result.get("state")==1&&oid!=10){
             ParkLogTb parkLogTb = new ParkLogTb();
             parkLogTb.setOperateUser(nickname);
             parkLogTb.setOperateTime(System.currentTimeMillis()/1000);

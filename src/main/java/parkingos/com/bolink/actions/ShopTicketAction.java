@@ -102,6 +102,8 @@ public class ShopTicketAction {
     public String createTicket(HttpServletRequest request, HttpServletResponse resp) {
 //        Map<String, String> reqParameterMap = RequestUtil.readBodyFormRequset( request );
 //        logger.info( reqParameterMap );
+
+        Long uin = RequestUtil.getLong(request,"uin",-1L);
         Map<String,Object> mapResult =new HashMap<>();
         Long shop_id = RequestUtil.getLong(request,"shopid",-1L);
         Integer reduce = RequestUtil.getInteger(request, "reduce", 0);
@@ -120,7 +122,7 @@ public class ShopTicketAction {
             return null;
         }
 
-        mapResult = ticketService.createTicket(shop_id,reduce,type,isAuto,1,timeRange);
+        mapResult = ticketService.createTicket(shop_id,reduce,type,isAuto,1,timeRange,uin);
         StringUtils.ajaxOutput( resp, JSONObject.toJSONString(mapResult) );
         return null;
     }
@@ -154,6 +156,7 @@ public class ShopTicketAction {
         Integer reduce = RequestUtil.getInteger(request, "reduce", 0);
         Integer type = RequestUtil.getInteger(request, "type", 3);
 
+        Long uin = RequestUtil.getLong(request,"uin",-1L);
 
         Integer freeLimitTimes = RequestUtil.getInteger(request,"free_limit_times",0);
         Integer timeRange = RequestUtil.getInteger(request, "time_range", 0);
@@ -172,7 +175,7 @@ public class ShopTicketAction {
             return null;
         }
 
-        mapResult = ticketService.createTicket(shopId,reduce,type,0,Integer.parseInt(num),timeRange);
+        mapResult = ticketService.createTicket(shopId,reduce,type,0,Integer.parseInt(num),timeRange,uin);
         if(mapResult.get("state")!=1){
             StringUtils.ajaxOutput( resp, JSONObject.toJSONString(mapResult) );
             return null;
@@ -180,7 +183,7 @@ public class ShopTicketAction {
             String code = mapResult.get("code")+"";
             String serverPath = request.getSession().getServletContext().getRealPath("/resource/images/"+code);
 //            logger.info("diyige code"+serverPath);
-            List<String> codeList = ticketService.getCodeList(shopId,reduce,type,Integer.parseInt(num),code,serverPath,timeRange);
+            List<String> codeList = ticketService.getCodeList(shopId,reduce,type,Integer.parseInt(num),code,serverPath,timeRange,uin);
             mapResult.put("codeList",codeList);
 //            ticketService.exportCode(codeList,request,resp);
             StringUtils.ajaxOutput( resp, JSONObject.toJSONString(mapResult) );

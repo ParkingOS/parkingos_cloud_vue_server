@@ -1,6 +1,5 @@
 package parkingos.com.bolink.service.impl;
 
-import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -9,16 +8,14 @@ import parkingos.com.bolink.dao.spring.CommonDao;
 import parkingos.com.bolink.models.ParkLogTb;
 import parkingos.com.bolink.models.UserInfoTb;
 import parkingos.com.bolink.models.UserRoleTb;
-import parkingos.com.bolink.qo.PageOrderConfig;
 import parkingos.com.bolink.service.SaveLogService;
 import parkingos.com.bolink.service.ShopMemberManageService;
+import parkingos.com.bolink.service.SupperSearchService;
 import parkingos.com.bolink.utils.CustomDefind;
-import parkingos.com.bolink.utils.OrmUtil;
 import parkingos.com.bolink.utils.RequestUtil;
 import parkingos.com.bolink.utils.StringUtils;
 
 import javax.servlet.http.HttpServletRequest;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -31,42 +28,51 @@ public class ShopMemberManageServiceImpl implements ShopMemberManageService {
     private CommonDao commonDao;
     @Autowired
     private SaveLogService saveLogService;
+    @Autowired
+    private SupperSearchService<UserInfoTb> supperSearchService;
 
     @Override
     public String quickquery(HttpServletRequest req) {
 
-        Integer pageNum = RequestUtil.getInteger( req, "page", 1 );
-        Integer pageSize = RequestUtil.getInteger( req, "rp", 10 );
-        String str = "{\"total\":0,\"page\":1,\"rows\":[]}";
-        JSONObject result = JSONObject.parseObject( str );
+        Map<String, String> reqParameterMap = RequestUtil.readBodyFormRequset(req);
+
+//        Integer pageNum = RequestUtil.getInteger( req, "page", 1 );
+//        Integer pageSize = RequestUtil.getInteger( req, "rp", 10 );
+//        String str = "{\"total\":0,\"page\":1,\"rows\":[]}";
+//        JSONObject result = JSONObject.parseObject( str );
 
         Long shop_id = RequestUtil.getLong( req, "shop_id", -1L );
+        if(shop_id==-1){
+            shop_id=RequestUtil.getLong( req, "shopid", -1L );
+        }
 
         UserInfoTb userInfoTb = new UserInfoTb();
         userInfoTb.setShopId( shop_id );
         //state状态 0为正常使用 1为删除状态
         userInfoTb.setState( 0 );
 
-        int count = commonDao.selectCountByConditions( userInfoTb );
-        result.put( "total", count );
+//        int count = commonDao.selectCountByConditions( userInfoTb );
+//        result.put( "total", count );
 
-        if (count > 0) {
-            /**分页处理*/
-            PageOrderConfig config = new PageOrderConfig();
-            config.setPageInfo( pageNum, pageSize );
-            List<UserInfoTb> list = commonDao.selectListByConditions( userInfoTb, config );
-            List<Map<String, Object>> resList = new ArrayList<>();
-            if (list != null && !list.isEmpty()) {
-                for (UserInfoTb sb : list) {
-                    OrmUtil<UserInfoTb> otm = new OrmUtil<>();
-                    Map<String, Object> map = otm.pojoToMap( sb );
-                    resList.add( map );
-                }
-                result.put( "rows", JSON.toJSON( resList ) );
-            }
-            result.put( "total", count );
-            result.put( "page", pageNum );
-        }
+        JSONObject result =  supperSearchService.supperSearch(userInfoTb,reqParameterMap);
+
+//        if (count > 0) {
+//            /**分页处理*/
+//            PageOrderConfig config = new PageOrderConfig();
+//            config.setPageInfo( pageNum, pageSize );
+//            List<UserInfoTb> list = commonDao.selectListByConditions( userInfoTb, config );
+//            List<Map<String, Object>> resList = new ArrayList<>();
+//            if (list != null && !list.isEmpty()) {
+//                for (UserInfoTb sb : list) {
+//                    OrmUtil<UserInfoTb> otm = new OrmUtil<>();
+//                    Map<String, Object> map = otm.pojoToMap( sb );
+//                    resList.add( map );
+//                }
+//                result.put( "rows", JSON.toJSON( resList ) );
+//            }
+//            result.put( "total", count );
+//            result.put( "page", pageNum );
+//        }
         return result.toJSONString();
 
     }
@@ -110,6 +116,33 @@ public class ShopMemberManageServiceImpl implements ShopMemberManageService {
         return "{\"state\":" + update + "}";
     }
 
+    @Override
+    public String getRoleByConditions(Long roleId, Long shopId) {
+        String result = "[]";
+        List list = null;
+        String sql =  "select id as value_no,role_name as value_name from user_role_tb where oid =(select id from zld_orgtype_tb WHERE NAME like '商户%' AND state=0) and state =0 and (adminid in(SELECT id from user_info_tb where state=0 and shop_id = "+shopId+" and auth_flag>0) or adminid=0)";
+        if(shopId>0&&roleId>0){
+//            list = commonDao.getObjectBySql("select id as value_no,role_name as value_name from user_role_tb where adminid" +
+//                    " in(select id from user_info_tb where shop_id="+shopId+" and role_id="+roleId+") and state = 0 ");
+            list = commonDao.getObjectBySql(sql);
+        }
+        if(list!=null&&list.size()>0){
+           result = StringUtils.createJson(list);
+        }
+        return result;
+    }
+
+    @Override
+    public String getShopUsers(Long shopId) {
+        String result = "[]";
+        String sql =  "select id as value_no,nickname as value_name from user_info_tb where shop_id="+shopId+"and state =0";
+        List list =commonDao.getObjectBySql(sql);
+        if(list!=null&&list.size()>0){
+            result = StringUtils.createJson(list);
+        }
+        return result;
+    }
+
 
     @Override
     public String create(HttpServletRequest request) {
@@ -125,6 +158,13 @@ public class ShopMemberManageServiceImpl implements ShopMemberManageService {
         String mobile = RequestUtil.processParams( request, "mobile" );
         Long role = RequestUtil.getLong( request, "auth_flag", 15L );//14:负责人 15：工作人员
         Long shop_id = RequestUtil.getLong( request, "shop_id", -1L );
+        if(shop_id==-1){
+            shop_id=RequestUtil.getLong( request, "shopid", -1L );
+        }
+
+
+        Long sex =  RequestUtil.getLong(request,"sex",-1L);
+        Long roleId = RequestUtil.getLong(request,"role_id",-1L);
         if (nickname.equals( "" )) nickname = null;
         if (phone.equals( "" )) phone = null;
         if (mobile.equals( "" )) mobile = null;
@@ -132,6 +172,9 @@ public class ShopMemberManageServiceImpl implements ShopMemberManageService {
 
         //用户id 判断是做添加还是做修改
         Long userid = RequestUtil.getLong( request, "userId", -1L );
+        if(userid==-1){
+            userid=RequestUtil.getLong( request, "id", -1L );
+        }
 
         UserInfoTb userInfoTb = new UserInfoTb();
         userInfoTb.setComid( comid );
@@ -140,6 +183,8 @@ public class ShopMemberManageServiceImpl implements ShopMemberManageService {
         userInfoTb.setPhone( phone );
         userInfoTb.setMobile( mobile );
         userInfoTb.setAuthFlag( role );
+        userInfoTb.setRoleId(roleId);
+        userInfoTb.setSex(sex);
 
         int count = 0;
 
@@ -162,12 +207,14 @@ public class ShopMemberManageServiceImpl implements ShopMemberManageService {
             userInfoTb.setRegTime( time );
             userInfoTb.setId( squen );
 
-            UserRoleTb userRoleTb = new UserRoleTb();
-            userRoleTb.setOid(Long.parseLong(CustomDefind.getValue("SHOPOID")));
-            userRoleTb.setType(0);
-            userRoleTb = (UserRoleTb)commonDao.selectObjectByConditions(userRoleTb);
-            if(userRoleTb!=null){
-                userInfoTb.setRoleId(userRoleTb.getId());
+            if(roleId==-1){
+                UserRoleTb userRoleTb = new UserRoleTb();
+                userRoleTb.setOid(Long.parseLong(CustomDefind.getValue("SHOPOID")));
+                userRoleTb.setType(0);
+                userRoleTb = (UserRoleTb)commonDao.selectObjectByConditions(userRoleTb);
+                if(userRoleTb!=null){
+                    userInfoTb.setRoleId(userRoleTb.getId());
+                }
             }
 
             String md5Pass = "";

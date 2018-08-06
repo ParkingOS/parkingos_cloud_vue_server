@@ -18,7 +18,6 @@ import parkingos.com.bolink.utils.OrmUtil;
 import parkingos.com.bolink.utils.StringUtils;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -111,27 +110,38 @@ public class MemberServiceImpl implements MemberService {
     @Override
     public String getRoleByConditions(Map<String, String> reqParameterMap) {
         List list =null;
-        String sql = "select r.id,r.role_name from user_role_tb r,zld_orgtype_tb o where r.oid=o.id and o.name like '%车场%' and r.adminid=0 and r.type=0 and r.state = 0";
-        List<Map<String,Object>> rolelist = commonDao.getObjectBySql(sql);
-        if(rolelist != null){
-            Long com_id = Long.parseLong(reqParameterMap.get("comid"));
-//            if(com_id > 0){//车场管理员登录，显示该管理员创建的角色
-//                Long loginuin = Long.parseLong(reqParameterMap.get("loginuin"));
-//                String rolesql = "select id as value_no,role_name as value_name from user_role_tb where (adminid="+loginuin+" or id="+rolelist.get(0).get("id")+") and state = 0";
-//                list = commonDao.getObjectBySql(rolesql);
+        String sql = "";
+//        Long shopid = Long.parseLong(reqParameterMap.get("shopid"));
+//        if(shopid>0){
+//            sql = "select id as value_no,role_name as value_name from user_role_tb where oid =(select id from zld_orgtype_tb WHERE NAME like '商户%' AND state=0) and state =0";
+//        }else{
+            sql = "select id as value_no,role_name as value_name from user_role_tb where oid =(select id from zld_orgtype_tb WHERE NAME = '停车场' AND state=0) and state =0 and (adminid in (SELECT id from user_info_tb where state=0 and comid = "+reqParameterMap.get("comid")+" and auth_flag>0 and auth_flag!=14 and auth_flag!=15) or adminid =0) ";
+//        }
+
+        list = commonDao.getObjectBySql(sql);
+
+//        String sql = "select r.id,r.role_name from user_role_tb r,zld_orgtype_tb o where r.oid=o.id and o.name like '%车场%' and r.adminid=0 and r.type=0 and r.state = 0";
+//        List<Map<String,Object>> rolelist = commonDao.getObjectBySql(sql);
+//        if(rolelist != null){
+//            Long com_id = Long.parseLong(reqParameterMap.get("comid"));
+////            if(com_id > 0){//车场管理员登录，显示该管理员创建的角色
+////                Long loginuin = Long.parseLong(reqParameterMap.get("loginuin"));
+////                String rolesql = "select id as value_no,role_name as value_name from user_role_tb where (adminid="+loginuin+" or id="+rolelist.get(0).get("id")+") and state = 0";
+////                list = commonDao.getObjectBySql(rolesql);
+////            }
+//           Long roleid= Long.parseLong(reqParameterMap.get("loginroleid"));
+//           if(com_id > 0&&roleid>0){
+////                list = commonDao.getObjectBySql("select id as value_no,role_name as value_name from user_role_tb where adminid" +
+////                        " in(select id from user_info_tb where comid="+com_id+" and role_id="+roleid+") and state = 0 ");
+//                if(list == null){
+//                    list = new ArrayList();
+//                }
+//                Map adminMap = new HashMap<String, Object>();
+//                adminMap.put("value_no", rolelist.get(0).get("id"));
+//                adminMap.put("value_name",  rolelist.get(0).get("role_name"));
+//                list.add(0,adminMap);
 //            }
-           if(com_id > 0){
-                list = commonDao.getObjectBySql("select id as value_no,role_name as value_name from user_role_tb where adminid" +
-                        " in(select id from user_info_tb where comid="+com_id+" and role_id="+rolelist.get(0).get("id")+") and state = 0 ");
-                if(list == null){
-                    list = new ArrayList();
-                }
-                Map adminMap = new HashMap<String, Object>();
-                adminMap.put("value_no", rolelist.get(0).get("id"));
-                adminMap.put("value_name",  rolelist.get(0).get("role_name"));
-                list.add(0,adminMap);
-            }
-        }
+//        }
         String result = "[]";
         if(list!=null&&!list.isEmpty()){
             result = StringUtils.createJson(list);

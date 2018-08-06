@@ -56,6 +56,8 @@ public class FixCodeAction {
         Integer freeLimit = RequestUtil.getInteger(request,"free_limit",0);
         Integer amountLimit = RequestUtil.getInteger(request,"amount_limit",0);
         String validiteTime= RequestUtil.getString(request,"validite_time");
+
+        Long uin = RequestUtil.getLong(request,"loginuin",-1L);
         Integer validite_time = 24;
         if(!Check.isNumber(validiteTime)){
             result.put("state",0);
@@ -115,6 +117,7 @@ public class FixCodeAction {
         fixCodeTb.setName(name);
         fixCodeTb.setValiditeTime(validite_time);
         fixCodeTb.setState(state);
+        fixCodeTb.setUin(uin);
         fixCodeTb.setFreeLimit(freeLimit);//总张数
         if(ticketUnit==1||ticketUnit==2||ticketUnit==3){//时长减免
             fixCodeTb.setTimeLimit(amountLimit*freeLimit);

@@ -9,7 +9,6 @@ import parkingos.com.bolink.dao.spring.CommonDao;
 import parkingos.com.bolink.enums.FieldOperator;
 import parkingos.com.bolink.models.AuthRoleTb;
 import parkingos.com.bolink.models.CollectorSetTb;
-import parkingos.com.bolink.models.UserInfoTb;
 import parkingos.com.bolink.models.UserRoleTb;
 import parkingos.com.bolink.qo.PageOrderConfig;
 import parkingos.com.bolink.qo.SearchBean;
@@ -43,6 +42,7 @@ public class AdminRoleServiceImpl implements AdminRoleService {
         Long uin = Long.parseLong(reqmap.get("loginuin"));
         UserRoleTb userRoleTb = new UserRoleTb();
         userRoleTb.setState(0);
+        userRoleTb.setAdminid(uin);
 
         Map searchMap = supperSearchService.getBaseSearch(userRoleTb,reqmap);
         logger.info(searchMap);
@@ -59,7 +59,13 @@ public class AdminRoleServiceImpl implements AdminRoleService {
 //            List<SearchBean> searchList = new ArrayList<>();
 //            searchList.add( searchBean );
 
-            String sql = "select id from user_info_tb where comid= "+reqmap.get("comid")+" and role_id="+reqmap.get("roleid");
+            String sql = "";
+//            logger.info("~~~~~~~~~~~~"+reqmap.get("shopid"));
+            if(reqmap.get("shopid")!=null&&!"".equals(reqmap.get("shopid"))){
+                sql="select id from user_info_tb where shop_id= "+reqmap.get("shopid")+" and role_id="+reqmap.get("roleid");
+            }else {
+                sql = "select id from user_info_tb where comid= " + reqmap.get("comid") + " and role_id=" + reqmap.get("roleid");
+            }
             List<Map> list1 = commonDao.getObjectBySql(sql);
             List idList =new ArrayList();
             for(Map map:list1){
@@ -80,17 +86,12 @@ public class AdminRoleServiceImpl implements AdminRoleService {
             count = commonDao.selectCountByConditions(baseQuery,supperQuery);
             if(count>0){
                 list = commonDao.selectListByConditions(baseQuery,supperQuery,config);
-                Double total = 0.0;
                 if (list != null && !list.isEmpty()) {
                     for (UserRoleTb product : list) {
                         OrmUtil<UserRoleTb> otm = new OrmUtil<>();
                         Map<String, Object> map = otm.pojoToMap(product);
-                        if(map.get("amount")!=null){
-                            total += Double.parseDouble(map.get("amount")+"");
-                        }
                         resList.add(map);
                     }
-                    result.put("money",total);
                     result.put("rows", JSON.toJSON(resList));
                 }
             }
@@ -133,39 +134,39 @@ public class AdminRoleServiceImpl implements AdminRoleService {
         logger.error("=====>>>开始更新角色+" + userRoleTb + "===" + func);
         String str = "{\"state\":0,\"msg\":\"修改失败\"}";
         JSONObject result = JSONObject.parseObject(str);
-        Long auth_flag = -1L;
-        int is_inspect = 0;
-        int is_collector = 0;
-        int is_opencard = 0;
-        switch (func) {
-            case 1:
-                auth_flag = 2L;
-                is_collector = 1;
-                break;
-            case 2:
-                auth_flag = 16L;
-                is_inspect = 1;
-                break;
-            case 3:
-                auth_flag = 17L;
-                is_opencard = 1;
-                break;
-            default:
-                break;
-        }
-        userRoleTb.setIsCollector(is_collector);
-        userRoleTb.setIsInspect(is_inspect);
-        userRoleTb.setIsOpencard(is_opencard);
+//        Long auth_flag = -1L;
+//        int is_inspect = 0;
+//        int is_collector = 0;
+//        int is_opencard = 0;
+//        switch (func) {
+//            case 1:
+//                auth_flag = 2L;
+//                is_collector = 1;
+//                break;
+//            case 2:
+//                auth_flag = 16L;
+//                is_inspect = 1;
+//                break;
+//            case 3:
+//                auth_flag = 17L;
+//                is_opencard = 1;
+//                break;
+//            default:
+//                break;
+//        }
+//        userRoleTb.setIsCollector(is_collector);
+//        userRoleTb.setIsInspect(is_inspect);
+//        userRoleTb.setIsOpencard(is_opencard);
 
         int ret = commonDao.updateByPrimaryKey(userRoleTb);
         logger.error("=====>>>更新角色" + ret);
         if (ret == 1) {
-            UserInfoTb fields = new UserInfoTb();
-            fields.setAuthFlag(auth_flag);
-            UserInfoTb conditions = new UserInfoTb();
-            conditions.setRoleId(userRoleTb.getId());
-            int update = commonDao.updateByConditions(fields, conditions);
-            logger.error("=====>>>>>>更新user" + update);
+//            UserInfoTb fields = new UserInfoTb();
+//            fields.setAuthFlag(auth_flag);
+//            UserInfoTb conditions = new UserInfoTb();
+//            conditions.setRoleId(userRoleTb.getId());
+//            int update = commonDao.updateByConditions(fields, conditions);
+//            logger.error("=====>>>>>>更新user" + update);
             result.put("state", 1);
             result.put("msg", "修改成功");
         }
