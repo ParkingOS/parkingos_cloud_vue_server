@@ -193,6 +193,8 @@ public class ShopManageServiceImpl implements ShopManageService {
         Integer handInputEnable = RequestUtil.getInteger( request, "hand_input_enable", 0 );
         Integer supportType = RequestUtil.getInteger(request,"support_type",1);
         Integer freeLimitTimes = RequestUtil.getInteger(request,"free_limit_times",0);
+        Integer useFixCode = RequestUtil.getInteger(request,"use_fix_code",1);//默认支持
+
 
 
         if(comid==-1){
@@ -262,6 +264,7 @@ public class ShopManageServiceImpl implements ShopManageService {
         shopTb.setSupportType(supportType);
         shopTb.setUseLimit(useLimit);
         shopTb.setFreeLimitTimes(freeLimitTimes);
+        shopTb.setUseFixCode(useFixCode);
 
         shopTb.setComid( RequestUtil.getLong( request, "comid", -1L ) );
         int update = 0;

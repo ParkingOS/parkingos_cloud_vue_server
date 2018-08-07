@@ -186,9 +186,10 @@ public class AdminRoleAction {
     @RequestMapping(value = "/getroleauth")
     public String getroleauth(HttpServletRequest request, HttpServletResponse resp){
         Long loginRoleId = RequestUtil.getLong(request,"loginroleid",-1L);
-        Long id = RequestUtil.getLong(request,"id",1L);
+        Long id = RequestUtil.getLong(request,"id",-1L);
+        Long shopid = RequestUtil.getLong(request,"shopid",-1L);
 
-        String result = adminRoleService.getAuth(loginRoleId,id);
+        String result = adminRoleService.getAuth(loginRoleId,id,shopid);
 
         StringUtils.ajaxOutput(resp,result);
         return null;

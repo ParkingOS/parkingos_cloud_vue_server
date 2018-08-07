@@ -87,7 +87,8 @@ public class LoginServiceImpl implements LoginService {
 
         if (roleId != null && roleId > -1) {
             user.put("roleid", roleId);
-
+            Long shopId = -1L;
+            ShopTb shopTb = new ShopTb();
             ZldOrgtypeTb zldOrgtypeTb = new ZldOrgtypeTb();
             zldOrgtypeTb.setId(userRoleTb.getOid());
             zldOrgtypeTb = (ZldOrgtypeTb) commonDao.selectObjectByConditions(zldOrgtypeTb);
@@ -208,7 +209,6 @@ public class LoginServiceImpl implements LoginService {
                 }else if (orgname.contains("商户")) {
                     user.put("isadmin", 1);
                     user.put("shopid", userInfoTb.getShopId());
-                    ShopTb shopTb = new ShopTb();
                     shopTb.setId(userInfoTb.getShopId());
                     shopTb.setState(0);
                     int shopcount = commonDao.selectCountByConditions(shopTb);
@@ -219,7 +219,9 @@ public class LoginServiceImpl implements LoginService {
                     }else{
                         shopTb=(ShopTb)commonDao.selectObjectByConditions(shopTb);
                         if(shopTb!=null){
+                            shopId = shopTb.getId();
                             user.put("name",shopTb.getName());
+                            user.put("use_fix_code",shopTb.getUseFixCode());
                         }
                     }
                 }
@@ -228,6 +230,8 @@ public class LoginServiceImpl implements LoginService {
 
             //所有权限
             String allsql = "select * from auth_tb where oid = "+userRoleTb.getOid()+" and state = 0";
+
+            logger.info("allsql "+allsql);
             List<Map> allAuthList = commonDao.getObjectBySql(allsql);
             user.put("allauth", allAuthList);
 
@@ -266,8 +270,14 @@ public class LoginServiceImpl implements LoginService {
             } else {
                 //读取权限
                 String sql = "select a.actions,auth_id,nname,a.pid,a.url,a.sort,ar.sub_auth from auth_role_tb ar left join auth_tb a on ar.auth_id=a.id where role_id= "+roleId+" and a.state=0 order by  a.sort ";
+                if(shopId>-1){
+                    if(shopTb.getUseFixCode()==0){
+                        sql = "select a.actions,auth_id,nname,a.pid,a.url,a.sort,ar.sub_auth from auth_role_tb ar left join auth_tb a on ar.auth_id=a.id where role_id= "+roleId+" and a.state=0  and a.nname not like '%固定码%' order by  a.sort ";
+                    }
+                }
                 authList = commonDao.getObjectBySql(sql);
 
+                logger.info("huoqu quanxian sql "+sql);
                 for (Map<String, Object> map : authList) {
                     Long autId = (Long) map.get("auth_id");
                     String subAuth = (String) map.get("sub_auth");

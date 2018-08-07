@@ -49,6 +49,16 @@ public class ShopTb {
 
     private Integer freeLimitTimes;
 
+    private Integer useFixCode;
+
+    public Integer getUseFixCode() {
+        return useFixCode;
+    }
+
+    public void setUseFixCode(Integer useFixCode) {
+        this.useFixCode = useFixCode;
+    }
+
     public Integer getFreeLimitTimes() {
         return freeLimitTimes;
     }

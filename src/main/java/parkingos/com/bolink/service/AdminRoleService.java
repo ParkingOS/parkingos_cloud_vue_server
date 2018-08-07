@@ -17,7 +17,7 @@ public interface AdminRoleService {
 
     JSONObject precollectset(CollectorSetTb collectorSetTb);
 
-    String getAuth(Long loginRoleId, Long id);
+    String getAuth(Long loginRoleId, Long id,Long shopid);
 
     JSONObject editRoleAuth(Long id, String auths);
 

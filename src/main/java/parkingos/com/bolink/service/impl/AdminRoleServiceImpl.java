@@ -9,6 +9,7 @@ import parkingos.com.bolink.dao.spring.CommonDao;
 import parkingos.com.bolink.enums.FieldOperator;
 import parkingos.com.bolink.models.AuthRoleTb;
 import parkingos.com.bolink.models.CollectorSetTb;
+import parkingos.com.bolink.models.ShopTb;
 import parkingos.com.bolink.models.UserRoleTb;
 import parkingos.com.bolink.qo.PageOrderConfig;
 import parkingos.com.bolink.qo.SearchBean;
@@ -190,13 +191,28 @@ public class AdminRoleServiceImpl implements AdminRoleService {
     }
 
     @Override
-    public String getAuth(Long loginRoleId, Long id) {
+    public String getAuth(Long loginRoleId, Long id,Long shopid) {
 
         //查询所有权限
-        String allsql = "select id,pid,nname as name,sub_auth,sub_auth as sub_auth_name from auth_tb where state =0 order by id";
+        String allsql ="select id,pid,nname as name,sub_auth,sub_auth as sub_auth_name from auth_tb where state =0 order by id";
+        logger.info("shopid~~~"+shopid);
+
+        if(shopid>-1L){
+            ShopTb shopTb = new ShopTb();
+            shopTb.setId(shopid);
+            shopTb =(ShopTb)commonDao.selectObjectByConditions(shopTb);
+            if(shopTb!=null){
+                Integer useFixCode = shopTb.getUseFixCode();
+                if(useFixCode!=null&&useFixCode==0){
+                    allsql = "select id,pid,nname as name,sub_auth,sub_auth as sub_auth_name from auth_tb where state =0 and nname not like '%固定码%' order by id";
+                }
+            }
+        }
+        logger.info("msg all sql "+ allsql);
         List<Map<String, Object>> allAuthsList = commonDao.getObjectBySql(allsql);
         //查父权限
         String parentsql = "select auth_id,sub_auth from auth_role_tb where role_id =" + loginRoleId;
+
         List<Map<String, Object>> parentAuthsList = commonDao.getObjectBySql(parentsql);
         //查自己权限
         String ownsql = "select auth_id,ar.sub_auth,pid from auth_role_tb ar left join auth_tb at on ar.auth_id= at.id where role_id =" + id;
