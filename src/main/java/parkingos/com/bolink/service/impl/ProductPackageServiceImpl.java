@@ -10,6 +10,7 @@ import parkingos.com.bolink.models.ProductPackageTb;
 import parkingos.com.bolink.models.SyncInfoPoolTb;
 import parkingos.com.bolink.service.ProductPackageService;
 import parkingos.com.bolink.service.SupperSearchService;
+import parkingos.com.bolink.utils.CommonUtils;
 
 import java.math.BigDecimal;
 import java.util.Map;
@@ -23,6 +24,8 @@ public class ProductPackageServiceImpl implements ProductPackageService {
     private CommonDao commonDao;
     @Autowired
     private SupperSearchService<ProductPackageTb> supperSearchService;
+    @Autowired
+    private CommonUtils commonUtils;
 
     @Override
     public JSONObject selectResultByConditions(Map<String, String> reqmap) {
@@ -48,6 +51,7 @@ public class ProductPackageServiceImpl implements ProductPackageService {
         if(ret==1){
             result.put("state",1);
             result.put("msg","增加成功");
+            commonUtils.sendMessage(productPackageTb,productPackageTb.getComid(),productPackageTb.getId(),1);
             int ins = insertSysn(productPackageTb,0);
             if(ins!=1){
                 logger.error("=======>>>>>>插入同步表失败");
@@ -77,6 +81,7 @@ public class ProductPackageServiceImpl implements ProductPackageService {
         if(ret==1){
             result.put("state",1);
             result.put("msg","删除成功");
+            commonUtils.sendMessage(productPackageTb,comid,id,3);
             productPackageTb = (ProductPackageTb)commonDao.selectObjectByConditions(productPackageTb);
             int ins = insertSysn(productPackageTb,2);
             if(ins!=1){
@@ -148,6 +153,7 @@ public class ProductPackageServiceImpl implements ProductPackageService {
         if(ret==1){
             result.put("state",1);
             result.put("msg","修改成功");
+            commonUtils.sendMessage(productPackageTb,comid,id,2);
             int ins = insertSysn(productPackageTb,1);
             if(ins!=1){
                 logger.error("=======>>>>>插入同步表失败");
@@ -163,6 +169,7 @@ public class ProductPackageServiceImpl implements ProductPackageService {
         syncInfoPoolTb.setTableName("product_package_tb");
         syncInfoPoolTb.setCreateTime(System.currentTimeMillis()/1000);
         syncInfoPoolTb.setOperate(operater);
+        syncInfoPoolTb.setUpdateTime(System.currentTimeMillis()/1000);
         return commonDao.insert(syncInfoPoolTb);
     }
 

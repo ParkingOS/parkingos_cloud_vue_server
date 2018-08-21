@@ -183,7 +183,9 @@ public class ShopMemberManageServiceImpl implements ShopMemberManageService {
         userInfoTb.setPhone( phone );
         userInfoTb.setMobile( mobile );
         userInfoTb.setAuthFlag( role );
-        userInfoTb.setRoleId(roleId);
+        if(roleId>-1){
+            userInfoTb.setRoleId(roleId);
+        }
         userInfoTb.setSex(sex);
 
         int count = 0;

@@ -161,6 +161,18 @@ public class GetDataAction {
     }
 
     /*
+ *
+ * 获得集团或者城市下面所有车场
+ * */
+    @RequestMapping(value = "/getshops")
+    public String getAllShops(HttpServletRequest request, HttpServletResponse resp){
+        String comid = request.getParameter("comid");
+        String result = getDataService.getAllShops(comid);
+        StringUtils.ajaxOutput(resp,result);
+        return null;
+    }
+
+    /*
    *
    * 获得集团或者城市下面所有 收费员
    * */

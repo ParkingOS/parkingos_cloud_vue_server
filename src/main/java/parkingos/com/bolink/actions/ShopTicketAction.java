@@ -52,7 +52,7 @@ public class ShopTicketAction {
         Map<String, String> reqParameterMap = RequestUtil.readBodyFormRequset( request );
 
         List<List<Object>> bodyList = ticketService.exportExcel( reqParameterMap );
-        String[][] heards = new String[][]{{"编号", "STR"}, {"商户名称", "STR"}, {"优惠时长(分钟)", "STR"}, {"优惠时长(小时)", "STR"}, {"优惠时长(天)", "STR"}, {"优惠金额", "STR"}, {"到期时间", "STR"}, {"状态", "STR"}, {"车牌号", "STR"}, {"优惠类型", "STR"}};
+        String[][] heards = new String[][]{{"编号", "STR"}, {"商户名称", "STR"}, {"状态", "STR"}, {"车牌号", "STR"},{"优惠时长", "STR"}, {"优惠金额", "STR"},  {"优惠类型", "STR"}, {"创建时间", "STR"},{"到期时间", "STR"},{"使用时间", "STR"}};
 
         ExportDataExcel excel = new ExportDataExcel( "优惠券数据", heards, "sheet1" );
         String fname = "优惠券数据";
@@ -90,6 +90,45 @@ public class ShopTicketAction {
         Map<String, String> reqParameterMap = RequestUtil.readBodyFormRequset( request );
         JSONObject result = ticketService.getTicketLog( reqParameterMap );
         StringUtils.ajaxOutput( resp, result.toJSONString() );
+        return null;
+    }
+
+    /*
+   * 优惠券明细
+   *
+   * */
+    @RequestMapping("/exportlog")
+    //优惠券查询
+    public String exportLog(HttpServletRequest request, HttpServletResponse response) {
+
+        Map<String, String> reqParameterMap = RequestUtil.readBodyFormRequset(request);
+
+        Integer hiddenType = RequestUtil.getInteger(request,"hidden_type",0);
+        logger.info("hiddentype~~~~~"+hiddenType);
+        String [][] heards = new String[][]{{"车牌号","STR"},{"优惠时长","STR"},{"优惠金额","STR"},{"发券人","STR"},{"状态","STR"},{"优惠类型","STR"},{"使用时间","STR"},{"创建时间","STR"},{"到期时间","STR"}};
+        if(hiddenType==1){
+            heards = new String[][]{{"车牌号","STR"},{"优惠金额","STR"},{"发券人","STR"},{"状态","STR"},{"优惠类型","STR"},{"使用时间","STR"},{"创建时间","STR"},{"到期时间","STR"}};
+        }else if(hiddenType==2){
+            heards = new String[][]{{"车牌号","STR"},{"优惠时长","STR"},{"发券人","STR"},{"状态","STR"},{"优惠类型","STR"},{"使用时间","STR"},{"创建时间","STR"},{"到期时间","STR"}};
+        }
+
+        //获取要到处的数据
+        List<List<Object>> bodyList = ticketService.exportLog(reqParameterMap,hiddenType);
+
+        ExportDataExcel excel = new ExportDataExcel("用券明细", heards, "sheet1");
+        String fname = "用券明细";
+        fname = StringUtils.encodingFileName(fname);
+        try {
+            OutputStream os = response.getOutputStream();
+            response.reset();
+            response.setHeader("Content-disposition", "attachment; filename="+fname+".xls");
+            excel.PoiWriteExcel_To2007(bodyList, os);
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+
         return null;
     }
 

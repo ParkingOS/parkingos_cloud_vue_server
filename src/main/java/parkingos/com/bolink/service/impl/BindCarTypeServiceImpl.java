@@ -93,6 +93,7 @@ public class BindCarTypeServiceImpl implements BindCarTypeService {
         syncInfoPoolTb.setTableName("car_number_type_tb");
         syncInfoPoolTb.setCreateTime(System.currentTimeMillis()/1000);
         syncInfoPoolTb.setOperate(operater);
+        syncInfoPoolTb.setUpdateTime(System.currentTimeMillis()/1000);
         commonDao.insert(syncInfoPoolTb);
     }
 }

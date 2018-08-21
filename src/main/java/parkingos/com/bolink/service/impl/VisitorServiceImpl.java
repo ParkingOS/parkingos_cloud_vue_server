@@ -6,11 +6,13 @@ import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import parkingos.com.bolink.dao.spring.CommonDao;
-import parkingos.com.bolink.models.*;
-import parkingos.com.bolink.service.CarTypeService;
+import parkingos.com.bolink.models.ComInfoTb;
+import parkingos.com.bolink.models.SyncInfoPoolTb;
+import parkingos.com.bolink.models.VisitorTb;
 import parkingos.com.bolink.service.SupperSearchService;
 import parkingos.com.bolink.service.VisitorService;
 import parkingos.com.bolink.utils.Check;
+import parkingos.com.bolink.utils.CommonUtils;
 import parkingos.com.bolink.utils.OrmUtil;
 import parkingos.com.bolink.utils.TimeTools;
 
@@ -28,6 +30,8 @@ public class VisitorServiceImpl implements VisitorService {
     private CommonDao commonDao;
     @Autowired
     private SupperSearchService<VisitorTb> supperSearchService;
+    @Autowired
+    private CommonUtils commonUtils;
 
     @Override
     public JSONObject selectResultByConditions(Map<String, String> reqmap) {
@@ -95,6 +99,9 @@ public class VisitorServiceImpl implements VisitorService {
         int update = commonDao.updateByPrimaryKey(visitorTb);
         if(update==1){
             visitorTb = (VisitorTb)commonDao.selectObjectByConditions(visitorTb);
+
+            commonUtils.sendMessage(visitorTb,visitorTb.getComid(),visitorTb.getId(),2);
+
             insertSysn(visitorTb,1);
             result.put("state",1);
             result.put("msg","更改成功");
@@ -121,6 +128,7 @@ public class VisitorServiceImpl implements VisitorService {
         syncInfoPoolTb.setTableName("visitor_tb");
         syncInfoPoolTb.setCreateTime(System.currentTimeMillis()/1000);
         syncInfoPoolTb.setOperate(operater);
+        syncInfoPoolTb.setUpdateTime(System.currentTimeMillis()/1000);
         commonDao.insert(syncInfoPoolTb);
     }
 }

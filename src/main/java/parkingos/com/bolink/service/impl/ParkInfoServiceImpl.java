@@ -114,6 +114,7 @@ public class ParkInfoServiceImpl implements ParkInfoService {
             syncInfoPoolTb.setTableId(Long.parseLong(id));
             syncInfoPoolTb.setCreateTime(System.currentTimeMillis()/1000);
             syncInfoPoolTb.setOperate(1);
+            syncInfoPoolTb.setUpdateTime(System.currentTimeMillis()/1000);
             int ins =commonDao.insert(syncInfoPoolTb);
             if(ins!=1){
                 logger.error("======>>>车场插入同步表失败");

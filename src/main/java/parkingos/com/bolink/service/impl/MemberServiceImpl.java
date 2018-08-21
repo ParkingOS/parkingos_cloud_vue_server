@@ -14,6 +14,7 @@ import parkingos.com.bolink.qo.PageOrderConfig;
 import parkingos.com.bolink.qo.SearchBean;
 import parkingos.com.bolink.service.MemberService;
 import parkingos.com.bolink.service.SupperSearchService;
+import parkingos.com.bolink.utils.CommonUtils;
 import parkingos.com.bolink.utils.OrmUtil;
 import parkingos.com.bolink.utils.StringUtils;
 
@@ -30,6 +31,8 @@ public class MemberServiceImpl implements MemberService {
     private CommonDao commonDao;
     @Autowired
     private SupperSearchService<UserInfoTb> supperSearchService;
+    @Autowired
+    private CommonUtils commonUtils;
 
     @Override
     public JSONObject selectResultByConditions(Map<String, String> reqmap) {
@@ -256,6 +259,7 @@ public class MemberServiceImpl implements MemberService {
             result.put("msg","增加成功");
             result.put("id",nextid);
             //不支持ETCPark,支持的话再加
+            commonUtils.sendMessage(user,user.getComid(),nextid,1);
             insertSysn(user,0);
         }
 //        if(r==1){
@@ -288,6 +292,7 @@ public class MemberServiceImpl implements MemberService {
             UserInfoTb condition = new UserInfoTb();
             condition.setId(userInfoTb.getId());
             userInfoTb = (UserInfoTb)commonDao.selectObjectByConditions(condition);
+            commonUtils.sendMessage(userInfoTb,userInfoTb.getComid(),userInfoTb.getId(),2);
             insertSysn(userInfoTb,1);
             result.put("state",1);
             result.put("msg","修改成功");
@@ -322,6 +327,7 @@ public class MemberServiceImpl implements MemberService {
             int ret =commonDao.updateByPrimaryKey(userInfoTb);
             if(ret==1){
                 userInfoTb =(UserInfoTb)commonDao.selectObjectByConditions(userInfoTb);
+                commonUtils.sendMessage(userInfoTb,userInfoTb.getComid(),userInfoTb.getId(),2);
                 insertSysn(userInfoTb,1);
 //                if(publicMethods.isEtcPark(comid)){
 //                    int ret = daService.update("insert into sync_info_pool_tb(comid,table_name,table_id,create_time,operate) values(?,?,?,?,?)", new Object[]{comid,"user_info_tb",Long.valueOf(uin),System.currentTimeMillis()/1000,1});
@@ -353,6 +359,7 @@ public class MemberServiceImpl implements MemberService {
             result.put("state",1);
             result.put("msg","删除成功");
             userInfoTb =(UserInfoTb)commonDao.selectObjectByConditions(userInfoTb);
+            commonUtils.sendMessage(userInfoTb,userInfoTb.getComid(),id,3);
             insertSysn(userInfoTb,2);
 
 //            //判断是否支持ETCPARK
@@ -389,6 +396,7 @@ public class MemberServiceImpl implements MemberService {
             ret = commonDao.updateByPrimaryKey(userInfoTb);
             if(ret==1){
                 userInfoTb =(UserInfoTb)commonDao.selectObjectByConditions(userInfoTb);
+                commonUtils.sendMessage(userInfoTb,userInfoTb.getComid(),id,2);
                 insertSysn(userInfoTb,1);
 //                if(publicMethods.isEtcPark(comid)){
 //                    int r = daService.update("insert into sync_info_pool_tb(comid,table_name,table_id,create_time,operate) values(?,?,?,?,?)", new Object[]{comid,"user_info_tb",id,System.currentTimeMillis()/1000,1});
@@ -411,6 +419,7 @@ public class MemberServiceImpl implements MemberService {
         syncInfoPoolTb.setTableName("user_info_tb");
         syncInfoPoolTb.setCreateTime(System.currentTimeMillis()/1000);
         syncInfoPoolTb.setOperate(operater);
+        syncInfoPoolTb.setUpdateTime(System.currentTimeMillis()/1000);
         commonDao.insert(syncInfoPoolTb);
     }
 

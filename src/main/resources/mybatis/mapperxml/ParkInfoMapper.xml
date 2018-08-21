@@ -7,11 +7,9 @@
     select
     a.car_number AS "cartId",
     a.create_time AS "timemills",
-    b.company_name AS "parkName"
-    from ${tableName} a,
-    com_info_tb b
-    where a.comid = b.id
-    and a.create_time > #{create_time,jdbcType=BIGINT}
+    a.comid
+    from ${tableName} a
+    where a.create_time > #{create_time,jdbcType=BIGINT}
     and a.groupid= #{groupid,jdbcType=BIGINT}
     and a.state = 0
     and a.ishd = 0
@@ -25,14 +23,14 @@
         select
     a.car_number AS "cartId",
     a.end_time AS "timemills",
-    b.company_name AS "parkName"
-    from ${tableName} a,
-    com_info_tb b
-    where a.comid = b.id
-        and a.end_time > #{create_time,jdbcType=BIGINT}
+    a.comid
+    from ${tableName} a
+
+    where
+        a.end_time > #{create_time,jdbcType=BIGINT}
         and a.groupid= #{groupid,jdbcType=BIGINT}
-        and a.state in(1,2)
-        and b.state = 0
+        and a.state =1
+
         and a.ishd = 0
         ORDER BY a.end_time DESC
         limit  10
@@ -41,15 +39,15 @@
     <!--获取车场收费排行-->
     <select id="getParkRank"  resultType="map">
     select COALESCE(sum(a.cash_pay+a.electronic_pay+a.cash_prepay+a.electronic_prepay),0) AS "total" ,
-    b.company_name AS "parkName"
-    from ${tableName} a ,com_info_tb b
-    where a.comid=b.id
-     and a.end_time > #{end_time,jdbcType=BIGINT}
+    a.comid
+    from ${tableName} a
+    where
+     a.end_time > #{end_time,jdbcType=BIGINT}
      and a.groupid= #{groupid,jdbcType=BIGINT}
      and a.ishd = 0
-     and b.state= 0
+
      and a.out_uid>-1
-     GROUP BY a.comid, b.company_name
+     GROUP BY a.comid
       ORDER BY  total desc
       limit 5
     </select>
@@ -60,38 +58,8 @@
         where a.groupid = #{groupid,jdbcType=BIGINT}
         and a.state = 0
     </select>
-   <!--获取今日电子收费-->
-    <select id="getElectronicPay"  resultType="java.lang.Double">
-        select COALESCE(sum(a.electronic_pay),0 )AS "electronic_pay"
-        from order_tb_new a
-        where a.end_time > #{create_time,jdbcType=BIGINT}
-        and a.groupid= #{groupid,jdbcType=BIGINT}
-        and a.ishd = 0
-    </select>
-    <!--获取今日现金收费-->
-    <select id="getCashPay"  resultType="java.lang.Double">
-        select COALESCE(sum(a.cash_pay),0) cash_pay
-        from order_tb_new a
-        where a.end_time > #{create_time,jdbcType=BIGINT}
-        and a.groupid= #{groupid,jdbcType=BIGINT}
-        and a.ishd = 0
-    </select>
-    <!--获取今日减免-->
-    <select id="getReduceAmount"  resultType="java.lang.Double">
-        select COALESCE(sum(a.reduce_amount),0) reduce_amount
-        from order_tb_new a
-        where a.end_time > #{create_time,jdbcType=BIGINT}
-        and a.groupid= #{groupid,jdbcType=BIGINT}
-        and a.ishd = 0
-    </select>
-    <select id="getFreeAmount"  resultType="java.lang.Double">
-        select COALESCE(sum(a.amount_receivable-a.electronic_prepay-a.cash_prepay-a.reduce_amount),0) free_amount
-        from order_tb_new a
-        where a.end_time > #{create_time,jdbcType=BIGINT}
-        and a.pay_type = 8
-        and a.ishd = 0
-        and a.groupid= #{groupid,jdbcType=BIGINT}
-    </select>
+
+
     <!--获取今日进场总数-->
     <select id="getEntryCount"  resultType="java.lang.Integer">
         select count(id) inCars
@@ -205,38 +173,7 @@ and a.is_delete = 0
         ]]>
     </select>
 
-    <!--获取今日电子收费-->
-    <select id="getElectronicPaybc"  resultType="java.lang.Double">
-        select COALESCE(sum(a.electronic_pay),0 )AS "electronic_pay"
-        from order_tb_new a
-        where a.end_time > #{create_time,jdbcType=BIGINT}
-        and a.comid= #{comid,jdbcType=BIGINT}
-        and a.ishd = 0
-    </select>
-    <!--获取今日现金收费-->
-    <select id="getCashPaybc"  resultType="java.lang.Double">
-        select COALESCE(sum(a.cash_pay),0) cash_pay
-        from order_tb_new a
-        where a.end_time > #{create_time,jdbcType=BIGINT}
-        and a.comid= #{comid,jdbcType=BIGINT}
-        and a.ishd = 0
-    </select>
-    <!--获取今日减免-->
-    <select id="getReduceAmountbc"  resultType="java.lang.Double">
-        select COALESCE(sum(a.reduce_amount),0) reduce_amount
-        from order_tb_new a
-        where a.end_time > #{create_time,jdbcType=BIGINT}
-        and a.comid= #{comid,jdbcType=BIGINT}
-        and a.ishd = 0
-  </select>
-    <select id="getFreeAmountbc"  resultType="java.lang.Double">
-        select COALESCE(sum(a.amount_receivable-a.electronic_prepay-a.cash_prepay-a.reduce_amount),0) free_amount
-        from order_tb_new a
-        where a.end_time > #{create_time,jdbcType=BIGINT}
-        and a.pay_type = 8
-        and a.comid= #{comid,jdbcType=BIGINT}
-        and a.ishd = 0
-    </select>
+
 
     <!--获取今日进场总数-->
     <select id="getEntryCountbc"  resultType="java.lang.Integer">
@@ -306,4 +243,17 @@ and a.is_delete = 0
       group by create_time
       order by create_time asc;
     </select>
+
+    <!--获取泊位率根据comid-->
+    <select id="getParkNameById"  resultType="map">
+
+        SELECT
+            company_name as name
+        FROM
+            com_info_tb
+        WHERE
+            ID = #{comid,jdbcType=BIGINT}
+            and state = 0
+    </select>
+
 </mapper>

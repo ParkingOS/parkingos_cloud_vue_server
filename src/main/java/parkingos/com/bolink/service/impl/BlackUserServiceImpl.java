@@ -9,6 +9,7 @@ import parkingos.com.bolink.models.SyncInfoPoolTb;
 import parkingos.com.bolink.models.ZldBlackTb;
 import parkingos.com.bolink.service.BlackUserService;
 import parkingos.com.bolink.service.SupperSearchService;
+import parkingos.com.bolink.utils.CommonUtils;
 
 import java.util.Map;
 
@@ -21,6 +22,8 @@ public class BlackUserServiceImpl implements BlackUserService {
     private CommonDao commonDao;
     @Autowired
     private SupperSearchService<ZldBlackTb> supperSearchService;
+    @Autowired
+    private CommonUtils commonUtils;
 
     @Override
     public JSONObject selectResultByConditions(Map<String, String> reqmap) {
@@ -41,10 +44,8 @@ public class BlackUserServiceImpl implements BlackUserService {
         int ret = commonDao.updateByPrimaryKey(zldBlackTb);
         if(ret==1){
             zldBlackTb = (ZldBlackTb)commonDao.selectObjectByConditions(zldBlackTb);
+            commonUtils.sendMessage(zldBlackTb,zldBlackTb.getComid(),zldBlackTb.getId(),2);
             int ins = insertSysn(zldBlackTb,1);
-            if(ins!=1){
-                logger.error("======>>>>插入同步表失败");
-            }
             result.put("state",1);
             result.put("msg","修改成功");
         }
@@ -59,10 +60,8 @@ public class BlackUserServiceImpl implements BlackUserService {
         int ret = commonDao.updateByPrimaryKey(zldBlackTb);
         if(ret==1){
             zldBlackTb = (ZldBlackTb)commonDao.selectObjectByConditions(zldBlackTb);
+            commonUtils.sendMessage(zldBlackTb,zldBlackTb.getComid(),zldBlackTb.getId(),3);
             int ins = insertSysn(zldBlackTb,2);
-            if(ins!=1){
-                logger.error("======>>>>插入同步表失败");
-            }
             result.put("state",1);
             result.put("msg","删除成功");
         }
@@ -82,10 +81,8 @@ public class BlackUserServiceImpl implements BlackUserService {
         if(ret ==1){
             result.put("state",1);
             result.put("msg","添加成功");
+            commonUtils.sendMessage(zldBlackTb,zldBlackTb.getComid(),zldBlackTb.getId(),1);
             int ins = insertSysn(zldBlackTb,0);
-            if(ins!=1){
-                logger.error("======>>>>插入同步表失败");
-            }
         }
         return result;
     }
@@ -97,6 +94,7 @@ public class BlackUserServiceImpl implements BlackUserService {
         syncInfoPoolTb.setTableName("zld_black_tb");
         syncInfoPoolTb.setCreateTime(System.currentTimeMillis()/1000);
         syncInfoPoolTb.setOperate(operater);
+        syncInfoPoolTb.setUpdateTime(System.currentTimeMillis()/1000);
         return commonDao.insert(syncInfoPoolTb);
     }
 

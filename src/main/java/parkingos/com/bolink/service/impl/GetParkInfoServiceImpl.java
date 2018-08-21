@@ -105,6 +105,9 @@ public class GetParkInfoServiceImpl implements GetParkInfoService {
         List<HashMap<String, Object>> parkRankList = parkInfoMapper.getParkRank(tday, groupid,tableName);
         for(HashMap<String, Object> map:parkRankList){
             map.put("total",af1.format(map.get("total")));
+            long comid = (long)map.get("comid");
+            String parkName = getParkNameById(comid);
+            map.put("parkName",parkName);
         }
         //获取车辆进场，离场，在场的数量统计
         int inCars = parkInfoMapper.getEntryCount(tday, groupid,tableName);
@@ -354,9 +357,22 @@ public class GetParkInfoServiceImpl implements GetParkInfoService {
             Date date = new Date(time * 1000);
             map.put("time", sdf.format(date));
             map.remove("timemills");
+            if(map.get("comid")!=null){
+                long comid = (long)map.get("comid");
+                String parkName = getParkNameById(comid);
+                map.put("parkName",parkName);
+            }
 
         }
 
+    }
+
+    private String getParkNameById(long comid) {
+        Map<String,Object> map = parkInfoMapper.getParkNameById(comid);
+        if(map!=null&&map.get("name")!=null){
+            return map.get("name")+"";
+        }
+        return "";
     }
 
     private List<HashMap<String, Object>> getParkStatus(int groupid) {

@@ -9,6 +9,7 @@ import parkingos.com.bolink.models.PriceTb;
 import parkingos.com.bolink.models.SyncInfoPoolTb;
 import parkingos.com.bolink.service.PriceService;
 import parkingos.com.bolink.service.SupperSearchService;
+import parkingos.com.bolink.utils.CommonUtils;
 
 import java.util.Map;
 
@@ -21,6 +22,8 @@ public class PriceServiceImpl implements PriceService {
     private CommonDao commonDao;
     @Autowired
     private SupperSearchService<PriceTb> supperSearchService;
+    @Autowired
+    private CommonUtils commonUtils;
 
     @Override
     public JSONObject selectResultByConditions(Map<String, String> reqmap) {
@@ -43,6 +46,7 @@ public class PriceServiceImpl implements PriceService {
 
         int ret = commonDao.insert(priceTb);
         if(ret==1){
+            boolean issend = commonUtils.sendMessage(priceTb,priceTb.getComid(),priceTb.getId(),1);
             insertSysn(priceTb,0);
             result.put("state",1);
             result.put("msg","添加成功");
@@ -58,6 +62,7 @@ public class PriceServiceImpl implements PriceService {
         int ret = commonDao.updateByPrimaryKey(priceTb);
         if(ret==1){
             priceTb = (PriceTb)commonDao.selectObjectByConditions(priceTb);
+            boolean issend = commonUtils.sendMessage(priceTb,priceTb.getComid(),priceTb.getId(),2);
             insertSysn(priceTb,1);
             result.put("state",1);
             result.put("msg","修改成功");
@@ -73,6 +78,7 @@ public class PriceServiceImpl implements PriceService {
         int ret = commonDao.updateByPrimaryKey(priceTb);
         if(ret==1){
             priceTb = (PriceTb)commonDao.selectObjectByConditions(priceTb);
+            boolean issend = commonUtils.sendMessage(priceTb,priceTb.getComid(),priceTb.getId(),3);
             insertSysn(priceTb,2);
             result.put("state",1);
             result.put("msg","删除成功");
@@ -87,6 +93,7 @@ public class PriceServiceImpl implements PriceService {
         syncInfoPoolTb.setTableName("price_tb");
         syncInfoPoolTb.setCreateTime(System.currentTimeMillis()/1000);
         syncInfoPoolTb.setOperate(operater);
+        syncInfoPoolTb.setUpdateTime(System.currentTimeMillis()/1000);
         commonDao.insert(syncInfoPoolTb);
     }
 

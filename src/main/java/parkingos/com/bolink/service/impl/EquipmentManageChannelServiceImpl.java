@@ -6,11 +6,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import parkingos.com.bolink.dao.spring.CommonDao;
-import parkingos.com.bolink.models.CarTypeTb;
 import parkingos.com.bolink.models.ComPassTb;
 import parkingos.com.bolink.models.SyncInfoPoolTb;
 import parkingos.com.bolink.service.EquipmentManageChannelService;
 import parkingos.com.bolink.service.SupperSearchService;
+import parkingos.com.bolink.utils.CommonUtils;
 
 import java.util.Map;
 
@@ -24,6 +24,8 @@ public class EquipmentManageChannelServiceImpl implements EquipmentManageChannel
     private SupperSearchService<ComPassTb> supperSearchService;
     @Autowired
     private CommonDao commonDao;
+    @Autowired
+    private CommonUtils commonUtils;
 
     @Override
     public JSONObject selectResultByConditions(Map<String, String> reqmap) {
@@ -41,6 +43,8 @@ public class EquipmentManageChannelServiceImpl implements EquipmentManageChannel
     public Integer insertResultByConditions(ComPassTb comPassTb) {
         Integer result = commonDao.insert(comPassTb);
         if(result==1){
+            commonUtils.sendMessage(comPassTb,comPassTb.getComid(),comPassTb.getId(),1);
+
             SyncInfoPoolTb syncInfoPoolTb = new SyncInfoPoolTb();
             syncInfoPoolTb.setOperate(0);
             syncInfoPoolTb.setComid(comPassTb.getComid());
@@ -48,6 +52,7 @@ public class EquipmentManageChannelServiceImpl implements EquipmentManageChannel
             syncInfoPoolTb.setTableId(comPassTb.getId());
             syncInfoPoolTb.setTableName("com_pass_tb");
             syncInfoPoolTb.setState(0);
+            syncInfoPoolTb.setUpdateTime(System.currentTimeMillis()/1000);
             int ins = commonDao.insert(syncInfoPoolTb);
             logger.info("插入同步表:"+ins);
         }
@@ -62,6 +67,9 @@ public class EquipmentManageChannelServiceImpl implements EquipmentManageChannel
             ComPassTb con = new ComPassTb();
             con.setId(comPassTb.getId());
             comPassTb=(ComPassTb)commonDao.selectObjectByConditions(con);
+
+            commonUtils.sendMessage(comPassTb,comPassTb.getComid(),comPassTb.getId(),2);
+
             SyncInfoPoolTb syncInfoPoolTb = new SyncInfoPoolTb();
             syncInfoPoolTb.setOperate(1);
             syncInfoPoolTb.setComid(comPassTb.getComid());
@@ -69,6 +77,7 @@ public class EquipmentManageChannelServiceImpl implements EquipmentManageChannel
             syncInfoPoolTb.setTableId(comPassTb.getId());
             syncInfoPoolTb.setTableName("com_pass_tb");
             syncInfoPoolTb.setState(0);
+            syncInfoPoolTb.setUpdateTime(System.currentTimeMillis()/1000);
             int ins = commonDao.insert(syncInfoPoolTb);
             logger.info("插入同步表:"+ins);
         }
@@ -83,6 +92,8 @@ public class EquipmentManageChannelServiceImpl implements EquipmentManageChannel
             ComPassTb con = new ComPassTb();
             con.setId(comPassTb.getId());
             comPassTb=(ComPassTb)commonDao.selectObjectByConditions(con);
+
+            commonUtils.sendMessage(comPassTb,comPassTb.getComid(),comPassTb.getId(),3);
             SyncInfoPoolTb syncInfoPoolTb = new SyncInfoPoolTb();
             syncInfoPoolTb.setOperate(2);
             syncInfoPoolTb.setComid(comPassTb.getComid());
@@ -90,6 +101,7 @@ public class EquipmentManageChannelServiceImpl implements EquipmentManageChannel
             syncInfoPoolTb.setTableId(comPassTb.getId());
             syncInfoPoolTb.setTableName("com_pass_tb");
             syncInfoPoolTb.setState(0);
+            syncInfoPoolTb.setUpdateTime(System.currentTimeMillis()/1000);
             int ins = commonDao.insert(syncInfoPoolTb);
             logger.info("插入同步表:"+ins);
         }

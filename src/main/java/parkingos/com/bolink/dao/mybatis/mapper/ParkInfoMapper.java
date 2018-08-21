@@ -4,6 +4,7 @@ import org.apache.ibatis.annotations.Param;
 
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public interface ParkInfoMapper {
     List<HashMap<String,Object>> getEntryCar(@Param("create_time") long create_time, @Param("groupid")long groupid, @Param("tableName")String tableName );
@@ -36,4 +37,5 @@ public interface ParkInfoMapper {
     double getFreeAmountbc(@Param("create_time") long create_time, @Param("comid")int comid);
     List<HashMap<String,Object>> getBerthPercent(@Param("comidlist") List<HashMap<String,Object>> list,@Param("create_time") long create_time);
 
+    Map<String,Object> getParkNameById(@Param("comid")long comid);
 }

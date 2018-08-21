@@ -459,6 +459,31 @@ public class GetDataServiceImpl implements GetDataService {
         return result;
     }
 
+    @Override
+    public String getAllShops(String comid) {
+        List<Map<String,Object>>  shopList = null;
+        String result = "[";
+
+        String sql = "select id,name from shop_tb where state = 0 and comid = "+ comid;
+
+
+        shopList = commonDao.getObjectBySql(sql);
+
+        if(shopList!=null&&shopList.size()>0){
+            int i = 0;
+            for(Map map : shopList){
+                if(i==0){
+                    result += "{\"value_no\":\"" + map.get("id") + "\",\"value_name\":\"" + map.get("name") + "\"}";
+                }else {
+                    result += ",{\"value_no\":\"" + map.get("id") + "\",\"value_name\":\"" + map.get("name") + "\"}";
+                }
+                i++;
+            }
+        }
+        result+="]";
+        return result;
+    }
+
     private List<Map<String, Object>> getcollectors(Long cityid){
         try {
             if(cityid != null && cityid > 0){

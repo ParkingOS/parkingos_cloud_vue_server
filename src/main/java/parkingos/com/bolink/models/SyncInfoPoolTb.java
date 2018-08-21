@@ -24,6 +24,16 @@ public class SyncInfoPoolTb {
 
     private Long createTime;
 
+    public Long getUpdateTime() {
+        return updateTime;
+    }
+
+    public void setUpdateTime(Long updateTime) {
+        this.updateTime = updateTime;
+    }
+
+    private Long updateTime;
+
     private Integer operate;
 
     private Integer state;

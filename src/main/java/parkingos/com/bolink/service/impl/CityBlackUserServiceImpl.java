@@ -180,6 +180,7 @@ public class CityBlackUserServiceImpl implements CityBlackUserService {
         syncInfoPoolTb.setTableName("zld_black_tb");
         syncInfoPoolTb.setCreateTime(System.currentTimeMillis()/1000);
         syncInfoPoolTb.setOperate(operater);
+        syncInfoPoolTb.setUpdateTime(System.currentTimeMillis()/1000);
         return commonDao.insert(syncInfoPoolTb);
     }
 

@@ -29,6 +29,8 @@ public class VipServiceImpl implements VipService {
     private CommonDao commonDao;
     @Autowired
     private GetDataService getDataService;
+    @Autowired
+    private CommonUtils commonUtils;
 
     @Autowired
     private SupperSearchService<CarowerProduct> supperSearchService;
@@ -65,10 +67,9 @@ public class VipServiceImpl implements VipService {
         if (ret == 1) {
             result.put("state", 1);
             result.put("msg", "删除成功");
+            boolean issend = commonUtils.sendMessage(carowerProduct,comid,id,3);
+
             int ins = insertSysn(carowerProduct, 2, comid);
-            if (ins != 1) {
-                logger.error("====>>>>>插入同步表失败");
-            }
         }
         return result;
     }
@@ -171,16 +172,6 @@ public class VipServiceImpl implements VipService {
             }
         }
 
-//        Double act_total = 0.0d;
-//        if (!acttotal.equals("")) {
-//            try{
-//                act_total = StringUtils.formatDouble(Double.valueOf(acttotal));
-//            }catch (Exception e){
-//                result.put("msg","请正确填写实收金额");
-//                return result;
-//            }
-//        }
-
         logger.error("=======>>>>>act_total" + act_total);
 
         Long uin = -1L;
@@ -202,47 +193,6 @@ public class VipServiceImpl implements VipService {
                         if (uin > 0) {
                             validuin = uin;
                         }
-                        //修改或添加车牌时查询此车牌是否已经对应有月卡会员记录
-//                        String subCar = strNum.startsWith("无")?strNum:"%"+strNum.substring(1)+"%";
-//                        logger.error("======>>>>>subCar"+subCar);
-//                        String sql = "select pid, car_number from  carower_product where com_id=" + comid + " and is_delete=0 and car_number like '" + subCar+"'";
-//                        logger.error("======>>>sql"+sql);
-//                        List<Map> carinfoList = commonDao.getObjectBySql(sql);
-//                        logger.error("=====>>>>>carinfoList"+carinfoList.size());
-//                        Long pidMonth = -1L;
-//                        boolean isMonthUser = false;
-//                        if(carinfoList != null && !carinfoList.isEmpty() && carinfoList.size()>0){
-//                            for (Iterator iterator = carinfoList.iterator(); iterator
-//                                    .hasNext();) {
-//                                Map uinmap = (Map) iterator.next();
-//                                pidMonth = (Long)uinmap.get("pid");
-//                                String carNumUnique = String.valueOf(uinmap.get("car_number"));
-//                                logger.error("====>>>>>>pidMonth"+pidMonth);
-//                                logger.error("====>>>>>>carNumUnique"+carNumUnique);
-//                                if (pidMonth != null && pidMonth != -1) {
-//                                    String isMonthUsersql = "select p.b_time,p.e_time,p.type from product_package_tb p,carower_product c where c.pid=p.id and p.comid=" + comid + " and c.car_number='" + carNumUnique + "' order by c.id desc ";
-//                                    List<Map<String, Object>> list = commonDao.getObjectBySql(isMonthUsersql);
-//                                    if (list != null && list.size() > 0) {
-//                                        isMonthUser = true;
-//                                    }
-//                                }
-//								/*
-//								 * 假如改车牌已经注册过月卡会员，车牌一致时才能继续添加，否则提示已注册
-//								 * 其中A,B和B,A也代表车牌是一致的
-//								 */
-//                                boolean isSameCarNumber = isCarNumberSame(carNumber, carNumUnique);
-//                                logger.error("=====>>>>>>isSameCarNumber"+isSameCarNumber);
-//                                if(isMonthUser && isSameCarNumber){
-//                                    isMonthUser = false;
-//                                    carNumber = carNumUnique;
-//                                }
-//                            }
-//                            logger.error("=====>>>>isMonthUser"+isMonthUser);
-//                            if(isMonthUser){
-//                                result.put("msg", "该车牌已注册为月卡会员,请修改车牌");
-//                                return result;
-//                            }
-//                        }
                     } else {
                         result.put("msg", "车牌号有误");
                         return result;
@@ -284,6 +234,7 @@ public class VipServiceImpl implements VipService {
         carowerProduct1.setLimitDayType(limit_day_type);
         int ret = commonDao.insert(carowerProduct1);
 
+
         //******添加月卡消费记录*******
         Integer renewId = (commonDao.selectSequence(CardRenewTb.class)).intValue();
         String tradeNo = TimeTools.getTimeYYYYMMDDHHMMSS() + "" + comid;
@@ -315,11 +266,11 @@ public class VipServiceImpl implements VipService {
             result.put("state", 1);
             result.put("msg", "添加成功");
             result.put("id",nextid);
+            boolean issend = commonUtils.sendMessage(carowerProduct1,comid,nextid,1);
+            logger.info("........发送月卡数据"+issend);
             int ins = insertSysn(carowerProduct1, 0, comid);
+            boolean issend1 = commonUtils.sendMessage(cardRenewTb,comid,renewId.longValue(),1);
             int reNew = insertCardSysn(cardRenewTb, 0, comid);
-            if (ins != 1) {
-                logger.error("======>>>>>>>>>插入同步表失败");
-            }
         }
 
         return result;
@@ -361,40 +312,6 @@ public class VipServiceImpl implements VipService {
                             if (uin > 0) {
                                 validuin = uin;
                             }
-                            //修改或添加车牌时查询此车牌是否已经对应有月卡会员记录
-//                            String subCar = strNum.startsWith("无") ? strNum : "%" + strNum.substring(1) + "%";
-//                            String sql = "select pid, car_number from  carower_product where com_id=" + comid + " and is_delete=0 and car_number like '" + subCar +"'";
-//                            List<Map> carinfoList = commonDao.getObjectBySql(sql);
-//                            Long pid = -1L;
-//                            boolean isMonthUser = false;
-//                            //定义月卡会员记录中对应的车牌
-//                            String carNumUnique = "";
-//                            if (carinfoList != null && !carinfoList.isEmpty() && carinfoList.size() > 0) {
-//                                for (Iterator iterator = carinfoList.iterator(); iterator
-//                                        .hasNext(); ) {
-//                                    Map uinmap = (Map) iterator.next();
-//                                    pid = (Long) uinmap.get("pid");
-//                                    carNumUnique = String.valueOf(uinmap.get("car_number"));
-//                                    if (pid != null && pid != -1) {
-//                                        String isMonthUsersql = "select p.b_time,p.e_time,p.type from product_package_tb p," +
-//                                                "carower_product c where c.pid=p.id and p.comid=" + comid + " and c.car_number='" + carNumUnique + "' order by c.id desc ";
-//                                        List<Map<String, Object>> list = commonDao.getObjectBySql(isMonthUsersql);
-//                                        if (list != null && list.size() > 0) {
-//                                            isMonthUser = true;
-//                                        }
-//                                    }
-//                                    boolean isSameCarNumber = isCarNumberSame(carNumber, carNumUnique);
-//                                    if (isMonthUser && isSameCarNumber) {
-//                                        isMonthUser = false;
-//                                    } else if (isMonthUser && carinfoList.size() < 2) {
-//                                        isMonthUser = false;
-//                                    }
-//                                }
-//                            }
-//                            if (isMonthUser) {
-//                                result.put("msg", "该车牌:" + carNumberBefore + "已注册为月卡会员,请修改车牌");
-//                                return result;
-//                            }
                         } else {
                             result.put("msg", "车牌号有误");
                             return result;
@@ -412,6 +329,7 @@ public class VipServiceImpl implements VipService {
                 if (ret > 0) {
                     result.put("state", 1);
                     result.put("msg", "修改车牌成功");
+                    boolean issend1 = commonUtils.sendMessage(carowerProduct1,comid,id,2);
                     int r = insertSysn(carowerProduct1, 1, comid);
                     logger.error("parkadmin or admin:" + carowerProduct1 + " add comid:" + comid + " vipuser ,add sync ret:" + r);
                     String allSql = "select * from carower_product where car_number= '" + carNumberBefore + "' and com_id=" + comid + " and is_delete=0";
@@ -425,12 +343,11 @@ public class VipServiceImpl implements VipService {
                         carowerProduct2.setCarNumber(carNumber);
                         int ins = commonDao.updateByPrimaryKey(carowerProduct2);
                         if (ins == 1) {
+                            boolean issend = commonUtils.sendMessage(carowerProduct2,comid,idLong,2);
                             insertSysn(carowerProduct2, 1, comid);
                             logger.error(">>>>>>>>>>>>>>新添加月卡会员修改记录id:" + idLong);
                         }
-//                        mongoDbUtils.saveLogs( request,0, 3, "修改了车牌："+carNumber);
                     }
-//                    mongoDbUtils.saveLogs( request,0, 3, "修改了车牌："+carNumber);
                 } else {
                     logger.error(">>>>>>>>>>>>>>>>对应的月卡会员车牌编号未修改成功，id：" + id);
                 }
@@ -546,8 +463,10 @@ public class VipServiceImpl implements VipService {
                 result.put("state", 1);
                 result.put("msg", "续费成功");
                 //下发 更新月卡信息
+                boolean issend = commonUtils.sendMessage(carowerProduct,comid,id,2);
                 int ins = insertSysn(carowerProduct, 1, comid);
                 //下发 月卡续费记录
+                boolean issend1 = commonUtils.sendMessage(cardRenewTb,comid,renewId.longValue(),1);
                 int res = insertCardSysn(cardRenewTb, 0, comid);
                 logger.error("======月卡续费===ins:" + ins + "===res:" + res);
                 if (ins != 1) {
@@ -569,6 +488,7 @@ public class VipServiceImpl implements VipService {
         syncInfoPoolTb.setTableName("card_renew_tb");
         syncInfoPoolTb.setCreateTime(System.currentTimeMillis() / 1000);
         syncInfoPoolTb.setOperate(operater);
+        syncInfoPoolTb.setUpdateTime(System.currentTimeMillis()/1000);
         return commonDao.insert(syncInfoPoolTb);
     }
 
@@ -579,6 +499,7 @@ public class VipServiceImpl implements VipService {
         syncInfoPoolTb.setTableName("carower_product");
         syncInfoPoolTb.setCreateTime(System.currentTimeMillis() / 1000);
         syncInfoPoolTb.setOperate(operater);
+        syncInfoPoolTb.setUpdateTime(System.currentTimeMillis()/1000);
         return commonDao.insert(syncInfoPoolTb);
     }
 
@@ -743,6 +664,7 @@ public class VipServiceImpl implements VipService {
             result.put("state", 1);
             result.put("msg", "续费成功");
             //下发 更新月卡信息
+            boolean issend = commonUtils.sendMessage(carowerProduct,comid,id,2);
             int ins = insertSysn(carowerProduct, 1, comid);
 
             if (ins != 1) {

@@ -147,4 +147,38 @@ public class HttpProxy {
 		}
 		return result;
 	}
+
+	public  String doHeadPost(String url,String content){
+		HttpClient httpClient = new HttpClient();
+		PostMethod post = new PostMethod(url);
+		int state = 0;
+		String result = "";
+		try {
+			httpClient.setConnectionTimeout(1000*2);
+			post.addRequestHeader("Content-Type", "application/json;charset=utf-8");
+			RequestEntity requestEntity = new StringRequestEntity(new String(content.getBytes("utf-8")));
+			post.setRequestEntity(requestEntity);
+			state = httpClient.executeMethod(post);
+			if(state==HttpStatus.SC_OK){
+				BufferedReader br = new BufferedReader(new InputStreamReader(
+						post.getResponseBodyAsStream()));
+				StringBuffer stringBuffer = new StringBuffer();
+				String str = "";
+				while ((str = br.readLine()) != null) {
+					stringBuffer.append(str);
+				}
+				result= stringBuffer.toString();
+			}else {
+				System.err.println(post.getResponseBodyAsString());
+				result = state+"";
+			}
+			post.releaseConnection();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}finally{
+			if(post!=null)
+				post.releaseConnection();
+		}
+		return result;
+	}
 }

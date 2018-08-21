@@ -29,4 +29,6 @@ public interface GetDataService {
     String getSuperimposed(String comid);
 
     String getGroupChannelTypes(Long groupid);
+
+    String getAllShops(String comid);
 }

@@ -16,6 +16,7 @@ import parkingos.com.bolink.enums.FieldOperator;
 import parkingos.com.bolink.models.QrCodeTb;
 import parkingos.com.bolink.models.ShopTb;
 import parkingos.com.bolink.models.TicketTb;
+import parkingos.com.bolink.models.UserInfoTb;
 import parkingos.com.bolink.qo.PageOrderConfig;
 import parkingos.com.bolink.qo.SearchBean;
 import parkingos.com.bolink.service.SupperSearchService;
@@ -30,7 +31,10 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 @Service
 public class TicketServiceImpl implements TicketService {
@@ -73,6 +77,12 @@ public class TicketServiceImpl implements TicketService {
         }
         if (state != -1) {
             ticketTb.setState(state);
+        }
+
+        if(reqmap.get("create_time")==null){
+            reqmap.put("create_time","between");
+            reqmap.put("create_time_start",TimeTools.getToDayBeginTime()+"");
+            reqmap.put("create_time_end",TimeTools.getToDayBeginTime()+86400+"");
         }
 
         Map searchMap = supperSearchService.getBaseSearch(ticketTb, reqmap);
@@ -200,39 +210,12 @@ public class TicketServiceImpl implements TicketService {
 
         if (ticketList != null && ticketList.size() > 0) {
             for (Map map : ticketList) {
+                logger.error("~~~~~~"+map);
                 List<Object> list = new ArrayList<>();
                 list.add(map.get("id"));
                 list.add(map.get("shop_name"));
                 //list.add( map.get( "money" ) );
-                //优惠时长
-                Object money = map.get("money");
-                Integer ticketUnit = (Integer) map.get("ticket_unit");
-                if (ticketUnit == 1 && !money.equals(0)) {
-                    list.add(map.get("money"));
-                } else {
-                    list.add("");
-                }
-                if (ticketUnit == 2 && !money.equals(0)) {
-                    list.add(map.get("money"));
-                } else {
-                    list.add("");
-                }
-                if (ticketUnit == 3 && !money.equals(0)) {
-                    list.add(map.get("money"));
-                } else {
-                    list.add("");
-                }
-                Double umoney = Double.valueOf(map.get("umoney") + "");
-                if (umoney > 0) {
-                    list.add(map.get("umoney"));
-                } else {
-                    list.add("");
-                }
 
-
-                Long limit_day = Long.valueOf(map.get("limit_day") + "");
-                String date = new SimpleDateFormat("yyyy-MM-DD HH:mm:ss").format(new Date(limit_day * 1000));
-                list.add(date);
                 Integer state = (Integer) map.get("state");
                 if (state == 0) {
                     list.add("未使用");
@@ -244,16 +227,72 @@ public class TicketServiceImpl implements TicketService {
                     list.add(state);
                 }
                 list.add(map.get("car_number"));
-                Integer type = (Integer) map.get("type");
-                if (type == 3) {
-                    list.add("时长减免");
-                } else if (type == 5) {
-                    list.add("金额减免");
-                } else if (type == 4) {
-                    list.add("全免券");
-                } else {
-                    list.add(type);
+
+                //优惠时长
+                Integer money = (Integer) map.get("money");
+                Integer ticketUnit = (Integer) map.get("ticket_unit");
+                if(money>0&&ticketUnit!=null){
+                    if (ticketUnit == 1 ) {
+                        list.add(map.get("money")+"分钟");
+                    }
+                    else if (ticketUnit == 2 ) {
+                        list.add(map.get("money")+"小时");
+                    }
+                    else if (ticketUnit == 3 ) {
+                        list.add(map.get("money")+"天");
+                    }else{
+                        list.add("");
+                    }
+                }else{
+                    list.add("");
                 }
+
+                Double umoney = Double.valueOf(map.get("umoney") + "");
+                if (umoney!=null&&umoney > 0) {
+                    list.add(map.get("umoney")+"元");
+                } else {
+                    list.add("");
+                }
+                Integer type = (Integer) map.get("type");
+                if(type!=null){
+                    if (type == 3) {
+                        list.add("时长减免");
+                    } else if (type == 5) {
+                        list.add("金额减免");
+                    } else if (type == 4) {
+                        list.add("全免券");
+                    } else {
+                        list.add(type);
+                    }
+                }else{
+                    list.add("");
+                }
+
+                if(map.get("create_time")!=null){
+                    Long create_time = Long.valueOf(map.get("create_time") + "");
+                    String date1 = TimeTools.getTime_yyyyMMdd_HHmmss(create_time*1000);
+//                    new SimpleDateFormat("yyyy-MM-DD HH:mm:ss").format(new Date(create_time * 1000));
+                    list.add(date1);
+                }else{
+                    list.add("");
+                }
+
+                if(map.get("limit_day")!=null){
+                    Long limit_day = Long.valueOf(map.get("limit_day") + "");
+                    String date = TimeTools.getTime_yyyyMMdd_HHmmss(limit_day*1000);//new SimpleDateFormat("yyyy-MM-DD HH:mm:ss").format(new Date(limit_day * 1000));
+                    list.add(date);
+                }else{
+                    list.add("");
+                }
+
+                if(map.get("use_time")!=null) {
+                    Long use_time = Long.valueOf(map.get("use_time") + "");
+                    String date2 = TimeTools.getTime_yyyyMMdd_HHmmss(use_time*1000);//new SimpleDateFormat("yyyy-MM-DD HH:mm:ss").format(new Date(use_time * 1000));
+                    list.add(date2);
+                }else {
+                    list.add("");
+                }
+
                 bodyList.add(list);
             }
         }
@@ -281,16 +320,6 @@ public class TicketServiceImpl implements TicketService {
         if("-1".equals(state)){
             reqmap.remove("state");
         }
-//        Long start = null;
-//        Long end = null;
-//        if (date == null || "".equals(date)) {
-//            start = TimeTools.getToDayBeginTime();
-//            end = TimeTools.getToDayBeginTime() + 86399;
-//        }
-//        else {
-//            start = TimeTools.getLongMilliSecondFrom_HHMMDDHHmmss(date.split("至")[0]);
-//            end = TimeTools.getLongMilliSecondFrom_HHMMDDHHmmss(date.split("至")[1]);
-//        }
         int count = 0;
         List<TicketTb> list = null;
         List<Map<String, Object>> resList = new ArrayList<>();
@@ -305,18 +334,6 @@ public class TicketServiceImpl implements TicketService {
             if (searchMap.containsKey("config"))
                 config = (PageOrderConfig) searchMap.get("config");
 
-
-            //封装searchbean  集团或城市下面所有车场
-//            SearchBean searchBean = new SearchBean();
-//            searchBean.setOperator(FieldOperator.BETWEEN);
-//            searchBean.setFieldName("create_time");
-//            searchBean.setStartValue(start);
-//            searchBean.setEndValue(end);
-
-//            if (supperQuery == null) {
-//                supperQuery = new ArrayList<>();
-//            }
-//            supperQuery.add(searchBean);
 
 
             count = commonDao.selectCountByConditions(baseQuery, supperQuery);
@@ -754,4 +771,133 @@ public class TicketServiceImpl implements TicketService {
         }
     }
 
+    @Override
+    public List<List<Object>> exportLog(Map<String, String> reqParameterMap,Integer hiddenType) {
+        //删除分页条件  查询该条件下所有  不然为一页数据
+        reqParameterMap.put("rp", Integer.MAX_VALUE + "");
+        reqParameterMap.put("page", "1");
+        reqParameterMap.put("orderby", "desc");
+        reqParameterMap.put("orderfield", "id");
+
+        JSONObject result = getTicketLog(reqParameterMap);
+        List<Map> ticketList = JSON.parseArray(result.get("rows").toString(), Map.class);
+        List<List<Object>> bodyList = new ArrayList<List<Object>>();
+        if(ticketList!=null&&ticketList.size()>0){
+
+
+            String [] f = new String[]{"car_number","money","umoney","uin","state","type","use_time","create_time","limit_day"};
+            if(hiddenType==1){
+                f = new String[]{"car_number","umoney","uin","state","type","use_time","create_time","limit_day"};
+            }else if(hiddenType==2){
+                f= new String[]{"car_number","money","uin","state","type","use_time","create_time","limit_day"};
+            }
+            for(Map map : ticketList){
+                List<Object> values = new ArrayList<Object>();
+                Map<Long,String> nameMap = new HashMap<>();
+                //判断各种字段 组装导出数据
+                for(String field : f){
+                    if("uin".equals(field)){
+                        String name ="";
+                        if(map.get(field)!=null) {
+                            if (nameMap.containsKey(map.get(field))) {
+                                name = nameMap.get(map.get(field));
+                            } else {
+                                name = getUinName(Long.valueOf(map.get(field) + ""));
+                                nameMap.put(Long.valueOf(map.get(field) + ""), name);
+                            }
+                            values.add(name);
+                        }else{
+                            values.add("");
+                        }
+
+                    }else if("create_time".equals(field)||"use_time".equals(field)||"limit_day".equals(field)){
+                        if(map.get(field)!=null){
+                            values.add(TimeTools.getTime_yyyyMMdd_HHmmss(Long.valueOf((map.get(field)+""))*1000));
+                        }else{
+                            values.add("");
+                        }
+                    }else if("state".equals(field)){
+                        if(map.get(field)!=null){
+                            Integer state = (Integer)map.get(field);
+                            if (state == 0) {
+                                values.add("未使用");
+                            } else if (state == 1) {
+                                values.add("已使用");
+                            } else if (state == 2) {
+                                values.add("回收作废");
+                            } else {
+                                values.add(state);
+                            }
+                        }else{
+                            values.add("");
+                        }
+                    }else if("type".equals(field)){
+                        if(map.get(field)!=null){
+                            Integer type = (Integer)map.get(field);
+                            if (type == 3) {
+                                values.add("时长减免");
+                            } else if (type == 5) {
+                                values.add("金额减免");
+                            } else if (type == 4) {
+                                values.add("全免券");
+                            } else {
+                                values.add(type);
+                            }
+                        }else{
+                            values.add("");
+                        }
+                    }else if("money".equals(field)){
+                        if(map.get(field)!=null){
+                            Integer money = (Integer)map.get(field);
+                            if(money>0){
+                                Integer ticketUnit = (Integer) map.get("ticket_unit");
+                                if (ticketUnit == 1) {
+                                    values.add(money+"分钟");
+                                } else if (ticketUnit == 2) {
+                                    values.add(money+"小时");
+                                } else if (ticketUnit == 3) {
+                                    values.add(money+"天");
+                                } else {
+                                    values.add("");
+                                }
+                            }else{
+                                values.add("");
+                            }
+
+                        }else{
+                            values.add("");
+                        }
+                    }else if("umoney".equals(field)){
+                        if(map.get(field)!=null){
+                            Double umoney = Double.valueOf(map.get("umoney") + "");
+                            if(umoney>0){
+                                values.add(umoney+"元");
+                            }else{
+                                values.add("");
+                            }
+                        }else{
+                            values.add("");
+                        }
+                    }else{
+                        values.add(map.get(field)+"");
+                    }
+                }
+                bodyList.add(values);
+            }
+        }
+        return bodyList;
+    }
+
+
+    private String getUinName(Long uin) {
+        UserInfoTb userInfoTb = new UserInfoTb();
+        userInfoTb.setId(uin);
+        userInfoTb = (UserInfoTb)commonDao.selectObjectByConditions(userInfoTb);
+
+        String uinName = "";
+        if(userInfoTb!=null&&userInfoTb.getNickname()!=null){
+            uinName = userInfoTb.getNickname();
+        }
+        return uinName;
+    }
 }
