@@ -10,4 +10,8 @@ public interface ShopMemberManageService {
     String delete(HttpServletRequest req);
 
     String editpass(HttpServletRequest req);
+
+    String getRoleByConditions(Long roleId, Long shopId);
+
+    String getShopUsers(Long shopId);
 }

@@ -18,7 +18,10 @@ import parkingos.com.bolink.service.OrderService;
 import parkingos.com.bolink.service.SupperSearchService;
 import parkingos.com.bolink.utils.*;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 @Service("orderSpring")
 public class OrderServiceImpl implements OrderService {
@@ -88,45 +91,45 @@ public class OrderServiceImpl implements OrderService {
         DB db = MongoClientFactory.getInstance().getMongoDBBuilder("zld");
         //根据订单编号查询出mongodb中存入的对应个表名
         //Map map = daService.getMap("select * from order_tb where order_id_local=? and comid=?", new Object[]{orderid,comid});
-//        OrderTb orderTb = new OrderTb();
-//        orderTb.setOrderIdLocal(orderid + "");
-//        orderTb.setComid(comid);
-//        orderTb = (OrderTb) commonDao.selectObjectByConditions(orderTb);
+        OrderTb orderTb = new OrderTb();
+        orderTb.setOrderIdLocal(orderid + "");
+        orderTb.setComid(comid);
+        orderTb = (OrderTb) commonDao.selectObjectByConditions(orderTb);
 
-        Calendar calendar=Calendar.getInstance();
-        //获得当前时间的月份，月份从0开始所以结果要加1
-        int month=calendar.get(Calendar.MONTH)+1;
-        logger.info("这是今年的"+month);
-        String monthStr = "";
-        if(month<10){
-            monthStr="0"+month;
-        }else{
-            monthStr = month+"";
-        }
-        String sql = "select * from order_tb_2018_"+monthStr+" where comid="+comid+" and ishd = 0"+" and order_id_local = '"+orderid+"'";
-        List<Map<String,Object>> list = commonDao.getObjectBySql(sql);
-        if(list==null||list.isEmpty()){
-            month=month-1;
-            if(month<10){
-                monthStr="0"+month;
-            }else{
-                monthStr = month+"";
-            }
-            sql = "select * from order_tb_2018_"+monthStr+" where comid="+comid+" and ishd = 0"+" and order_id_local = '"+orderid+"'";
-            logger.info("==============sql2"+sql);
-            list = commonDao.getObjectBySql(sql);
-        }
-
-        String collectionName = "";
-//        if (orderTb != null && orderTb.getCarpicTableName() != null) {
-//            collectionName = orderTb.getCarpicTableName();
+//        Calendar calendar=Calendar.getInstance();
+//        //获得当前时间的月份，月份从0开始所以结果要加1
+//        int month=calendar.get(Calendar.MONTH)+1;
+//        logger.info("这是今年的"+month);
+//        String monthStr = "";
+//        if(month<10){
+//            monthStr="0"+month;
+//        }else{
+//            monthStr = month+"";
+//        }
+//        String sql = "select * from order_tb_2018_"+monthStr+" where comid="+comid+" and ishd = 0"+" and order_id_local = '"+orderid+"'";
+//        List<Map<String,Object>> list = commonDao.getObjectBySql(sql);
+//        if(list==null||list.isEmpty()){
+//            month=month-1;
+//            if(month<10){
+//                monthStr="0"+month;
+//            }else{
+//                monthStr = month+"";
+//            }
+//            sql = "select * from order_tb_2018_"+monthStr+" where comid="+comid+" and ishd = 0"+" and order_id_local = '"+orderid+"'";
+//            logger.info("==============sql2"+sql);
+//            list = commonDao.getObjectBySql(sql);
 //        }
 
-        if(list!=null&&list.size()>0){
-            if(list.get(0).get("carpic_table_name")!=null){
-                collectionName=list.get(0).get("carpic_table_name")+"";
-            }
+        String collectionName = "";
+        if (orderTb != null && orderTb.getCarpicTableName() != null) {
+            collectionName = orderTb.getCarpicTableName();
         }
+
+//        if(list!=null&&list.size()>0){
+//            if(list.get(0).get("carpic_table_name")!=null){
+//                collectionName=list.get(0).get("carpic_table_name")+"";
+//            }
+//        }
 
         logger.error("====>>获得订单图片..collectionName" + collectionName);
         DBCollection collection = db.getCollection("collectionName");

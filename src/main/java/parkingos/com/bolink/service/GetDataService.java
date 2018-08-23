@@ -22,11 +22,13 @@ public interface GetDataService {
 
     String getAllCollectors(String groupid, String cityid);
 
-    String getAllPackage(String groupid,String cityid);
+    String getAllPackage(String groupid, String cityid);
 
     String getAllUnion(Long cityid);
 
     String getSuperimposed(String comid);
 
     String getGroupChannelTypes(Long groupid);
+
+    String getAllShops(String comid);
 }

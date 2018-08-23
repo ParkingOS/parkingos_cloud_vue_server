@@ -40,6 +40,12 @@
         <env>yun</env>
       </properties>
     </profile>
+    <profile>
+      <id>third</id>
+      <properties>
+        <env>third</env>
+      </properties>
+    </profile>
   </profiles>
   <build>
     <finalName>cloud</finalName>

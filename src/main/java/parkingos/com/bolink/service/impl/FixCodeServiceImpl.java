@@ -191,7 +191,7 @@ public class FixCodeServiceImpl implements FixCodeService {
                         result.put("error","固定码金额余额不足");
                         return result;
                     }else{
-                        Map<String,Object> retMap = ticketService.createTicket(shopid,amount,5,0,1);
+                        Map<String,Object> retMap = ticketService.createTicket(shopid,amount,5,0,1,0,fixCodeTb.getUin());
                         if(retMap.get("result") == -1 || retMap.get("result") == -2){
                             logger.info("生成减免劵出错，用劵失败");
                             result.put("state",0);
@@ -216,7 +216,7 @@ public class FixCodeServiceImpl implements FixCodeService {
                         result.put("error","固定码时长余额不足");
                         return result;
                     }else{
-                        Map<String,Object> retMap = ticketService.createTicket(shopid,amount,3,0,1);
+                        Map<String,Object> retMap = ticketService.createTicket(shopid,amount,3,0,1,0,fixCodeTb.getUin());
                         if(retMap.get("result") == -1 || retMap.get("result") == -2){
                             logger.info("生成减免劵出错，用劵失败");
                             result.put("state",0);
@@ -242,7 +242,7 @@ public class FixCodeServiceImpl implements FixCodeService {
                     result.put("error","固定码全免券余额不足");
                     return result;
                 }else{
-                    Map<String,Object> retMap = ticketService.createTicket(shopid,0,4,0,1);
+                    Map<String,Object> retMap = ticketService.createTicket(shopid,0,4,0,1,0,fixCodeTb.getUin());
                     if(retMap.get("result") == -1 || retMap.get("result") == -2){
                         logger.info("生成减免劵出错，用劵失败");
                         result.put("state",0);
