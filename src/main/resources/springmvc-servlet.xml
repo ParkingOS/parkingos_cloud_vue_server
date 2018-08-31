@@ -30,9 +30,9 @@
     <mvc:annotation-driven/>
 
     <!-- 将 springSwaggerConfig加载到spring容器 -->
-    <bean class="com.mangofactory.swagger.configuration.SpringSwaggerConfig" />
+    <!--<bean class="com.mangofactory.swagger.configuration.SpringSwaggerConfig" />-->
     <!-- 将自定义的swagger配置类加载到spring容器 -->
-    <bean class="parkingos.com.bolink.swagger.SwaggerConfig" />
+    <!--<bean class="parkingos.com.bolink.swagger.SwaggerConfig" />-->
 
     <!--配置视图解析器-->
     <bean class="org.springframework.web.servlet.view.InternalResourceViewResolver"

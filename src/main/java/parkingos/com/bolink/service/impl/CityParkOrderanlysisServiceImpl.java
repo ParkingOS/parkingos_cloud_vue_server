@@ -38,6 +38,8 @@ public class CityParkOrderanlysisServiceImpl implements CityParkOrderAnlysisServ
     @Override
     public JSONObject selectResultByConditions(Map<String, String> reqmap) {
 
+        //map  里面放 time
+
         String str = "{\"page\":1,\"rows\":[]}";
         JSONObject result = JSONObject.parseObject(str);
 

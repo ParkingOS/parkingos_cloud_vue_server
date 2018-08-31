@@ -67,6 +67,14 @@ public class FixCodeAction {
         }else{
             validite_time = Integer.parseInt(validiteTime);
         }
+
+//        if(validite_time>500000||validite_time<=0){
+//            result.put("state",0);
+//            result.put("msg","请设置一个合理的有效期");
+//            StringUtils.ajaxOutput(resp,result.toJSONString());
+//            return null;
+//        }
+
         //Integer validite_time = RequestUtil.getInteger(request,"validite_time",24);
 //        Integer amount = RequestUtil.getInteger(request,"amount",0);
 

@@ -35,6 +35,8 @@ public class MonthParkOrderanlysisServiceImpl implements MonthParkOrderAnlysisSe
     @Override
     public JSONObject selectResultByConditions(Map<String, String> reqmap) throws Exception{
 
+        //map里面  放comid_start
+
         String resstr = "{\"page\":1,\"rows\":[]}";
         JSONObject result = JSONObject.parseObject(resstr);
 

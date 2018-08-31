@@ -35,6 +35,8 @@ public class ParkCollectorOrderanlysisServiceImpl implements ParkCollectorOrderA
     @Override
     public JSONObject selectResultByConditions(Map<String, String> reqmap) {
 
+        //reqmap 里面放comid_start
+
         String str = "{\"page\":1,\"rows\":[]}";
         JSONObject result = JSONObject.parseObject(str);
 

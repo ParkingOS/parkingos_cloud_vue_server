@@ -2,9 +2,6 @@ package parkingos.com.bolink.actions;
 
 
 import com.alibaba.fastjson.JSONObject;
-import com.wordnik.swagger.annotations.Api;
-import com.wordnik.swagger.annotations.ApiImplicitParam;
-import com.wordnik.swagger.annotations.ApiOperation;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -24,7 +21,11 @@ import java.io.OutputStream;
 import java.text.ParseException;
 import java.util.List;
 import java.util.Map;
-@Api(value = "vip")
+
+//import com.wordnik.swagger.annotations.Api;
+//import com.wordnik.swagger.annotations.ApiImplicitParam;
+//import com.wordnik.swagger.annotations.ApiOperation;
+//@Api(value = "vip")
 @Controller
 @RequestMapping("/vip")
 public class VipManageAction {
@@ -73,8 +74,8 @@ public class VipManageAction {
         return null;
     }
 
-    @ApiOperation(value="获取指定id用户详细信息", notes="根据user的id来获取用户详细信息")
-    @ApiImplicitParam(name = "id",value = "用户id", dataType = "String", paramType = "path")
+//    @ApiOperation(value="获取指定id用户详细信息", notes="根据user的id来获取用户详细信息")
+//    @ApiImplicitParam(name = "id",value = "用户id", dataType = "String", paramType = "path")
     @RequestMapping(value = "/add")
     /**
      *

@@ -47,7 +47,9 @@ public class ExampleUtis {
                     example.setOrderType(reqmap.get("orderby"));
                     break;
                 case "orderfield":
-                    example.setOrderByClause(reqmap.get("orderfield"));
+                    if(reqmap.get("orderfield")!=null&&!"".equals(reqmap.get("orderfield"))){
+                        example.setOrderByClause(reqmap.get("orderfield"));
+                    }
                     break;
                 case "comid":
 //                    example.createCriteria().andComidEqualTo(Long.valueOf(reqmap.get("comid")));

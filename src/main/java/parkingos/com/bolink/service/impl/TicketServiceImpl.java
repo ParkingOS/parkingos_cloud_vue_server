@@ -8,7 +8,6 @@ import org.apache.poi.hssf.util.HSSFColor;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellStyle;
 import org.apache.poi.ss.usermodel.Row;
-import org.joda.time.LocalDate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import parkingos.com.bolink.dao.spring.CommonDao;
@@ -35,6 +34,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+//import org.joda.time.LocalDate;
 
 @Service
 public class TicketServiceImpl implements TicketService {
@@ -596,7 +597,7 @@ public class TicketServiceImpl implements TicketService {
         //自定义二维码存放路径
 
         //excel名称
-        String sheetName = "商家优惠券" + LocalDate.now().toString().substring(4).replace("-", "");
+        String sheetName = "商家优惠券"+TimeTools.getTime_yyyyMMdd_HHmmss(System.currentTimeMillis()).substring(5,10).replace("-", "") ;//+ LocalDate.now().toString().substring(4).replace("-", "");
         sheetName = StringUtils.encodingFileName(sheetName);
         try {
             //创建工作薄

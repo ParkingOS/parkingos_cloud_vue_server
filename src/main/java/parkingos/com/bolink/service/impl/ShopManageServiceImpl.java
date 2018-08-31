@@ -223,12 +223,12 @@ public class ShopManageServiceImpl implements ShopManageService {
 
 
         String default_limit = RequestUtil.getString( request, "default_limit" );
-        System.out.println("====默认显示额度:"+default_limit);
+//        System.out.println("====默认显示额度:"+default_limit);
         if(default_limit.endsWith(",")){
             return "{\"state\":0,\"msg\":\"请输入正确的默认额度\"}";
         }
         String[] defaultArr = default_limit.split(",");
-        System.out.println("====默认显示额度:"+defaultArr.length);
+//        System.out.println("====默认显示额度:"+defaultArr.length);
         if(defaultArr.length<1){
             return "{\"state\":0,\"msg\":\"请输入正确的默认额度\"}";
         }
@@ -243,9 +243,13 @@ public class ShopManageServiceImpl implements ShopManageService {
 
         double discount_percent = RequestUtil.getDouble( request, "discount_percent", 100.00 );//商户折扣/%
         double discount_money = RequestUtil.getDouble( request, "discount_money", 1.00 );//商户折扣---每小时/元
-        Integer validite_time = RequestUtil.getInteger( request, "validite_time", 0 );//有效期/小时
+        Integer validite_time = RequestUtil.getInteger( request, "validite_time", 24 );//有效期/小时
         Integer ticket_unit = RequestUtil.getInteger(request, "ticket_unit", 1);//单位
         double free_money = RequestUtil.getDouble(request, "free_money",1.00);//全免劵单价---每张/元
+
+//        if(validite_time==0||validite_time>500000){
+//            return "{\"state\":0,\"msg\":\"请设置一个合理的有效期。\"}";
+//        }
 
         //封装
         ShopTb shopTb = new ShopTb();
