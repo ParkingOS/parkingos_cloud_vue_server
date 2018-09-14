@@ -5,6 +5,7 @@ import com.alibaba.fastjson.JSONObject;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import parkingos.com.bolink.controller.OrderServiceController;
 import parkingos.com.bolink.dao.mybatis.OrderTbExample;
 import parkingos.com.bolink.dao.mybatis.mapper.OrderMapper;
 import parkingos.com.bolink.dao.mybatis.mapper.OrderTbMapper;
@@ -37,6 +38,8 @@ public class CityOrderServiceImpl implements CityOrderService {
     private OrderTbMapper orderTbMapper;
     @Autowired
     private OrderMapper orderMapper;
+    @Autowired
+    private OrderServiceController orderServiceController;
 
 
     @Override
@@ -55,7 +58,7 @@ public class CityOrderServiceImpl implements CityOrderService {
         List<OrderTb> list =null;
         //统计满足条件的所有订单的集合  用来统计价格
         List<OrderTb> moneyList =null;
-        List<Map<String, Object>> resList =new ArrayList<>();
+        List<Map<String, Object>> resList =new ArrayList<Map<String, Object>>();
 
         //查询今天的数据显示
         logger.error("=========..req"+reqmap.size());
@@ -90,20 +93,23 @@ public class CityOrderServiceImpl implements CityOrderService {
         }
 
 //        count = commonDao.selectCountByConditions(baseQuery,supperQuery);
-        count = getOrdersCountByGroupid(reqmap);
+//        count = getOrdersCountByGroupid(reqmap);
+        count = orderServiceController.selectOrdersCount(reqmap);
         Map moneymap = new HashMap();
         if(count>0){
             //价格统计不需要分页  要查询所有
 //            logger.info("///////////"+reqmap);
-            moneymap = getMoneyMap(reqmap);
+//            moneymap = getMoneyMap(reqmap);
+            moneymap=orderServiceController.selectMoneyByExample(reqmap);
                 //带分页的 要显示在页面  的数据list
             if(reqmap.get("export")==null){//不是导出
                 reqmap.put("rp",rp);
             }
-            list = getOrdersListByGroupid(reqmap);
+//            list = getOrdersListByGroupid(reqmap);
+            list=orderServiceController.getOrdersByMapConditons(reqmap);
             if (list != null && !list.isEmpty()) {
                 for (OrderTb orderTb1 : list) {
-                    OrmUtil<OrderTb> otm = new OrmUtil<>();
+                    OrmUtil<OrderTb> otm = new OrmUtil<OrderTb>();
                     Map<String, Object> map = otm.pojoToMap(orderTb1);
                     Long start = (Long) map.get("create_time");
                     Long end = (Long) map.get("end_time");
@@ -130,7 +136,6 @@ public class CityOrderServiceImpl implements CityOrderService {
         if(reqmap.get("page")!=null){
             result.put("page",Integer.parseInt(reqmap.get("page")));
         }
-        logger.error("============>>>>>返回数据"+result);
         return result;
     }
 

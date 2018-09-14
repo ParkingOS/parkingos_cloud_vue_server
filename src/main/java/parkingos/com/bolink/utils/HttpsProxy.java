@@ -151,15 +151,15 @@ public class HttpsProxy {
 
 		return charset;
 	}
-	public static void main(String[] args) {
-//    	addpark();
-//    	updatepark();
-//    	querypark();
-//    	adduser();
-//    	updateuser();
-		addorder();
-		updateorder();
-	}
+//	public static void main(String[] args) {
+////    	addpark();
+////    	updatepark();
+////    	querypark();
+////    	adduser();
+////    	updateuser();
+//		addorder();
+//		updateorder();
+//	}
 	private static void updateorder(){
 		String url = "https://127.0.0.1/api-web/order/updateorder";
 //		String url = "https://s.bolink.club/unionapi/order/updateorder";

@@ -58,7 +58,7 @@ public class VisitorServiceImpl implements VisitorService {
             Map<Long, String> uinNameMap = new HashMap<Long, String>();
             for (VisitorTb visitorTb : blackList) {
                 List<Object> values = new ArrayList<Object>();
-                OrmUtil<VisitorTb> otm = new OrmUtil<>();
+                OrmUtil<VisitorTb> otm = new OrmUtil<VisitorTb>();
                 Map map = otm.pojoToMap(visitorTb);
                 for (String field : f) {
                     Object v = map.get(field);

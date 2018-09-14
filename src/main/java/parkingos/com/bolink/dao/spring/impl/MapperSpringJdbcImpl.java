@@ -3,7 +3,6 @@ package parkingos.com.bolink.dao.spring.impl;
 
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 import parkingos.com.bolink.dao.spring.CommonMapper;
@@ -29,7 +28,7 @@ public class MapperSpringJdbcImpl extends JdbcTemplate implements CommonMapper {
      */
     @Autowired
     @Override
-    public void setDataSource(@Qualifier("master")DataSource dataSource) {
+    public void setDataSource(DataSource dataSource) {
         super.setDataSource(dataSource);
     }
 

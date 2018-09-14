@@ -1,12 +1,13 @@
 package parkingos.com.bolink.dao.mybatis.mapper;
 
 
+import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 import parkingos.com.bolink.dao.mybatis.CardRenewTbExample;
 import parkingos.com.bolink.models.CardRenewTb;
 
 import java.util.List;
-
+@Mapper
 public interface CardRenewTbMapper {
     int countByExample(CardRenewTbExample example);
 

@@ -68,8 +68,8 @@ public class CenterMonitorServiceImpl implements CenterMonitorService {
         calendar.set(Calendar.SECOND, 0);
         long tday = calendar.getTimeInMillis() / 1000;
 
-        List<HashMap<String, Object>> ss = new ArrayList<>();//泊位使用率
-        HashMap<String, Object> countMap = new HashMap<>();//进出车统计
+        List<HashMap<String, Object>> ss = new ArrayList<HashMap<String, Object>>();//泊位使用率
+        HashMap<String, Object> countMap = new HashMap<String, Object>();//进出车统计
         HashMap<String, Object> totalIncomemap = new HashMap<>();//今日收入统计
         List<HashMap<String, Object>> confirmOrders = new ArrayList<>();//所有的确认订单
         Map<String, Object> videoMap = new HashMap<String, Object>();//需要返回的播放列表
@@ -82,10 +82,10 @@ public class CenterMonitorServiceImpl implements CenterMonitorService {
                 tableName+= "_"+cityid%100;
             }
 
-            List<Map<String,Object>> tableList =  commonDao.getObjectBySql("select count(*) from pg_class where relname ="+tableName);
-            if(tableList.get(0).get("count")==0){
-
-            }
+//            List<Map<String,Object>> tableList =  commonDao.getObjectBySql("select count(*) from pg_class where relname ="+tableName);
+//            if(tableList.get(0).get("count")==0){
+//
+//            }
 
 
             Map<String, String> parammap = new HashMap<String, String>();

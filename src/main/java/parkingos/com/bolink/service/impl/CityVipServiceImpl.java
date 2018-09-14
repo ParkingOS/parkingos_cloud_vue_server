@@ -47,7 +47,7 @@ public class CityVipServiceImpl implements CityVipService {
 
         int count =0;
         List<CarowerProduct> list =null;
-        List<Map<String, Object>> resList =new ArrayList<>();
+        List<Map<String, Object>> resList =new ArrayList<Map<String, Object>>();
 
         //组装所有查询参数
         CarowerProduct carowerProduct = new CarowerProduct();
@@ -104,7 +104,7 @@ public class CityVipServiceImpl implements CityVipService {
                 searchBean.setBasicValue(parks);
 
                 if (supperQuery == null) {
-                    supperQuery = new ArrayList<>();
+                    supperQuery = new ArrayList<SearchBean>();
                 }
                 supperQuery.add( searchBean );
 

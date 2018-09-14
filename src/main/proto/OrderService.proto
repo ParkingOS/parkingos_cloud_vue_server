@@ -1,0 +1,79 @@
+syntax = "proto3";
+
+option java_multiple_files = true;
+package com.zld.proto;
+
+message Order {
+    int64 id =1;
+    int64 createTime =2;
+    int64 comid=3;
+    int64 uin=4;
+    double total=5;
+    int32 state=6;
+    int64 endTime=7;
+    int32 payType=9;
+    int64 uid=10;
+    string carNumber=11;
+    int32 type =8;
+    int64 outUid=12;
+    string orderIdLocal=13;
+    int32 islocked =14;
+    string lockKey =15;
+    string cType =16;
+    string carType =17;
+    string carpicTableName=18;
+    int64 cityid =19;
+    string tableName =20;
+    double amountReceivable =21;
+    double electronicPrepay=22;
+    double electronicPay=23;
+    double cashPrepay=24;
+    double cashPay=25;
+    double reduceAmount=26;
+}
+
+message OrderCount{
+    int32 count = 1;
+}
+
+message OrderList{
+    repeated Order order=1;
+}
+
+message OrderMap{
+    map<string,string> map=1;
+}
+message MapList{
+    repeated OrderMap map=1;
+}
+
+message OrderConditoins{
+    map<string,string> map =1;
+}
+
+service OrderService {
+
+    rpc qryOrdersByComidAndOrderId(Order) returns(OrderList);
+
+    rpc getOrdersByMapConditons(OrderMap) returns(OrderList);
+
+    rpc selectOrdersCount(OrderMap) returns(OrderCount);
+
+    rpc selectMoneyByExample(OrderMap) returns(OrderMap);
+
+    //后台统计查询服务接口
+    //1 集团日报
+    rpc selectCityDayAnlysis(OrderMap) returns(MapList);
+    //2 集团 车场日报
+    rpc selectCityParkDayAnlysis(OrderMap) returns(MapList);
+    //3 集团  集团月报
+    rpc selectCityMonthAnlysis(OrderMap) returns(MapList);
+
+    //4 车场  车场日报
+    rpc selectParkDayAnlysis(OrderMap) returns(MapList);
+    //5 车场   车场月报
+    rpc selectParkMonthAnlysis(OrderMap) returns(MapList);
+    //6 车场   车场收费员日报
+    rpc selectParkCollectorAnlysis(OrderMap) returns(MapList);
+
+}

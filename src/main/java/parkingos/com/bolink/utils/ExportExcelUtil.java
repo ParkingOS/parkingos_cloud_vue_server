@@ -13,12 +13,9 @@ import org.apache.poi.xssf.usermodel.XSSFCellStyle;
 import org.apache.poi.xssf.usermodel.XSSFDataFormat;
 import org.apache.poi.xssf.usermodel.XSSFFont;
 
-import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.text.ParseException;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -261,33 +258,33 @@ public class ExportExcelUtil {
 	     * @throws IOException
 	     * @throws ParseException
 	     */
-	    public static void main(String[] args) throws IOException, ParseException {
-	        String headers[] =  { "日期", "天气", "自然", "自然", "调整", "调整", "备注","记录人"} ;
-	        String dataType []={"DATE","DATE","DATE","DATE","DATE","DATE","STR","DOUBLE"};
-	        String[] subHeads = new String[] { "温度℃", "湿度%", "温度℃","湿度%" };// 在excel中的第4行每列（合并列）的参数
-			String[] headnum = new String[] { "1,2,0,0", "1,2,1,1", "1,1,2,3","1,1,4,5", "1,2,6,6", "1,2,7,7"};
-			// 对应excel中的行和列，下表从0开始{"开始行,结束行,开始列,结束列"}
-			String[] subheadnum = new String[] { "2,2,2,2", "2,2,3,3", "2,2,4,4","2,2,5,5"};
-			
-	        File file = new File("D://test.xlsx");
-	        if (file.exists())
-	            file.delete();
-	        file.createNewFile();
-	         
-	        ExportExcelUtil exportData = new ExportExcelUtil("订单报表", headers, "报表1",dataType,
-	        		subHeads,headnum,subheadnum,new int[]{1,6});
-	        
-	        List data = new ArrayList();
-	        for (int i = 0; i < 100; i++) {
-	            List<Object> cellList = new ArrayList<Object>();
-	            for (int j = 0; j < 7; j++) {
-	                cellList.add(new Date());
-	            }
-	            cellList.add(0.9);
-	            data.add(cellList);
-	        }
-	        OutputStream out = new FileOutputStream(file);
-	        exportData.PoiWriteExcel_To2007(data,out);
-	    }
+//	    public static void main(String[] args) throws IOException, ParseException {
+//	        String headers[] =  { "日期", "天气", "自然", "自然", "调整", "调整", "备注","记录人"} ;
+//	        String dataType []={"DATE","DATE","DATE","DATE","DATE","DATE","STR","DOUBLE"};
+//	        String[] subHeads = new String[] { "温度℃", "湿度%", "温度℃","湿度%" };// 在excel中的第4行每列（合并列）的参数
+//			String[] headnum = new String[] { "1,2,0,0", "1,2,1,1", "1,1,2,3","1,1,4,5", "1,2,6,6", "1,2,7,7"};
+//			// 对应excel中的行和列，下表从0开始{"开始行,结束行,开始列,结束列"}
+//			String[] subheadnum = new String[] { "2,2,2,2", "2,2,3,3", "2,2,4,4","2,2,5,5"};
+//
+//	        File file = new File("D://test.xlsx");
+//	        if (file.exists())
+//	            file.delete();
+//	        file.createNewFile();
+//
+//	        ExportExcelUtil exportData = new ExportExcelUtil("订单报表", headers, "报表1",dataType,
+//	        		subHeads,headnum,subheadnum,new int[]{1,6});
+//
+//	        List data = new ArrayList();
+//	        for (int i = 0; i < 100; i++) {
+//	            List<Object> cellList = new ArrayList<Object>();
+//	            for (int j = 0; j < 7; j++) {
+//	                cellList.add(new Date());
+//	            }
+//	            cellList.add(0.9);
+//	            data.add(cellList);
+//	        }
+//	        OutputStream out = new FileOutputStream(file);
+//	        exportData.PoiWriteExcel_To2007(data,out);
+//	    }
 
 }

@@ -1,0 +1,25 @@
+
+
+server:
+  port: 10203
+  servlet-path: /cloud
+mybatis:
+  mapper-locations: "classpath*:mybatis/mapperxml/*.xml"
+  configuration:
+    mapUnderscoreToCamelCase: true
+logging:
+  level:
+    com.zld.mapper: DEBUG
+spring:
+  cloud:
+    consul:
+      host: localhost
+      port: 8500
+      discovery:
+        register: false
+#  profiles:
+#    active:
+---
+spring:
+  application:
+    name: grpc-client

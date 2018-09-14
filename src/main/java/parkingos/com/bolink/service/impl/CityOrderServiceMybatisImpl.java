@@ -24,15 +24,9 @@ public class CityOrderServiceMybatisImpl implements CityUnorderService {
 
     @Override
     public JSONObject selectResultByConditions(Map<String, String> map) {
-        System.out.println("============mybatis+陈博文");
 //        OrderAndParkTbExample orderAndParkTbExample = new OrderAndParkTbExample();
         JSONObject result = new JSONObject();
-//        OrderAndParkTb orderAndParkTb = new OrderAndParkTb();
-//        orderAndParkTb.setState(0);
-//        orderAndParkTb.setIshd(0);
-        List<Long> list = new ArrayList<>();
-//        list.add(21782L);
-//        list.add(21866L);
+        List<Long> list = new ArrayList<Long>();
         List<OrderAndParkTb> resList = cityorderTbMapper.queryByParam(list);
         result.put("rows", JSON.toJSON(resList));
         return result;

@@ -10,7 +10,7 @@ import java.util.Map;
 public class GetPojoFieldType<T> {
 
     public  Map<String, Integer> getFieldTypes(T t,Map<String,String> params) {
-        Map<String,Integer> resutlMap = new HashMap<>();
+        Map<String,Integer> resutlMap = new HashMap<String,Integer>();
         if (t == null) {
             return null;
         } else {

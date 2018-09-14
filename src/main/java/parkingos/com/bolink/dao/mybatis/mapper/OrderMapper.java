@@ -1,6 +1,7 @@
 package parkingos.com.bolink.dao.mybatis.mapper;
 
 
+import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
 import parkingos.com.bolink.dao.mybatis.OrderTbExample;
@@ -8,7 +9,7 @@ import parkingos.com.bolink.models.OrderTb;
 
 import java.util.List;
 import java.util.Map;
-
+@Mapper
 public interface OrderMapper {
     @Select("select cityid from com_info_tb where id =#{comid} and state=0")
     Long getCityIdByComId(@Param("comid")Long comid);

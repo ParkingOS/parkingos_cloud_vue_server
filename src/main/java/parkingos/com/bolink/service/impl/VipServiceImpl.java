@@ -554,7 +554,7 @@ public class VipServiceImpl implements VipService {
             String[] f = new String[]{"id", "p_name", "mobile"/*,"uin"*/, "name", "car_number", "create_time", "b_time", "e_time", "total","p_lot", "car_type_id", "limit_day_type", "remark"};
             for (CarowerProduct carowerProduct : viplist) {
                 List<String> values = new ArrayList<String>();
-                OrmUtil<CarowerProduct> otm = new OrmUtil<>();
+                OrmUtil<CarowerProduct> otm = new OrmUtil<CarowerProduct>();
                 Map map = otm.pojoToMap(carowerProduct);
                 for (String field : f) {
                     if ("p_name".equals(field)) {

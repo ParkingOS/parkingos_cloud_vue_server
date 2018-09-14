@@ -1,6 +1,7 @@
 package parkingos.com.bolink.utils;
 
 import com.mongodb.*;
+import org.springframework.stereotype.Repository;
 
 import java.net.UnknownHostException;
 import java.util.ArrayList;
@@ -9,6 +10,7 @@ import java.util.List;
 
 
 /**mongodb配置**/
+@Repository
 public class MongoClientFactory {
 
 	//private Logger logger = Logger.getLogger(MongoClientFactory.class);

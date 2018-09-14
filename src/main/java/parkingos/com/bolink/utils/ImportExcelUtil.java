@@ -15,8 +15,6 @@ import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.InputStream;
 import java.io.PushbackInputStream;
 import java.text.SimpleDateFormat;
@@ -191,15 +189,15 @@ public class ImportExcelUtil {
 
 
 
-	public static void main(String[] args) {
-		try {
-//			System.err.println(readLocal().size());
-			File file = new File("C:\\test.xlsx");
-			ArrayList<Object[]> values = generateUserSql(new FileInputStream(file), "test.xlsx", 1);
-			System.out.println(values);
-			//String sql = "insert into com_info_tb(company_name,resume,create_time,longitude,latitude,type,state,city) values(?,?,?,?,?,?,?,?)";
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-	}
+//	public static void main(String[] args) {
+//		try {
+////			System.err.println(readLocal().size());
+//			File file = new File("C:\\test.xlsx");
+//			ArrayList<Object[]> values = generateUserSql(new FileInputStream(file), "test.xlsx", 1);
+//			System.out.println(values);
+//			//String sql = "insert into com_info_tb(company_name,resume,create_time,longitude,latitude,type,state,city) values(?,?,?,?,?,?,?,?)";
+//		} catch (Exception e) {
+//			e.printStackTrace();
+//		}
+//	}
 }

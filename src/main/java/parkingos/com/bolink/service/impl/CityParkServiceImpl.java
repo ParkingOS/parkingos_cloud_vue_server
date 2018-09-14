@@ -43,7 +43,7 @@ public class CityParkServiceImpl implements CityParkService {
 
         int count = 0;
         List<ComInfoTb> list = null;
-        List<Map<String, Object>> resList = new ArrayList<>();
+        List<Map<String, Object>> resList = new ArrayList<Map<String, Object>>();
 
         ComInfoTb comInfoTb = new ComInfoTb();
         comInfoTb.setState(0);
@@ -114,7 +114,7 @@ public class CityParkServiceImpl implements CityParkService {
 //            searchBean1.setBasicValue(stateList);
 
             if (supperQuery == null) {
-                supperQuery = new ArrayList<>();
+                supperQuery = new ArrayList<SearchBean>();
             }
             supperQuery.add(searchBean);
 //            supperQuery.add(searchBean1);

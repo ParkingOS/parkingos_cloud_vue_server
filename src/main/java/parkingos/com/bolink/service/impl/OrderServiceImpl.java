@@ -9,6 +9,7 @@ import com.mongodb.DBObject;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import parkingos.com.bolink.controller.OrderServiceController;
 import parkingos.com.bolink.dao.mybatis.OrderTbExample;
 import parkingos.com.bolink.dao.mybatis.mapper.OrderMapper;
 import parkingos.com.bolink.dao.spring.CommonDao;
@@ -36,6 +37,8 @@ public class OrderServiceImpl implements OrderService {
     private SupperSearchService<OrderTb> supperSearchService;
     @Autowired
     private OrderMapper orderMapper;
+    @Autowired
+    private OrderServiceController orderServiceController;
 
     @Override
     public int selectCountByConditions(OrderTb orderTb) {
@@ -47,43 +50,6 @@ public class OrderServiceImpl implements OrderService {
 
 
         JSONObject result = new JSONObject();
-        logger.error("======>>...订单comid:" + Long.parseLong(reqmap.get("comid")));
-
-        //查询在场订单数量  车辆数量  空闲车位
-//        Map<String,String> newReqmap = new HashMap<>();
-//        OrderTb newOrder = new OrderTb();
-//        newOrder.setComid(Long.parseLong(reqmap.get("comid")));
-//        newOrder.setState(0);
-//        newOrder.setIshd(0);
-//        //不用高级查询条件 只需要基本条件  新建map
-//        JSONObject newResult = supperSearchService.supperSearch(newOrder, newReqmap);
-//        Integer total = (Integer) JSON.parse(newResult.get("total")+"");
-//        logger.error("=======>>>在场车辆"+total);
-//
-//        ComInfoTb comInfoTb = new ComInfoTb();
-//        comInfoTb.setId(Long.parseLong(reqmap.get("comid")));
-//        comInfoTb = (ComInfoTb) commonDao.selectObjectByConditions(comInfoTb);
-//        Integer parktotal = 0;
-//        Integer blank = 0;
-//        if(comInfoTb!=null){
-//            Integer parking_total = 0;
-//            if(comInfoTb.getParkingTotal()!= null){
-//                parking_total=comInfoTb.getParkingTotal();//车场车位数
-//            }
-//            Integer shareNumber = 0;
-//            if(comInfoTb.getShareNumber() != null){
-//                shareNumber=comInfoTb.getShareNumber();//车场车位分享数
-//            }
-//            if(shareNumber > 0){
-//                parktotal = shareNumber;
-//            }else{
-//                parktotal = parking_total;
-//            }
-//        }
-//        blank = parktotal -total;
-//        if(blank<=0){
-//            blank = 0;
-//        }
 
         //查询三天的数据显示
         logger.error("=========..req" + reqmap.size());
@@ -103,8 +69,6 @@ public class OrderServiceImpl implements OrderService {
             reqmap.put("tableName","order_tb_new");
         }
 
-//        OrderTb orderTb = new OrderTb();
-//        orderTb.setComid(comid);
         String createTime = reqmap.get("create_time");
         String endTime = reqmap.get("end_time");
         logger.error("===>>>createTime" + createTime + "~~~~endTime:" + endTime);
@@ -116,27 +80,28 @@ public class OrderServiceImpl implements OrderService {
                 logger.error("=========..req" + reqmap.size());
             }
         }
-//        JSONObject result = supperSearchService.supperSearch(orderTb, reqmap);
-
-        //时长重新处理  收款人和收费员重新处理
-//        List<OrderTb> orderList = JSON.parseArray(result.get("rows").toString(), OrderTb.class);
         String rp = "20";
         if(reqmap.get("rp")!=null){
             rp = reqmap.get("rp");
         }
 
-        int count = getOrdersCountByComid(reqmap);
-        List<OrderTb> orderList =new ArrayList<>();
-        List<Map<String, Object>> resList = new ArrayList<>();
+//        int count = getOrdersCountByComid(reqmap);
+        int count = orderServiceController.selectOrdersCount(reqmap);
+        logger.info("get orderCount by service :"+count);
+        List<OrderTb> orderList =new ArrayList<OrderTb>();
+        List<Map<String, Object>> resList = new ArrayList<Map<String, Object>>();
         if(count>0) {
             if(reqmap.get("export")==null){//不是导出
                 reqmap.put("rp",rp);
             }
-            orderList = getOrderListByComid(reqmap);
+//            orderList = getOrderListByComid(reqmap);
+            orderList = orderServiceController.getOrdersByMapConditons(reqmap);
             if (orderList != null && orderList.size() > 0) {
                 for (OrderTb order : orderList) {
-                    OrmUtil<OrderTb> om = new OrmUtil<>();
+                    logger.info("get order ======:"+order);
+                    OrmUtil<OrderTb> om = new OrmUtil<OrderTb>();
                     Map map = om.pojoToMap(order);
+                    logger.info("get order map======:"+map);
                     Long start = (Long) map.get("create_time");
                     Long end = (Long) map.get("end_time");
                     if (start != null && end != null) {
@@ -151,12 +116,6 @@ public class OrderServiceImpl implements OrderService {
         result.remove("rows");
         result.put("rows", JSON.toJSON(resList));
         result.put("total",count);
-//        result.put("",);
-        //车位数据
-//        result.put("parktotal",total);
-//        result.put("blank",blank);
-
-        //logger.error("============>>>>>返回数据" + result);
         return result;
     }
 
@@ -245,10 +204,14 @@ public class OrderServiceImpl implements OrderService {
         }else{
             tableName="order_tb_new";
         }
-        List<Map<String, Object>> list = orderMapper.qryOrdersByComidAndOrderId(comid,orderid,tableName);
+        List<OrderTb> list = orderServiceController.qryOrdersByComidAndOrderId(comid,orderid,tableName);
+//        List<Map<String, Object>> list = orderMapper.qryOrdersByComidAndOrderId(comid,orderid,tableName);
         if (list != null && list.size() > 0) {
-            if (list.get(0).get("carpic_table_name") != null) {
-                collectionName = list.get(0).get("carpic_table_name") + "";
+//            if (list.get(0).get("carpic_table_name") != null) {
+//                collectionName = list.get(0).get("carpic_table_name") + "";
+//            }
+            if (list.get(0).getCarpicTableName() != null) {
+                collectionName = list.get(0).getCarpicTableName();
             }
         }
 

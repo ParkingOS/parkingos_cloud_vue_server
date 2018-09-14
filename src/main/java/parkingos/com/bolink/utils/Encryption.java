@@ -24,25 +24,25 @@ public class Encryption {
 	 * 
 	 * @param args
 	 */
-	public static void main(String[] args) {
-		// TODO Auto-generated method stub
-		try {
-			// String password = System.currentTimeMillis()+"000";
-			String key = "1234567812345678";
-			String content = "123";
-			System.out.println("加密前：" + content);
-			String encryptString = encryptToAESPKCS5(content, key);
-			System.out.println("加密后：" + encryptString);
-
-			System.out.println("解密前：" + encryptString);
-			String decrypyResult = decryptToAESPKCS5(encryptString, key);
-			System.out.println("解密后：" + decrypyResult);
-		}
-		catch(Exception e) {
-			// TODO: handle exception
-		}
-
-	}
+//	public static void main(String[] args) {
+//		// TODO Auto-generated method stub
+//		try {
+//			// String password = System.currentTimeMillis()+"000";
+//			String key = "1234567812345678";
+//			String content = "123";
+//			System.out.println("加密前：" + content);
+//			String encryptString = encryptToAESPKCS5(content, key);
+//			System.out.println("加密后：" + encryptString);
+//
+//			System.out.println("解密前：" + encryptString);
+//			String decrypyResult = decryptToAESPKCS5(encryptString, key);
+//			System.out.println("解密后：" + decrypyResult);
+//		}
+//		catch(Exception e) {
+//			// TODO: handle exception
+//		}
+//
+//	}
 	
 	/**
 	 * 

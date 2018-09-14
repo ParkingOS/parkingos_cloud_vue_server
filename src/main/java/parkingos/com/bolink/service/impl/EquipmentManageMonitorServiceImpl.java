@@ -69,7 +69,7 @@ public class EquipmentManageMonitorServiceImpl implements EquipmentManageMonitor
 
         int count =0;
         List<MonitorInfoTb> list =null;
-        List<Map<String, Object>> resList =new ArrayList<>();
+        List<Map<String, Object>> resList =new ArrayList<Map<String, Object>>();
 
         MonitorInfoTb monitorInfoTb = new MonitorInfoTb();
         monitorInfoTb.setState(1);
@@ -94,7 +94,7 @@ public class EquipmentManageMonitorServiceImpl implements EquipmentManageMonitor
                 parks = commonMethods.getParks(Long.parseLong(groupid));
             }
 
-            List<String> parksCon = new ArrayList<>();
+            List<String> parksCon = new ArrayList<String>();
             for(Object parkid:parks){
                 parksCon.add(parkid+"");
             }

@@ -12,8 +12,6 @@ import org.apache.poi.xssf.usermodel.XSSFCellStyle;
 import org.apache.poi.xssf.usermodel.XSSFDataFormat;
 import org.apache.poi.xssf.usermodel.XSSFFont;
 
-import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.text.ParseException;
@@ -179,25 +177,25 @@ public class ExportDataExcel {
      * @throws IOException
      * @throws ParseException
      */
-    public static void main(String[] args) throws IOException, ParseException {
-        String headers[][] = {{"日期","DATE"},{"标题","TIME"},{"其他","DOUBLE"}} ; 
-        File file = new File("D://test.xlsx");
-        if (file.exists())
-            file.delete();
-        file.createNewFile();
-         
-        ExportDataExcel exportData = new ExportDataExcel("test", headers, "test");
-         
-        List data = new ArrayList();
-        for (int i = 0; i < 100; i++) {
-            List<Object> cellList = new ArrayList<Object>();
-            for (int j = 0; j < 2; j++) {
-                cellList.add(new Date());
-            }
-            cellList.add(0.9);
-            data.add(cellList);
-        }
-        OutputStream out = new FileOutputStream(file);
-        exportData.PoiWriteExcel_To2007(data,out);
-    }
+//    public static void main(String[] args) throws IOException, ParseException {
+//        String headers[][] = {{"日期","DATE"},{"标题","TIME"},{"其他","DOUBLE"}} ;
+//        File file = new File("D://test.xlsx");
+//        if (file.exists())
+//            file.delete();
+//        file.createNewFile();
+//
+//        ExportDataExcel exportData = new ExportDataExcel("test", headers, "test");
+//
+//        List data = new ArrayList();
+//        for (int i = 0; i < 100; i++) {
+//            List<Object> cellList = new ArrayList<Object>();
+//            for (int j = 0; j < 2; j++) {
+//                cellList.add(new Date());
+//            }
+//            cellList.add(0.9);
+//            data.add(cellList);
+//        }
+//        OutputStream out = new FileOutputStream(file);
+//        exportData.PoiWriteExcel_To2007(data,out);
+//    }
 }

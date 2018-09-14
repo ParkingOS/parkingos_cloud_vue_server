@@ -41,7 +41,7 @@ public class ShopAccountServiceImpl implements ShopAcccountService {
 
         int count = 0;
         List<ShopAccountTb> list = null;
-        List<Map<String, Object>> resList = new ArrayList<>();
+        List<Map<String, Object>> resList = new ArrayList<Map<String, Object>>();
 
         ShopAccountTb shopAccountTb = new ShopAccountTb();
         //登陆停车场
@@ -68,7 +68,7 @@ public class ShopAccountServiceImpl implements ShopAcccountService {
                 config = (PageOrderConfig) searchMap.get("config");
         }
 
-        List<SearchBean> nameList = new ArrayList<>();
+        List<SearchBean> nameList = new ArrayList<SearchBean>();
         SearchBean searchBean = new SearchBean();
         nameList.add(searchBean);
         Map<Long, String> names = null;

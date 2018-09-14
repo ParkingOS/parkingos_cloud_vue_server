@@ -95,10 +95,10 @@ public class Check {
 		return exp.matcher(url).matches();
 	}
 	
-	public static void main(String[] args) {
-		String url ="http://test.server.lembee.com/bolian/inPark/notify?a=1";
-		System.err.println(checkURL(url));
-	}
+//	public static void main(String[] args) {
+//		String url ="http://test.server.lembee.com/bolian/inPark/notify?a=1";
+//		System.err.println(checkURL(url));
+//	}
 /**
  * 
 * dealPhone

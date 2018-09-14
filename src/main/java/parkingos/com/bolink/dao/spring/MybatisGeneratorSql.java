@@ -35,7 +35,7 @@ public class MybatisGeneratorSql {
             values.addAll(suppervalues);
         }
         sql.append(getPageLimitSql(pageOrderConfig));
-        Map<String,Object> result = new HashMap<>();
+        Map<String,Object> result = new HashMap<String,Object>();
         result.put("sql",sql.toString());
         result.put("values",values);
         return result;
@@ -63,7 +63,7 @@ public class MybatisGeneratorSql {
             values.addAll(suppervalues);
         }
 
-        Map<String,Object> result = new HashMap<>();
+        Map<String,Object> result = new HashMap<String,Object>();
         result.put("sql",sql.toString());
         result.put("values",values);
         return result;

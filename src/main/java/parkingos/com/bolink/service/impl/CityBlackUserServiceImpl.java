@@ -41,7 +41,7 @@ public class CityBlackUserServiceImpl implements CityBlackUserService {
 
         int count =0;
         List<ZldBlackTb> list =null;
-        List<Map<String, Object>> resList =new ArrayList<>();
+        List<Map<String, Object>> resList =new ArrayList<Map<String, Object>>();
 
         //查询某一车场
         logger.error("=========..req"+reqmap.size());
@@ -73,7 +73,7 @@ public class CityBlackUserServiceImpl implements CityBlackUserService {
             list = commonDao.selectListByConditions(baseQuery,supperQuery,config);
             if (list != null && !list.isEmpty()) {
                 for (ZldBlackTb zldBlackTb1 : list) {
-                    OrmUtil<ZldBlackTb> otm = new OrmUtil<>();
+                    OrmUtil<ZldBlackTb> otm = new OrmUtil<ZldBlackTb>();
                     Map<String, Object> map = otm.pojoToMap(zldBlackTb1);
                     resList.add(map);
                 }

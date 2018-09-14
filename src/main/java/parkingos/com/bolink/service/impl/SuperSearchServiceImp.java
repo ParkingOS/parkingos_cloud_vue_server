@@ -31,7 +31,7 @@ public class SuperSearchServiceImp<T> implements SupperSearchService<T> {
 
     public  Map<String,Object> getBaseSearch(T t ,Map<String,String> params){
         //返回结果
-        Map<String,Object> result = new HashMap<>();
+        Map<String,Object> result = new HashMap<String,Object>();
 
         //分页，排序
         // orderfield=id,orderby=desc,
@@ -58,7 +58,7 @@ public class SuperSearchServiceImp<T> implements SupperSearchService<T> {
         //需要查询的字段数组
         String []queryFields = fields.split("__");
 
-        GetPojoFieldType<T> getFieldTypeTool = new GetPojoFieldType<>();
+        GetPojoFieldType<T> getFieldTypeTool = new GetPojoFieldType<T>();
         //取出所有字段的类型
         Map<String ,Integer> fieldTypes = getFieldTypeTool.getFieldTypes(t,params);
         //复杂查询字段

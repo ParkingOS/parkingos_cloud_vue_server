@@ -898,11 +898,11 @@ public class StringUtils {
 		return out;
 	}
 
-	public static void main(String[] args) {
-		String s = "{\"local_id\":\"a088b47c9ecc_1001_channels_B1_B2_A3\",\"park_id\":\"21773\"}key=S4EGJHU4ZA9RU351";
-		System.out.println(MD5(s));
-		//System.out.println(encodeUTF8("京G99999"));
-	}
+//	public static void main(String[] args) {
+//		String s = "{\"local_id\":\"a088b47c9ecc_1001_channels_B1_B2_A3\",\"park_id\":\"21773\"}key=S4EGJHU4ZA9RU351";
+//		System.out.println(MD5(s));
+//		//System.out.println(encodeUTF8("京G99999"));
+//	}
 
 	public static String getWeek(int week) {
 		switch (week) {

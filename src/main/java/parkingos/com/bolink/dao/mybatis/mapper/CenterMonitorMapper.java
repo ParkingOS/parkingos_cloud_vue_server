@@ -1,11 +1,12 @@
 package parkingos.com.bolink.dao.mybatis.mapper;
 
+import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
+@Mapper
 public interface CenterMonitorMapper {
     List<HashMap<String,Object>> getConfirmOrdersByGroupid( @Param("groupid") String groupid);
 

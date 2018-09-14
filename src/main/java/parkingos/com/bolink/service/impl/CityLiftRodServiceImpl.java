@@ -41,7 +41,7 @@ public class CityLiftRodServiceImpl implements CityLiftRodService {
 
         int count =0;
         List<LiftRodTb> list =null;
-        List<Map<String, Object>> resList =new ArrayList<>();
+        List<Map<String, Object>> resList =new ArrayList<Map<String, Object>>();
 
         LiftRodTb liftRodTb = new LiftRodTb();
         liftRodTb.setIsDelete(0);
@@ -65,7 +65,7 @@ public class CityLiftRodServiceImpl implements CityLiftRodService {
             }
             if (list != null && !list.isEmpty()) {
                 for (LiftRodTb liftRodTb1 : list) {
-                    OrmUtil<LiftRodTb> otm = new OrmUtil<>();
+                    OrmUtil<LiftRodTb> otm = new OrmUtil<LiftRodTb>();
                     Map<String, Object> map = otm.pojoToMap(liftRodTb1);
                     resList.add(map);
                 }

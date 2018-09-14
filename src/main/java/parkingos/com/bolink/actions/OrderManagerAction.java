@@ -34,6 +34,8 @@ public class OrderManagerAction {
     private OrderService orderService;
     @Autowired
     private SaveLogService saveLogService;
+//    @Autowired
+//    private OrderServiceController orderServiceController;
 
     @RequestMapping(value = "/query")
     public String query(HttpServletRequest request, HttpServletResponse resp) {
@@ -41,6 +43,9 @@ public class OrderManagerAction {
         Map<String, String> reqParameterMap = RequestUtil.readBodyFormRequset(request);
 
         JSONObject result = orderService.selectResultByConditions(reqParameterMap);
+//        JSONObject result =new JSONObject();
+//        List<OrderTb>  list = orderServiceController.getOrdersByMapConditons(reqParameterMap);
+//        result.put("rows",list);
         //把结果返回页面
         StringUtils.ajaxOutput(resp, result.toJSONString());
         return null;

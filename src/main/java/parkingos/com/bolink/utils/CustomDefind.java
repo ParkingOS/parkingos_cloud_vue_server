@@ -2,11 +2,11 @@ package parkingos.com.bolink.utils;
 
 import org.apache.ibatis.io.Resources;
 import org.apache.log4j.Logger;
+import org.springframework.boot.context.properties.ConfigurationProperties;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
+import java.io.*;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Properties;
 
 /**
@@ -14,11 +14,16 @@ import java.util.Properties;
  * @author Administrator
  *
  */
+@ConfigurationProperties
 public class CustomDefind {
 
-
+	private static Map<String, String> config_map = new HashMap<String, String>();
 	Logger logger = Logger.getLogger(CustomDefind.class);
 	//private static String PATH = ;
+
+	static {
+		load();
+	}
 
 	public static String MESSAGESIGN = getValue("MESSAGESIGN");
 	public static String CUSTOMPARKIDS = getValue("CUSTOMPARKIDS");
@@ -41,20 +46,24 @@ public class CustomDefind {
 	//添加是否支持判断ETCPARK的字段判定值
 	public static String ISSUPPORTETCPARK = CustomDefind.getValue("ISSUPPORTETCPARK");
 
-	public static String getValue(String key){
-		String fileName ="config.properties";
-		System.out.println(">>>00>>>>config file path:"+fileName);
-		Properties properties = new Properties();
+	public static void load(){
+		InputStream is = Thread.currentThread().getContextClassLoader().getResourceAsStream("application.properties");
+		Properties p = new Properties();
 		try {
-			File file = Resources.getResourceAsFile(fileName);
-			properties.load(new FileInputStream(file));
-			return properties.getProperty(key);
-		} catch (FileNotFoundException e) {
-			e.printStackTrace();
+			p.load(is);
+			for (Map.Entry<Object,Object> e : p.entrySet()) {
+				config_map.put((String) e.getKey(), (String) e.getValue());
+			}
 		} catch (IOException e) {
-			e.printStackTrace();
+//			logger.fatal("load property file failed", e);
 		}
-		return "0";
+	}
+
+	public static String getValue(String key) {
+		if (StringUtils.isBlank(key)) {
+			return null;
+		}
+		return config_map.get(key);
 	}
 
 	public static void setValue(String key,String value){
@@ -146,87 +155,87 @@ public class CustomDefind {
 		return limit;*/
 	}
 
-	public static void main(String[] args) {
-		/*totalTicketMap.put(3, 1);
-		totalTicketMap.put(4, 2);
-		totalTicketMap.put(5, 2);
-		totalTicketMap.put(6, 3);
-		totalTicketMap.put(7, 4);
-		totalTicketMap.put(8, 5);
-		totalTicketMap.put(9, 5);
-		totalTicketMap.put(10, 6);
-		totalTicketMap.put(11, 7);
-		totalTicketMap.put(12, 8);
-		totalTicketMap.put(13, 8);
-		totalTicketMap.put(14, 9);
-		totalTicketMap.put(15, 10);
-		totalTicketMap.put(16, 11);
-		totalTicketMap.put(17, 11);
-		totalTicketMap.put(18, 12);*/
-		/*System.err.println("37:"+getUseMoney(37.0,0));
-		System.err.println("36:"+getUseMoney(36.0,0));
-		System.err.println("35:"+getUseMoney(35.0,0));
-		System.err.println("34:"+getUseMoney(34.0,0));
-		System.err.println("33:"+getUseMoney(33.0,0));
-		System.err.println("32:"+getUseMoney(32.0,0));
-		System.err.println("31:"+getUseMoney(31.0,0));
-		System.err.println("30:"+getUseMoney(30.0,0));
-		System.err.println("29:"+getUseMoney(29.0,0));
-		System.err.println("28:"+getUseMoney(28.0,0));
-		System.err.println("27:"+getUseMoney(27.0,0));
-		System.err.println("26:"+getUseMoney(26.0,0));
-		System.err.println("25:"+getUseMoney(25.0,0));
-		System.err.println("24:"+getUseMoney(24.0,0));
-		System.err.println("23:"+getUseMoney(23.0,0));
-		System.err.println("22:"+getUseMoney(22.0,0));
-		System.err.println("21:"+getUseMoney(21.0,0));
-		System.err.println("20:"+getUseMoney(20.0,0));
-		System.err.println("19:"+getUseMoney(19.0,0));
-		System.err.println("18:"+getUseMoney(18.0,0));
-		System.err.println("17:"+getUseMoney(17.0,0));
-		System.err.println("16:"+getUseMoney(16.0,0));
-		System.err.println("15:"+getUseMoney(15.0,0));
-		System.err.println("14:"+getUseMoney(14.0,0));
-		System.err.println("13:"+getUseMoney(13.0,0));
-		System.err.println("12:"+getUseMoney(12.0,0));
-		System.err.println("11:"+getUseMoney(11.0,0));
-		System.err.println("10:"+getUseMoney(10.0,0));
-		System.err.println("9:"+getUseMoney(9.0,0));
-		System.err.println("8:"+getUseMoney(8.0,0));
-		System.err.println("7:"+getUseMoney(7.0,0));
-		System.err.println("6:"+getUseMoney(6.0,0));
-		System.err.println("5:"+getUseMoney(5.0,0));
-		System.err.println("4:"+getUseMoney(4.0,0));
-		System.err.println("3:"+getUseMoney(3.0,0));
-		System.err.println("2:"+getUseMoney(2.0,0));
-		System.err.println("1:"+getUseMoney(1.0,0));
-		
-		System.err.println("25:"+getUseMoney(25.0,1));
-		System.err.println("24:"+getUseMoney(24.0,1));
-		System.err.println("23:"+getUseMoney(23.0,1));
-		System.err.println("22:"+getUseMoney(22.0,1));
-		System.err.println("21:"+getUseMoney(21.0,1));
-		System.err.println("20:"+getUseMoney(20.0,1));
-		System.err.println("19:"+getUseMoney(19.0,1));
-		System.err.println("18:"+getUseMoney(18.0,1));
-		System.err.println("17:"+getUseMoney(17.0,1));
-		System.err.println("16:"+getUseMoney(16.0,1));
-		System.err.println("15:"+getUseMoney(15.0,1));
-		System.err.println("14:"+getUseMoney(14.0,1));
-		System.err.println("13:"+getUseMoney(13.0,1));
-		System.err.println("12:"+getUseMoney(12.0,1));
-		System.err.println("11:"+getUseMoney(11.0,1));
-		System.err.println("10:"+getUseMoney(10.0,1));
-		System.err.println("9:"+getUseMoney(9.0,1));
-		System.err.println("8:"+getUseMoney(8.0,1));
-		System.err.println("7:"+getUseMoney(7.0,1));
-		System.err.println("6:"+getUseMoney(6.0,1));
-		System.err.println("5:"+getUseMoney(5.0,1));
-		System.err.println("4:"+getUseMoney(4.0,1));
-		System.err.println("3:"+getUseMoney(3.0,1));
-		System.err.println("2:"+getUseMoney(2.0,1));
-		System.err.println("1:"+getUseMoney(1.0,1));*/
-	}
+//	public static void main(String[] args) {
+//		/*totalTicketMap.put(3, 1);
+//		totalTicketMap.put(4, 2);
+//		totalTicketMap.put(5, 2);
+//		totalTicketMap.put(6, 3);
+//		totalTicketMap.put(7, 4);
+//		totalTicketMap.put(8, 5);
+//		totalTicketMap.put(9, 5);
+//		totalTicketMap.put(10, 6);
+//		totalTicketMap.put(11, 7);
+//		totalTicketMap.put(12, 8);
+//		totalTicketMap.put(13, 8);
+//		totalTicketMap.put(14, 9);
+//		totalTicketMap.put(15, 10);
+//		totalTicketMap.put(16, 11);
+//		totalTicketMap.put(17, 11);
+//		totalTicketMap.put(18, 12);*/
+//		/*System.err.println("37:"+getUseMoney(37.0,0));
+//		System.err.println("36:"+getUseMoney(36.0,0));
+//		System.err.println("35:"+getUseMoney(35.0,0));
+//		System.err.println("34:"+getUseMoney(34.0,0));
+//		System.err.println("33:"+getUseMoney(33.0,0));
+//		System.err.println("32:"+getUseMoney(32.0,0));
+//		System.err.println("31:"+getUseMoney(31.0,0));
+//		System.err.println("30:"+getUseMoney(30.0,0));
+//		System.err.println("29:"+getUseMoney(29.0,0));
+//		System.err.println("28:"+getUseMoney(28.0,0));
+//		System.err.println("27:"+getUseMoney(27.0,0));
+//		System.err.println("26:"+getUseMoney(26.0,0));
+//		System.err.println("25:"+getUseMoney(25.0,0));
+//		System.err.println("24:"+getUseMoney(24.0,0));
+//		System.err.println("23:"+getUseMoney(23.0,0));
+//		System.err.println("22:"+getUseMoney(22.0,0));
+//		System.err.println("21:"+getUseMoney(21.0,0));
+//		System.err.println("20:"+getUseMoney(20.0,0));
+//		System.err.println("19:"+getUseMoney(19.0,0));
+//		System.err.println("18:"+getUseMoney(18.0,0));
+//		System.err.println("17:"+getUseMoney(17.0,0));
+//		System.err.println("16:"+getUseMoney(16.0,0));
+//		System.err.println("15:"+getUseMoney(15.0,0));
+//		System.err.println("14:"+getUseMoney(14.0,0));
+//		System.err.println("13:"+getUseMoney(13.0,0));
+//		System.err.println("12:"+getUseMoney(12.0,0));
+//		System.err.println("11:"+getUseMoney(11.0,0));
+//		System.err.println("10:"+getUseMoney(10.0,0));
+//		System.err.println("9:"+getUseMoney(9.0,0));
+//		System.err.println("8:"+getUseMoney(8.0,0));
+//		System.err.println("7:"+getUseMoney(7.0,0));
+//		System.err.println("6:"+getUseMoney(6.0,0));
+//		System.err.println("5:"+getUseMoney(5.0,0));
+//		System.err.println("4:"+getUseMoney(4.0,0));
+//		System.err.println("3:"+getUseMoney(3.0,0));
+//		System.err.println("2:"+getUseMoney(2.0,0));
+//		System.err.println("1:"+getUseMoney(1.0,0));
+//
+//		System.err.println("25:"+getUseMoney(25.0,1));
+//		System.err.println("24:"+getUseMoney(24.0,1));
+//		System.err.println("23:"+getUseMoney(23.0,1));
+//		System.err.println("22:"+getUseMoney(22.0,1));
+//		System.err.println("21:"+getUseMoney(21.0,1));
+//		System.err.println("20:"+getUseMoney(20.0,1));
+//		System.err.println("19:"+getUseMoney(19.0,1));
+//		System.err.println("18:"+getUseMoney(18.0,1));
+//		System.err.println("17:"+getUseMoney(17.0,1));
+//		System.err.println("16:"+getUseMoney(16.0,1));
+//		System.err.println("15:"+getUseMoney(15.0,1));
+//		System.err.println("14:"+getUseMoney(14.0,1));
+//		System.err.println("13:"+getUseMoney(13.0,1));
+//		System.err.println("12:"+getUseMoney(12.0,1));
+//		System.err.println("11:"+getUseMoney(11.0,1));
+//		System.err.println("10:"+getUseMoney(10.0,1));
+//		System.err.println("9:"+getUseMoney(9.0,1));
+//		System.err.println("8:"+getUseMoney(8.0,1));
+//		System.err.println("7:"+getUseMoney(7.0,1));
+//		System.err.println("6:"+getUseMoney(6.0,1));
+//		System.err.println("5:"+getUseMoney(5.0,1));
+//		System.err.println("4:"+getUseMoney(4.0,1));
+//		System.err.println("3:"+getUseMoney(3.0,1));
+//		System.err.println("2:"+getUseMoney(2.0,1));
+//		System.err.println("1:"+getUseMoney(1.0,1));*/
+//	}
 
 
 }

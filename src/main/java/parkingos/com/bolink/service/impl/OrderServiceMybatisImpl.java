@@ -44,7 +44,7 @@ public class OrderServiceMybatisImpl implements OrderService {
         //example.createCriteria().andIdEqualTo(35869766L);
         String str = "{\"total\":12,\"page\":1,\"rows\":[]}";
         JSONObject result = JSONObject.parseObject(str);
-        List<Map<String, Object>> resList =new ArrayList<>();
+        List<Map<String, Object>> resList =new ArrayList<Map<String, Object>>();
         /**
          {pay_type_start=0,pay_type=0,
          trade_no=trade,
@@ -92,7 +92,7 @@ public class OrderServiceMybatisImpl implements OrderService {
             cardRenewTbList= orderTbMapper.selectByExample(example);
         if (cardRenewTbList != null && !cardRenewTbList.isEmpty()) {
             for (OrderTb t2 : cardRenewTbList) {
-                OrmUtil<OrderTb> otm = new OrmUtil<>();
+                OrmUtil<OrderTb> otm = new OrmUtil<OrderTb>();
                 Map<String, Object> maps = otm.pojoToMap(t2);
                 resList.add(maps);
             }

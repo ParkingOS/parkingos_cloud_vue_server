@@ -53,7 +53,7 @@ public class TicketServiceImpl implements TicketService {
         String str = "{\"total\":0,\"page\":1,\"rows\":[]}";
         JSONObject result = JSONObject.parseObject(str);
 
-        List<Map<String, Object>> resList = new ArrayList<>();
+        List<Map<String, Object>> resList = new ArrayList<Map<String, Object>>();
         int count = 0;
 
         TicketTb ticketTb = new TicketTb();
@@ -105,7 +105,7 @@ public class TicketServiceImpl implements TicketService {
         shopTb.setComid(Long.valueOf(reqmap.get("comid")));
 
         SearchBean searchBean = new SearchBean();
-        List<SearchBean> searchList = new ArrayList<>();
+        List<SearchBean> searchList = new ArrayList<SearchBean>();
         searchList.add(searchBean);
         Map<Long, String> shopNames = null;
         Map<Long, Integer> shopUnits = null;

@@ -40,9 +40,9 @@ public class ParkuserWorkRecordServiceImpl implements ParkuserWorkRecordService 
         JSONObject result = new JSONObject();
 //        JSONObject result = supperSearchService.supperSearch(parkuserWorkRecordTb,reqmap);
 //        List<Map<String,Object>> rows = (List)result.get("rows");
-        List<Long> userIdList= new ArrayList<>();
+        List<Long> userIdList= new ArrayList<Long>();
         if(reqmap.get("uinName")!=null&&!"".equals(reqmap.get("uinName"))){
-            Map<String, String> newMap = new HashMap<>();
+            Map<String, String> newMap = new HashMap<String, String>();
             newMap.put("comid",reqmap.get("comid"));
             String uinName = reqmap.get("uinName");
             newMap.put("nickname",uinName);

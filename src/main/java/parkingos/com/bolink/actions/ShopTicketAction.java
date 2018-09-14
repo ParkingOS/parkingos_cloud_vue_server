@@ -143,7 +143,7 @@ public class ShopTicketAction {
 //        logger.info( reqParameterMap );
 
         Long uin = RequestUtil.getLong(request,"uin",-1L);
-        Map<String,Object> mapResult =new HashMap<>();
+        Map<String,Object> mapResult =new HashMap<String,Object>();
         Long shop_id = RequestUtil.getLong(request,"shopid",-1L);
         Integer reduce = RequestUtil.getInteger(request, "reduce", 0);
         Integer type = RequestUtil.getInteger(request, "type", 3);
@@ -188,7 +188,7 @@ public class ShopTicketAction {
     @RequestMapping("/exportcode")
     //优惠券查询
     public String exportCode(HttpServletRequest request, HttpServletResponse resp) {
-        Map<String,Object> mapResult = new HashMap<>();
+        Map<String,Object> mapResult = new HashMap<String,Object>();
         Long shopId = RequestUtil.getLong(request,"shop_id",-1L);
         String num = RequestUtil.getString(request,"number");
 //        Integer number = RequestUtil.getInteger(request,"number",1);
@@ -215,7 +215,7 @@ public class ShopTicketAction {
         }
 
         mapResult = ticketService.createTicket(shopId,reduce,type,0,Integer.parseInt(num),timeRange,uin);
-        if(mapResult.get("state")!=1){
+        if((int)mapResult.get("state")!=1){
             StringUtils.ajaxOutput( resp, JSONObject.toJSONString(mapResult) );
             return null;
         }else{

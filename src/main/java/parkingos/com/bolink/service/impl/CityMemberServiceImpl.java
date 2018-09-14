@@ -56,7 +56,7 @@ public class CityMemberServiceImpl implements CityMemberService {
 
         int count = 0;
         List<UserInfoTb> list =null;
-        List<Map<String, Object>> resList =new ArrayList<>();
+        List<Map<String, Object>> resList =new ArrayList<Map<String, Object>>();
 
         Map searchMap = supperSearchService.getBaseSearch(userInfoTb,reqmap);
         logger.info(searchMap);
@@ -77,7 +77,7 @@ public class CityMemberServiceImpl implements CityMemberService {
             searchBean.setBasicValue(roleIdList);
 
             if (supperQuery == null) {
-                supperQuery = new ArrayList<>();
+                supperQuery = new ArrayList<SearchBean>();
             }
             supperQuery.add( searchBean );
 

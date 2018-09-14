@@ -161,10 +161,10 @@ public class ShopManageServiceImpl implements ShopManageService {
             PageOrderConfig config = new PageOrderConfig();
             config.setPageInfo( pageNum, pageSize );
             List<ShopTb> list = commonDao.selectListByConditions( shopTb, config );
-            List<Map<String, Object>> resList = new ArrayList<>();
+            List<Map<String, Object>> resList = new ArrayList<Map<String, Object>>();
             if (list != null && !list.isEmpty()) {
                 for (ShopTb sb : list) {
-                    OrmUtil<ShopTb> otm = new OrmUtil<>();
+                    OrmUtil<ShopTb> otm = new OrmUtil<ShopTb>();
                     Map<String, Object> map = otm.pojoToMap( sb );
                     resList.add( map );
                 }

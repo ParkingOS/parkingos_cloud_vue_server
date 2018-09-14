@@ -1,13 +1,14 @@
 package parkingos.com.bolink.dao.mybatis.mapper;
 
 
+import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 import parkingos.com.bolink.dao.mybatis.OrderTbExample;
 import parkingos.com.bolink.models.OrderTb;
 
 import java.util.List;
 import java.util.Map;
-
+@Mapper
 public interface OrderTbMapper {
     int countByExample(OrderTbExample example);
 

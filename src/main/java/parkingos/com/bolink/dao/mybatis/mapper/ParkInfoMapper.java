@@ -1,11 +1,12 @@
 package parkingos.com.bolink.dao.mybatis.mapper;
 
+import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
+@Mapper
 public interface ParkInfoMapper {
     List<HashMap<String,Object>> getEntryCar(@Param("create_time") long create_time, @Param("groupid")long groupid, @Param("tableName")String tableName );
     List<HashMap<String,Object>> getExitCar( @Param("create_time") long create_time, @Param("groupid")long groupid,@Param("tableName")String tableName);

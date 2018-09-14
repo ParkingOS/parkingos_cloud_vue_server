@@ -96,7 +96,7 @@ public class CarRenewServiceImpl implements CarRenewService {
 				//javabean转map取参数
 //				List<String> values = new ArrayList<String>();
 				List<Object> values = new ArrayList<Object>();
-				OrmUtil<CardRenewTb> otm = new OrmUtil<>();
+				OrmUtil<CardRenewTb> otm = new OrmUtil<CardRenewTb>();
 				Map map = otm.pojoToMap(cardRenewTb);
 				//判断各种字段 组装导出数据
 				for (String field : f) {

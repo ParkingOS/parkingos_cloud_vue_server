@@ -1,7 +1,7 @@
 package parkingos.com.bolink.actions;
 
+import org.apache.log4j.Logger;
 import org.jdom.JDOMException;
-import org.soofa.log4j.Logger;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import parkingos.com.bolink.utils.payutils.HttpUtil;

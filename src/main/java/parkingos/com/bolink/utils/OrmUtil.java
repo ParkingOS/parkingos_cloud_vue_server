@@ -110,7 +110,7 @@ public class OrmUtil<T> {
                 Object endValue = searchBean.getEndValue();
                 if("like".equals(operator)){//like将String转为List<String>
                     if(basicValue instanceof String) {
-                        List<String> likeList = new ArrayList<>();
+                        List<String> likeList = new ArrayList<String>();
                         likeList.add((String)basicValue);
                         searchBean.setBasicValue(likeList);
                     }

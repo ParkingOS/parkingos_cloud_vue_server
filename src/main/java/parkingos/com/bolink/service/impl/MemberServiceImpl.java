@@ -48,7 +48,7 @@ public class MemberServiceImpl implements MemberService {
         Map<String,Object> searchMap = supperSearchService.getBaseSearch(userInfoTb,reqmap);
         int count =0;
         List<UserInfoTb> list =null;
-        List<Map<String, Object>> resList =new ArrayList<>();
+        List<Map<String, Object>> resList =new ArrayList<Map<String, Object>>();
         if(searchMap!=null&&!searchMap.isEmpty()){
             List<SearchBean> supperQuery = null;
             if(searchMap.containsKey("supper"))
@@ -59,7 +59,7 @@ public class MemberServiceImpl implements MemberService {
             bean.setOperator(FieldOperator.NOT);
             bean.setFieldName("auth_flag");
             //参数集合形式
-            List<Integer> paramList = new ArrayList<>();
+            List<Integer> paramList = new ArrayList<Integer>();
             paramList.add(14);
             paramList.add(15);
             bean.setBasicValue(paramList);

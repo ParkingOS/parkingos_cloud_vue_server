@@ -97,19 +97,19 @@ public class MessageUtils {
 		return new MessageUtils();
 	}
 	
-	public static void main(String[] args) {
-		try {
-			//System.out.println(sendMsg("93104","callbkf","18101333937","【停车宝】 您好"));
-			String content = "您的验证码是8449";
-			String result = sendMsg("15001303478",content);
-			if(result!=null&&result.indexOf("return=\"0\"")!=-1)
-				 System.err.println("发送成功");
-		} catch (HttpException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-	}
+//	public static void main(String[] args) {
+//		try {
+//			//System.out.println(sendMsg("93104","callbkf","18101333937","【停车宝】 您好"));
+//			String content = "您的验证码是8449";
+//			String result = sendMsg("15001303478",content);
+//			if(result!=null&&result.indexOf("return=\"0\"")!=-1)
+//				 System.err.println("发送成功");
+//		} catch (HttpException e) {
+//			// TODO Auto-generated catch block
+//			e.printStackTrace();
+//		} catch (IOException e) {
+//			// TODO Auto-generated catch block
+//			e.printStackTrace();
+//		}
+//	}
 }

@@ -113,7 +113,7 @@ public class LiftRodServiceImpl implements LiftRodService {
             for(LiftRodTb liftRodTb : liftRodList){
 //                List<String> values = new ArrayList<String>();
                 List<Object> values = new ArrayList<Object>();
-                OrmUtil<LiftRodTb> otm = new OrmUtil<>();
+                OrmUtil<LiftRodTb> otm = new OrmUtil<LiftRodTb>();
                 Map map = otm.pojoToMap(liftRodTb);
                 //判断各种字段 组装导出数据
                 for(String field : f){

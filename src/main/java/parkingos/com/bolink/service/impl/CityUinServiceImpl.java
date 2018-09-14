@@ -83,7 +83,7 @@ public class CityUinServiceImpl implements CityUinService {
         orgCityMerchants.setId(cityid);
         orgCityMerchants.setState(0);
         orgCityMerchants =(OrgCityMerchants)commonDao.selectObjectByConditions(orgCityMerchants);
-        Map<String,Object> map = new HashMap<>();
+        Map<String,Object> map = new HashMap<String,Object>();
         if(orgCityMerchants!=null){
             map.put("self_setting",orgCityMerchants.getSelfRefillSetting());
             result.put("self_setting",map);

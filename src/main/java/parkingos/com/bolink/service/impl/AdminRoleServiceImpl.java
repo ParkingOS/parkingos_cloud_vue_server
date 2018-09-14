@@ -38,7 +38,7 @@ public class AdminRoleServiceImpl implements AdminRoleService {
 
         int count =0;
         List<UserRoleTb> list =null;
-        List<Map<String, Object>> resList =new ArrayList<>();
+        List<Map<String, Object>> resList =new ArrayList<Map<String, Object>>();
 
         Long uin = Long.parseLong(reqmap.get("loginuin"));
         UserRoleTb userRoleTb = new UserRoleTb();
@@ -80,7 +80,7 @@ public class AdminRoleServiceImpl implements AdminRoleService {
             searchBean.setBasicValue(idList);
 
             if (supperQuery == null) {
-                supperQuery = new ArrayList<>();
+                supperQuery = new ArrayList<SearchBean>();
             }
             supperQuery.add( searchBean );
 

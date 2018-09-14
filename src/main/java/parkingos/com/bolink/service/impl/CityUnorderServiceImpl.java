@@ -44,7 +44,7 @@ public class CityUnorderServiceImpl implements CityUnorderService {
 
         int count =0;
         List<OrderTb> list =null;
-        List<Map<String, Object>> resList =new ArrayList<>();
+        List<Map<String, Object>> resList =new ArrayList<Map<String, Object>>();
 
         //查询今天的数据显示
         logger.error("=========..req"+reqmap.size());
@@ -83,7 +83,7 @@ public class CityUnorderServiceImpl implements CityUnorderService {
             list = getOrdersListByGroupid(reqmap);
             if (list != null && !list.isEmpty()) {
                 for (OrderTb orderTb1 : list) {
-                    OrmUtil<OrderTb> otm = new OrmUtil<>();
+                    OrmUtil<OrderTb> otm = new OrmUtil<OrderTb>();
                     Map<String, Object> map = otm.pojoToMap(orderTb1);
                     Long start = (Long) map.get("create_time");
                     if (start != null ) {
