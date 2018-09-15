@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import parkingos.com.bolink.dao.spring.CommonDao;
 import parkingos.com.bolink.models.ComInfoTb;
+import parkingos.com.bolink.models.HomeownerSetTb;
 import parkingos.com.bolink.models.SyncInfoPoolTb;
 import parkingos.com.bolink.models.VisitorTb;
 import parkingos.com.bolink.service.SupperSearchService;
@@ -108,6 +109,29 @@ public class VisitorServiceImpl implements VisitorService {
         }
 
         return result;
+    }
+
+    @Override
+    public Long getNextSetId() {
+        return commonDao.selectSequence(HomeownerSetTb.class);
+    }
+
+    @Override
+    public JSONObject setVisitor(HomeownerSetTb homeownerSetTb, int type) {
+        String str = "{\"state\":0,\"msg\":\"设置失败\"}";
+        JSONObject jsonObject = JSONObject.parseObject(str);
+        //type 2 更新
+        int result = 0;
+        if(type==1){
+            result = commonDao.insert(homeownerSetTb);
+        }else{
+            result = commonDao.updateByPrimaryKey(homeownerSetTb);
+        }
+        if(result==1){
+            jsonObject.put("state",result);
+            jsonObject.put("msg","设置成功");
+        }
+        return jsonObject;
     }
 
     private String getComName(Long comid){

@@ -6,6 +6,7 @@ import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
+import parkingos.com.bolink.models.HomeownerSetTb;
 import parkingos.com.bolink.models.ParkLogTb;
 import parkingos.com.bolink.models.VisitorTb;
 import parkingos.com.bolink.service.SaveLogService;
@@ -139,6 +140,40 @@ public class VisitorAction {
         StringUtils.ajaxOutput(resp,result.toJSONString());
         return null;
     }
+
+    /*
+    * 访客设置
+    *
+    * */
+    @RequestMapping(value = "/setvisitor")
+    public String setVisitor(HttpServletRequest request, HttpServletResponse resp){
+
+//        Long comid = RequestUtil.getLong(request,"comid",-1L);
+        Long id = RequestUtil.getLong(request,"id",-1L);
+
+        Integer accessCert = RequestUtil.getInteger(request,"access_cert",1);
+        Integer accessNotCert = RequestUtil.getInteger(request,"access_not_cert",1);
+        Integer autoCert = RequestUtil.getInteger(request,"auto_cert",1);
+        Integer autoNotCert = RequestUtil.getInteger(request,"auto_not_cert",0);
+        int type = 2;// 1：插入 ，2更新
+        if(id<0){
+            id = visitorService.getNextSetId();
+            type =1;
+        }
+
+        HomeownerSetTb homeownerSetTb = new HomeownerSetTb();
+        homeownerSetTb.setId(id);
+        homeownerSetTb.setAccessCert(accessCert);
+        homeownerSetTb.setAccessNotCert(accessNotCert);
+        homeownerSetTb.setAutoCert(autoCert);
+        homeownerSetTb.setAutoNotCert(autoNotCert);
+//        homeownerSetTb.setComid(comid);
+
+        JSONObject result = visitorService.setVisitor(homeownerSetTb,type);
+        StringUtils.ajaxOutput(resp,result.toJSONString());
+        return null;
+    }
+
 
 
 }
