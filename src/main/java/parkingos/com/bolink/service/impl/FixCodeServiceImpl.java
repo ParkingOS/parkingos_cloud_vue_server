@@ -67,7 +67,7 @@ public class FixCodeServiceImpl implements FixCodeService {
                     for (FixCodeTb fixCodeTb1 : list) {
                         OrmUtil<FixCodeTb> otm = new OrmUtil<>();
                         Map<String, Object> map = otm.pojoToMap(fixCodeTb1);
-                        if(map.get("end_time")!=null&&map.get("state")!=2){
+                        if(map.get("end_time")!=null&&(int)map.get("state")!=2){
                             if(Long.parseLong(map.get("end_time")+"")<System.currentTimeMillis()/1000){//已过期
                                 map.put("state",2);
                                 updateList.add(map);
@@ -89,7 +89,7 @@ public class FixCodeServiceImpl implements FixCodeService {
                     for(int i =0;i<updateList.size();i++){
                         Map<String,Object> newMap = updateList.get(i);
 //                        logger.info("begin new exe:"+newMap);
-                        if(newMap.get("state")==2){
+                        if((int)newMap.get("state")==2){
                             FixCodeTb fixCodeTb1 = new FixCodeTb();
                             fixCodeTb1.setId((Long)newMap.get("id"));
                             fixCodeTb1.setState(2);
@@ -192,7 +192,7 @@ public class FixCodeServiceImpl implements FixCodeService {
                         return result;
                     }else{
                         Map<String,Object> retMap = ticketService.createTicket(shopid,amount,5,0,1,0,fixCodeTb.getUin());
-                        if(retMap.get("result") == -1 || retMap.get("result") == -2){
+                        if((int)retMap.get("result") == -1 ||(int) retMap.get("result") == -2){
                             logger.info("生成减免劵出错，用劵失败");
                             result.put("state",0);
                             result.put("error",retMap.get("error"));
@@ -217,7 +217,7 @@ public class FixCodeServiceImpl implements FixCodeService {
                         return result;
                     }else{
                         Map<String,Object> retMap = ticketService.createTicket(shopid,amount,3,0,1,0,fixCodeTb.getUin());
-                        if(retMap.get("result") == -1 || retMap.get("result") == -2){
+                        if((int)retMap.get("result") == -1 || (int)retMap.get("result") == -2){
                             logger.info("生成减免劵出错，用劵失败");
                             result.put("state",0);
                             result.put("error",retMap.get("error"));
@@ -243,7 +243,7 @@ public class FixCodeServiceImpl implements FixCodeService {
                     return result;
                 }else{
                     Map<String,Object> retMap = ticketService.createTicket(shopid,0,4,0,1,0,fixCodeTb.getUin());
-                    if(retMap.get("result") == -1 || retMap.get("result") == -2){
+                    if((int)retMap.get("result") == -1 || (int)retMap.get("result") == -2){
                         logger.info("生成减免劵出错，用劵失败");
                         result.put("state",0);
                         result.put("error",retMap.get("error"));

@@ -82,10 +82,10 @@ public class CenterMonitorServiceImpl implements CenterMonitorService {
                 tableName+= "_"+cityid%100;
             }
 
-            List<Map<String,Object>> tableList =  commonDao.getObjectBySql("select count(*) from pg_class where relname ="+tableName);
-            if(tableList.get(0).get("count")==0){
-
-            }
+//            List<Map<String,Object>> tableList =  commonDao.getObjectBySql("select count(*) from pg_class where relname ="+tableName);
+//            if(tableList.get(0).get("count")==0){
+//
+//            }
 
 
             Map<String, String> parammap = new HashMap<String, String>();

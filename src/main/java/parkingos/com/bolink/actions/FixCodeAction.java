@@ -180,7 +180,7 @@ public class FixCodeAction {
 
         JSONObject result = fixCodeService.userTicket(code);
 
-        if(result.get("state")==1){
+        if((int)result.get("state")==1){
             try{
                 logger.info("扫码跳转用券路径"+result.getString("ticketurl"));
                 resp.sendRedirect(result.getString("ticketurl"));

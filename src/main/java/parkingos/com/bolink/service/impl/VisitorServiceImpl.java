@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import parkingos.com.bolink.dao.spring.CommonDao;
 import parkingos.com.bolink.models.ComInfoTb;
+import parkingos.com.bolink.models.HomeownerSetTb;
 import parkingos.com.bolink.models.SyncInfoPoolTb;
 import parkingos.com.bolink.models.VisitorTb;
 import parkingos.com.bolink.service.SupperSearchService;
@@ -58,7 +59,7 @@ public class VisitorServiceImpl implements VisitorService {
             Map<Long, String> uinNameMap = new HashMap<Long, String>();
             for (VisitorTb visitorTb : blackList) {
                 List<Object> values = new ArrayList<Object>();
-                OrmUtil<VisitorTb> otm = new OrmUtil<>();
+                OrmUtil<VisitorTb> otm = new OrmUtil<VisitorTb>();
                 Map map = otm.pojoToMap(visitorTb);
                 for (String field : f) {
                     Object v = map.get(field);
@@ -107,6 +108,42 @@ public class VisitorServiceImpl implements VisitorService {
             result.put("msg","更改成功");
         }
 
+        return result;
+    }
+
+    @Override
+    public Long getNextSetId() {
+        return commonDao.selectSequence(HomeownerSetTb.class);
+    }
+
+    @Override
+    public JSONObject setVisitor(HomeownerSetTb homeownerSetTb, int type) {
+        String str = "{\"state\":0,\"msg\":\"设置失败\"}";
+        JSONObject jsonObject = JSONObject.parseObject(str);
+        //type 2 更新
+        int result = 0;
+        if(type==1){
+            result = commonDao.insert(homeownerSetTb);
+        }else{
+            result = commonDao.updateByPrimaryKey(homeownerSetTb);
+        }
+        if(result==1){
+            jsonObject.put("state",result);
+            jsonObject.put("msg","设置成功");
+        }
+        return jsonObject;
+    }
+
+    @Override
+    public JSONObject getVisitorSet(HomeownerSetTb homeownerSetTb) {
+        JSONObject result = new JSONObject();
+        int count = commonDao.selectCountByConditions(homeownerSetTb);
+        result.put("total",0);
+        if(count>0){
+            homeownerSetTb = (HomeownerSetTb)commonDao.selectObjectByConditions(homeownerSetTb);
+            result.put("rows",homeownerSetTb);
+            result.put("total",count);
+        }
         return result;
     }
 

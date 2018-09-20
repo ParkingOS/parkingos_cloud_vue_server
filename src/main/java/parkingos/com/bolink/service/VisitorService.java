@@ -1,7 +1,7 @@
 package parkingos.com.bolink.service;
 
 import com.alibaba.fastjson.JSONObject;
-import parkingos.com.bolink.models.CarTypeTb;
+import parkingos.com.bolink.models.HomeownerSetTb;
 import parkingos.com.bolink.models.VisitorTb;
 
 import java.util.List;
@@ -13,4 +13,10 @@ public interface VisitorService {
     List<List<Object>> exportExcel(Map<String, String> reqParameterMap);
 
     JSONObject updateVisitor(VisitorTb visitorTb);
+
+    Long getNextSetId();
+
+    JSONObject setVisitor(HomeownerSetTb homeownerSetTb, int type);
+
+    JSONObject getVisitorSet(HomeownerSetTb homeownerSetTb);
 }

@@ -215,7 +215,7 @@ public class ShopTicketAction {
         }
 
         mapResult = ticketService.createTicket(shopId,reduce,type,0,Integer.parseInt(num),timeRange,uin);
-        if(mapResult.get("state")!=1){
+        if((int)mapResult.get("state")!=1){
             StringUtils.ajaxOutput( resp, JSONObject.toJSONString(mapResult) );
             return null;
         }else{
