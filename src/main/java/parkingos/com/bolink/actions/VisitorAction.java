@@ -111,6 +111,7 @@ public class VisitorAction {
         String remark =RequestUtil.getString(request, "remark");
         Integer state = RequestUtil.getInteger(request, "state", 0);
         Long id = RequestUtil.getLong(request,"id",-1L);
+        String carNumber = RequestUtil.getString(request,"car_number");
         if(remark.length()>20){
             String str = "{\"state\":0,\"msg\":\"备注限制20字\"}";
             StringUtils.ajaxOutput(resp,str);
@@ -131,7 +132,7 @@ public class VisitorAction {
             parkLogTb.setOperateUser(nickname);
             parkLogTb.setOperateTime(System.currentTimeMillis()/1000);
             parkLogTb.setOperateType(2);
-            parkLogTb.setContent(uin+"("+nickname+")"+"审核了访客"+id);
+            parkLogTb.setContent(uin+"("+nickname+")"+"审核了访客"+id+"车牌号:"+carNumber);
             parkLogTb.setType("visitor");
             parkLogTb.setParkId(comid);
             saveLogService.saveLog(parkLogTb);
