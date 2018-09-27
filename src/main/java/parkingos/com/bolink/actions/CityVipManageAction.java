@@ -67,25 +67,28 @@ public class CityVipManageAction {
 
     @RequestMapping(value = "/importExcel")
     public String importExcel(HttpServletRequest request, HttpServletResponse resp,@RequestParam("file")MultipartFile file) throws Exception{
-        String nickname = StringUtils.decodeUTF8(RequestUtil.getString(request,"nickname1"));
-        Long uin = RequestUtil.getLong(request, "loginuin", -1L);
+        try {
+            String nickname = StringUtils.decodeUTF8(RequestUtil.getString(request, "nickname1"));
+            Long uin = RequestUtil.getLong(request, "loginuin", -1L);
 
-        Long groupid = RequestUtil.getLong(request,"groupid",-1L);
-        Long cityid = RequestUtil.getLong(request,"cityid",-1L);
-        JSONObject result = cityVipService.importExcel(file,groupid,cityid);
-
-
-        StringUtils.ajaxOutput(resp,result.toJSONString());
-        if((Integer)result.get("state")==1){
-            ParkLogTb parkLogTb = new ParkLogTb();
-            parkLogTb.setOperateUser(nickname);
-            parkLogTb.setOperateTime(System.currentTimeMillis()/1000);
-            parkLogTb.setOperateType(1);
-            parkLogTb.setContent(uin+"("+nickname+")"+"导入月卡会员成功");
-            parkLogTb.setType("vip");
-            parkLogTb.setGroupId(groupid);
-            saveLogService.saveLog(parkLogTb);
+            Long groupid = RequestUtil.getLong(request, "groupid", -1L);
+            Long cityid = RequestUtil.getLong(request, "cityid", -1L);
+            JSONObject result = cityVipService.importExcel(file, groupid, cityid, nickname, uin);
+            StringUtils.ajaxOutput(resp,result.toJSONString());
+        }catch (Exception e){
+            logger.error("import error",e);
         }
+
+//        if((Integer)result.get("state")==1){
+//            ParkLogTb parkLogTb = new ParkLogTb();
+//            parkLogTb.setOperateUser(nickname);
+//            parkLogTb.setOperateTime(System.currentTimeMillis()/1000);
+//            parkLogTb.setOperateType(1);
+//            parkLogTb.setContent(uin+"("+nickname+")"+"导入月卡会员成功");
+//            parkLogTb.setType("vip");
+//            parkLogTb.setGroupId(groupid);
+//            saveLogService.saveLog(parkLogTb);
+//        }
         return null;
     }
 

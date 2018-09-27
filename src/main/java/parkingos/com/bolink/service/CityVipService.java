@@ -13,7 +13,7 @@ public interface CityVipService {
 
 //    List<List<String>> exportExcel(Map<String, String> reqParameterMap);
 
-    JSONObject importExcel(MultipartFile file,Long groupid,Long cityid)  throws Exception;
+    JSONObject importExcel(MultipartFile file,Long groupid,Long cityid,String nickname,Long uin)  throws Exception;
 
     List<List<String>> exportExcel(Map<String, String> reqParameterMap);
 }
