@@ -377,7 +377,7 @@ public class TicketServiceImpl implements TicketService {
         Integer free = 0;//全免劵(张)
         Map<String, Object> rMap = new HashMap<String, Object>();
         if (shop_id == -1) {
-            rMap.put("result", -1);
+            rMap.put("state", -1);
             rMap.put("error", "商户编号>>" + shop_id + "不存在");
             return rMap;
         }
@@ -386,7 +386,13 @@ public class TicketServiceImpl implements TicketService {
 
         ShopTb shopTb = new ShopTb();
         shopTb.setId(shop_id);
+        shopTb.setState(0);
         ShopTb shopInfo = (ShopTb) commonDao.selectObjectByConditions(shopTb);
+        if(shopInfo==null){
+            rMap.put("state", -1);
+            rMap.put("error", "商户不存在");
+            return rMap;
+        }
         Integer ticket_limit = shopInfo.getTicketLimit() == null ? 0 : shopInfo.getTicketLimit();
         Integer ticketfree_limit = shopInfo.getTicketfreeLimit() == null ? 0 : shopInfo.getTicketfreeLimit();
         Integer ticket_money = shopInfo.getTicketMoney() == null ? 0 : shopInfo.getTicketMoney();
@@ -402,14 +408,14 @@ public class TicketServiceImpl implements TicketService {
         if (type == 3) {//优惠券-时长
             if (reduce <= 0) {
                 logger.error("优惠券额度必须为正数" + ",商户shop_id:" + shop_id);
-                rMap.put("result", -2);
+                rMap.put("state", -2);
                 rMap.put("error", "优惠券额度必须为正数");
                 return rMap;
             }
 
             if (ticket_limit < (reduce * number)) {
                 logger.error("优惠券额度已用完，还剩余额度" + ticket_limit + ",优惠券时长time：" + reduce + ",商户shop_id:" + shop_id);
-                rMap.put("result", -2);
+                rMap.put("state", -2);
                 rMap.put("error", "优惠券额度不够");
                 return rMap;
             }
@@ -417,13 +423,13 @@ public class TicketServiceImpl implements TicketService {
         } else if (type == 5) {//优惠券-金额
             if (reduce <= 0) {
                 logger.error("优惠券额度必须为正数" + ",商户shop_id:" + shop_id);
-                rMap.put("result", -2);
+                rMap.put("state", -2);
                 rMap.put("error", "优惠券额度必须为正数");
                 return rMap;
             }
             if (ticket_money < (reduce * number)) {
                 logger.error("优惠券额度已用完，还剩余额度" + ticket_money + ",优惠券金额amount：" + reduce + ",商户shop_id:" + shop_id);
-                rMap.put("result", -2);
+                rMap.put("state", -2);
                 rMap.put("error", "优惠券额度不够");
                 return rMap;
             }
@@ -432,8 +438,8 @@ public class TicketServiceImpl implements TicketService {
             reduce = 0;
             if (ticketfree_limit < number) {
                 logger.error("全免券额度已用完，还剩余额度" + ticketfree_limit + ",商户shop_id:" + shop_id);
-                rMap.put("result", -2);
-                rMap.put("error", "全免券额度已用完");
+                rMap.put("state", -2);
+                rMap.put("error", "优惠券额度不够");
                 return rMap;
             }
         }
@@ -498,7 +504,7 @@ public class TicketServiceImpl implements TicketService {
                 return rMap;
             }
         }
-        rMap.put("result", -1);
+        rMap.put("state", -1);
         rMap.put("error", "生成减免劵出错，用劵失败");
         return rMap;
     }

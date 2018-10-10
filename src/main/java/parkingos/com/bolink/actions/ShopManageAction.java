@@ -64,6 +64,16 @@ public class ShopManageAction {
         return null;
     }
 
+    /**changeSuperimposed
+     * 删除
+     */
+    @RequestMapping("/refund")
+    public String refund(HttpServletRequest request, HttpServletResponse resp) {
+        String result = shopManageService.refund( request );
+        StringUtils.ajaxOutput( resp, result );
+        return null;
+    }
+
 
 
     /**

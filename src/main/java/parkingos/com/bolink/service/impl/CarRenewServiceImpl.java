@@ -55,8 +55,16 @@ public class CarRenewServiceImpl implements CarRenewService {
 		Double actReceivable = 0.0;
 		if(cardRenewList!=null&&cardRenewList.size()>0) {
 			for (CardRenewTb cardRenew : cardRenewList) {
-				amountReceivable += Double.parseDouble(cardRenew.getAmountReceivable());
-				actReceivable += Double.parseDouble(cardRenew.getAmountPay());
+				try {
+					amountReceivable += Double.parseDouble(cardRenew.getAmountReceivable());
+				}catch (Exception e){
+					amountReceivable += 0;
+				}
+				try {
+					actReceivable += Double.parseDouble(cardRenew.getAmountPay());
+				}catch (Exception e){
+					actReceivable += 0;
+				}
 			}
 		}
 		result.put("amountReceivable",StringUtils.formatDouble(amountReceivable));
