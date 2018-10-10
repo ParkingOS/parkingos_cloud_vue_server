@@ -674,6 +674,7 @@ public class TicketServiceImpl implements TicketService {
                     if(nameMap.containsKey(shopid)){
                         name = nameMap.get(shopid);
                         unit = unitMap.get(shopid);
+
                     }else{
                         ShopTb shopTb = new ShopTb();
                         shopTb.setId(shopid);
