@@ -21,6 +21,16 @@ public class FixCodeTb {
 
     private Long uin;
 
+    private Long beginTime;
+
+    public Long getBeginTime() {
+        return beginTime;
+    }
+
+    public void setBeginTime(Long beginTime) {
+        this.beginTime = beginTime;
+    }
+
     public Long getUin() {
         return uin;
     }

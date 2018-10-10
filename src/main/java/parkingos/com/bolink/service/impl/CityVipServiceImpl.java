@@ -5,6 +5,7 @@ import com.alibaba.fastjson.JSONObject;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 import parkingos.com.bolink.dao.spring.CommonDao;
 import parkingos.com.bolink.enums.FieldOperator;
@@ -13,6 +14,7 @@ import parkingos.com.bolink.qo.PageOrderConfig;
 import parkingos.com.bolink.qo.SearchBean;
 import parkingos.com.bolink.service.CityVipService;
 import parkingos.com.bolink.service.GetDataService;
+import parkingos.com.bolink.service.SaveLogService;
 import parkingos.com.bolink.service.SupperSearchService;
 import parkingos.com.bolink.utils.*;
 
@@ -38,6 +40,8 @@ public class CityVipServiceImpl implements CityVipService {
     private SupperSearchService<CarowerProduct> supperSearchService;
     @Autowired
     private CommonMethods commonMethods;
+    @Autowired
+    private SaveLogService saveLogService;
 
     @Override
     public JSONObject selectResultByConditions(Map<String, String> reqmap) {
@@ -409,7 +413,13 @@ public class CityVipServiceImpl implements CityVipService {
     }
 
     @Override
-    public JSONObject importExcel(MultipartFile file,Long groupid,Long cityid)  throws Exception{
+    @Transactional
+    public JSONObject importExcel(MultipartFile file,Long groupid,Long cityid,String nickname,Long uin)  throws Exception{
+
+
+        OrgGroupTb orgGroupTb = new OrgGroupTb();
+        orgGroupTb.setId(groupid);
+        orgGroupTb = (OrgGroupTb)commonDao.selectObjectByConditions(orgGroupTb);
 
         JSONObject result = new JSONObject();
 
@@ -608,6 +618,16 @@ public class CityVipServiceImpl implements CityVipService {
                     carowerProduct.setCarNumber((String)arr[8]);
                     carowerProduct.setCardId((String)arr[9]);
                     r += commonDao.insert(carowerProduct);
+
+
+                    ParkLogTb parkLogTb = new ParkLogTb();
+                    parkLogTb.setOperateUser(nickname);
+                    parkLogTb.setOperateTime(System.currentTimeMillis()/1000);
+                    parkLogTb.setOperateType(1);
+                    parkLogTb.setContent(uin+"("+nickname+")"+"新建月卡会员成功:"+arr[8]);
+                    parkLogTb.setType("vip");
+                    parkLogTb.setGroupId(groupid);
+                    saveLogService.saveLog(parkLogTb);
                 }
                 logger.error("批量导入月卡结果：" + r);
                 errmsg +="</br>新建"+r+"条";
@@ -625,6 +645,15 @@ public class CityVipServiceImpl implements CityVipService {
                     conditions.setComId((Long)arr[5]);
                     conditions.setCarNumber((String)arr[6]);
                     r += commonDao.updateByConditions(fields,conditions);
+
+                    ParkLogTb parkLogTb = new ParkLogTb();
+                    parkLogTb.setOperateUser(nickname);
+                    parkLogTb.setOperateTime(System.currentTimeMillis()/1000);
+                    parkLogTb.setOperateType(2);
+                    parkLogTb.setContent(uin+"("+nickname+")"+"更新月卡会员成功:"+arr[6]);
+                    parkLogTb.setType("vip");
+                    parkLogTb.setGroupId(groupid);
+                    saveLogService.saveLog(parkLogTb);
                 }
                 logger.error("批量更新月卡结果：" + r);
                 errmsg +="</br>更新"+r+"条";

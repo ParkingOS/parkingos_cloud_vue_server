@@ -6,13 +6,16 @@ import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import parkingos.com.bolink.dao.spring.CommonDao;
+import parkingos.com.bolink.enums.FieldOperator;
 import parkingos.com.bolink.models.ComInfoTb;
 import parkingos.com.bolink.models.ParkLogTb;
 import parkingos.com.bolink.models.ShopAccountTb;
 import parkingos.com.bolink.models.ShopTb;
 import parkingos.com.bolink.qo.PageOrderConfig;
+import parkingos.com.bolink.qo.SearchBean;
 import parkingos.com.bolink.service.SaveLogService;
 import parkingos.com.bolink.service.ShopManageService;
+import parkingos.com.bolink.service.SupperSearchService;
 import parkingos.com.bolink.utils.Check;
 import parkingos.com.bolink.utils.OrmUtil;
 import parkingos.com.bolink.utils.RequestUtil;
@@ -33,6 +36,8 @@ public class ShopManageServiceImpl implements ShopManageService {
     private CommonDao commonDao;
     @Autowired
     private SaveLogService saveLogService;
+    @Autowired
+    private SupperSearchService<ShopTb> supperSearchService;
 
     @Override
     public String addMoney(HttpServletRequest request) {
@@ -114,32 +119,121 @@ public class ShopManageServiceImpl implements ShopManageService {
     }
 
     @Override
-    public String delete(HttpServletRequest request) {
+    public String refund(HttpServletRequest request) {
+
+        JSONObject jsonObject = new JSONObject();
+        jsonObject.put("state",0);
         Long comid = RequestUtil.getLong(request,"comid",-1L);
         String nickname = StringUtils.decodeUTF8(RequestUtil.getString(request,"nickname1"));
         Long uin = RequestUtil.getLong(request, "loginuin", -1L);
 
+        Long shopId = RequestUtil.getLong( request, "shop_id", -1L );
+
+        ShopTb queryShopTb = new ShopTb();
+        queryShopTb.setId( shopId );
+
+        ShopTb shopTb = (ShopTb) commonDao.selectObjectByConditions( queryShopTb );
+
+        Integer ticket_time = RequestUtil.getInteger( request, "ticket_time", 0 );
+        Integer ticket_money = RequestUtil.getInteger( request, "ticket_money", 0 );
+        double addmoney = RequestUtil.getDouble( request, "addmoney", 0.00 );
+        Integer ticketfree_limit = RequestUtil.getInteger( request, "ticketfree_limit", 0 );
+
+        if(ticket_money>shopTb.getTicketMoney()||ticket_time>shopTb.getTicketLimit()||ticketfree_limit>shopTb.getTicketfreeLimit()){
+            jsonObject.put("msg","商户余额不足！");
+            return jsonObject.toJSONString();
+        }
+
+        shopTb.setTicketLimit( shopTb.getTicketLimit() - ticket_time );
+        shopTb.setTicketfreeLimit( shopTb.getTicketfreeLimit() - ticketfree_limit );
+        shopTb.setTicketMoney( shopTb.getTicketMoney() - ticket_money );
+        commonDao.updateByPrimaryKey( shopTb );
+
+        ShopAccountTb shopAccountTb = new ShopAccountTb();
+        shopAccountTb.setShopId( Integer.parseInt( shopTb.getId() + "" ) );
+        shopAccountTb.setShopName( shopTb.getName() );
+        shopAccountTb.setTicketLimit( ticket_time );
+        shopAccountTb.setTicketfreeLimit( ticketfree_limit );
+        shopAccountTb.setTicketMoney( ticket_money );
+        shopAccountTb.setAddMoney( new BigDecimal( addmoney ) );
+        shopAccountTb.setOperateTime( System.currentTimeMillis() / 1000 );
+        shopAccountTb.setOperateType( 3 );
+        shopAccountTb.setParkId( comid );
+        shopAccountTb.setOperator( uin );
+        int insert = commonDao.insert( shopAccountTb );
+
+        if(insert==1){
+            ParkLogTb parkLogTb = new ParkLogTb();
+            parkLogTb.setOperateUser(nickname);
+            parkLogTb.setOperateTime(System.currentTimeMillis()/1000);
+            parkLogTb.setOperateType(2);
+            parkLogTb.setContent(uin+"("+nickname+")给商户"+shopId+"退款"+addmoney+"元");
+            parkLogTb.setType("shop");
+            parkLogTb.setParkId(comid);
+            saveLogService.saveLog(parkLogTb);
+            jsonObject.put("state",1);
+            jsonObject.put("msg","退款成功！");
+        }
+
+        return jsonObject.toJSONString();
+    }
+
+    @Override
+    public String delete(HttpServletRequest request) {
+        JSONObject jsonObject = new JSONObject();
+        jsonObject.put("state",0);
+
+        Long comid = RequestUtil.getLong(request,"comid",-1L);
+        String nickname = StringUtils.decodeUTF8(RequestUtil.getString(request,"nickname1"));
+        Long uin = RequestUtil.getLong(request, "loginuin", -1L);
+
+        //0删除  1 销户
+        Integer logoutState = RequestUtil.getInteger(request,"logoutState",0);
         Long id = RequestUtil.getLong( request, "id", -1L );
         int delete = 0;
         if (id > 0) {
             ShopTb shopTb = new ShopTb();
-            shopTb.setId( id );
-            shopTb.setState( 1 );
-            //删除操作将state状态修改为1
-            delete = commonDao.updateByPrimaryKey( shopTb );
+            shopTb.setId(id);
+            if(logoutState==0) {
+                shopTb.setState(1);
+                //删除操作将state状态修改为1
+                delete = commonDao.updateByPrimaryKey(shopTb);
+            }else if(logoutState==1){
+                //查询该商户还有没有余额 ，如果有余额，那么先让他进行退款操作
+                shopTb = (ShopTb)commonDao.selectObjectByConditions(shopTb);
+                if (shopTb!=null){
+                    int ticketLimit =shopTb.getTicketLimit();
+                    int ticketfree_limit = shopTb.getTicketfreeLimit();
+                    int ticket_money = shopTb.getTicketMoney();
+                    if(ticketLimit>0||ticket_money>0||ticketfree_limit>0){
+                        jsonObject.put("msg","请退款后再进行销户操作！");
+                        return jsonObject.toJSONString();
+                    }
+                    //销户
+                    shopTb.setState(2);
+                    delete = commonDao.updateByPrimaryKey(shopTb);
+                }
+            }
         }
 
         if(delete==1){
+            jsonObject.put("state",1);
             ParkLogTb parkLogTb = new ParkLogTb();
             parkLogTb.setOperateUser(nickname);
             parkLogTb.setOperateTime(System.currentTimeMillis()/1000);
             parkLogTb.setOperateType(3);
-            parkLogTb.setContent(uin+"("+nickname+")"+"删除了商户"+id);
+            if(logoutState==0) {
+                parkLogTb.setContent(uin + "(" + nickname + ")" + "删除了商户" + id);
+                jsonObject.put("msg","删除成功！");
+            }else if(logoutState==1){
+                parkLogTb.setContent(uin + "(" + nickname + ")" + "进行了商户销户操作:" + id);
+                jsonObject.put("msg","销户成功！");
+            }
             parkLogTb.setType("shop");
             parkLogTb.setParkId(comid);
             saveLogService.saveLog(parkLogTb);
         }
-        return "{\"state\":" + delete + "}";
+        return jsonObject.toJSONString();
     }
 
     @Override
@@ -151,20 +245,28 @@ public class ShopManageServiceImpl implements ShopManageService {
 
         ShopTb shopTb = new ShopTb();
         shopTb.setComid( Long.valueOf( RequestUtil.processParams( req, "comid" ) ) );
-        //state状态 0为正常使用 1为删除状态
-        shopTb.setState( 0 );
-
-        int count = commonDao.selectCountByConditions( shopTb );
+        //state状态 0为正常使用 1为删除状态  2为销户状态(也要显示在列表)
+//        shopTb.setState( 0 );
+        List<Integer> stateList = new ArrayList<>();
+        stateList.add(0);
+        stateList.add(2);
+        SearchBean searchBean = new SearchBean();
+        searchBean.setOperator(FieldOperator.CONTAINS);
+        searchBean.setFieldName("state");
+        searchBean.setBasicValue(stateList);
+        List<SearchBean> searchBeans = new ArrayList<>();
+        searchBeans.add(searchBean);
+        int count = commonDao.selectCountByConditions(shopTb,searchBeans);
         result.put( "total", count );
         if (count > 0) {
             /**分页处理*/
             PageOrderConfig config = new PageOrderConfig();
             config.setPageInfo( pageNum, pageSize );
-            List<ShopTb> list = commonDao.selectListByConditions( shopTb, config );
-            List<Map<String, Object>> resList = new ArrayList<Map<String, Object>>();
+            List<ShopTb> list = commonDao.selectListByConditions( shopTb,searchBeans, config );
+            List<Map<String, Object>> resList = new ArrayList<>();
             if (list != null && !list.isEmpty()) {
                 for (ShopTb sb : list) {
-                    OrmUtil<ShopTb> otm = new OrmUtil<ShopTb>();
+                    OrmUtil<ShopTb> otm = new OrmUtil<>();
                     Map<String, Object> map = otm.pojoToMap( sb );
                     resList.add( map );
                 }

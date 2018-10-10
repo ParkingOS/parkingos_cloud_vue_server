@@ -134,6 +134,19 @@ public class VisitorServiceImpl implements VisitorService {
         return jsonObject;
     }
 
+    @Override
+    public JSONObject getVisitorSet(HomeownerSetTb homeownerSetTb) {
+        JSONObject result = new JSONObject();
+        int count = commonDao.selectCountByConditions(homeownerSetTb);
+        result.put("total",0);
+        if(count>0){
+            homeownerSetTb = (HomeownerSetTb)commonDao.selectObjectByConditions(homeownerSetTb);
+            result.put("rows",homeownerSetTb);
+            result.put("total",count);
+        }
+        return result;
+    }
+
     private String getComName(Long comid){
         ComInfoTb comInfoTb  = new ComInfoTb();
         comInfoTb.setId(comid);

@@ -267,4 +267,15 @@ public class FixCodeServiceImpl implements FixCodeService {
         return result;
     }
 
+    @Override
+    public JSONObject setPublic(ShopTb shopTb) {
+        JSONObject result = new JSONObject();
+        int update = commonDao.updateByPrimaryKey(shopTb);
+        if(update==1){
+            result.put("state",1);
+            result.put("msg","修改成功");
+        }
+        return result;
+    }
+
 }

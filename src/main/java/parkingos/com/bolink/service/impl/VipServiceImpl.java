@@ -239,7 +239,8 @@ public class VipServiceImpl implements VipService {
         Integer renewId = (commonDao.selectSequence(CardRenewTb.class)).intValue();
         String tradeNo = TimeTools.getTimeYYYYMMDDHHMMSS() + "" + comid;
         //对于字符串类型 最好都要进行编码解码处理  防止中文乱码
-        String operater = StringUtils.decodeUTF8(RequestUtil.getString(req, "nickname"));
+        String operater = StringUtils.decodeUTF8(RequestUtil.getString(req, "nickname1"));
+
         //组装插入月卡消费记录数据
         CardRenewTb cardRenewTb = new CardRenewTb();
         cardRenewTb.setId(renewId);
@@ -251,7 +252,6 @@ public class VipServiceImpl implements VipService {
         cardRenewTb.setCollector(operater);
         cardRenewTb.setPayType("现金");
         cardRenewTb.setCarNumber(carNumber.toUpperCase());
-        cardRenewTb.setUserId(name);
         cardRenewTb.setResume(remark);
         cardRenewTb.setBuyMonth(months);
         cardRenewTb.setComid(comid + "");
@@ -437,7 +437,7 @@ public class VipServiceImpl implements VipService {
             //******添加月卡消费记录*******
             Integer renewId = (commonDao.selectSequence(CardRenewTb.class)).intValue();
             String tradeNo = TimeTools.getTimeYYYYMMDDHHMMSS() + "" + comid;
-            String operater = StringUtils.decodeUTF8(RequestUtil.getString(req, "nickname"));
+            String operater = StringUtils.decodeUTF8(RequestUtil.getString(req, "nickname1"));
             //组装插入月卡消费记录数据
             CardRenewTb cardRenewTb = new CardRenewTb();
             cardRenewTb.setId(renewId);
@@ -449,7 +449,6 @@ public class VipServiceImpl implements VipService {
             cardRenewTb.setCollector(operater);
             cardRenewTb.setPayType("现金");
             cardRenewTb.setCarNumber(carowerProduct.getCarNumber());
-            cardRenewTb.setUserId(name);
             cardRenewTb.setResume(remark);
             cardRenewTb.setBuyMonth(months);
             cardRenewTb.setComid(comid + "");

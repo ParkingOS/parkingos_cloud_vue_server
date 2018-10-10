@@ -464,7 +464,7 @@ public class GetDataServiceImpl implements GetDataService {
         List<Map<String,Object>>  shopList = null;
         String result = "[";
 
-        String sql = "select id,name from shop_tb where state = 0 and comid = "+ comid;
+        String sql = "select id,name from shop_tb where state != 1 and comid = "+ comid;
 
 
         shopList = commonDao.getObjectBySql(sql);

@@ -17,4 +17,6 @@ public interface VisitorService {
     Long getNextSetId();
 
     JSONObject setVisitor(HomeownerSetTb homeownerSetTb, int type);
+
+    JSONObject getVisitorSet(HomeownerSetTb homeownerSetTb);
 }

@@ -72,7 +72,7 @@ public class ShopTicketAction {
         parkLogTb.setOperateTime(System.currentTimeMillis()/1000);
         parkLogTb.setOperateType(4);
         parkLogTb.setContent(uin+"("+nickname+")"+"导出了优惠券数据");
-        parkLogTb.setType("ticket");
+        parkLogTb.setType("shop");
         parkLogTb.setParkId(comid);
         saveLogService.saveLog(parkLogTb);
         return null;
@@ -155,7 +155,7 @@ public class ShopTicketAction {
         //如果全免券支持多次使用，获取这张全免券的有效期
         Integer timeRange = RequestUtil.getInteger(request,"time_range",0);
         if(freeLimitTimes==1&&timeRange<=0){
-            mapResult.put("result", -1);
+            mapResult.put("state", -1);
             mapResult.put("error", "请输入正确的全免券有效期时长");
             StringUtils.ajaxOutput( resp, JSONObject.toJSONString(mapResult) );
             return null;
@@ -200,7 +200,7 @@ public class ShopTicketAction {
         Integer freeLimitTimes = RequestUtil.getInteger(request,"free_limit_times",0);
         Integer timeRange = RequestUtil.getInteger(request, "time_range", 0);
         if(freeLimitTimes==1&&timeRange<=0){
-            mapResult.put("result", -1);
+            mapResult.put("state", -1);
             mapResult.put("error", "请输入正确的全免券有效期时长");
             StringUtils.ajaxOutput( resp, JSONObject.toJSONString(mapResult) );
             return null;

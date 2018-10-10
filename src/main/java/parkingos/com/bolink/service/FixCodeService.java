@@ -2,6 +2,7 @@ package parkingos.com.bolink.service;
 
 import com.alibaba.fastjson.JSONObject;
 import parkingos.com.bolink.models.FixCodeTb;
+import parkingos.com.bolink.models.ShopTb;
 
 import java.util.Map;
 
@@ -16,4 +17,6 @@ public interface FixCodeService {
     JSONObject updateRole(FixCodeTb fixCodeTb);
 
     JSONObject userTicket(String code);
+
+    JSONObject setPublic(ShopTb shopTb);
 }

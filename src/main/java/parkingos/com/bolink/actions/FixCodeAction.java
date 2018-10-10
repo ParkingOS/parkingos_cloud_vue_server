@@ -14,6 +14,8 @@ import parkingos.com.bolink.utils.*;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.Map;
 
 @Controller
@@ -44,7 +46,7 @@ public class FixCodeAction {
 //     * 增加固态二维码
 //     */
     @RequestMapping(value = "/add")
-    public String addRole(HttpServletRequest request, HttpServletResponse resp){
+    public String addRole(HttpServletRequest request, HttpServletResponse resp) throws Exception{
 
         JSONObject result = new JSONObject();
 
@@ -57,6 +59,16 @@ public class FixCodeAction {
         Integer amountLimit = RequestUtil.getInteger(request,"amount_limit",0);
         String validiteTime= RequestUtil.getString(request,"validite_time");
 
+        String begin_time = RequestUtil.processParams(request, "begin_time");
+        //时区问题  进行转换
+        if(!"".equals(begin_time)) {
+            begin_time = begin_time.replace("Z", " UTC");//注意是空格+UTC
+            SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS Z");//注意格式化的表达式
+            Date d = format.parse(begin_time);
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+            begin_time = sdf.format(d);
+        }
+
         Long uin = RequestUtil.getLong(request,"loginuin",-1L);
         Integer validite_time = 24;
         if(!Check.isNumber(validiteTime)){
@@ -68,15 +80,6 @@ public class FixCodeAction {
             validite_time = Integer.parseInt(validiteTime);
         }
 
-//        if(validite_time>500000||validite_time<=0){
-//            result.put("state",0);
-//            result.put("msg","请设置一个合理的有效期");
-//            StringUtils.ajaxOutput(resp,result.toJSONString());
-//            return null;
-//        }
-
-        //Integer validite_time = RequestUtil.getInteger(request,"validite_time",24);
-//        Integer amount = RequestUtil.getInteger(request,"amount",0);
 
         //根据shopid获得该商户的用券单位
         ShopTb shopTb  =shopAcccountService.getShopByid(shopid);
@@ -113,6 +116,9 @@ public class FixCodeAction {
 
 
         Long btime = System.currentTimeMillis()/1000;
+        if(!"".equals(begin_time)){
+            btime=TimeTools.getLongMilliSecondFrom_HHMMDDHHmmss(begin_time);
+        }
         //截止有效时间
         Long etime =  btime + validite_time*60*60;
         Long id = fixCodeService.getId();
@@ -138,7 +144,8 @@ public class FixCodeAction {
 //        fixCodeTb.setAmount(amount);
         //fixCodeTb.setMoneyLimit(moneyLimit);
         fixCodeTb.setType(type);
-        fixCodeTb.setCreateTime(btime);
+        fixCodeTb.setCreateTime(System.currentTimeMillis()/1000);
+        fixCodeTb.setBeginTime(btime);
         fixCodeTb.setEndTime(etime);
         fixCodeTb.setCodeSrc(CustomDefind.getValue("FIXCODEURL")+code[0]);
 
@@ -212,6 +219,41 @@ public class FixCodeAction {
         }
 
         QrCodeUtil.downAllFile(request,resp,"FixCode");
+        return null;
+    }
+
+    /*
+    * 公众号设置
+    *
+    * */
+    @RequestMapping(value = "/public")
+    public String setPublic(HttpServletRequest request, HttpServletResponse resp){
+        JSONObject result = new JSONObject();
+        Long id = RequestUtil.getLong(request,"id",-1L);
+        String appid = RequestUtil.getString(request,"appid");
+        String secret = RequestUtil.getString(request,"secret");
+        String concernAddress = RequestUtil.getString(request,"concern_address");
+        Integer publicState = RequestUtil.getInteger(request,"public_state",0);
+        if(appid.length()!=18){
+            result.put("state",0);
+            result.put("msg","请输入正确的appid");
+            StringUtils.ajaxOutput(resp,result.toJSONString());
+            return null;
+        }
+        if(secret.length()!=32){
+            result.put("state",0);
+            result.put("msg","请输入正确的secret");
+            StringUtils.ajaxOutput(resp,result.toJSONString());
+            return null;
+        }
+        ShopTb shopTb = new ShopTb();
+        shopTb.setId(id);
+        shopTb.setAppid(appid);
+        shopTb.setSecret(secret);
+        shopTb.setConcernAddress(concernAddress);
+        shopTb.setPublicState(publicState);
+        result = fixCodeService.setPublic(shopTb);
+        StringUtils.ajaxOutput(resp,result.toJSONString());
         return null;
     }
 

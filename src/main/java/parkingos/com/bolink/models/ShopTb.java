@@ -51,6 +51,22 @@ public class ShopTb {
 
     private Integer useFixCode;
 
+    private String appid;
+
+    private String secret;
+
+    private String concernAddress;
+
+    private Integer publicState;
+
+    public Integer getPublicState() {
+        return publicState;
+    }
+
+    public void setPublicState(Integer publicState) {
+        this.publicState = publicState;
+    }
+
     public Integer getUseFixCode() {
         return useFixCode;
     }
@@ -175,31 +191,6 @@ public class ShopTb {
         this.freeMoney = freeMoney;
     }
 
-    @Override
-    public String toString() {
-        return "ShopTb{" +
-                "id=" + id +
-                ", freeMoney=" + freeMoney +
-                ", ticketUnit=" + ticketUnit +
-                ", name='" + name + '\'' +
-                ", address='" + address + '\'' +
-                ", mobile='" + mobile + '\'' +
-                ", phone='" + phone + '\'' +
-                ", comid=" + comid +
-                ", ticketLimit=" + ticketLimit +
-                ", description='" + description + '\'' +
-                ", state=" + state +
-                ", createTime=" + createTime +
-                ", ticketfreeLimit=" + ticketfreeLimit +
-                ", ticketType=" + ticketType +
-                ", ticketMoney=" + ticketMoney +
-                ", defaultLimit='" + defaultLimit + '\'' +
-                ", discountPercent=" + discountPercent +
-                ", discountMoney=" + discountMoney +
-                ", validiteTime=" + validiteTime +
-                '}';
-    }
-
     public Integer getTicketUnit() {
         return ticketUnit;
     }
@@ -266,5 +257,62 @@ public class ShopTb {
 
     public void setHandInputEnable(Integer handInputEnable) {
         this.handInputEnable = handInputEnable;
+    }
+
+    @Override
+    public String toString() {
+        return "ShopTb{" +
+                "id=" + id +
+                ", freeMoney=" + freeMoney +
+                ", ticketUnit=" + ticketUnit +
+                ", name='" + name + '\'' +
+                ", address='" + address + '\'' +
+                ", mobile='" + mobile + '\'' +
+                ", phone='" + phone + '\'' +
+                ", comid=" + comid +
+                ", ticketLimit=" + ticketLimit +
+                ", description='" + description + '\'' +
+                ", state=" + state +
+                ", createTime=" + createTime +
+                ", ticketfreeLimit=" + ticketfreeLimit +
+                ", ticketType=" + ticketType +
+                ", ticketMoney=" + ticketMoney +
+                ", defaultLimit='" + defaultLimit + '\'' +
+                ", discountPercent=" + discountPercent +
+                ", discountMoney=" + discountMoney +
+                ", validiteTime=" + validiteTime +
+                ", handInputEnable=" + handInputEnable +
+                ", supportType=" + supportType +
+                ", useLimit=" + useLimit +
+                ", freeLimitTimes=" + freeLimitTimes +
+                ", useFixCode=" + useFixCode +
+                ", appid='" + appid + '\'' +
+                ", secret='" + secret + '\'' +
+                ", concernAddress='" + concernAddress + '\'' +
+                '}';
+    }
+
+    public String getAppid() {
+        return appid;
+    }
+
+    public void setAppid(String appid) {
+        this.appid = appid;
+    }
+
+    public String getSecret() {
+        return secret;
+    }
+
+    public void setSecret(String secret) {
+        this.secret = secret;
+    }
+
+    public String getConcernAddress() {
+        return concernAddress;
+    }
+
+    public void setConcernAddress(String concernAddress) {
+        this.concernAddress = concernAddress;
     }
 }

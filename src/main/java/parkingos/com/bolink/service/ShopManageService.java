@@ -14,4 +14,6 @@ public interface ShopManageService {
     String addMoney(HttpServletRequest request);
 
     int updateComSuperimposed(ComInfoTb comInfoTb);
+
+    String refund(HttpServletRequest request);
 }

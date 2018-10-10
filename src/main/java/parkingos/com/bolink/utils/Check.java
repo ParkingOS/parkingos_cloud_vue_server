@@ -152,12 +152,13 @@ public class Check {
     	// int -2147483648－－2147483647
     	if(value==null)
     		return false;
-    	if(value.length()>9&&isLong(value)){
-    		Long  l = Long.parseLong(value);
-    		if(l<=Integer.MAX_VALUE)
-    			return true;
-    	}
-    	return value.matches("^\\d{1,9}");
+//    	if(value.length()>9&&isLong(value)){
+//    		Long  l = Long.parseLong(value);
+//    		if(l<=Integer.MAX_VALUE)
+//    			return true;
+//    	}
+//    	return value.matches("^\\d{1,9}");
+		return value.matches("[0-9]+");
     }
     /**
      * 判断是否是长整型
@@ -225,4 +226,8 @@ public class Check {
 		}
 		return true;
 	}
+
+//	public static void main(String[] args){
+//		System.out.print("===>>"+isNumber("15000000000000000"));
+//	}
 }

@@ -111,6 +111,7 @@ public class VisitorAction {
         String remark =RequestUtil.getString(request, "remark");
         Integer state = RequestUtil.getInteger(request, "state", 0);
         Long id = RequestUtil.getLong(request,"id",-1L);
+        String carNumber = RequestUtil.getString(request,"car_number");
         if(remark.length()>20){
             String str = "{\"state\":0,\"msg\":\"备注限制20字\"}";
             StringUtils.ajaxOutput(resp,str);
@@ -131,7 +132,7 @@ public class VisitorAction {
             parkLogTb.setOperateUser(nickname);
             parkLogTb.setOperateTime(System.currentTimeMillis()/1000);
             parkLogTb.setOperateType(2);
-            parkLogTb.setContent(uin+"("+nickname+")"+"审核了访客"+id);
+            parkLogTb.setContent(uin+"("+nickname+")"+"审核了访客"+id+"车牌号:"+carNumber);
             parkLogTb.setType("visitor");
             parkLogTb.setParkId(comid);
             saveLogService.saveLog(parkLogTb);
@@ -148,7 +149,7 @@ public class VisitorAction {
     @RequestMapping(value = "/setvisitor")
     public String setVisitor(HttpServletRequest request, HttpServletResponse resp){
 
-//        Long comid = RequestUtil.getLong(request,"comid",-1L);
+        Long comid = RequestUtil.getLong(request,"comid",-1L);
         Long id = RequestUtil.getLong(request,"id",-1L);
 
         Integer accessCert = RequestUtil.getInteger(request,"access_cert",1);
@@ -167,13 +168,22 @@ public class VisitorAction {
         homeownerSetTb.setAccessNotCert(accessNotCert);
         homeownerSetTb.setAutoCert(autoCert);
         homeownerSetTb.setAutoNotCert(autoNotCert);
-//        homeownerSetTb.setComid(comid);
+        homeownerSetTb.setComid(comid);
 
         JSONObject result = visitorService.setVisitor(homeownerSetTb,type);
         StringUtils.ajaxOutput(resp,result.toJSONString());
         return null;
     }
 
-
+    @RequestMapping(value = "/getvisitorset")
+    public String getVisitorSet(HttpServletRequest request, HttpServletResponse resp){
+        Long comid = RequestUtil.getLong(request,"comid",-1L);
+        HomeownerSetTb homeownerSetTb = new HomeownerSetTb();
+        homeownerSetTb.setComid(comid);
+        JSONObject result = visitorService.getVisitorSet(homeownerSetTb);
+        logger.info("======>>>>>>>>"+result.toJSONString());
+        StringUtils.ajaxOutput(resp,result.toJSONString());
+        return null;
+    }
 
 }

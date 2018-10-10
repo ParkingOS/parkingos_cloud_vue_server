@@ -14,4 +14,6 @@ public interface HomeOwnerService {
     JSONObject addOwner(HomeOwnerTb homeOwnerTb);
 
     List<List<Object>> exportExcel(Map<String, String> reqParameterMap);
+
+    void saveOrUpdateAll(List<HomeOwnerTb> homeOwnerTbList,String nickname,Long uin);
 }
