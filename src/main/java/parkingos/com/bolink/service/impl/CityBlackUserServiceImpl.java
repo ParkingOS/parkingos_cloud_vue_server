@@ -14,6 +14,7 @@ import parkingos.com.bolink.qo.SearchBean;
 import parkingos.com.bolink.service.CityBlackUserService;
 import parkingos.com.bolink.service.SupperSearchService;
 import parkingos.com.bolink.utils.Check;
+import parkingos.com.bolink.utils.CommonUtils;
 import parkingos.com.bolink.utils.OrmUtil;
 
 import java.util.ArrayList;
@@ -32,6 +33,8 @@ public class CityBlackUserServiceImpl implements CityBlackUserService {
     private SupperSearchService<ZldBlackTb> supperSearchService;
     @Autowired
     private CommonMethods commonMethods;
+    @Autowired
+    private CommonUtils commonUtils;
 
     @Override
     public JSONObject selectResultByConditions(Map<String, String> reqmap) {
@@ -117,6 +120,7 @@ public class CityBlackUserServiceImpl implements CityBlackUserService {
             zldBlackTb1.setId(id);
             zldBlackTb1 = (ZldBlackTb)commonDao.selectObjectByConditions(zldBlackTb1);
             if(zldBlackTb1!=null&&zldBlackTb1.getState()!=null){
+                commonUtils.sendMessage(zldBlackTb1,zldBlackTb1.getComid(),zldBlackTb1.getId(),2);
                 insertSysn(zldBlackTb1,1);
             }
             result.put("state",1);

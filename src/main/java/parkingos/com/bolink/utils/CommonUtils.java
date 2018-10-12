@@ -189,7 +189,7 @@ public class CommonUtils<T> {
         JSONObject jsonObject = JSONObject.parseObject("{}");
         jsonObject.put("channelid", localId);
         jsonObject.put("data",message);
-        String url = "http://" + ip + ":8080/zld/sendmesgtopark";
+        String url = "http://" + ip + ":8083/zld/sendmesgtopark";
         logger.error(url);
         logger.error(jsonObject);
         String ret = new HttpProxy().doHeadPost(url, StringUtils.encodeUTF8(jsonObject.toString()));
