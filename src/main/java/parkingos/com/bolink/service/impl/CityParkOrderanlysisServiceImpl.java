@@ -50,7 +50,7 @@ public class CityParkOrderanlysisServiceImpl implements CityParkOrderAnlysisServ
         logger.info("select cityid result:"+cityid);
 
         String tableName = "order_tb_new";
-        if(cityid>-1){
+        if(cityid!=null&&cityid>-1){
             tableName += "_"+cityid%100;
         }
         reqmap.put("end_time","between");
