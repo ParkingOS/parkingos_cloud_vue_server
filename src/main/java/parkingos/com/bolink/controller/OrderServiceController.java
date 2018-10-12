@@ -82,6 +82,9 @@ public class OrderServiceController extends BaseController {
         orderTb.setOutUid(order.getOutUid());
         orderTb.setUid(order.getUid());
         orderTb.setPayType(order.getPayType());
+        orderTb.setInPassid(order.getInPassid());
+        orderTb.setOutPassid(order.getOutPassid());
+        orderTb.setFreereasons(order.getFreereasons());
         return orderTb;
     }
 

@@ -30,6 +30,10 @@ message Order {
     double cashPrepay=24;
     double cashPay=25;
     double reduceAmount=26;
+    int64 groupid =27;
+    string inPassid =28;
+    string outPassid =29;
+    string freereasons =30;
 }
 
 message OrderCount{

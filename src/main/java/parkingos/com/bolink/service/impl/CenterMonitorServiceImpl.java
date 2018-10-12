@@ -21,7 +21,7 @@ import parkingos.com.bolink.dwr.DWRScriptSessionListener;
 import parkingos.com.bolink.dwr.Push;
 import parkingos.com.bolink.models.LiftrodInfoTb;
 import parkingos.com.bolink.service.CenterMonitorService;
-import parkingos.com.bolink.service.CityParkOrderAnlysisService;
+import parkingos.com.bolink.service.CityOrderAnlysisService;
 import parkingos.com.bolink.service.ParkOrderAnlysisService;
 import parkingos.com.bolink.utils.*;
 
@@ -48,7 +48,7 @@ public class CenterMonitorServiceImpl implements CenterMonitorService {
     @Autowired
     private CenterMonitorMapper centerMonitorMapper;
     @Autowired
-    private CityParkOrderAnlysisService cityParkOrderanlysisService;
+    private CityOrderAnlysisService cityOrderAnlysisService;
     @Autowired
     private ParkOrderAnlysisService parkOrderanlysisService;
     @Autowired
@@ -91,8 +91,8 @@ public class CenterMonitorServiceImpl implements CenterMonitorService {
             Map<String, String> parammap = new HashMap<String, String>();
             parammap.put("groupid", groupid + "");
             String todyyymmdd = TimeTools.getDate_YY_MM_DD();
-            parammap.put("date", todyyymmdd + " 00:00:00至" + todyyymmdd + "23:59:59");
-            JSONObject retjson = cityParkOrderanlysisService.selectResultByConditions(parammap);
+            parammap.put("date", todyyymmdd + " 00:00:00至" + todyyymmdd + " 23:59:59");
+            JSONObject retjson = cityOrderAnlysisService.selectResultByConditions(parammap);
             JSONArray retarry = retjson.getJSONArray("rows");
             Double cashPay = 0d;
             Double electronicPay = 0d;

@@ -2,7 +2,7 @@
 
 server:
   port: 8082
-  servlet-path: /cloud
+  context-path: /cloud
 mybatis:
   mapper-locations: "classpath*:mybatis/mapperxml/*.xml"
   configuration:
