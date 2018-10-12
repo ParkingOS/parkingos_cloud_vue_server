@@ -50,7 +50,7 @@ public class ParkCollectorOrderanlysisServiceImpl implements ParkCollectorOrderA
             cityId = orderMapper.getGroupIdByComId(comid);
         }
         String tableName = "order_tb_new";
-        if(cityId>-1){
+        if(cityId!=null&&cityId>-1){
             tableName = "order_tb_new_"+cityId%100;
         }
 

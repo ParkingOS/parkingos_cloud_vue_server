@@ -55,7 +55,7 @@ public class CityUnorderServiceImpl implements CityUnorderService {
             Long groupId = Long.parseLong(groupIdStr);
             cityID = orderMapper.getCityIdByGroupId(groupId);
         }
-        if(cityID>-1){
+        if(cityID!=null&&cityID>-1){
             reqmap.put("tableName","order_tb_new_"+cityID%100);
         }else{
             reqmap.put("tableName","order_tb_new");

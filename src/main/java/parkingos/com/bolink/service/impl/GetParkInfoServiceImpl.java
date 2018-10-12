@@ -31,7 +31,7 @@ public class GetParkInfoServiceImpl implements GetParkInfoService {
     public String getInfo(int groupid) {
         Long cityid = orderMapper.getCityIdByGroupId(Long.parseLong(groupid+""));
         String tableName = "order_tb_new";
-        if (cityid>-1){
+        if (cityid!=null&&cityid>-1){
             tableName = "order_tb_new_"+cityid%100;
         }
         HashMap<String, Object> retMap = new HashMap<String, Object>();
@@ -176,7 +176,7 @@ public class GetParkInfoServiceImpl implements GetParkInfoService {
             cityid = orderMapper.getCityIdByComId(Long.parseLong(comid+""));
         }
         String tableName = "order_tb_new";
-        if(cityid>-1){
+        if(cityid!=null&&cityid>-1){
             tableName = tableName+"_"+cityid%100;
         }
         HashMap<String, Object> retMap = new HashMap<String, Object>();

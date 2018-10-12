@@ -78,7 +78,7 @@ public class CenterMonitorServiceImpl implements CenterMonitorService {
             Long cityid = orderMapper.getCityIdByGroupId(groupid);
             //获取今日电子支付，现金支付，减免金额的统计
             String tableName = "order_tb_new";
-            if(cityid>-1){
+            if(cityid!=null&&cityid>-1){
                 tableName+= "_"+cityid%100;
             }
 
@@ -165,7 +165,7 @@ public class CenterMonitorServiceImpl implements CenterMonitorService {
                 cityid = orderMapper.getCityIdByComId(comid);
             }
             String tableName = "order_tb_new";
-            if(cityid>-1){
+            if(cityid!=null&&cityid>-1){
                 tableName+="_"+cityid%100;
             }
             //获取今日电子支付，现金支付，减免金额的统计
@@ -388,7 +388,7 @@ public class CenterMonitorServiceImpl implements CenterMonitorService {
             cityid = orderMapper.getCityIdByComId(Long.parseLong(comid));
         }
         String tableName = "order_tb_new";
-        if(cityid>-1){
+        if(cityid!=null&&cityid>-1){
             tableName+= "_"+cityid%100;
         }
         Map ordermap = centerMonitorMapper.getSelectOrder(Long.parseLong(comid),carNumber,tableName);
@@ -598,7 +598,7 @@ public class CenterMonitorServiceImpl implements CenterMonitorService {
             cityid = orderMapper.getCityIdByComId(comid);
         }
         String tableName = "order_tb_new";
-        if(cityid>-1){
+        if(cityid!=null&&cityid>-1){
             tableName+= "_"+cityid%100;
         }
         System.out.println("进来获取集合");

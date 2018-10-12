@@ -51,7 +51,7 @@ public class MonthParkOrderanlysisServiceImpl implements MonthParkOrderAnlysisSe
             cityid = orderMapper.getCityIdByComId(comid);
         }
         String tableName = "order_tb_new";
-        if(cityid>-1){
+        if(cityid!=null&&cityid>-1){
             tableName += "_"+cityid%100;
         }
         String btime = reqmap.get("btime");

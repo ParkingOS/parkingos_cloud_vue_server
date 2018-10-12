@@ -240,7 +240,7 @@ public class OrderServiceImpl implements OrderService {
 //            collectionName = orderTb.getCarpicTableName();
 //        }
         String tableName = "";
-        if(cityid>-1){
+        if(cityid!=null&&cityid>-1){
             tableName = "order_tb_new_"+cityid%100;
         }else{
             tableName="order_tb_new";
