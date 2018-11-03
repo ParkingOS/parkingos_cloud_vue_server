@@ -2,7 +2,8 @@ package parkingos.com.bolink.service.impl;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import parkingos.com.bolink.dao.spring.CommonDao;
@@ -22,7 +23,7 @@ import java.util.*;
 @Service
 public class AdminRoleServiceImpl implements AdminRoleService {
 
-    Logger logger = Logger.getLogger(AdminRoleServiceImpl.class);
+    Logger logger = LoggerFactory.getLogger(AdminRoleServiceImpl.class);
 
     @Autowired
     private CommonDao commonDao;
@@ -46,7 +47,6 @@ public class AdminRoleServiceImpl implements AdminRoleService {
         userRoleTb.setAdminid(uin);
 
         Map searchMap = supperSearchService.getBaseSearch(userRoleTb,reqmap);
-        logger.info(searchMap);
         if(searchMap!=null&&!searchMap.isEmpty()){
             UserRoleTb baseQuery =(UserRoleTb)searchMap.get("base");
             List<SearchBean> supperQuery = null;
@@ -57,11 +57,8 @@ public class AdminRoleServiceImpl implements AdminRoleService {
                 config = (PageOrderConfig)searchMap.get("config");
 
 
-//            List<SearchBean> searchList = new ArrayList<>();
-//            searchList.add( searchBean );
 
             String sql = "";
-//            logger.info("~~~~~~~~~~~~"+reqmap.get("shopid"));
             if(reqmap.get("shopid")!=null&&!"".equals(reqmap.get("shopid"))){
                 sql="select id from user_info_tb where shop_id= "+reqmap.get("shopid")+" and role_id="+reqmap.get("roleid");
             }else {
@@ -135,39 +132,10 @@ public class AdminRoleServiceImpl implements AdminRoleService {
         logger.error("=====>>>开始更新角色+" + userRoleTb + "===" + func);
         String str = "{\"state\":0,\"msg\":\"修改失败\"}";
         JSONObject result = JSONObject.parseObject(str);
-//        Long auth_flag = -1L;
-//        int is_inspect = 0;
-//        int is_collector = 0;
-//        int is_opencard = 0;
-//        switch (func) {
-//            case 1:
-//                auth_flag = 2L;
-//                is_collector = 1;
-//                break;
-//            case 2:
-//                auth_flag = 16L;
-//                is_inspect = 1;
-//                break;
-//            case 3:
-//                auth_flag = 17L;
-//                is_opencard = 1;
-//                break;
-//            default:
-//                break;
-//        }
-//        userRoleTb.setIsCollector(is_collector);
-//        userRoleTb.setIsInspect(is_inspect);
-//        userRoleTb.setIsOpencard(is_opencard);
 
         int ret = commonDao.updateByPrimaryKey(userRoleTb);
         logger.error("=====>>>更新角色" + ret);
         if (ret == 1) {
-//            UserInfoTb fields = new UserInfoTb();
-//            fields.setAuthFlag(auth_flag);
-//            UserInfoTb conditions = new UserInfoTb();
-//            conditions.setRoleId(userRoleTb.getId());
-//            int update = commonDao.updateByConditions(fields, conditions);
-//            logger.error("=====>>>>>>更新user" + update);
             result.put("state", 1);
             result.put("msg", "修改成功");
         }

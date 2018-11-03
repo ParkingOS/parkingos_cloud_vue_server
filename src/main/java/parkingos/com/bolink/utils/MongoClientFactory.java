@@ -13,7 +13,7 @@ import java.util.List;
 @Repository
 public class MongoClientFactory {
 
-	//private Logger logger = Logger.getLogger(MongoClientFactory.class);
+	//private Logger logger = LoggerFactory.getLogger(MongoClientFactory.class);
 
 	private HashMap<String, DB> mongodbmap = new HashMap<String, DB>();
 	private MongoClientFactory() {

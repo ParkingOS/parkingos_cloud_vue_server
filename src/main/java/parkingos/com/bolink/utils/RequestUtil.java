@@ -1,7 +1,8 @@
 package parkingos.com.bolink.utils;
 
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.HashMap;
@@ -10,7 +11,7 @@ import java.util.Map;
 
 
 public class RequestUtil {
-	static Logger logger = Logger.getLogger(RequestUtil.class);
+	static Logger logger = LoggerFactory.getLogger(RequestUtil.class);
 	
 	//*******************从request的parameter中获取数据*************************//
 	public static String processParams(HttpServletRequest request,String param){

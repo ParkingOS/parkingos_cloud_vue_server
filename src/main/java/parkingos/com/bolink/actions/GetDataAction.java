@@ -1,7 +1,8 @@
 package parkingos.com.bolink.actions;
 
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -16,7 +17,7 @@ import javax.servlet.http.HttpServletResponse;
 @RequestMapping("/getdata")
 public class GetDataAction {
 
-    Logger logger = Logger.getLogger(GetDataAction.class);
+    Logger logger = LoggerFactory.getLogger(GetDataAction.class);
 
     @Autowired
     private GetDataService getDataService;
@@ -76,6 +77,20 @@ public class GetDataAction {
         return null;
     }
 
+    /*
+    * 根据车型获取月卡套餐
+    *
+    * */
+
+    @RequestMapping(value = "/getpnamebycar")
+    public String getPnameByCar(HttpServletRequest request, HttpServletResponse resp){
+        Long comid = RequestUtil.getLong(request, "comid", -1L);
+        String carId = RequestUtil.getString(request,"carId");
+        logger.info("====>>>>"+comid+"~"+carId);
+        String result = getDataService.getPnameByCar(comid,carId);
+        StringUtils.ajaxOutput(resp,result);
+        return null;
+    }
     /*
     * 获得所有的user 收费员
     *

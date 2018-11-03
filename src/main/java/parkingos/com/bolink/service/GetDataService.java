@@ -31,4 +31,6 @@ public interface GetDataService {
     String getGroupChannelTypes(Long groupid);
 
     String getAllShops(String comid);
+
+    String getPnameByCar(Long comid, String carId);
 }

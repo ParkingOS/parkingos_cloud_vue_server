@@ -2,7 +2,8 @@ package parkingos.com.bolink.actions;
 
 
 import com.alibaba.fastjson.JSONObject;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -26,7 +27,7 @@ import java.util.Map;
 @RequestMapping("/unorder")
 public class CityUnorderAction {
 
-    Logger logger = Logger.getLogger(CityUnorderAction.class);
+    Logger logger = LoggerFactory.getLogger(CityUnorderAction.class);
 
     @Autowired
 //    @Resource(name = "citymybatis")
@@ -45,7 +46,6 @@ public class CityUnorderAction {
         Map<String, String> reqParameterMap = RequestUtil.readBodyFormRequset(request);
 
         JSONObject result = cityUnorderService.selectResultByConditions(reqParameterMap);
-        logger.info(result);
         //把结果返回页面
         StringUtils.ajaxOutput(resp, result.toJSONString());
         return null;

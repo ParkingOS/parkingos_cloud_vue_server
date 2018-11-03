@@ -1,19 +1,19 @@
 
 
 server:
-  port: 8080
-  servlet-path: /cloud
+  port: 8082
+  context-path: /cloud
 mybatis:
   mapper-locations: "classpath*:mybatis/mapperxml/*.xml"
   configuration:
     mapUnderscoreToCamelCase: true
 logging:
   level:
-    com.zld.mapper: DEBUG
+    com.zld.mapper: info
 spring:
   cloud:
     consul:
-      host: localhost
+      host: consul_order
       port: 8500
       discovery:
         register: false
@@ -23,3 +23,14 @@ spring:
 spring:
   application:
     name: grpc-client
+
+memcache:
+  servers: memcached.tq.cn:11211
+  failover: true
+  initConn: 100
+  minConn: 20
+  maxConn: 1000
+  maintSleep: 50
+  nagel: false
+  socketTO: 3000
+  aliveCheck: true

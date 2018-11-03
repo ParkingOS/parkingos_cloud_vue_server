@@ -1,7 +1,8 @@
 package parkingos.com.bolink.actions;
 
 import com.alibaba.fastjson.JSONObject;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -25,7 +26,7 @@ import java.util.Map;
 @RequestMapping("/carrenew")
 public class CarRenewAction {
 
-    Logger logger = Logger.getLogger(CarRenewAction.class);
+    Logger logger = LoggerFactory.getLogger(CarRenewAction.class);
 
 
     @Autowired
@@ -53,7 +54,6 @@ public class CarRenewAction {
         Map<String, String> reqParameterMap = RequestUtil.readBodyFormRequset(request);
 
         String[][]  heards = new String[][]{{"购买流水号","STR"}, {"月卡编号","STR"}, {"月卡续费时间","STR"}, {"应收金额","STR"}, {"实收金额","STR"}, {"收费员","STR"}, {"缴费类型","STR"}, {"车牌号","STR"}, {"用户编号","STR"}, {"开始时间","STR"},{"结束时间","STR"}, {"备注","STR"}};
-        logger.info(reqParameterMap);
         List<List<Object>> bodyList = carRenewService.exportExcel(reqParameterMap);
 
 

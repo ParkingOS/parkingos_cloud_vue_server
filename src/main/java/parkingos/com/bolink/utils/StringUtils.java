@@ -572,14 +572,17 @@ public class StringUtils {
 		}
 		return new ArrayList<Object>();
 	}
-	// public static void main(String[] args) {
-	// String s = null;
-	// try {
-	// s = MD5("laoyao11111140888993");
-	// } catch (Exception e) {
-	// }
-	// System.out.println(s);
-	// }
+//	 public static void main(String[] args) {
+//	 String s = "1";
+//	 String s1="a";
+//	 try {
+//	  int i = compareStr(s,s1);
+//		 System.out.println(i);
+//	 } catch (Exception e) {
+//
+//	 }
+
+//	 }
 	public static String getMondayOfThisWeek() {
 		Calendar c = Calendar.getInstance();
 		int day_of_week = c.get(Calendar.DAY_OF_WEEK) - 1;
@@ -1250,5 +1253,10 @@ public class StringUtils {
 		String result=sb.toString();
 		return result;
 	}
+
+	public static int compareStr(String compareFrom,String compareTo) {
+		return compareFrom.compareTo(compareTo);
+	}
+
 
 }

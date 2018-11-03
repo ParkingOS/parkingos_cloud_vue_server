@@ -1,7 +1,8 @@
 package parkingos.com.bolink.actions;
 
 import com.alibaba.fastjson.JSONObject;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -22,7 +23,7 @@ import java.util.Map;
 @RequestMapping("/user")
 public class LoginAction {
 
-	Logger logger = Logger.getLogger(LoginAction.class);
+	Logger logger = LoggerFactory.getLogger(LoginAction.class);
 	@Autowired
 	private CommonDao commonDao;
 	@Autowired
@@ -54,7 +55,6 @@ public class LoginAction {
 //		user.put("parkid",21879);
 //		result.put("user",user);
 
-		logger.info(result);
 		StringUtils.ajaxOutput(resp,result.toJSONString());
 		return null;
 	}

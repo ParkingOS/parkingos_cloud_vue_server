@@ -19,4 +19,6 @@ public interface OrderService {
     List<List<Object>> exportExcel(Map<String, String> reqParameterMap);
 
     Long getComidByOrder(Long id);
+
+    void resetDataByComid(Long comid);
 }

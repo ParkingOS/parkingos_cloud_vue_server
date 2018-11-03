@@ -6,7 +6,8 @@ import com.mongodb.BasicDBObject;
 import com.mongodb.DB;
 import com.mongodb.DBCollection;
 import com.mongodb.DBObject;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import parkingos.com.bolink.dao.spring.CommonDao;
@@ -28,7 +29,7 @@ import java.util.Map;
 @Service
 public class LiftRodServiceImpl implements LiftRodService {
 
-    Logger logger = Logger.getLogger(LiftRodServiceImpl.class);
+    Logger logger = LoggerFactory.getLogger(LiftRodServiceImpl.class);
 
     @Autowired
     private CommonDao commonDao;
@@ -153,7 +154,7 @@ public class LiftRodServiceImpl implements LiftRodService {
         String reason = CustomDefind.getValue("LIFTRODREASON");
         logger.error("lift>>>,reason:"+reason);
         if(type==0){
-            String ret = "[{\"value_no\":\"-1\",\"value_name\":\"\"},{\"value_no\":\"100\",\"value_name\":\"原因未选\"}";
+            String ret = "[{\"value_no\":\"-1\",\"value_name\":\"\"}";
             if(reason!=null){
                 String res[] = reason.split("\\|");
                 for(int i=0;i<res.length;i++){

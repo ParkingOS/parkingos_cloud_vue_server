@@ -2,7 +2,8 @@ package parkingos.com.bolink.service.impl;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import parkingos.com.bolink.dao.spring.CommonDao;
@@ -23,7 +24,7 @@ import java.util.Map;
 @Service
 public class CityLiftRodServiceImpl implements CityLiftRodService {
 
-    Logger logger = Logger.getLogger(CityLiftRodServiceImpl.class);
+    Logger logger = LoggerFactory.getLogger(CityLiftRodServiceImpl.class);
 
     @Autowired
     private CommonDao commonDao;
@@ -73,55 +74,6 @@ public class CityLiftRodServiceImpl implements CityLiftRodService {
             }
         }
 
-//        String groupid = reqmap.get("groupid");
-//        String cityid = reqmap.get("cityid");
-//        System.out.println("=====groupid:"+groupid+"===cityid:"+cityid);
-//
-//        Map searchMap = supperSearchService.getBaseSearch(liftRodTb,reqmap);
-//        logger.info(searchMap);
-//        if(searchMap!=null&&!searchMap.isEmpty()){
-//            LiftRodTb baseQuery =(LiftRodTb)searchMap.get("base");
-//            List<SearchBean> supperQuery = null;
-//            if(searchMap.containsKey("supper"))
-//                supperQuery = (List<SearchBean>)searchMap.get("supper");
-//            PageOrderConfig config = null;
-//            if(searchMap.containsKey("config"))
-//                config = (PageOrderConfig)searchMap.get("config");
-//
-//            List parks =new ArrayList();
-//
-//            if(groupid !=null&&!"".equals(groupid)){
-//                parks = commonMethods.getParks(Long.parseLong(groupid));
-//            }else if(cityid !=null&&!"".equals(cityid)){
-//                parks = commonMethods.getparks(Long.parseLong(cityid));
-//            }
-//
-//            System.out.println("=======parks:"+parks);
-//
-//            //封装searchbean  城市和集团下所有车场的抬杆记录
-//            SearchBean searchBean = new SearchBean();
-//            searchBean.setOperator(FieldOperator.CONTAINS);
-//            searchBean.setFieldName("comid");
-//            searchBean.setBasicValue(parks);
-//
-//            if (supperQuery == null) {
-//                supperQuery = new ArrayList<>();
-//            }
-//            supperQuery.add( searchBean );
-//
-//            count = commonDao.selectCountByConditions(baseQuery,supperQuery);
-//            if(count>0){
-//                list = commonDao.selectListByConditions(baseQuery,supperQuery,config);
-//                if (list != null && !list.isEmpty()) {
-//                    for (LiftRodTb liftRodTb1 : list) {
-//                        OrmUtil<LiftRodTb> otm = new OrmUtil<>();
-//                        Map<String, Object> map = otm.pojoToMap(liftRodTb1);
-//                        resList.add(map);
-//                    }
-//                    result.put("rows", JSON.toJSON(resList));
-//                }
-//            }
-//        }
         result.put("total",count);
         if(reqmap.get("page")!=null){
             result.put("page",Integer.parseInt(reqmap.get("page")));

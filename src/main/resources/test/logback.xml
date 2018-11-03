@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <configuration scan="true">
 
-    <property name="LOG_PATH" value="/data/springcloud"/>
+    <property name="LOG_PATH" value="/data/spring-boot-cloud"/>
 
     <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
         <encoder>

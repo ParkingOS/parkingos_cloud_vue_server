@@ -23,3 +23,14 @@ spring:
 spring:
   application:
     name: grpc-client
+
+memcache:
+  servers: memcached.tq.cn:11211
+  failover: true
+  initConn: 100
+  minConn: 20
+  maxConn: 1000
+  maintSleep: 50
+  nagel: false
+  socketTO: 3000
+  aliveCheck: true

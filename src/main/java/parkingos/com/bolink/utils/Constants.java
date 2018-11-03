@@ -1,13 +1,14 @@
 package parkingos.com.bolink.utils;
 
-import org.apache.log4j.Logger;
 import org.directwebremoting.ScriptSession;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.HashMap;
 import java.util.Map;
 
 public class Constants {
-	private Logger logger = Logger.getLogger(Constants.class);
+	private Logger logger = LoggerFactory.getLogger(Constants.class);
 	public   Map<String,ScriptSession> scriptSessionMap = null;
 	private Constants() {
 		scriptSessionMap = new HashMap<String,ScriptSession>();

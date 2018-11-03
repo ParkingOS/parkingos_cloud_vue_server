@@ -147,7 +147,9 @@
         P .group_phone,
         P .park_phone,
         M .play_src,
-        M . ID
+        M . ID,
+        M . comid,
+        M . groupid
         FROM
         phone_info_tb P,
         monitor_info_tb M

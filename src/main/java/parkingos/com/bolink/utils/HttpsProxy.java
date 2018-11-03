@@ -1,6 +1,7 @@
 package parkingos.com.bolink.utils;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.net.ssl.*;
 import java.io.*;
@@ -16,7 +17,7 @@ import java.util.Map;
 public class HttpsProxy {
 	private static final String METHOD_POST = "POST";
 	private static final String DEFAULT_CHARSET = "utf-8";
-	static Logger logger = Logger.getLogger(HttpsProxy.class);
+	static Logger logger = LoggerFactory.getLogger(HttpsProxy.class);
 
 	public static String doPost(String url, String params,
 								String charset, int connectTimeout, int readTimeout) throws Exception {

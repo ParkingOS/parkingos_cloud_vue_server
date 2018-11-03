@@ -1,7 +1,8 @@
 package parkingos.com.bolink.service.impl;
 
 import com.alibaba.fastjson.JSONObject;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import parkingos.com.bolink.dao.spring.CommonDao;
@@ -16,7 +17,7 @@ import java.util.Map;
 @Service
 public class LoginServiceImpl implements LoginService {
 
-    Logger logger = Logger.getLogger(LoginServiceImpl.class);
+    Logger logger = LoggerFactory.getLogger(LoginServiceImpl.class);
 
     @Autowired
     private CommonDao commonDao;
@@ -43,24 +44,34 @@ public class LoginServiceImpl implements LoginService {
         }
         userInfoTb = (UserInfoTb) commonDao.selectObjectByConditions(userInfoTb);
         if (userInfoTb == null) {
-            if("admin".equals(userId)){
-                userInfoTb.setPassword(null);
-                userInfoTb = (UserInfoTb) commonDao.selectObjectByConditions(userInfoTb);
-                if(userInfoTb==null){
-                    result.put("state", true);
-                    result.put("msg", "新建账号");
-                    user.put("oid", CustomDefind.getValue("UNIONADMIN"));//开源云之后新建admin账号
-                    result.put("user",user);
-                    return result;
-                }else{
-                    result.put("state", false);
-                    result.put("msg", "账号或密码错误");
-                    return result;
-                }
-            }
+//            if("admin".equals(userId)){
+//                userInfoTb.setPassword(null);
+//                userInfoTb = (UserInfoTb) commonDao.selectObjectByConditions(userInfoTb);
+//                if(userInfoTb==null){
+//                    result.put("state", true);
+//                    result.put("msg", "新建账号");
+//                    user.put("oid", CustomDefind.getValue("UNIONADMIN"));//开源云之后新建admin账号
+//                    result.put("user",user);
+//                    return result;
+//                }else{
+//                    result.put("state", false);
+//                    result.put("msg", "账号或密码错误");
+//                    return result;
+//                }
+//            }
             result.put("state", false);
             result.put("msg", "账号或密码错误");
             return result;
+        }
+
+        String comids = CustomDefind.SECRETPARK;
+        logger.info("====>>>>>>"+comids);
+        String[] comidArr = comids.split(",");
+        for(String parkId:comidArr){
+            if(parkId.equals(userInfoTb.getComid()+"")){
+                user.put("secret_park",1);
+                break;
+            }
         }
 
         Long role = -1L;

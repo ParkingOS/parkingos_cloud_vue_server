@@ -2,7 +2,8 @@ package parkingos.com.bolink.service.impl;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import parkingos.com.bolink.dao.mybatis.OrderTbExample;
@@ -19,7 +20,7 @@ import java.util.Map;
 @Service("mybatis")
 public class OrderServiceMybatisImpl implements OrderService {
 
-    Logger logger = Logger.getLogger(OrderServiceMybatisImpl.class);
+    Logger logger = LoggerFactory.getLogger(OrderServiceMybatisImpl.class);
 
     @Autowired
     OrderTbMapper orderTbMapper;
@@ -83,7 +84,7 @@ public class OrderServiceMybatisImpl implements OrderService {
                     break;
             }
         }
-        logger.info(example);
+        logger.info(example+"");
 
         int count = orderTbMapper.countByExample(example);
         result.put("total",count);
@@ -120,6 +121,11 @@ public class OrderServiceMybatisImpl implements OrderService {
     @Override
     public Long getComidByOrder(Long id) {
         return null;
+    }
+
+    @Override
+    public void resetDataByComid(Long comid) {
+
     }
 
 }

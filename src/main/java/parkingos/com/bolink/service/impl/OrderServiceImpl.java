@@ -6,10 +6,10 @@ import com.mongodb.BasicDBObject;
 import com.mongodb.DB;
 import com.mongodb.DBCollection;
 import com.mongodb.DBObject;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import parkingos.com.bolink.controller.OrderServiceController;
 import parkingos.com.bolink.dao.mybatis.OrderTbExample;
 import parkingos.com.bolink.dao.mybatis.mapper.OrderMapper;
 import parkingos.com.bolink.dao.spring.CommonDao;
@@ -17,6 +17,7 @@ import parkingos.com.bolink.models.CarpicTb;
 import parkingos.com.bolink.models.ComPassTb;
 import parkingos.com.bolink.models.OrderTb;
 import parkingos.com.bolink.models.UserInfoTb;
+import parkingos.com.bolink.orderserver.OrderServer;
 import parkingos.com.bolink.service.OrderService;
 import parkingos.com.bolink.service.SupperSearchService;
 import parkingos.com.bolink.utils.*;
@@ -29,7 +30,7 @@ import java.util.Map;
 @Service("orderSpring")
 public class OrderServiceImpl implements OrderService {
 
-    Logger logger = Logger.getLogger(OrderServiceImpl.class);
+    Logger logger = LoggerFactory.getLogger(OrderServiceImpl.class);
 
     @Autowired
     private CommonDao commonDao;
@@ -38,7 +39,7 @@ public class OrderServiceImpl implements OrderService {
     @Autowired
     private OrderMapper orderMapper;
     @Autowired
-    private OrderServiceController orderServiceController;
+    private OrderServer orderServer;
 
     @Override
     public int selectCountByConditions(OrderTb orderTb) {
@@ -86,7 +87,7 @@ public class OrderServiceImpl implements OrderService {
         }
 
 //        int count = getOrdersCountByComid(reqmap);
-        int count = orderServiceController.selectOrdersCount(reqmap);
+        int count = orderServer.selectOrdersCount(reqmap);
         logger.info("get orderCount by service :"+count);
         List<OrderTb> orderList =new ArrayList<OrderTb>();
         List<Map<String, Object>> resList = new ArrayList<Map<String, Object>>();
@@ -95,7 +96,7 @@ public class OrderServiceImpl implements OrderService {
                 reqmap.put("rp",rp);
             }
 //            orderList = getOrderListByComid(reqmap);
-            orderList = orderServiceController.getOrdersByMapConditons(reqmap);
+            orderList = orderServer.getOrdersByMapConditons(reqmap);
             if (orderList != null && orderList.size() > 0) {
                 for (OrderTb order : orderList) {
                     logger.info("get order ======:"+order);
@@ -204,7 +205,7 @@ public class OrderServiceImpl implements OrderService {
         }else{
             tableName="order_tb_new";
         }
-        List<OrderTb> list = orderServiceController.qryOrdersByComidAndOrderId(comid,orderid,tableName);
+        List<OrderTb> list = orderServer.qryOrdersByComidAndOrderId(comid,orderid,tableName);
 //        List<Map<String, Object>> list = orderMapper.qryOrdersByComidAndOrderId(comid,orderid,tableName);
         if (list != null && list.size() > 0) {
 //            if (list.get(0).get("carpic_table_name") != null) {
@@ -263,7 +264,6 @@ public class OrderServiceImpl implements OrderService {
             carpicTb.setComid(comid + "");
             carpicTb = (CarpicTb) commonDao.selectObjectByConditions(carpicTb);
 
-            logger.error(carpicTb);
             String collectionName = "";
             if (carpicTb != null && carpicTb.getCarpicTableName() != null) {
                 collectionName = carpicTb.getCarpicTableName();
@@ -461,6 +461,22 @@ public class OrderServiceImpl implements OrderService {
             return orderTb.getComid();
         }
         return -1L;
+    }
+
+    @Override
+    public void resetDataByComid(Long comid) {
+        Long groupId = orderMapper.getGroupIdByComId(comid);
+        Long cityid = -1L;
+        if(groupId!=null&&groupId>-1){
+            cityid = orderMapper.getCityIdByGroupId(groupId);
+        }else {
+            cityid = orderMapper.getCityIdByComId(comid);
+        }
+        String tableName = "order_tb_new";
+        if(cityid!=null&&cityid>0){
+            tableName= tableName+"_"+cityid;
+        }
+        orderServer.resetDataByComid(comid,tableName);
     }
 
     private String getPassName(Long comId, Integer passId) {

@@ -2,7 +2,8 @@ package parkingos.com.bolink.utils.payutils;
 
 
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -12,7 +13,7 @@ import java.net.URL;
 import java.net.URLConnection;
 
 public class HttpUtil {
-    private static final Logger logger = Logger.getLogger(HttpUtil.class);
+    private static final Logger logger = LoggerFactory.getLogger(HttpUtil.class);
     private final static int CONNECT_TIMEOUT = 5000; // in milliseconds
     private final static String DEFAULT_ENCODING = "UTF-8";
 

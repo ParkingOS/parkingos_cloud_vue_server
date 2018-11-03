@@ -5,7 +5,8 @@ import com.google.zxing.EncodeHintType;
 import com.google.zxing.MultiFormatWriter;
 import com.google.zxing.client.j2se.MatrixToImageWriter;
 import com.google.zxing.common.BitMatrix;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.imageio.ImageIO;
 import javax.servlet.http.HttpServletRequest;
@@ -22,7 +23,7 @@ import java.util.Map;
  * @author QuanHao
  */
 public class QrCodeUtil {
-	static Logger logger = Logger.getLogger(QrCodeUtil.class);
+	static Logger logger = LoggerFactory.getLogger(QrCodeUtil.class);
 	
 	/**
 	 * 获取服务器根目录
@@ -123,7 +124,7 @@ public class QrCodeUtil {
 				logger.error(children[i]);
 				File child = new File(file, children[i]);
 				boolean delete = child.delete();
-				logger.error(delete);
+				logger.error(delete+"");
 			}
 		}
 	}

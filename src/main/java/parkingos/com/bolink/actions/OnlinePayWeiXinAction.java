@@ -1,7 +1,8 @@
 package parkingos.com.bolink.actions;
 
-import org.apache.log4j.Logger;
 import org.jdom.JDOMException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import parkingos.com.bolink.utils.payutils.HttpUtil;
@@ -21,7 +22,7 @@ import java.util.TreeMap;
 @RequestMapping(value = "/OnlinePay")
 public class OnlinePayWeiXinAction {
 
-    Logger logger = Logger.getLogger(OnlinePayWeiXinAction.class);
+    Logger logger = LoggerFactory.getLogger(OnlinePayWeiXinAction.class);
 
     @RequestMapping(value = "/WeiXin")
     public String WeiXinPay(HttpServletRequest request, HttpServletResponse response) throws JDOMException, IOException {

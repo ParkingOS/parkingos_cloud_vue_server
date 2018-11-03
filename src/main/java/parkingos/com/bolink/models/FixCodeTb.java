@@ -23,6 +23,26 @@ public class FixCodeTb {
 
     private Long beginTime;
 
+    private String passWord;
+
+    private Integer usePwd;
+
+    public String getPassWord() {
+        return passWord;
+    }
+
+    public void setPassWord(String passWord) {
+        this.passWord = passWord;
+    }
+
+    public Integer getUsePwd() {
+        return usePwd;
+    }
+
+    public void setUsePwd(Integer usePwd) {
+        this.usePwd = usePwd;
+    }
+
     public Long getBeginTime() {
         return beginTime;
     }

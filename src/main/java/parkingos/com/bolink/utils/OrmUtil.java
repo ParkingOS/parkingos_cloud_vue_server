@@ -1,6 +1,7 @@
 package parkingos.com.bolink.utils;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Repository;
 import parkingos.com.bolink.qo.SearchBean;
 
@@ -17,7 +18,7 @@ import java.util.regex.Pattern;
  */
 @Repository
 public class OrmUtil<T> {
-    Logger logger = Logger.getLogger(getClass());
+    Logger logger = LoggerFactory.getLogger(getClass());
 
     /**
      * pojo转为map

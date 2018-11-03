@@ -2,7 +2,8 @@ package parkingos.com.bolink.service.impl;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import parkingos.com.bolink.dao.spring.CommonDao;
@@ -23,7 +24,7 @@ import java.util.Map;
 @Service
 public class CarRenewServiceImpl implements CarRenewService {
 
-	Logger logger = Logger.getLogger(CarRenewServiceImpl.class);
+	Logger logger = LoggerFactory.getLogger(CarRenewServiceImpl.class);
 
 	@Autowired
 	private CommonDao commonDao;
@@ -37,7 +38,6 @@ public class CarRenewServiceImpl implements CarRenewService {
 	@Override
 	public JSONObject selectResultByConditions(Map<String,String> reqmap) {
 
-		logger.info(reqmap);
 		//测试期间设置登录有效期为1小时
 		CardRenewTb cardRenewTb = new CardRenewTb();
 		cardRenewTb.setComid(reqmap.get("comid"));

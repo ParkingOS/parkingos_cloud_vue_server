@@ -2,13 +2,14 @@ package parkingos.com.bolink.service.impl;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import parkingos.com.bolink.controller.OrderServiceController;
 import parkingos.com.bolink.dao.mybatis.mapper.OrderMapper;
 import parkingos.com.bolink.dao.spring.CommonDao;
 import parkingos.com.bolink.models.OrderTb;
+import parkingos.com.bolink.orderserver.OrderServer;
 import parkingos.com.bolink.service.ParkOrderAnlysisService;
 import parkingos.com.bolink.service.SupperSearchService;
 import parkingos.com.bolink.utils.StringUtils;
@@ -22,7 +23,7 @@ import java.util.Map;
 @Service
 public class ParkOrderanlysisServiceImpl implements ParkOrderAnlysisService {
 
-    Logger logger = Logger.getLogger(ParkOrderanlysisServiceImpl.class);
+    Logger logger = LoggerFactory.getLogger(ParkOrderanlysisServiceImpl.class);
 
     @Autowired
     private CommonDao commonDao;
@@ -33,7 +34,7 @@ public class ParkOrderanlysisServiceImpl implements ParkOrderAnlysisService {
     @Autowired
     private OrderMapper orderMapper;
     @Autowired
-    private OrderServiceController orderServiceController;
+    private OrderServer orderServer;
 
     @Override
     public JSONObject selectResultByConditions(Map<String, String> reqmap) {
@@ -80,7 +81,7 @@ public class ParkOrderanlysisServiceImpl implements ParkOrderAnlysisService {
         reqmap.put("end_time_start",btime+"");
         reqmap.put("end_time_end",etime+"");
 
-        List<Map<String,String>> backList = orderServiceController.selectParkDayAnlysis(reqmap);
+        List<Map<String,String>> backList = orderServer.selectParkDayAnlysis(reqmap);
 
 //        String out_uid = reqmap.get("out_uid");
 //
@@ -263,7 +264,6 @@ public class ParkOrderanlysisServiceImpl implements ParkOrderAnlysisService {
         list = commonDao.getObjectBySql(sql);
 
 
-        logger.error(list);
         double amountmoney = 0.0;//总金额
         double cashpay = 0.0;//现金结算金额
         double cashprepay = 0.0;//现金预付金额

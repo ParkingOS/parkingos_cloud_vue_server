@@ -11,7 +11,7 @@ import java.util.List;
 /**mongodb配置**/
 public class MongoDBFactory {
 
-	//private Logger logger = Logger.getLogger(MongoClientFactory.class);
+	//private Logger logger = LoggerFactory.getLogger(MongoClientFactory.class);
 
 	private HashMap<String, DB> mongodbmap = new HashMap<String, DB>();
 	private MongoDBFactory() {

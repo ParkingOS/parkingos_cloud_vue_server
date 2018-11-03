@@ -244,16 +244,54 @@ and a.is_delete = 0
       order by create_time asc;
     </select>
 
-    <!--获取泊位率根据comid-->
     <select id="getParkNameById"  resultType="map">
 
         SELECT
-            company_name as name
+        company_name as name
         FROM
-            com_info_tb
+        com_info_tb
         WHERE
-            ID = #{comid,jdbcType=BIGINT}
-            and state = 0
+        ID = #{comid,jdbcType=BIGINT}
+        and state = 0
     </select>
 
+    <select id="getParkEmpty"  resultType="java.lang.Integer">
+        SELECT
+        empty
+        FROM
+        com_info_tb
+        WHERE
+        ID = #{comid,jdbcType=BIGINT}
+        and state = 0
+    </select>
+
+    <select id="getMonthTotal"  resultType="java.lang.Integer">
+        SELECT
+	    COUNT (*)
+        FROM
+	    carower_product
+        WHERE
+	    com_id = #{comid,jdbcType=BIGINT}
+        AND create_time > #{create_time,jdbcType=BIGINT}
+    </select>
+
+    <select id="getTicketCount"  resultType="java.lang.Integer">
+        SELECT
+	    COUNT (*)
+        FROM
+	    ticket_tb
+        WHERE
+	    comid = #{comid,jdbcType=BIGINT}
+        AND create_time > #{create_time,jdbcType=BIGINT}
+    </select>
+
+    <select id="getVisitorCount"  resultType="java.lang.Integer">
+        SELECT
+	    COUNT (*)
+        FROM
+	    visitor_tb
+        WHERE
+	    comid = #{comid,jdbcType=BIGINT}
+        AND STATE = 0
+    </select>
 </mapper>

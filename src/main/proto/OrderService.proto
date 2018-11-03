@@ -55,9 +55,21 @@ message OrderConditoins{
     map<string,string> map =1;
 }
 
+message OrderCars{
+    repeated string carNumber=1;
+    string tableName =2;
+    int64 comid=3;
+}
+
 service OrderService {
 
+    rpc getOrdersByCars(OrderCars) returns(OrderList);
+
     rpc qryOrdersByComidAndOrderId(Order) returns(OrderList);
+
+    rpc resetDataByComid(Order) returns(OrderCount);
+
+    rpc getSelectOrder(Order) returns(Order);
 
     rpc getOrdersByMapConditons(OrderMap) returns(OrderList);
 
@@ -79,5 +91,20 @@ service OrderService {
     rpc selectParkMonthAnlysis(OrderMap) returns(MapList);
     //6 车场   车场收费员日报
     rpc selectParkCollectorAnlysis(OrderMap) returns(MapList);
+
+    rpc getEntryCar(Order) returns(MapList);
+    rpc getExitCar(Order) returns(MapList);
+    rpc getParkRank(Order) returns(MapList);
+    rpc getEntryCount(Order) returns(OrderCount);
+    rpc getExitCount(Order) returns(OrderCount);
+    rpc getInparkCount(Order) returns(OrderCount);
+
+
+    rpc getEntryCarByComid(Order) returns(MapList);
+    rpc getExitCarByComid(Order) returns(MapList);
+    rpc getRankByout(Order) returns(MapList);
+    rpc getEntryCountbc(Order) returns(OrderCount);
+    rpc getExitCountbc(Order) returns(OrderCount);
+    rpc getInparkCountbc(Order) returns(OrderCount);
 
 }

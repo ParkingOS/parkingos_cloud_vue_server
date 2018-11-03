@@ -2,7 +2,8 @@ package parkingos.com.bolink.service.impl;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import parkingos.com.bolink.dao.mybatis.OrderTbExample;
@@ -24,7 +25,7 @@ import java.util.Map;
 @Service("unorderSpring")
 public class CityUnorderServiceImpl implements CityUnorderService {
 
-    Logger logger = Logger.getLogger(CityUnorderServiceImpl.class);
+    Logger logger = LoggerFactory.getLogger(CityUnorderServiceImpl.class);
 
     @Autowired
     private CommonDao commonDao;
@@ -217,15 +218,6 @@ public class CityUnorderServiceImpl implements CityUnorderService {
                         }else{
                             values.add("");
                         }
-//                        Long end = (Long)map.get("end_time");
-//                        if(end==null){
-//                            end = System.currentTimeMillis()/1000;
-//                        }
-//                        if(start!=null){
-//                            values.add(StringUtils.getTimeString(start, end));
-//                        }else{
-//                            values.add("");
-//                        }
                     }else if("state".equals(field)){
                         switch(Integer.valueOf(v + "")){
                             case 1:values.add("已支付");break;

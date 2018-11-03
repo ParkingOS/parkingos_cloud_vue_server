@@ -2,13 +2,14 @@ package parkingos.com.bolink.service.impl;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import parkingos.com.bolink.controller.OrderServiceController;
 import parkingos.com.bolink.dao.mybatis.mapper.OrderMapper;
 import parkingos.com.bolink.dao.spring.CommonDao;
 import parkingos.com.bolink.models.OrderTb;
+import parkingos.com.bolink.orderserver.OrderServer;
 import parkingos.com.bolink.service.CityOrderAnlysisService;
 import parkingos.com.bolink.service.SupperSearchService;
 import parkingos.com.bolink.utils.StringUtils;
@@ -21,7 +22,7 @@ import java.util.Map;
 @Service
 public class CityOrderanlysisServiceImpl implements CityOrderAnlysisService {
 
-    Logger logger = Logger.getLogger(CityOrderanlysisServiceImpl.class);
+    Logger logger = LoggerFactory.getLogger(CityOrderanlysisServiceImpl.class);
 
     @Autowired
     private CommonDao commonDao;
@@ -32,7 +33,7 @@ public class CityOrderanlysisServiceImpl implements CityOrderAnlysisService {
     @Autowired
     private OrderMapper orderMapper;
     @Autowired
-    private OrderServiceController orderServiceController;
+    private OrderServer orderServer;
 
     @Override
     public JSONObject selectResultByConditions(Map<String, String> reqmap) {
@@ -66,130 +67,9 @@ public class CityOrderanlysisServiceImpl implements CityOrderAnlysisService {
         reqmap.put("end_time_start",btime+"");
         reqmap.put("end_time_end",etime+"");
 
-        List<Map<String,String>> backList = orderServiceController.selectCityDayAnlysis(reqmap);
+        List<Map<String,String>> backList = orderServer.selectCityDayAnlysis(reqmap);
 
 
-//        SimpleDateFormat df2 = new SimpleDateFormat("yyyy-MM-dd");
-//        String nowtime= df2.format(System.currentTimeMillis());
-//        String sql = "select count(*) scount,sum(amount_receivable) amount_receivable, " +
-//                "sum(total) total , sum(cash_pay) cash_pay,sum(cash_prepay) cash_prepay, sum(electronic_pay) electronic_pay,sum(electronic_prepay) electronic_prepay, " +
-//                "sum(reduce_amount) reduce_pay,to_char(to_timestamp(end_time),'yyyy-MM-dd') e_time from "+tableName+" where ";
-//        String free_sql = "select count(*) scount,sum(amount_receivable-electronic_prepay-cash_prepay-reduce_amount) free_pay,to_char(to_timestamp(end_time),'yyyy-MM-dd') e_time from "+tableName+" where ";
-//        String groupby = " group by to_char(to_timestamp(end_time),'yyyy-MM-dd')";
-//        if(Check.isNumber(comidStr)){
-//            sql = "select count(*) scount,sum(amount_receivable) amount_receivable, " +
-//                    "sum(total) total , sum(cash_pay) cash_pay,sum(cash_prepay) cash_prepay, sum(electronic_pay) electronic_pay,sum(electronic_prepay) electronic_prepay, " +
-//                    "sum(reduce_amount) reduce_pay,to_char(to_timestamp(end_time),'yyyy-MM-dd') e_time,comid from "+tableName+" where ";
-//            free_sql = "select count(*) scount,sum(amount_receivable-electronic_prepay-cash_prepay-reduce_amount) free_pay,to_char(to_timestamp(end_time),'yyyy-MM-dd') e_time,comid from "+tableName+" where ";
-//            groupby = " group by to_char(to_timestamp(end_time),'yyyy-MM-dd'),comid";
-//        }
-//
-//        if(Check.isNumber(comidStr)){
-//            sql +="comid = "+Long.parseLong(comidStr)+" and end_time ";
-//            free_sql +="comid = "+Long.parseLong(comidStr)+" and end_time ";
-//        }else {
-//            sql +="groupid = "+groupid+" and end_time ";
-//            free_sql +="groupid = "+groupid+" and end_time ";
-//        }
-//
-//
-//        String date = StringUtils.decodeUTF8(StringUtils.decodeUTF8(reqmap.get("date")));
-//        logger.error("=====date:"+date);
-//
-//        Long btime = null;
-//        Long etime = null;
-//        if(date==null||"".equals(date)){
-//            btime = TimeTools.getToDayBeginTime()-86400*9;
-//            etime =TimeTools.getToDayBeginTime()+86399;
-//        }else {
-//            String[] dateArr = date.split("至");
-//            String start =dateArr[0];
-//            String end = dateArr[1];
-//            btime = TimeTools.getLongMilliSecondFrom_HHMMDDHHmmss(start);
-//            etime = TimeTools.getLongMilliSecondFrom_HHMMDDHHmmss(end);
-//        }
-//
-//        logger.info("=====>>>>>>btime="+btime+"=====>>>etime="+etime);
-//
-//
-//        sql +=" between "+btime+" and "+etime;
-//        free_sql +=" between "+btime+" and "+etime;
-//        sql +=" and state= 1 and out_uid > -1 and ishd=0 ";
-//        free_sql +=" and state= 1 and out_uid >-1 and ishd=0 ";
-//
-//
-//        logger.error("====groupby:"+groupby);
-//        logger.error("====sql:"+sql);
-//        logger.error("====free_sql:"+free_sql);
-//        //总订单集合
-//        List<Map<String, Object>> totalList =commonDao.getObjectBySql(sql +groupby+" order by  e_time ");
-//        //免费订单集合
-//        List<Map<String, Object>> freeList = commonDao.getObjectBySql(free_sql +" and pay_type=8 "+groupby+" order by e_time  ");//pgOnlyReadService.getAllMap(free_sql +" and pay_type=8 group by out_uid,comid order by scount desc ",params);
-//        int totalCount = 0;//总订单数
-//        double totalMoney = 0.0;//订单金额
-//        double cashMoney = 0.0;//现金支付金额
-//        double elecMoney = 0.0;//电子支付金额
-//        double actFreeMoney = 0.0;//免费金额+减免支付
-//        double actRecMoney =0.0;//电子结算+现金结算
-//        List<Map<String, Object>> backList = new ArrayList<Map<String, Object>>();
-//        if(totalList != null && totalList.size() > 0) {
-//            for (Map<String, Object> totalOrder : totalList) {
-//                if (totalOrder.containsKey("comid")) {
-//                    Long comid = (Long) totalOrder.get("comid");
-//                    List<Map<String, Object>> list = commonDao.getObjectBySql("select company_name from com_info_tb where id =" + comid);
-//                    logger.error("=========车场:" + list.get(0));
-//                    if (list.get(0) != null && !list.get(0).isEmpty()) {
-//                        totalOrder.put("comid", list.get(0).get("company_name"));
-//                    }
-//                } else {
-//                    totalOrder.put("comid", "-");
-//                }
-//                totalCount += Integer.parseInt(totalOrder.get("scount") + "");
-//
-//                totalMoney += Double.parseDouble(totalOrder.get("amount_receivable") + "");
-//
-//                totalOrder.put("time", totalOrder.get("e_time"));
-//                //格式化应收
-//                totalOrder.put("amount_receivable",String.format("%.2f",StringUtils.formatDouble(Double.parseDouble(totalOrder.get("amount_receivable")+""))));
-//
-//                //现金支付
-//                cashMoney +=StringUtils.formatDouble(totalOrder.get("cash_pay"))+StringUtils.formatDouble(totalOrder.get("cash_prepay"));
-//                totalOrder.put("cash_pay",String.format("%.2f",StringUtils.formatDouble(totalOrder.get("cash_pay"))+StringUtils.formatDouble(totalOrder.get("cash_prepay"))));
-//                //电子支付
-//                elecMoney += StringUtils.formatDouble(totalOrder.get("electronic_pay")) + StringUtils.formatDouble(totalOrder.get("electronic_prepay"));
-//                totalOrder.put("electronic_pay", String.format("%.2f", StringUtils.formatDouble(totalOrder.get("electronic_pay")) + StringUtils.formatDouble(totalOrder.get("electronic_prepay"))));
-//                //每一行的合计 = 现金支付+电子支付
-//                totalOrder.put("act_total", String.format("%.2f",StringUtils.formatDouble(Double.parseDouble(totalOrder.get("cash_pay")+"")+Double.parseDouble(totalOrder.get("electronic_pay")+""))));
-//
-//                //减免支付
-//                double reduceAmount = StringUtils.formatDouble(Double.parseDouble((totalOrder.get("reduce_pay") == null ? "0.00" : totalOrder.get("reduce_pay") + "")));
-//                double actFreePay = reduceAmount;
-//                //遍历免费集合
-//                if (freeList != null && freeList.size() > 0) {
-//                    for (Map<String, Object> freeOrder : freeList) {
-//                        if(freeOrder.get("e_time").equals(totalOrder.get("e_time"))){
-//                            double freePay = StringUtils.formatDouble(Double.parseDouble((freeOrder.get("free_pay") == null ? "0.00" : freeOrder.get("free_pay") + "")));
-//                            actFreePay = freePay+reduceAmount;
-//                        }
-//                    }
-//                }
-//                actFreeMoney+=actFreePay;
-//                totalOrder.put("free_pay",  String.format("%.2f",actFreePay));
-//                backList.add(totalOrder);
-//            }
-//        }
-//
-//        if(backList.size()>0){
-//            Map sumMap = new HashMap();
-//            sumMap.put("time","合计");
-//            sumMap.put("comid","-");
-//            sumMap.put("amount_receivable",String.format("%.2f",StringUtils.formatDouble(totalMoney)));
-//            sumMap.put("cash_pay",String.format("%.2f",StringUtils.formatDouble(cashMoney)));
-//            sumMap.put("electronic_pay",String.format("%.2f",StringUtils.formatDouble(elecMoney)));
-//            sumMap.put("act_total",String.format("%.2f",StringUtils.formatDouble((cashMoney+elecMoney))));
-//            sumMap.put("free_pay",String.format("%.2f",StringUtils.formatDouble(actFreeMoney)));
-//            backList.add(sumMap);
-//        }
 
         result.put("rows",JSON.toJSON(backList));
         return result;

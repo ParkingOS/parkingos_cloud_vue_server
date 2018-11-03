@@ -1,7 +1,8 @@
 package parkingos.com.bolink.service.impl;
 
 import com.alibaba.fastjson.JSONObject;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import parkingos.com.bolink.dao.spring.CommonDao;
@@ -16,7 +17,7 @@ import javax.servlet.http.HttpServletRequest;
 @Service
 public class GroupInfoServiceImpl implements GroupInfoService {
 
-    Logger logger = Logger.getLogger(GroupInfoServiceImpl.class);
+    Logger logger = LoggerFactory.getLogger(GroupInfoServiceImpl.class);
 
     @Autowired
     private CommonDao commonDao;

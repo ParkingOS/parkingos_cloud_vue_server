@@ -2,20 +2,26 @@ package parkingos.com.bolink.service.impl;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import parkingos.com.bolink.dao.mybatis.mapper.ParkInfoMapper;
 import parkingos.com.bolink.dao.spring.CommonDao;
 import parkingos.com.bolink.enums.FieldOperator;
-import parkingos.com.bolink.models.*;
+import parkingos.com.bolink.models.ComInfoTb;
+import parkingos.com.bolink.models.LiftRodTb;
+import parkingos.com.bolink.models.ParkLogTb;
+import parkingos.com.bolink.models.UserInfoTb;
 import parkingos.com.bolink.qo.PageOrderConfig;
 import parkingos.com.bolink.qo.SearchBean;
 import parkingos.com.bolink.service.CityParkService;
+import parkingos.com.bolink.service.OrderService;
 import parkingos.com.bolink.service.SaveLogService;
 import parkingos.com.bolink.service.SupperSearchService;
 import parkingos.com.bolink.utils.*;
 
+import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import java.math.BigDecimal;
 import java.util.*;
@@ -23,7 +29,7 @@ import java.util.*;
 @Service
 public class CityParkServiceImpl implements CityParkService {
 
-    Logger logger = Logger.getLogger(CityParkServiceImpl.class);
+    Logger logger = LoggerFactory.getLogger(CityParkServiceImpl.class);
 
     @Autowired
     private CommonDao commonDao;
@@ -35,6 +41,9 @@ public class CityParkServiceImpl implements CityParkService {
     private ParkInfoMapper parkInfoMapper;
     @Autowired
     private SaveLogService saveLogService;
+    @Autowired
+    @Resource(name = "orderSpring")
+    private OrderService orderService;
 
     @Override
     public JSONObject selectResultByConditions(Map<String, String> reqmap) {
@@ -48,23 +57,6 @@ public class CityParkServiceImpl implements CityParkService {
         ComInfoTb comInfoTb = new ComInfoTb();
         comInfoTb.setState(0);
 
-//        Map searchMap = supperSearchService.getGroupOrCitySearch(liftRodTb,reqmap);
-//        LiftRodTb baseQuery =(LiftRodTb)searchMap.get("base");
-//        List<SearchBean> supperQuery =(List<SearchBean>)searchMap.get("supper");
-//        PageOrderConfig config = (PageOrderConfig)searchMap.get("config");
-//
-//        count = commonDao.selectCountByConditions(baseQuery,supperQuery);
-//        if(count>0){
-//            list = commonDao.selectListByConditions(baseQuery,supperQuery,config);
-//            if (list != null && !list.isEmpty()) {
-//                for (LiftRodTb liftRodTb1 : list) {
-//                    OrmUtil<LiftRodTb> otm = new OrmUtil<>();
-//                    Map<String, Object> map = otm.pojoToMap(liftRodTb1);
-//                    resList.add(map);
-//                }
-//                result.put("rows", JSON.toJSON(resList));
-//            }
-//        }
         String groupidStart = reqmap.get("groupid_start");
         if(!Check.isEmpty(groupidStart)){
             comInfoTb.setGroupid(Long.parseLong(groupidStart));
@@ -74,7 +66,6 @@ public class CityParkServiceImpl implements CityParkService {
         System.out.println("=====groupid:" + groupid + "===cityid:" + cityid);
 
         Map searchMap = supperSearchService.getBaseSearch(comInfoTb, reqmap);
-        logger.info(searchMap);
         if (searchMap != null && !searchMap.isEmpty()) {
             ComInfoTb baseQuery = (ComInfoTb) searchMap.get("base");
             List<SearchBean> supperQuery = null;
@@ -240,22 +231,22 @@ public class CityParkServiceImpl implements CityParkService {
         Double latitude = RequestUtil.getDouble(request, "latitude", 0d);
 
 
-        if (longitude == 0 || latitude == 0) {
-            result.put("msg", "请标注地理位置");
-            return result;
-        }
+//        if (longitude == 0 || latitude == 0) {
+//            result.put("msg", "请标注地理位置");
+//            return result;
+//        }
 
         //判断地图位置是否冲突
-        ComInfoTb newCominfoTb = new ComInfoTb();
-
-//        logger.info("park zuobiao:"+longitude+"~~"+new BigDecimal(longitude).setScale(6, BigDecimal.ROUND_HALF_UP));
-        newCominfoTb.setLongitude(new BigDecimal(longitude).setScale(6, BigDecimal.ROUND_HALF_UP));
-        newCominfoTb.setLatitude(new BigDecimal(latitude).setScale(6, BigDecimal.ROUND_HALF_UP));
-        int count = commonDao.selectCountByConditions(newCominfoTb);
-        if (count > 0) {
-            result.put("msg", "地理位置冲突，请重新标注!");
-            return result;
-        }
+//        ComInfoTb newCominfoTb = new ComInfoTb();
+//
+////        logger.info("park zuobiao:"+longitude+"~~"+new BigDecimal(longitude).setScale(6, BigDecimal.ROUND_HALF_UP));
+//        newCominfoTb.setLongitude(new BigDecimal(longitude).setScale(6, BigDecimal.ROUND_HALF_UP));
+//        newCominfoTb.setLatitude(new BigDecimal(latitude).setScale(6, BigDecimal.ROUND_HALF_UP));
+//        int count = commonDao.selectCountByConditions(newCominfoTb);
+//        if (count > 0) {
+//            result.put("msg", "地理位置冲突，请重新标注!");
+//            return result;
+//        }
 
 
         ComInfoTb comInfoTb = new ComInfoTb();
@@ -351,18 +342,19 @@ public class CityParkServiceImpl implements CityParkService {
                     String param = StringUtils.createJson(paramMap);
                     logger.error(param);
                     ret = HttpsProxy.doPost(url, param, "utf-8", 20000, 20000);
+                    logger.error(ret);
                     JSONObject object = JSONObject.parseObject(ret);
                     if (object != null) {
                         Integer uploadState = Integer.parseInt(object.get("state") + "");
-                        System.out.println("chenbowen:" + uploadState);
+                        logger.info("上传车场："+uploadState+"");
                         if (uploadState == 1) {
-                            ComInfoTb comInfoTb1 = new ComInfoTb();
-                            comInfoTb1.setUploadUnionTime(System.currentTimeMillis() / 1000L);
-                            comInfoTb1.setUnionState(2);
-                            comInfoTb1.setId(comid);
-                            uploadCount = commonDao.updateByPrimaryKey(comInfoTb1);
+//                            ComInfoTb comInfoTb1 = new ComInfoTb();
+//                            comInfoTb1.setUploadUnionTime(System.currentTimeMillis() / 1000L);
+//                            comInfoTb1.setUnionState(2);
+//                            comInfoTb1.setId(comid);
+//                            uploadCount = commonDao.updateByPrimaryKey(comInfoTb1);
                             int insert = commonDao.insert(comInfoTb);
-                            logger.error("上传车场个数:" + uploadCount + "云平台新建车场:" + insert);
+                            logger.error("上传车场个数:1,云平台新建车场:" + insert);
                             result.put("state", 1);
                             result.put("msg", "新建车场成功,上传到泊链成功");
 
@@ -381,7 +373,7 @@ public class CityParkServiceImpl implements CityParkService {
                             return result;
                         } else {
                             result.put("state", 0);
-                            logger.error(object.get("errmsg"));
+                            logger.error(object.get("errmsg")+"");
                             String errmsg = object.get("errmsg") + "";
                             if (errmsg.contains("运营商编号")) {
                                 result.put("msg", "新建车场失败,泊链运营集团编号错误");
@@ -391,9 +383,8 @@ public class CityParkServiceImpl implements CityParkService {
                         }
                     }
                 } catch (Exception e) {
-                    e.printStackTrace();
+                    logger.error("新建车场失败===",e);
                 }
-                logger.error(ret);
             }else {//如果填写了泊链车场编号,证明泊链那边有车场,去验证所填泊链编号是否正确
                 String url = CustomDefind.UNIONIP + "park/checkparkid";
                 Map<String, Object> paramMap = new HashMap<String, Object>();
@@ -541,18 +532,21 @@ public class CityParkServiceImpl implements CityParkService {
 
         //密码正确，根据车场编号搜索需要重置的数据
         try {
-            OrderTb orderTb = new OrderTb();
-            orderTb.setComid(comid);
-            orderTb.setIshd(0);
+//            OrderTb orderTb = new OrderTb();
+//            orderTb.setComid(comid);
+//            orderTb.setIshd(0);
             PageOrderConfig pageOrderConfig = new PageOrderConfig();
             pageOrderConfig.setPageInfo(null,null);
-            List<OrderTb> orderTbList = commonDao.selectListByConditions(orderTb,pageOrderConfig);
-            if(orderTbList!=null&&orderTbList.size()>0){
-                for(OrderTb order:orderTbList){
-                    order.setIshd(1);
-                    commonDao.updateByPrimaryKey(order);
-                }
-            }
+//            List<OrderTb> orderTbList = commonDao.selectListByConditions(orderTb,pageOrderConfig);
+//            if(orderTbList!=null&&orderTbList.size()>0){
+//                for(OrderTb order:orderTbList){
+//                    order.setIshd(1);
+//                    commonDao.updateByPrimaryKey(order);
+//                }
+//            }
+
+            orderService.resetDataByComid(comid);
+
             logger.error(comid+"重置订单完成,开始重置抬杆数据");
             LiftRodTb liftRodTb = new LiftRodTb();
             liftRodTb.setComid(comid);

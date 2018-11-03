@@ -2,12 +2,13 @@ package parkingos.com.bolink.service.impl;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
-import org.apache.log4j.Logger;
 import org.apache.poi.hssf.usermodel.*;
 import org.apache.poi.hssf.util.HSSFColor;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellStyle;
 import org.apache.poi.ss.usermodel.Row;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import parkingos.com.bolink.dao.spring.CommonDao;
@@ -40,7 +41,7 @@ import java.util.Map;
 @Service
 public class TicketServiceImpl implements TicketService {
 
-    Logger logger = Logger.getLogger(TicketServiceImpl.class);
+    Logger logger = LoggerFactory.getLogger(TicketServiceImpl.class);
 
     @Autowired
     private CommonDao commonDao;
@@ -143,7 +144,6 @@ public class TicketServiceImpl implements TicketService {
                 return result;
             }
         }
-        logger.info(searchMap);
 
         count = commonDao.selectCountByConditions(baseQuery, supperQuery);
         if (count > 0) {

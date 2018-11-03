@@ -2,10 +2,10 @@ package parkingos.com.bolink.service.impl;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import parkingos.com.bolink.controller.OrderServiceController;
 import parkingos.com.bolink.dao.mybatis.OrderTbExample;
 import parkingos.com.bolink.dao.mybatis.mapper.OrderMapper;
 import parkingos.com.bolink.dao.mybatis.mapper.OrderTbMapper;
@@ -14,6 +14,7 @@ import parkingos.com.bolink.models.ComInfoTb;
 import parkingos.com.bolink.models.ComPassTb;
 import parkingos.com.bolink.models.OrderTb;
 import parkingos.com.bolink.models.UserInfoTb;
+import parkingos.com.bolink.orderserver.OrderServer;
 import parkingos.com.bolink.service.CityOrderService;
 import parkingos.com.bolink.service.SupperSearchService;
 import parkingos.com.bolink.utils.*;
@@ -26,7 +27,7 @@ import java.util.Map;
 @Service("cityorderSpring")
 public class CityOrderServiceImpl implements CityOrderService {
 
-    Logger logger = Logger.getLogger(CityOrderServiceImpl.class);
+    Logger logger = LoggerFactory.getLogger(CityOrderServiceImpl.class);
 
     @Autowired
     private CommonDao commonDao;
@@ -39,7 +40,7 @@ public class CityOrderServiceImpl implements CityOrderService {
     @Autowired
     private OrderMapper orderMapper;
     @Autowired
-    private OrderServiceController orderServiceController;
+    private OrderServer orderServer;
 
 
     @Override
@@ -92,21 +93,19 @@ public class CityOrderServiceImpl implements CityOrderService {
             rp = reqmap.get("rp");
         }
 
-//        count = commonDao.selectCountByConditions(baseQuery,supperQuery);
-//        count = getOrdersCountByGroupid(reqmap);
-        count = orderServiceController.selectOrdersCount(reqmap);
+        count = orderServer.selectOrdersCount(reqmap);
         Map moneymap = new HashMap();
         if(count>0){
             //价格统计不需要分页  要查询所有
 //            logger.info("///////////"+reqmap);
 //            moneymap = getMoneyMap(reqmap);
-            moneymap=orderServiceController.selectMoneyByExample(reqmap);
+            moneymap=orderServer.selectMoneyByExample(reqmap);
                 //带分页的 要显示在页面  的数据list
             if(reqmap.get("export")==null){//不是导出
                 reqmap.put("rp",rp);
             }
 //            list = getOrdersListByGroupid(reqmap);
-            list=orderServiceController.getOrdersByMapConditons(reqmap);
+            list=orderServer.getOrdersByMapConditons(reqmap);
             if (list != null && !list.isEmpty()) {
                 for (OrderTb orderTb1 : list) {
                     OrmUtil<OrderTb> otm = new OrmUtil<OrderTb>();

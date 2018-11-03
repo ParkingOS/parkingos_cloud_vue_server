@@ -2,7 +2,8 @@ package parkingos.com.bolink.actions;
 
 
 import com.alibaba.fastjson.JSONObject;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -22,7 +23,7 @@ import java.util.Map;
 @RequestMapping("/fixcode")
 public class FixCodeAction {
 
-    Logger logger = Logger.getLogger(FixCodeAction.class);
+    Logger logger = LoggerFactory.getLogger(FixCodeAction.class);
 
     @Autowired
     private FixCodeService fixCodeService;
@@ -219,6 +220,36 @@ public class FixCodeAction {
         }
 
         QrCodeUtil.downAllFile(request,resp,"FixCode");
+        return null;
+    }
+
+
+    /*
+    * 公众号设置密码
+    *
+    * */
+
+    @RequestMapping(value = "/setpwd")
+    public String setPwd(HttpServletRequest request, HttpServletResponse resp){
+        JSONObject result = new JSONObject();
+        Long id = RequestUtil.getLong(request,"id",-1L);
+        String password = RequestUtil.getString(request,"password");
+        Integer usePwd = RequestUtil.getInteger(request,"pwd_state",-1);
+        logger.info("===>>>setpwd:"+password+"~"+usePwd);
+        if(usePwd==1){
+           if(password.length()!=4||!Check.isNumber(password)){
+               result.put("state",0);
+               result.put("msg","请输入4位数字密码!");
+               StringUtils.ajaxOutput(resp,result.toJSONString());
+               return null;
+           }
+        }
+        FixCodeTb fixCodeTb = new FixCodeTb();
+        fixCodeTb.setId(id);
+        fixCodeTb.setPassWord(password);
+        fixCodeTb.setUsePwd(usePwd);
+        result = fixCodeService.setPwd(fixCodeTb);
+        StringUtils.ajaxOutput(resp,result.toJSONString());
         return null;
     }
 

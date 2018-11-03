@@ -2,13 +2,14 @@ package parkingos.com.bolink.service.impl;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import parkingos.com.bolink.controller.OrderServiceController;
 import parkingos.com.bolink.dao.mybatis.mapper.OrderMapper;
 import parkingos.com.bolink.dao.spring.CommonDao;
 import parkingos.com.bolink.models.OrderTb;
+import parkingos.com.bolink.orderserver.OrderServer;
 import parkingos.com.bolink.service.MonthParkOrderAnlysisService;
 import parkingos.com.bolink.service.SupperSearchService;
 import parkingos.com.bolink.utils.Check;
@@ -21,14 +22,14 @@ import java.util.Map;
 @Service
 public class MonthParkOrderanlysisServiceImpl implements MonthParkOrderAnlysisService {
 
-    Logger logger = Logger.getLogger(MonthParkOrderanlysisServiceImpl.class);
+    Logger logger = LoggerFactory.getLogger(MonthParkOrderanlysisServiceImpl.class);
 
     @Autowired
     private CommonDao commonDao;
     @Autowired
     private OrderMapper orderMapper;
     @Autowired
-    private OrderServiceController orderServiceController;
+    private OrderServer orderServer;
 
     @Autowired
     private SupperSearchService<OrderTb> supperSearchService;
@@ -77,7 +78,7 @@ public class MonthParkOrderanlysisServiceImpl implements MonthParkOrderAnlysisSe
         reqmap.put("end_time_start",b+"");
         reqmap.put("end_time_end",e+"");
         reqmap.put("comid_start",comid+"");
-        List<Map<String,String>> backList = orderServiceController.selectParkMonthAnlysis(reqmap);
+        List<Map<String,String>> backList = orderServer.selectParkMonthAnlysis(reqmap);
 
 
 

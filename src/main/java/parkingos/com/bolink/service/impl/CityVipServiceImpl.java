@@ -2,7 +2,8 @@ package parkingos.com.bolink.service.impl;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -30,7 +31,7 @@ import java.util.Map;
 @Service
 public class CityVipServiceImpl implements CityVipService {
 
-    Logger logger = Logger.getLogger(CityVipServiceImpl.class);
+    Logger logger = LoggerFactory.getLogger(CityVipServiceImpl.class);
 
     @Autowired
     private CommonDao commonDao;
@@ -58,30 +59,13 @@ public class CityVipServiceImpl implements CityVipService {
 
         carowerProduct.setIsDelete(0L);
 
-//        Map searchMap = supperSearchService.getGroupOrCitySearch(carowerProduct,reqmap);
-//        CarowerProduct baseQuery =(CarowerProduct)searchMap.get("base");
-//        List<SearchBean> supperQuery =(List<SearchBean>)searchMap.get("supper");
-//        PageOrderConfig config = (PageOrderConfig)searchMap.get("config");
-//
-//        count = commonDao.selectCountByConditions(baseQuery,supperQuery);
-//        if(count>0){
-//            list = commonDao.selectListByConditions(baseQuery,supperQuery,config);
-//            if (list != null && !list.isEmpty()) {
-//                for (CarowerProduct carowerProduct1 : list) {
-//                    OrmUtil<CarowerProduct> otm = new OrmUtil<>();
-//                    Map<String, Object> map = otm.pojoToMap(carowerProduct1);
-//                    resList.add(map);
-//                }
-//                result.put("rows", JSON.toJSON(resList));
-//            }
-//        }
 
         String groupid = reqmap.get("groupid");
         String cityid = reqmap.get("cityid");
         System.out.println("=====groupid:"+groupid+"===cityid:"+cityid);
 
         Map searchMap = supperSearchService.getBaseSearch(carowerProduct,reqmap);
-        logger.info(searchMap);
+        logger.info(searchMap+"");
         if(searchMap!=null&&!searchMap.isEmpty()){
             CarowerProduct baseQuery =(CarowerProduct)searchMap.get("base");
             List<SearchBean> supperQuery = null;
@@ -140,148 +124,6 @@ public class CityVipServiceImpl implements CityVipService {
 
 
 
-//    @Override
-//    public JSONObject createVip(HttpServletRequest req) {
-//
-//        String str = "{\"state\":0,\"msg\":\"添加失败\"}";
-//        JSONObject result = JSONObject.parseObject(str);
-//
-//        String[] coms = req.getParameterMap().get("comid");
-//        String coms[]=request.getParameterValues("comid");
-//        boolean isAll=false;//是否添加到所有车场
-//        if(coms!=null&&coms.length>0){
-//            for(String c : coms){
-//                if(c.equals("-1")){
-//                    isAll = true;
-//                    break;
-//                }
-//            }
-//        }
-//        Long pid = RequestUtil.getLong(req, "p_name", -1L);
-//
-//        Long carTypeId = RequestUtil.getLong(req,"car_type_id",-1L);
-//        System.out.println("=====>>>car_type_id:"+carTypeId);
-//
-//        //车主手机
-//        String mobile = RequestUtil.processParams(req, "mobile").trim();
-//        String name = RequestUtil.processParams(req, "name").trim();
-//        String address = StringUtils.decodeUTF8(RequestUtil.processParams(req, "address").trim());
-//        //起始时间
-//        String b_time = RequestUtil.processParams(req, "b_time");
-//        String e_time =RequestUtil.processParams(req, "e_time");
-//
-//        //修改月卡会员编号cardId为主键id
-//        Long nextid = commonDao.selectSequence(CarowerProduct.class);
-//        String cardId = String.valueOf(nextid);
-//
-//        Integer flag = RequestUtil.getInteger(req, "flag", -1);
-//        //备注
-//        String remark = StringUtils.decodeUTF8(RequestUtil.processParams(req, "remark"));
-//        String carNumber = RequestUtil.processParams(req, "car_number");
-//        logger.error("=======>>>>>carNumber"+carNumber);
-//        //实收金额
-//        Double act_total = RequestUtil.getDouble(req,"act_total",0.0);
-//
-//        Long ntime = System.currentTimeMillis() / 1000;
-//        Long btime = TimeTools.getLongMilliSecondFrom_HHMMDD(b_time) / 1000;
-//        Long etime = TimeTools.getLongMilliSecondFrom_HHMMDD(e_time)/1000+86399;
-//
-////        CarowerProduct carowerProduct = new CarowerProduct();
-////        carowerProduct.setComId(comid);
-////        carowerProduct.setCardId(cardId);
-////        carowerProduct.setIsDelete(0L);
-////        int count = commonDao.selectCountByConditions(carowerProduct);
-////
-////        logger.error("======>>>>>>>>count"+count);
-////        if (count > 0) {
-////            result.put("msg", "月卡编号重复");
-////            return result;
-////        }
-//
-//        Long uin =-1L;
-//        //添加生成月卡会员时的车主编号
-//        if(carNumber != null && !carNumber.equals("")){
-//            String [] carNumStrings = carNumber.split(",");
-//            if(carNumStrings != null && carNumStrings.length>0){
-//                for(String strNum :carNumStrings){
-//                    strNum = strNum.toUpperCase();
-//                    logger.error("==>>>.strNum"+strNum);
-//                    if(StringUtils.checkPlate(strNum)){
-//                        CarInfoTb carInfoTb = new CarInfoTb();
-//                        carInfoTb.setCarNumber(strNum);
-//                        carInfoTb = (CarInfoTb) commonDao.selectObjectByConditions(carInfoTb);
-//                        if (carInfoTb != null && carInfoTb.getId() != null) {
-//                            uin = carInfoTb.getUin();
-//                        }
-//                    }else{
-//                        result.put("msg", "车牌号有误");
-//                        return result;
-//                    }
-//                }
-//            }
-//        }
-//
-//        List<Long> comids = new ArrayList<>();
-//
-//        if(coms.length>0){
-//            for(String s : coms){
-//                if(!"-1".equals(s)&& Check.isLong(s))
-//                    comids.add(Long.valueOf(s));
-//            }
-//        }
-//        System.out.println(comids);
-//
-//        if(comids!=null&&comids.size()>0){
-//            for(Long comid:comids){
-//                //组装增加会员参数插入数据库
-//                int ret=0;
-//                CarowerProduct carowerProduct1 = new CarowerProduct();
-//                carowerProduct1.setId(nextid);
-//                carowerProduct1.setUin(uin);
-//                carowerProduct1.setPid(pid);
-//                carowerProduct1.setCarTypeId(carTypeId);
-//                carowerProduct1.setCreateTime(ntime);
-//                carowerProduct1.setUpdateTime(ntime);
-//                carowerProduct1.setbTime(btime);
-//                carowerProduct1.seteTime(etime);
-////              carowerProduct1.setTotal(new BigDecimal(total+""));
-//                carowerProduct1.setRemark(remark);
-//                carowerProduct1.setName(name);
-//                carowerProduct1.setAddress(address);
-//                carowerProduct1.setActTotal(new BigDecimal(act_total+""));
-//                carowerProduct1.setComId(comid);
-//                carowerProduct1.setCarNumber(carNumber.toUpperCase());
-//                carowerProduct1.setCardId(nextid+"");
-//                carowerProduct1.setMobile(mobile);
-//                ret = commonDao.insert(carowerProduct1);
-//                if(ret==1){
-//                    result.put("state",1);
-//                    result.put("msg","添加成功");
-//                    int ins = insertSysn(carowerProduct1,0,comid);
-//                    if(ins!=1){
-//                        logger.error("======>>>>>>>>>插入同步表失败");
-//                    }
-//                }
-//            }
-//        }else{
-//            result.put("msg","请选择车场");
-//            return result;
-//        }
-//
-//
-//        return result;
-//    }
-
-
-//    private int insertCardSysn(CardRenewTb cardRenewTb, int operater, Long comid) {
-//        SyncInfoPoolTb syncInfoPoolTb = new SyncInfoPoolTb();
-//        syncInfoPoolTb.setComid(comid);
-//        syncInfoPoolTb.setTableId((cardRenewTb.getId()).longValue());
-//        syncInfoPoolTb.setTableName("card_renew_tb");
-//        syncInfoPoolTb.setCreateTime(System.currentTimeMillis() / 1000);
-//        syncInfoPoolTb.setOperate(operater);
-//        return commonDao.insert(syncInfoPoolTb);
-//    }
 
     private int insertSysn(CarowerProduct carowerProduct, Integer operater, Long comid) {
         SyncInfoPoolTb syncInfoPoolTb = new SyncInfoPoolTb();
@@ -455,14 +297,14 @@ public class CityVipServiceImpl implements CityVipService {
                 Map<String,Integer> comCarMap = new HashMap<>();
                 int i=1;
                 for(Object[] o : datas){
-                    if(o.length!=7){
-                        errmsg+=i+"行，数据长度不对，应该为7列,当前"+o.length+"列</br>";
-                        i++;
-                        continue;
-                    }
+//                    if(o.length!=7){
+//                        errmsg+=i+"行，数据长度不对，应该为7列,当前"+o.length+"列</br>";
+//                        i++;
+//                        continue;
+//                    }
                     boolean isValid = true;
                     Long comid =null;//车场编号
-                    String car_number = o[6]+"";//车牌
+                    String car_number = o[7]+"";//车牌
                     String btime = o[1]+"";
                     String etime = o[2]+"";
                     if(Check.isLong(o[0]+"")){
@@ -571,7 +413,7 @@ public class CityVipServiceImpl implements CityVipService {
                             etime = TimeTools.getLongMilliSecondFrom_HHMMDD(v[2]+"")/1000+86399;
                         Double total = StringUtils.formatDouble(v[5]);
                         Long id = commonDao.selectSequence(CarowerProduct.class);//daService.getkey("seq_carower_product");
-                        Object[] va = new Object[]{id,comid,System.currentTimeMillis()/1000,btime,etime,v[3],v[4],total,v[6],id+""};
+                        Object[] va = new Object[]{id,comid,System.currentTimeMillis()/1000,btime,etime,v[3],v[4],total,v[7],id+"",v[6]};
                         insertValues.add(va);
                         Object[] syncVa = new Object[]{comid,"carower_product",id,ntime,0};
                         syncValues.add(syncVa);
@@ -589,11 +431,11 @@ public class CityVipServiceImpl implements CityVipService {
                         if(!Check.isEmpty(o[2]+""))
                             etime = TimeTools.getLongMilliSecondFrom_HHMMDD(o[2]+"")/1000+86399;
                         Double total = StringUtils.formatDouble(o[5]);
-                        Object[] va = new Object[]{btime,etime,o[3],o[4],total,comid,o[6]};
+                        Object[] va = new Object[]{btime,etime,o[3],o[4],total,comid,o[7],o[6]};
                         updateValues.add(va);
                         CarowerProduct carowerProduct = new CarowerProduct();
                         carowerProduct.setComId(comid);
-                        carowerProduct.setCarNumber(o[6]+"");
+                        carowerProduct.setCarNumber(o[7]+"");
                         carowerProduct = (CarowerProduct) commonDao.selectObjectByConditions(carowerProduct);
 
                         Object[] syncVa = new Object[]{comid,"carower_product",carowerProduct.getId(),ntime,1};
@@ -617,6 +459,7 @@ public class CityVipServiceImpl implements CityVipService {
                     carowerProduct.setActTotal(new BigDecimal(arr[7]+""));
                     carowerProduct.setCarNumber((String)arr[8]);
                     carowerProduct.setCardId((String)arr[9]);
+                    carowerProduct.setMobile((String)arr[10]);
                     r += commonDao.insert(carowerProduct);
 
 
@@ -635,6 +478,7 @@ public class CityVipServiceImpl implements CityVipService {
             if(!updateValues.isEmpty()) {
                 int r = 0;
                 for(Object[] arr:updateValues){
+                    logger.info("update==>>>"+arr);
                     CarowerProduct fields = new CarowerProduct();
                     CarowerProduct conditions = new CarowerProduct();
                     fields.setbTime((Long)arr[0]);
@@ -642,6 +486,7 @@ public class CityVipServiceImpl implements CityVipService {
                     fields.setRemark((String)arr[2]);
                     fields.setName((String)arr[3]);
                     fields.setActTotal(new BigDecimal(arr[4]+""));
+                    fields.setMobile((String)arr[7]);
                     conditions.setComId((Long)arr[5]);
                     conditions.setCarNumber((String)arr[6]);
                     r += commonDao.updateByConditions(fields,conditions);

@@ -2,7 +2,8 @@ package parkingos.com.bolink.utils;
 
 
 import com.mongodb.*;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import javax.servlet.http.HttpServletRequest;
@@ -19,7 +20,7 @@ import java.util.Map;
 @Service
 public class MongoDbUtils {
 
-	private Logger logger = Logger.getLogger(MongoDbUtils.class);
+	private Logger logger = LoggerFactory.getLogger(MongoDbUtils.class);
 
 	public List<String> getParkPicUrls(Long uin, String dbName){
 		List<String> result =new ArrayList<String>();

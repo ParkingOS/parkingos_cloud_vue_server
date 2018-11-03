@@ -1,7 +1,8 @@
 package parkingos.com.bolink.service.impl;
 
 import com.alibaba.fastjson.JSONObject;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import parkingos.com.bolink.dao.spring.CommonDao;
@@ -9,13 +10,12 @@ import parkingos.com.bolink.models.OrgGroupTb;
 import parkingos.com.bolink.service.CityGroupService;
 import parkingos.com.bolink.service.SupperSearchService;
 
-import java.math.BigDecimal;
 import java.util.Map;
 
 @Service
 public class CityGroupServiceImpl implements CityGroupService {
 
-    Logger logger = Logger.getLogger(CityGroupServiceImpl.class);
+    Logger logger = LoggerFactory.getLogger(CityGroupServiceImpl.class);
 
     @Autowired
     private CommonDao commonDao;
@@ -58,8 +58,6 @@ public class CityGroupServiceImpl implements CityGroupService {
         orgGroupTb.setCityid(Long.parseLong(cityid));
         orgGroupTb.setOperatorid(operatorid);
         if(id==null){
-            orgGroupTb.setLatitude(new BigDecimal(latitude));
-            orgGroupTb.setLongitude(new BigDecimal(longitude));
             orgGroupTb.setCreateTime(System.currentTimeMillis()/1000);
             int res = commonDao.insert(orgGroupTb);
             if(res==1){

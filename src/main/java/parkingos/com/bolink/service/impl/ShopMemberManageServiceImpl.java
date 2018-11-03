@@ -1,7 +1,8 @@
 package parkingos.com.bolink.service.impl;
 
 import com.alibaba.fastjson.JSONObject;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import parkingos.com.bolink.dao.spring.CommonDao;
@@ -22,7 +23,7 @@ import java.util.Map;
 @Service
 public class ShopMemberManageServiceImpl implements ShopMemberManageService {
 
-    Logger logger = Logger.getLogger( ShopMemberManageServiceImpl.class );
+    Logger logger = LoggerFactory.getLogger( ShopMemberManageServiceImpl.class );
 
     @Autowired
     private CommonDao commonDao;

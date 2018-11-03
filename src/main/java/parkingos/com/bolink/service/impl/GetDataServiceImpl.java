@@ -1,7 +1,8 @@
 package parkingos.com.bolink.service.impl;
 
 import com.alibaba.fastjson.JSONObject;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import parkingos.com.bolink.dao.spring.CommonDao;
@@ -18,7 +19,7 @@ import java.util.Map;
 @Service
 public class GetDataServiceImpl implements GetDataService {
 
-    Logger logger = Logger.getLogger(GetDataServiceImpl.class);
+    Logger logger = LoggerFactory.getLogger(GetDataServiceImpl.class);
 
     @Autowired
     private CommonDao commonDao;
@@ -99,21 +100,9 @@ public class GetDataServiceImpl implements GetDataService {
     public String getpname(Long comid) {
 //        String result = "[{\"value_no\":\"-1\",\"value_name\":\"请选择\"}";
         String result = "[";
-        logger.error("=========>>>>>comid"+comid);
         if(comid!=-1){
-            logger.error("开始获取套餐");
             String sql = "select id,p_name from product_package_tb where (comid="+comid;
             List<Map<String,Object>>  pList = null;
-            ComInfoTb comInfoTb = new ComInfoTb();
-            comInfoTb.setPid(comid);
-            List comsList = commonDao.selectListByConditions(comInfoTb);
-            Object[] parm = new Object[comsList.size()+1];
-            parm[0] = comid;
-            for (int i = 1; i < parm.length; i++) {
-                long comidoth = Long.parseLong(((Map)comsList.get(i-1)).get("id")+"");
-                parm[i] = comidoth;
-                sql += " or comid ="+parm[i];
-            }
             logger.error("======>>>>>>获取月卡套餐"+sql);
             pList = commonDao.getObjectBySql(sql +") and is_delete=0 ");
             if(pList!=null&&pList.size()>0){
@@ -126,11 +115,6 @@ public class GetDataServiceImpl implements GetDataService {
                     }
                 }
             }
-//            if(pList!=null&&pList.size()>0){
-//                for(Map map : pList){
-//                    result+=",{\"value_no\":\""+map.get("id")+"\",\"value_name\":\""+map.get("p_name")+"\"}";
-//                }
-//            }
         }
         result+="]";
         return result;
@@ -478,6 +462,28 @@ public class GetDataServiceImpl implements GetDataService {
                     result += ",{\"value_no\":\"" + map.get("id") + "\",\"value_name\":\"" + map.get("name") + "\"}";
                 }
                 i++;
+            }
+        }
+        result+="]";
+        return result;
+    }
+
+    @Override
+    public String getPnameByCar(Long comid, String carId) {
+        String result = "[";
+        if(comid!=-1L&&!"".equals(carId)){
+            String sql = "select id,p_name from product_package_tb where comid="+comid;
+            List<Map<String,Object>>  pList = null;
+            pList = commonDao.getObjectBySql(sql +" and is_delete=0 and car_type_id='"+carId+"'");
+            if(pList!=null&&pList.size()>0){
+                for(int i = 0;i<pList.size();i++){
+                    Map map = pList.get(i);
+                    if(i==0){
+                        result+="{\"value_no\":\""+map.get("id")+"\",\"value_name\":\""+map.get("p_name")+"\"}";
+                    }else{
+                        result+=",{\"value_no\":\""+map.get("id")+"\",\"value_name\":\""+map.get("p_name")+"\"}";
+                    }
+                }
             }
         }
         result+="]";

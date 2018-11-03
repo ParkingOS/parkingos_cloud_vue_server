@@ -1,7 +1,8 @@
 package parkingos.com.bolink.utils;
 
 import com.alibaba.fastjson.JSONObject;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import parkingos.com.bolink.dao.spring.CommonDao;
@@ -20,7 +21,7 @@ import java.util.regex.Pattern;
 
 @Component
 public class CommonUtils<T> {
-    Logger logger = Logger.getLogger(CommonUtils.class);
+    Logger logger = LoggerFactory.getLogger(CommonUtils.class);
     @Autowired
     CommonDao commonDao;
 
@@ -169,7 +170,7 @@ public class CommonUtils<T> {
         tokenTb.setParkId(comid + "");
         tokenTb.setReceiveCloud(1);
         List<ParkTokenTb> tokens = commonDao.selectListByConditions(tokenTb);
-        logger.info(tokens);
+        logger.info("==="+tokens);
         if (tokens != null && !tokens.isEmpty()) {
             return tokens.get(0);
         }
@@ -177,7 +178,7 @@ public class CommonUtils<T> {
     }
 
     public boolean doSendMessage(JSONObject message, ParkTokenTb parkTokenTb) {
-        logger.error(parkTokenTb);
+        logger.error("~~~"+parkTokenTb);
         String ip = parkTokenTb.getServerIp();//(String)parkTokenTb.get("server_ip");
         String localId = parkTokenTb.getLocalId();// (String)parkTokenTb.get("local_id");
         if (Check.isEmpty(localId))
@@ -191,7 +192,7 @@ public class CommonUtils<T> {
         jsonObject.put("data",message);
         String url = "http://" + ip + ":8083/zld/sendmesgtopark";
         logger.error(url);
-        logger.error(jsonObject);
+        logger.error(""+jsonObject);
         String ret = new HttpProxy().doHeadPost(url, StringUtils.encodeUTF8(jsonObject.toString()));
         logger.error(ret);
         if (ret != null&&!"".equals(ret)) {
@@ -287,7 +288,7 @@ public class CommonUtils<T> {
         JSONObject jsonMesg = new JSONObject();
         jsonMesg.put("service_name", "visitor_sync");
         jsonMesg.put("data", jsonSend);
-        logger.error(jsonMesg);
+        logger.error(jsonMesg+"");
 
         boolean isSend = doSendMessage(jsonMesg,parkTokenTb);
         logger.error(">>>>>>>>>>>>>>云端发送数据到停车收费系统结果：" + isSend);
@@ -328,7 +329,7 @@ public class CommonUtils<T> {
         JSONObject jsonMesg = new JSONObject();
         jsonMesg.put("service_name", "blackuser_sync");
         jsonMesg.put("data", jsonSend);
-        logger.error(jsonMesg);
+        logger.error(jsonMesg+"");
 
         boolean isSend = doSendMessage(jsonMesg,parkTokenTb);
         logger.error(">>>>>>>>>>>>>>云端发送数据到停车收费系统结果：" + isSend);
@@ -375,7 +376,7 @@ public class CommonUtils<T> {
         JSONObject jsonMesg = new JSONObject();
         jsonMesg.put("service_name", "month_pay_sync");
         jsonMesg.put("data", jsonSend);
-        logger.error(jsonMesg);
+        logger.error(jsonMesg+"");
         boolean isSend = doSendMessage(jsonMesg,parkTokenTb);
         logger.error(">>>>>>>>>>>>>>云端发送数据到停车收费系统结果：" + isSend);
         if (isSend) {
@@ -415,7 +416,7 @@ public class CommonUtils<T> {
         JSONObject jsonMesg = new JSONObject();
         jsonMesg.put("service_name", "car_type_sync");
         jsonMesg.put("data", jsonSend);
-        logger.error(jsonMesg);
+        logger.error(jsonMesg+"");
         boolean isSend = doSendMessage(jsonMesg,parkTokenTb);
         logger.error(">>>>>>>>>>>>>>云端发送数据到停车收费系统结果：" + isSend);
         if (isSend) {
@@ -464,7 +465,7 @@ public class CommonUtils<T> {
         JSONObject jsonMesg = new JSONObject();
         jsonMesg.put("service_name", "collector_sync");
         jsonMesg.put("data", jsonSend);
-        logger.error(jsonMesg);
+        logger.error(jsonMesg+"");
         boolean isSend = doSendMessage(jsonMesg,parkTokenTb);
         logger.error(">>>>>>>>>>>>>>云端发送数据到停车收费系统结果：" + isSend);
         if (isSend) {
@@ -513,7 +514,7 @@ public class CommonUtils<T> {
         JSONObject jsonMesg = new JSONObject();
         jsonMesg.put("service_name", "month_card_sync");
         jsonMesg.put("data", jsonSend);
-        logger.error(jsonMesg);
+        logger.error(jsonMesg+"");
         boolean isSend = doSendMessage(jsonMesg,parkTokenTb);
         logger.error(">>>>>>>>>>>>>>云端发送数据到停车收费系统结果：" + isSend);
         if (isSend) {
@@ -554,7 +555,7 @@ public class CommonUtils<T> {
         JSONObject jsonMesg = new JSONObject();
         jsonMesg.put("service_name", "price_sync");
         jsonMesg.put("data", jsonSend);
-        logger.error(jsonMesg);
+        logger.error(jsonMesg+"");
         boolean isSend = doSendMessage(jsonMesg,parkTokenTb);
         logger.error(">>>>>>>>>>>>>>云端发送数据到停车收费系统结果：" + isSend);
         if (isSend) {

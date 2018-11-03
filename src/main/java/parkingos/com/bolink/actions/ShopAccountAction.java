@@ -1,7 +1,8 @@
 package parkingos.com.bolink.actions;
 
 import com.alibaba.fastjson.JSONObject;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -19,7 +20,7 @@ import java.util.Map;
 @RequestMapping("/shopaccount")
 public class ShopAccountAction {
 
-    Logger logger = Logger.getLogger( ShopAccountAction.class );
+    Logger logger = LoggerFactory.getLogger( ShopAccountAction.class );
     @Autowired
     private ShopAcccountService shopAcccountService;
 
@@ -27,9 +28,7 @@ public class ShopAccountAction {
     public String addMoney(HttpServletRequest request, HttpServletResponse resp) {
 
         Map<String, String> reqParameterMap = RequestUtil.readBodyFormRequset( request );
-        logger.info( reqParameterMap );
         JSONObject result = shopAcccountService.selectResultByConditions( reqParameterMap );
-        logger.info( result );
         StringUtils.ajaxOutput( resp, result.toString() );
         return null;
     }
@@ -120,7 +119,6 @@ public class ShopAccountAction {
     public String getRecharge(HttpServletRequest request, HttpServletResponse resp) {
 
         Map<String, String> reqParameterMap = RequestUtil.readBodyFormRequset( request );
-        logger.info(reqParameterMap);
         JSONObject result = shopAcccountService.getRecharge( reqParameterMap );
         StringUtils.ajaxOutput( resp, result.toString() );
         return null;

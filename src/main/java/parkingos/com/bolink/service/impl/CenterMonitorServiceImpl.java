@@ -3,27 +3,29 @@ package parkingos.com.bolink.service.impl;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import com.danga.MemCached.MemCachedClient;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.mongodb.BasicDBObject;
 import com.mongodb.DB;
 import com.mongodb.DBCollection;
 import com.mongodb.DBObject;
-import org.apache.log4j.Logger;
-import org.directwebremoting.ScriptSession;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import parkingos.com.bolink.dao.mybatis.mapper.CenterMonitorMapper;
 import parkingos.com.bolink.dao.mybatis.mapper.OrderMapper;
 import parkingos.com.bolink.dao.mybatis.mapper.ParkInfoMapper;
 import parkingos.com.bolink.dao.spring.CommonDao;
-import parkingos.com.bolink.dwr.DWRScriptSessionListener;
-import parkingos.com.bolink.dwr.Push;
 import parkingos.com.bolink.models.LiftrodInfoTb;
+import parkingos.com.bolink.models.OrderTb;
+import parkingos.com.bolink.orderserver.OrderServer;
 import parkingos.com.bolink.service.CenterMonitorService;
 import parkingos.com.bolink.service.CityOrderAnlysisService;
 import parkingos.com.bolink.service.ParkOrderAnlysisService;
 import parkingos.com.bolink.utils.*;
+import parkingos.com.bolink.websocket.WebSocketServer;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -39,7 +41,7 @@ import java.util.*;
 @Service
 public class CenterMonitorServiceImpl implements CenterMonitorService {
 
-    Logger logger = Logger.getLogger(CenterMonitorServiceImpl.class);
+    Logger logger = LoggerFactory.getLogger(CenterMonitorServiceImpl.class);
 
     @Autowired
     private CommonDao commonDao;
@@ -53,6 +55,10 @@ public class CenterMonitorServiceImpl implements CenterMonitorService {
     private ParkOrderAnlysisService parkOrderanlysisService;
     @Autowired
     private OrderMapper orderMapper;
+    @Autowired
+    private OrderServer orderServer;
+    @Autowired
+    private MemCachedClient memCachedClient;
     DecimalFormat af1 = new DecimalFormat("0");
 
     private Gson gson = new GsonBuilder().setDateFormat("yyyy-MM-dd HH:mm:ss").create();
@@ -178,7 +184,7 @@ public class CenterMonitorServiceImpl implements CenterMonitorService {
             Double cashPay = 0d;
             Double electronicPay = 0d;
             Double freePay = 0d;
-            if (retarry.size() > 0) {
+            if (retarry!=null&&retarry.size() > 0) {
                 JSONObject object = (JSONObject) retarry.get(retarry.size() - 1);
                 if (object.getString("cash_pay") != null && !"".equals(object.getString("cash_pay"))) {
                     cashPay = Double.parseDouble(object.getString("cash_pay"));
@@ -298,20 +304,20 @@ public class CenterMonitorServiceImpl implements CenterMonitorService {
 
         logger.error("matchConfirmPic from mongodb>>>>>>>>>channelId=" + eventId + ">>>>>>>comid=" + comid + ">>>>>>>>>carnumber" + carNumber);
         //获取需要人工确认的订单事件
-        List<Map<String, Object>> mactchOrderList = queryBlurOrdersByCarnumber(comid, carNumber);
+        List<OrderTb> mactchOrderList = queryBlurOrdersByCarnumber(comid, carNumber);
         JSONArray jsonArray = new JSONArray();
         if (mactchOrderList == null || mactchOrderList.isEmpty()) {
             StringUtils.ajaxOutput(response, jsonArray.toString());
             return;
         }
         for (int i = 0; i < mactchOrderList.size(); i++) {
-            System.out.println("进入获取多个图片开始进行第" + (i + 1) + "次循环的时间>>>>>>>>>>>" + new Date().getTime());
-            Map<String, Object> orderMap = mactchOrderList.get(i);
-            if (orderMap.get("order_id_local") == null) {
+            System.out.println("进入获取多个图片开始进行第" + (i + 1) + "次循环的时间>>>>>>>>>>>" + System.currentTimeMillis());
+            OrderTb orderTb = mactchOrderList.get(i);
+            if (orderTb.getOrderIdLocal() == null) {
                 continue;
             }
-            String orderid = (String) orderMap.get("order_id_local");
-            String car_number = (String) orderMap.get("car_number");
+            String orderid = orderTb.getOrderIdLocal();
+            String car_number = orderTb.getCarNumber();
             DB db = MongoClientFactory.getInstance().getMongoDBBuilder("zld");//
             //根据编号查询出mongodb中存入的对应个表
             Map map = centerMonitorMapper.matchPicMap(orderid,comid+"");
@@ -361,6 +367,7 @@ public class CenterMonitorServiceImpl implements CenterMonitorService {
                     in.close();
                     System.out.println("进入获取多个图片开始第" + (i + 1) + "次循环生成图片的时间>>>>>>>>>>>" + new Date().getTime());
                     JSONObject jsonObject = new JSONObject();
+                    jsonObject.put("comid",comid);
                     jsonObject.put("orderId", orderid);
                     jsonObject.put("carNumber", car_number);
                     jsonObject.put("picName", comid + "_" + orderid + ".jpg");
@@ -391,7 +398,10 @@ public class CenterMonitorServiceImpl implements CenterMonitorService {
         if(cityid!=null&&cityid>-1){
             tableName+= "_"+cityid%100;
         }
-        Map ordermap = centerMonitorMapper.getSelectOrder(Long.parseLong(comid),carNumber,tableName);
+//        Map ordermap = centerMonitorMapper.getSelectOrder(Long.parseLong(comid),carNumber,tableName);
+        OrderTb order = orderServer.getSelectOrder(Long.parseLong(comid),carNumber,tableName);
+        OrmUtil ormUtil = new OrmUtil();
+        Map ordermap =ormUtil.pojoToMap(order);
         return ordermap;
     }
 
@@ -406,7 +416,7 @@ public class CenterMonitorServiceImpl implements CenterMonitorService {
         params.put("event_id", StringUtils.encodeUTF8(StringUtils.encodeUTF8(event_id)));
         params.put("car_number", StringUtils.encodeUTF8(StringUtils.encodeUTF8(carNumber)));
 //        params.put("action", "balanceOrderInfo");
-        logger.error(params);
+        logger.info(params.toString());
 
 //        JSONObject object = JSONObject.parseObject(ret);
         String message = StringUtils.createLinkString(params);
@@ -533,27 +543,43 @@ public class CenterMonitorServiceImpl implements CenterMonitorService {
         }
         //判断主机号性质 1-集团 0-车场
         int mainPhoneType = -1;
+        String memKey = "";
+        logger.info("====>>>monMap"+monMap);
         if (Long.parseLong(exten) == Long.parseLong(monMap.get("group_phone").toString())) {
             mainPhoneType = 1;
+            memKey="groupid_"+monMap.get("groupid");
         }
         if (Long.parseLong(exten) == Long.parseLong(monMap.get("park_phone").toString())) {
             mainPhoneType = 0;
+            memKey="comid_"+monMap.get("comid");
         }
         logger.error("中央监控>>>>>呼入主机机号类型(1-集团 0-车场)：" + mainPhoneType + ">>>>");
         if (mainPhoneType == -1) {
             logger.error("中央监控>>>>>推送消息的主叫号>>>" + callerid_num + "和被叫号" + exten + "在云平台没有对应关系");
         } else {
             //推送弹视频的消息
-            Map<String, Object> message = new HashMap<String, Object>();
+            JSONObject message = new JSONObject();
             message.put("play_src", monMap.get("play_src"));
             message.put("main_phone_type", mainPhoneType);
             message.put("id", monMap.get("id"));
 
             logger.error(" 中央监控>>>>>发起推送消息" + gson.toJson(message));
-            Collection<ScriptSession> sessions = DWRScriptSessionListener.getScriptSessions();
-            if (sessions != null && sessions.size() > 0) {//有dwr监听事件再推送消息
-                Push.popCenteVideo(gson.toJson(message), sessions);
+            logger.info("===>>>memKey"+memKey);
+            String sessionId = memCachedClient.get(memKey)+"";
+            logger.info("===sessionId"+sessionId);
+            try {
+                if(sessionId!=null) {
+                    String[] strArr = sessionId.split(",");
+                    for(String id:strArr){
+                        WebSocketServer webSocketServer = new WebSocketServer();
+                        webSocketServer.sendMessage(gson.toJson(message),id);
+                    }
+                }
+            }catch (Exception e){
+                logger.error("send websocket error",e);
             }
+
+
             String ip ="";
             try{
                 ip =  InetAddress.getLocalHost().getHostAddress();
@@ -588,7 +614,7 @@ public class CenterMonitorServiceImpl implements CenterMonitorService {
         return liftmap;
     }
 
-    private List<Map<String,Object>> queryBlurOrdersByCarnumber(long comid, String carNumber) {
+    private List<OrderTb> queryBlurOrdersByCarnumber(long comid, String carNumber) {
 
         Long groupid = orderMapper.getGroupIdByComId(comid);
         Long cityid = -1L;
@@ -604,7 +630,7 @@ public class CenterMonitorServiceImpl implements CenterMonitorService {
         System.out.println("进来获取集合");
         List<Object> params = new ArrayList<Object>();
         params.add(comid);
-        List<Map<String, Object>> list = new ArrayList<Map<String, Object>>();
+        List<OrderTb> list = new ArrayList<>();
         //匹配除省份，无牌车首字符可能不是中文(c >= 0x4E00 &&  c <= 0x9FA5)
         char firstChar = carNumber.charAt(0);
         if (firstChar > 0x9FA5 || firstChar < 0x4E00) {
@@ -614,15 +640,16 @@ public class CenterMonitorServiceImpl implements CenterMonitorService {
         List<String> carNumberList = new ArrayList<>();
         carNumberList.add(carNumber.substring(1));
 
-        list = centerMonitorMapper.getCarByNameLike(comid,carNumberList,tableName);
+        list = orderServer.getOrdersByCars(comid,carNumberList,tableName);
+//        list = centerMonitorMapper.getCarByNameLike(comid,carNumberList,tableName);
 
         if (list == null || list.size() == 0) {
             // 2 模糊匹配除去两位
             carNumberList.clear();
             carNumberList.add(carNumber.substring(1, carNumber.length() - 1));
             carNumberList.add(carNumber.substring(2));
-            list = centerMonitorMapper.getCarByNameLike(comid,carNumberList,tableName);
-
+//            list = centerMonitorMapper.getCarByNameLike(comid,carNumberList,tableName);
+            list = orderServer.getOrdersByCars(comid,carNumberList,tableName);
             if (list == null || list.size() == 0) {
                 //3  模糊匹配除去三位
                 carNumber = carNumber.substring(1);
@@ -630,8 +657,8 @@ public class CenterMonitorServiceImpl implements CenterMonitorService {
                 carNumberList.add(carNumber.substring(1, carNumber.length() - 2));
                 carNumberList.add(carNumber.substring(2, carNumber.length() - 1));
                 carNumberList.add(carNumber.substring(3));
-                list = centerMonitorMapper.getCarByNameLike(comid,carNumberList,tableName);
-
+//                list = centerMonitorMapper.getCarByNameLike(comid,carNumberList,tableName);
+                list = orderServer.getOrdersByCars(comid,carNumberList,tableName);
                 if (list == null || list.size() == 0) {
                     //4 模糊匹配除去四位
                     carNumber = carNumber.substring(1);
@@ -640,8 +667,8 @@ public class CenterMonitorServiceImpl implements CenterMonitorService {
                     carNumberList.add(carNumber.substring(2, carNumber.length() - 2));
                     carNumberList.add(carNumber.substring(3, carNumber.length() - 1));
                     carNumberList.add(carNumber.substring(4, carNumber.length()));
-                    list = centerMonitorMapper.getCarByNameLike(comid,carNumberList,tableName);
-
+//                    list = centerMonitorMapper.getCarByNameLike(comid,carNumberList,tableName);
+                    list = orderServer.getOrdersByCars(comid,carNumberList,tableName);
                 }
             }
         }

@@ -2,7 +2,8 @@ package parkingos.com.bolink.service.impl;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import parkingos.com.bolink.dao.spring.CommonDao;
@@ -22,7 +23,7 @@ import java.util.Map;
 @Service
 public class EquipmentManageMonitorServiceImpl implements EquipmentManageMonitorService {
 
-    Logger logger = Logger.getLogger(EquipmentManageMonitorServiceImpl.class);
+    Logger logger = LoggerFactory.getLogger(EquipmentManageMonitorServiceImpl.class);
 
 
     @Autowired
@@ -78,7 +79,6 @@ public class EquipmentManageMonitorServiceImpl implements EquipmentManageMonitor
         System.out.println("获得集团下面所有监控=====groupid:"+groupid);
 
         Map searchMap = supperSearchService.getBaseSearch( monitorInfoTb,reqmap);
-        logger.info(searchMap);
         if(searchMap!=null&&!searchMap.isEmpty()){
             MonitorInfoTb baseQuery =(MonitorInfoTb)searchMap.get("base");
             List<SearchBean> supperQuery = null;

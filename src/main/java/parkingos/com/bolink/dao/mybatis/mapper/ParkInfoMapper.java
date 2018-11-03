@@ -39,4 +39,8 @@ public interface ParkInfoMapper {
     List<HashMap<String,Object>> getBerthPercent(@Param("comidlist") List<HashMap<String,Object>> list,@Param("create_time") long create_time);
 
     Map<String,Object> getParkNameById(@Param("comid")long comid);
+    int getParkEmpty(@Param("comid")int comid);
+    int getMonthTotal(@Param("comid")int comid,@Param("create_time") long create_time);
+    int getTicketCount(@Param("comid")int comid, @Param("create_time")long tday);
+    int getVisitorCount(@Param("comid")int comid);
 }

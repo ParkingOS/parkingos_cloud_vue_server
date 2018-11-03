@@ -2,7 +2,8 @@ package parkingos.com.bolink.actions;
 
 
 import com.alibaba.fastjson.JSONObject;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -22,7 +23,7 @@ import java.util.Random;
 @RequestMapping("/cartype")
 public class CarTypeAction {
 
-    Logger logger = Logger.getLogger(CarTypeAction.class);
+    Logger logger = LoggerFactory.getLogger(CarTypeAction.class);
 
     @Autowired
     private CarTypeService carTypeService;

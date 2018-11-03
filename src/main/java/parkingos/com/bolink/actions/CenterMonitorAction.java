@@ -2,7 +2,8 @@ package parkingos.com.bolink.actions;
 
 
 import com.alibaba.fastjson.JSONObject;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -21,7 +22,7 @@ import java.util.Map;
 @RequestMapping("/centermonitor")
 public class CenterMonitorAction {
 
-    Logger logger = Logger.getLogger(CenterMonitorAction.class);
+    Logger logger = LoggerFactory.getLogger(CenterMonitorAction.class);
     @Autowired
     private CenterMonitorService centerMonitorService;
 
@@ -95,7 +96,7 @@ public class CenterMonitorAction {
     * */
     @RequestMapping(value = "/matchconfirmorder")
     public String matchConfirmOrder(HttpServletRequest request, HttpServletResponse response) throws Exception {
-        System.out.println("进入模糊获取多个图片的时间>>>>>>>>>>>" + new Date().getTime());
+        System.out.println("进入模糊获取多个图片的时间>>>>>>>>>>>" + System.currentTimeMillis());
         String event_id = StringUtils.decodeUTF8(RequestUtil.getString(request, "event_id"));
         String car_number = StringUtils.decodeUTF8(RequestUtil.getString(request, "car_number"));
         String comid = StringUtils.decodeUTF8(RequestUtil.getString(request, "comid"));
@@ -103,7 +104,7 @@ public class CenterMonitorAction {
         logger.error("获得模糊匹配到的确认订单的图片" + event_id + "~~~" + car_number + "~~~" + comid);
 
         centerMonitorService.matchConfirmPic(event_id, Long.parseLong(comid), car_number, request, response);
-        System.out.println("出来获取多个图片的时间>>>>>>>>>>>" + new Date().getTime());
+        System.out.println("出来获取多个图片的时间>>>>>>>>>>>" + System.currentTimeMillis());
 
         return null;
     }

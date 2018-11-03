@@ -2,7 +2,8 @@ package parkingos.com.bolink.actions;
 
 
 import com.alibaba.fastjson.JSONObject;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -26,7 +27,7 @@ import java.util.Map;
 @RequestMapping("/liftRod")
 public class LiftRodAction {
 
-    Logger logger = Logger.getLogger(LiftRodAction.class);
+    Logger logger = LoggerFactory.getLogger(LiftRodAction.class);
 
     @Autowired
     private LiftRodService liftRodService;
@@ -47,13 +48,13 @@ public class LiftRodAction {
     @RequestMapping(value = "/getLiftRodPicture")
     public String getLiftRodPicture(HttpServletRequest request, HttpServletResponse response) throws Exception {
         String comid = RequestUtil.getString(request, "comid");
-        String liftrodId = RequestUtil.getString(request, "liftrodid");
+        String liftrodId = StringUtils.decodeUTF8(RequestUtil.getString(request, "liftrodid"));
         //集团 抬杆,获得id 根据id获得comid
         String id = RequestUtil.getString(request,"id");
-        logger.error("==========>>>>获取图片"+id);
-        if(id!=null&&!"undefined".equals(id)&&!"".equals(id)){
-            comid = getComidByLift(Long.parseLong(id));
-        }
+        logger.error("==========>>>>获取图片"+id+"~~~liftrodId"+liftrodId+"comid"+comid);
+//        if(id!=null&&!"undefined".equals(id)&&!"".equals(id)){
+//            comid = getComidByLift(Long.parseLong(id));
+//        }
 
         byte[] content = liftRodService.getLiftRodPicture(comid, liftrodId);
 

@@ -1,7 +1,8 @@
 package parkingos.com.bolink.dao.spring.impl;
 
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
@@ -20,7 +21,7 @@ public class MapperSpringJdbcImpl extends JdbcTemplate implements CommonMapper {
     @Autowired
     private MybatisGeneratorSql generatorSql;
 
-    Logger logger = Logger.getLogger(MybatisGeneratorSql.class);
+    Logger logger = LoggerFactory.getLogger(MybatisGeneratorSql.class);
 
 
     /**
@@ -38,7 +39,6 @@ public class MapperSpringJdbcImpl extends JdbcTemplate implements CommonMapper {
         Map<String,Object> preSqlMap = generatorSql.selectByConditions(selective,tableName,params,pageOrderConfig,searchBeans);
         if(preSqlMap!=null){
             String sql =(String) preSqlMap.get("sql");
-            logger.info(preSqlMap);
             List<Object> values = (List<Object>)preSqlMap.get("values");
             Object[] objects = null;
             if(params != null){
@@ -62,7 +62,6 @@ public class MapperSpringJdbcImpl extends JdbcTemplate implements CommonMapper {
                 objects = new Object[params.size()];
                 objects = values.toArray(objects);
             }
-            logger.info(preSqlMap);
             return queryForObject(sql,objects, Integer.class);
         }
         return 0;
@@ -79,7 +78,6 @@ public class MapperSpringJdbcImpl extends JdbcTemplate implements CommonMapper {
                 objects = new Object[selective.size()];
                 objects = values.toArray(objects);
             }
-            logger.info(preSqlMap);
             return queryForObject(sql,objects,Map.class);
         }
         return null;
@@ -132,7 +130,6 @@ public class MapperSpringJdbcImpl extends JdbcTemplate implements CommonMapper {
                 objects = new Object[length];
                 objects = values.toArray(objects);
             }
-            logger.info(preSqlMap);
             return update(sql,objects);
         }
         return 0;

@@ -1,6 +1,7 @@
 package parkingos.com.bolink.utils;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -11,7 +12,7 @@ import java.util.TimeZone;
 
 public class TimeTools {
 
-	private static Logger logger = Logger.getLogger(TimeTools.class);
+	private static Logger logger = LoggerFactory.getLogger(TimeTools.class);
 
 	private static GregorianCalendar gCalendar = null;
 

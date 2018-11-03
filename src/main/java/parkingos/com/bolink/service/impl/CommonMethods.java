@@ -7,7 +7,8 @@ package parkingos.com.bolink.service.impl;
 //import com.zld.service.PgOnlyReadService;
 //import com.zld.utils.*;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 import parkingos.com.bolink.dao.spring.CommonDao;
@@ -20,7 +21,7 @@ import java.util.Map;
 public class CommonMethods {
 
 
-	private Logger logger = Logger.getLogger(CommonMethods.class);
+	private Logger logger = LoggerFactory.getLogger(CommonMethods.class);
 
 		@Autowired
 		private CommonDao commonDao;

@@ -1,7 +1,8 @@
 package parkingos.com.bolink.dao.spring.impl;
 
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 import parkingos.com.bolink.dao.spring.CommonDao;
@@ -17,7 +18,7 @@ import java.util.Map;
 public class CommonDaoSpringImpl<T>  implements CommonDao<T> {
 
 
-    Logger logger = Logger.getLogger(getClass());
+    Logger logger = LoggerFactory.getLogger(getClass());
 
     @Autowired
     private CommonMapper commonMapper;

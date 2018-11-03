@@ -2,7 +2,8 @@ package parkingos.com.bolink.service.impl;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import parkingos.com.bolink.dao.spring.CommonDao;
@@ -18,13 +19,14 @@ import parkingos.com.bolink.utils.OrmUtil;
 import parkingos.com.bolink.utils.StringUtils;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 @Service
 public class GroupMemberServiceImpl implements GroupMemberService {
 
-    Logger logger = Logger.getLogger(GroupMemberServiceImpl.class);
+    Logger logger = LoggerFactory.getLogger(GroupMemberServiceImpl.class);
 
     @Autowired
     private CommonDao commonDao;
@@ -61,7 +63,6 @@ public class GroupMemberServiceImpl implements GroupMemberService {
         List<Map<String, Object>> resList =new ArrayList<Map<String, Object>>();
 
         Map searchMap = supperSearchService.getBaseSearch(userInfoTb,reqmap);
-        logger.info(searchMap);
         if(searchMap!=null&&!searchMap.isEmpty()){
             UserInfoTb baseQuery =(UserInfoTb)searchMap.get("base");
             List<SearchBean> supperQuery = null;
@@ -140,8 +141,12 @@ public class GroupMemberServiceImpl implements GroupMemberService {
         }
         List<Map<String, Object>> list = new ArrayList<Map<String,Object>>();
 
-        String sql = "select id as value_no,role_name as value_name from user_role_tb where state=0 and oid="+adminRoleList.get(0).get("oid")+" and id<>"+adminRoleList.get(0).get("id")+" and adminid in (select id from user_info_tb where groupid=(select groupid from user_info_tb where id="+uin+" )) ";
+        String sql = "select id as value_no,role_name as value_name from user_role_tb where state=0 and oid="+adminRoleList.get(0).get("oid")+" and adminid in (select id from user_info_tb where groupid=(select groupid from user_info_tb where id="+uin+" )) ";
         list = commonDao.getObjectBySql(sql);
+        Map<String, Object> map = new HashMap<>();
+        map.put("value_no",adminRoleList.get(0).get("id"));
+        map.put("value_name",adminRoleList.get(0).get("role_name"));
+        list.add(map);
         if(list != null && !list.isEmpty()){
             result = StringUtils.createJson(list);
         }

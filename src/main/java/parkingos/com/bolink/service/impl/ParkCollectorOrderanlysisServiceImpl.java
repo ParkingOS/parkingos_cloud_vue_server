@@ -2,13 +2,14 @@ package parkingos.com.bolink.service.impl;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import parkingos.com.bolink.controller.OrderServiceController;
 import parkingos.com.bolink.dao.mybatis.mapper.OrderMapper;
 import parkingos.com.bolink.dao.spring.CommonDao;
 import parkingos.com.bolink.models.OrderTb;
+import parkingos.com.bolink.orderserver.OrderServer;
 import parkingos.com.bolink.service.ParkCollectorOrderAnlysisService;
 import parkingos.com.bolink.service.SupperSearchService;
 import parkingos.com.bolink.utils.TimeTools;
@@ -20,7 +21,7 @@ import java.util.Map;
 @Service
 public class ParkCollectorOrderanlysisServiceImpl implements ParkCollectorOrderAnlysisService {
 
-    Logger logger = Logger.getLogger(ParkCollectorOrderanlysisServiceImpl.class);
+    Logger logger = LoggerFactory.getLogger(ParkCollectorOrderanlysisServiceImpl.class);
 
     @Autowired
     private CommonDao commonDao;
@@ -30,7 +31,7 @@ public class ParkCollectorOrderanlysisServiceImpl implements ParkCollectorOrderA
     @Autowired
     private SupperSearchService<OrderTb> supperSearchService;
     @Autowired
-    private OrderServiceController orderServiceController;
+    private OrderServer orderServer;
 
     @Override
     public JSONObject selectResultByConditions(Map<String, String> reqmap) {
@@ -68,7 +69,7 @@ public class ParkCollectorOrderanlysisServiceImpl implements ParkCollectorOrderA
         reqmap.put("end_time_start",start+"");
         reqmap.put("end_time_end",end+"");
         reqmap.put("comid_start",comid+"");
-        List<Map<String,String>> backList = orderServiceController.selectParkCollectorAnlysis(reqmap);
+        List<Map<String,String>> backList = orderServer.selectParkCollectorAnlysis(reqmap);
 
 //        String sql = "select count(*) scount,sum(amount_receivable) amount_receivable, " +
 //                "sum(total) total , sum(cash_pay) cash_pay,sum(cash_prepay) cash_prepay, sum(electronic_pay) electronic_pay,sum(electronic_prepay) electronic_prepay, " +

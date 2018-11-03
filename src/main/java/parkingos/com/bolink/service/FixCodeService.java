@@ -19,4 +19,6 @@ public interface FixCodeService {
     JSONObject userTicket(String code);
 
     JSONObject setPublic(ShopTb shopTb);
+
+    JSONObject setPwd(FixCodeTb fixCodeTb);
 }

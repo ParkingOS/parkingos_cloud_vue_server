@@ -2,7 +2,8 @@ package parkingos.com.bolink.service.impl;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import parkingos.com.bolink.dao.spring.CommonDao;
@@ -22,7 +23,7 @@ import java.util.Map;
 @Service
 public class SuperSearchServiceImp<T> implements SupperSearchService<T> {
 
-    Logger logger = Logger.getLogger(SupperSearchService.class);
+    Logger logger = LoggerFactory.getLogger(SupperSearchService.class);
     @Autowired
     private CommonDao commonDao;
     @Autowired
@@ -154,7 +155,7 @@ public class SuperSearchServiceImp<T> implements SupperSearchService<T> {
         List<T> list =null;
         List<Map<String, Object>> resList =new ArrayList<>();
         Map searchMap = getBaseSearch(t,params);
-        logger.info(searchMap);
+        logger.info(searchMap+"");
         if(searchMap!=null&&!searchMap.isEmpty()){
             T t1 =(T)searchMap.get("base");
             List<SearchBean> supperQuery = null;

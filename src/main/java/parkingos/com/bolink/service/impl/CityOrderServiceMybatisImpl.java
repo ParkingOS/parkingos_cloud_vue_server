@@ -2,7 +2,8 @@ package parkingos.com.bolink.service.impl;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import parkingos.com.bolink.dao.mybatis.mapper.CityOrderTbMapper;
@@ -16,7 +17,7 @@ import java.util.Map;
 @Service("citymybatis")
 public class CityOrderServiceMybatisImpl implements CityUnorderService {
 
-    Logger logger = Logger.getLogger(CityOrderServiceMybatisImpl.class);
+    Logger logger = LoggerFactory.getLogger(CityOrderServiceMybatisImpl.class);
 
     @Autowired
     CityOrderTbMapper cityorderTbMapper;

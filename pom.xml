@@ -48,11 +48,7 @@
                 </exclusion>
             </exclusions>
         </dependency>
-        <dependency>
-            <groupId>javax.servlet</groupId>
-            <artifactId>javax.servlet-api</artifactId>
-            <version>4.0.0</version>
-        </dependency>
+
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-test</artifactId>
@@ -89,6 +85,19 @@
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-actuator</artifactId>
+        </dependency>
+
+        <!-- memcache -->
+        <dependency>
+            <groupId>commons-pool</groupId>
+            <artifactId>commons-pool</artifactId>
+            <version>1.5.6</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.danga</groupId>
+            <artifactId>java_memcached-release</artifactId>
+            <version>2.6.6</version>
         </dependency>
 
         <!-- grpc -->
@@ -226,11 +235,15 @@
 
         <!--dwr中央监控jar-->
         <dependency>
-            <groupId>dwr.bolink</groupId>
+            <groupId>org.directwebremoting</groupId>
             <artifactId>dwr</artifactId>
-            <version>1.0.4</version>
+            <version>3.0.2-RELEASE</version>
         </dependency>
 
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-websocket</artifactId>
+        </dependency>
 
     </dependencies>
 

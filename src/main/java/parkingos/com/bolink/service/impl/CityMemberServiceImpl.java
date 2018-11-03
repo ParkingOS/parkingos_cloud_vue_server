@@ -2,7 +2,8 @@ package parkingos.com.bolink.service.impl;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import parkingos.com.bolink.dao.spring.CommonDao;
@@ -23,7 +24,7 @@ import java.util.Map;
 @Service
 public class CityMemberServiceImpl implements CityMemberService {
 
-    Logger logger = Logger.getLogger(CityMemberServiceImpl.class);
+    Logger logger = LoggerFactory.getLogger(CityMemberServiceImpl.class);
 
     @Autowired
     private CommonDao commonDao;
@@ -59,7 +60,7 @@ public class CityMemberServiceImpl implements CityMemberService {
         List<Map<String, Object>> resList =new ArrayList<Map<String, Object>>();
 
         Map searchMap = supperSearchService.getBaseSearch(userInfoTb,reqmap);
-        logger.info(searchMap);
+        logger.info("===="+searchMap);
         if(searchMap!=null&&!searchMap.isEmpty()){
             UserInfoTb baseQuery =(UserInfoTb)searchMap.get("base");
             List<SearchBean> supperQuery = null;
@@ -98,13 +99,6 @@ public class CityMemberServiceImpl implements CityMemberService {
         result.put("page",Integer.parseInt(reqmap.get("page")));
         logger.error("============>>>>>返回数据"+result);
         return result;
-//        UserInfoTb userInfoTb = new UserInfoTb();
-//        userInfoTb.setCityid(Long.parseLong(reqmap.get("cityid")));
-//        userInfoTb.setState(0);
-//
-//        JSONObject result = supperSearchService.supperSearch(userInfoTb,reqmap);
-//
-//        return result;
 
     }
 

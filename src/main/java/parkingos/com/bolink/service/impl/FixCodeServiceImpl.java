@@ -2,7 +2,8 @@ package parkingos.com.bolink.service.impl;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import parkingos.com.bolink.dao.spring.CommonDao;
@@ -25,7 +26,7 @@ import java.util.concurrent.ExecutorService;
 @Service
 public class FixCodeServiceImpl implements FixCodeService {
 
-    Logger logger = Logger.getLogger(FixCodeServiceImpl.class);
+    Logger logger = LoggerFactory.getLogger(FixCodeServiceImpl.class);
 
     @Autowired
     private CommonDao commonDao;
@@ -47,7 +48,6 @@ public class FixCodeServiceImpl implements FixCodeService {
         List<Map<String, Object>> resList =new ArrayList<Map<String, Object>>();
         final List<Map<String, Object>> updateList =new ArrayList<Map<String, Object>>();
         Map searchMap = supperSearchService.getBaseSearch(fixCodeTb,params);
-        logger.info(searchMap);
         if(searchMap!=null&&!searchMap.isEmpty()){
             FixCodeTb t1 =(FixCodeTb)searchMap.get("base");
             List<SearchBean> supperQuery = null;
@@ -271,6 +271,17 @@ public class FixCodeServiceImpl implements FixCodeService {
     public JSONObject setPublic(ShopTb shopTb) {
         JSONObject result = new JSONObject();
         int update = commonDao.updateByPrimaryKey(shopTb);
+        if(update==1){
+            result.put("state",1);
+            result.put("msg","修改成功");
+        }
+        return result;
+    }
+
+    @Override
+    public JSONObject setPwd(FixCodeTb fixCodeTb) {
+        JSONObject result = new JSONObject();
+        int update = commonDao.updateByPrimaryKey(fixCodeTb);
         if(update==1){
             result.put("state",1);
             result.put("msg","修改成功");
