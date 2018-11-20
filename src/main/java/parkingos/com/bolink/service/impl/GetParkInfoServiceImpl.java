@@ -177,7 +177,7 @@ public class GetParkInfoServiceImpl implements GetParkInfoService {
         long tday = calendar.getTimeInMillis() / 1000;
         //获取车场空车位
         int parkEmpty = parkInfoMapper.getParkEmpty(comid);
-        //获取车场今天新建月卡会员
+        //获取车场今天新建月卡会员  (现在是车场全部)
         int monthTotal = parkInfoMapper.getMonthTotal(comid,tday);
         //获取今天的优惠券下发数量
         int ticketCount = parkInfoMapper.getTicketCount(comid,tday);

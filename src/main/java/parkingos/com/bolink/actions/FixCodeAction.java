@@ -70,16 +70,25 @@ public class FixCodeAction {
             begin_time = sdf.format(d);
         }
 
+        String end_time = RequestUtil.processParams(request, "end_time");
+        if(!"".equals(end_time)) {
+            end_time = end_time.replace("Z", " UTC");//注意是空格+UTC
+            SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS Z");//注意格式化的表达式
+            Date d = format.parse(end_time);
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+            end_time = sdf.format(d);
+        }
+
         Long uin = RequestUtil.getLong(request,"loginuin",-1L);
         Integer validite_time = 24;
-        if(!Check.isNumber(validiteTime)){
-            result.put("state",0);
-            result.put("msg","请输入正确的有效期");
-            StringUtils.ajaxOutput(resp,result.toJSONString());
-            return null;
-        }else{
-            validite_time = Integer.parseInt(validiteTime);
-        }
+//        if(!Check.isNumber(validiteTime)){
+//            result.put("state",0);
+//            result.put("msg","请输入正确的有效期");
+//            StringUtils.ajaxOutput(resp,result.toJSONString());
+//            return null;
+//        }else{
+//            validite_time = Integer.parseInt(validiteTime);
+//        }
 
 
         //根据shopid获得该商户的用券单位
@@ -115,13 +124,24 @@ public class FixCodeAction {
         }
 
 
-
         Long btime = System.currentTimeMillis()/1000;
         if(!"".equals(begin_time)){
             btime=TimeTools.getLongMilliSecondFrom_HHMMDDHHmmss(begin_time);
         }
-        //截止有效时间
         Long etime =  btime + validite_time*60*60;
+        if(!"".equals(end_time)){
+            etime=TimeTools.getLongMilliSecondFrom_HHMMDDHHmmss(end_time);
+        }
+
+
+        if(btime>=etime){
+            result.put("state",0);
+            result.put("msg","有效期错误!");
+            StringUtils.ajaxOutput(resp,result.toJSONString());
+            return null;
+        }
+        //截止有效时间
+
         Long id = fixCodeService.getId();
         Long ids[] = new Long[]{id};
         String[] code = StringUtils.getGRCode(ids);

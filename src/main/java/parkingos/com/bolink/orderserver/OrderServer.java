@@ -733,7 +733,10 @@ public class OrderServer extends BaseServer {
             logger.error("server is down!!");
             return 0;
         }
-        return u.getCount();
+        if(u!=null){
+            return u.getCount();
+        }
+        return 0;
     }
 
     public int getExitCountbc(long tday, int comid, String tableName) {
@@ -756,7 +759,10 @@ public class OrderServer extends BaseServer {
             logger.error("server is down!!");
             return 0;
         }
-        return u.getCount();
+        if(u!=null){
+            return u.getCount();
+        }
+        return 0;
     }
 
     public int getInparkCountbc(long tday, int comid, String tableName) {
@@ -779,6 +785,9 @@ public class OrderServer extends BaseServer {
             logger.error("server is down!!");
             return 0;
         }
-        return u.getCount();
+        if(u!=null){
+            return u.getCount();
+        }
+        return 0;
     }
 }

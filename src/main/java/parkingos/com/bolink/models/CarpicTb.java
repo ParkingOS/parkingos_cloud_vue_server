@@ -33,6 +33,14 @@ public class CarpicTb {
 
     private String confirmpicTableName;
 
+    private String inOrderPic;
+
+    private String outOrderPic;
+
+    private String liftrodPic;
+
+    private String confirmPic;
+
     public Integer getId() {
         return id;
     }
@@ -159,5 +167,37 @@ public class CarpicTb {
 
     public void setConfirmpicTableName(String confirmpicTableName) {
         this.confirmpicTableName = confirmpicTableName == null ? null : confirmpicTableName.trim();
+    }
+
+    public String getInOrderPic() {
+        return inOrderPic;
+    }
+
+    public void setInOrderPic(String inOrderPic) {
+        this.inOrderPic = inOrderPic;
+    }
+
+    public String getOutOrderPic() {
+        return outOrderPic;
+    }
+
+    public void setOutOrderPic(String outOrderPic) {
+        this.outOrderPic = outOrderPic;
+    }
+
+    public String getLiftrodPic() {
+        return liftrodPic;
+    }
+
+    public void setLiftrodPic(String liftrodPic) {
+        this.liftrodPic = liftrodPic;
+    }
+
+    public String getConfirmPic() {
+        return confirmPic;
+    }
+
+    public void setConfirmPic(String confirmPic) {
+        this.confirmPic = confirmPic;
     }
 }

@@ -62,7 +62,7 @@ public class OrderManagerAction {
 //        if(id!=-1){
 //            comid = orderService.getComidByOrder(id);
 //        }
-        logger.error("==========>>>>获取图片..orderid..comid==>" + orderid+"==>"+comid);
+//        logger.error("==========>>>>获取图片..orderid..comid==>" + orderid+"==>"+comid);
         JSONObject result = orderService.getPicResult(orderid, comid);
         StringUtils.ajaxOutput(resp, result.toJSONString());
         return null;
@@ -74,20 +74,20 @@ public class OrderManagerAction {
         Long comid = RequestUtil.getLong(request, "comid", -1L);
         String type = RequestUtil.getString(request, "typeNew");
         Integer currentnum = RequestUtil.getInteger(request,"currentnum",-1);
-        byte[] content = orderService.getCarPics(orderid,comid,type,currentnum);
-        if(content.length==0){
-            response.sendRedirect("http://sysimages.tq.cn/images/webchat_101001/common/kefu.png");
-            return null;
-        }else{
-            response.setDateHeader("Expires", System.currentTimeMillis()+12*60*60*1000);
-            response.setContentLength(content.length);
-            response.setContentType("image/jpeg");
-            OutputStream o = response.getOutputStream();
-            o.write(content);
-            o.flush();
-            o.close();
-            System.out.println("mongdb over.....");
-        }
+        orderService.getCarPics(orderid,comid,type,response);
+//        if(content.length==0){
+//            response.sendRedirect("http://sysimages.tq.cn/images/webchat_101001/common/kefu.png");
+//            return null;
+//        }else{
+//            response.setDateHeader("Expires", System.currentTimeMillis()+12*60*60*1000);
+//            response.setContentLength(content.length);
+//            response.setContentType("image/jpeg");
+//            OutputStream o = response.getOutputStream();
+//            o.write(content);
+//            o.flush();
+//            o.close();
+//            System.out.println("mongdb over.....");
+//        }
         return null;
     }
 

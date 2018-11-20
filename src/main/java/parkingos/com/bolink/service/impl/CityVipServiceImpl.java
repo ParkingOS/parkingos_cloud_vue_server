@@ -69,12 +69,13 @@ public class CityVipServiceImpl implements CityVipService {
         if(searchMap!=null&&!searchMap.isEmpty()){
             CarowerProduct baseQuery =(CarowerProduct)searchMap.get("base");
             List<SearchBean> supperQuery = null;
-            if(searchMap.containsKey("supper"))
-                supperQuery = (List<SearchBean>)searchMap.get("supper");
+            if(searchMap.containsKey("supper")) {
+                supperQuery = (List<SearchBean>) searchMap.get("supper");
+            }
             PageOrderConfig config = null;
-            if(searchMap.containsKey("config"))
-                config = (PageOrderConfig)searchMap.get("config");
-
+            if(searchMap.containsKey("config")) {
+                config = (PageOrderConfig) searchMap.get("config");
+            }
             List parks =new ArrayList();
 
             if(groupid !=null&&!"".equals(groupid)){
@@ -278,8 +279,6 @@ public class CityVipServiceImpl implements CityVipService {
             }
         }
         System.out.println("====上传月卡会员:"+filename);
-//        System.out.println("====上传月卡会员:"+is);
-
 
         if(is!=null&&filename!=null){
             List<Object[]> syncValues = new ArrayList<>();
@@ -362,8 +361,6 @@ public class CityVipServiceImpl implements CityVipService {
 
                             comInfoTb.setState(0);
                             int count = commonDao.selectCountByConditions(comInfoTb,searchBeanList);
-                            System.out.println("============comid:"+comid);
-                            System.out.println("============count:"+count);
                             if(count<1){
                                 errmsg+=i+"行，车场编号不存在或者不可用："+comid;
                                 isValid = false;
@@ -381,6 +378,7 @@ public class CityVipServiceImpl implements CityVipService {
                                 CarowerProduct carowerProduct = new CarowerProduct();
                                 carowerProduct.setComId(comid);
                                 carowerProduct.setCarNumber(car_number);
+                                carowerProduct.setIsDelete(0L);
                                 int count = commonDao.selectCountByConditions(carowerProduct);//daService.getLong("select count(id) from carower_product where com_id =? and car_number=?  ",new Object[]{comid,car_number});
                                 if(count>0){
                                     //errmsg+=i+"行，数据已存在：(车场-车牌)"+comid+"-"+car_number;
@@ -394,31 +392,34 @@ public class CityVipServiceImpl implements CityVipService {
                         if(isValid){
                             newdatas.add(o);//加入到插入数据中
                         }
-                        if(!Check.isEmpty(errmsg)&&!errmsg.endsWith("</br>"))
-                            errmsg+="</br>";
+                        if(!Check.isEmpty(errmsg)&&!errmsg.endsWith("</br>")) {
+                            errmsg += "</br>";
+                        }
                     }
                     i++;
                 }
-                if(!newdatas.isEmpty())//处理插入数据
-                    for(Object[] v : newdatas){
+                if(!newdatas.isEmpty()) {//处理插入数据
+                    for (Object[] v : newdatas) {
                         System.out.println(StringUtils.objArry2String(v));
                         //System.out.println(v.length);
-                        Long comid =Long.valueOf(v[0]+"");
+                        Long comid = Long.valueOf(v[0] + "");
                         Long btime = ntime;
-                        if(!Check.isEmpty(v[1]+"")){
-                            btime = TimeTools.getLongMilliSecondFrom_HHMMDD(v[1]+"")/1000;
+                        if (!Check.isEmpty(v[1] + "")) {
+                            btime = TimeTools.getLongMilliSecondFrom_HHMMDD(v[1] + "") / 1000;
                         }
                         Long etime = ntime;
-                        if(!Check.isEmpty(v[2]+""))
-                            etime = TimeTools.getLongMilliSecondFrom_HHMMDD(v[2]+"")/1000+86399;
+                        if (!Check.isEmpty(v[2] + "")) {
+                            etime = TimeTools.getLongMilliSecondFrom_HHMMDD(v[2] + "") / 1000 + 86399;
+                        }
                         Double total = StringUtils.formatDouble(v[5]);
                         Long id = commonDao.selectSequence(CarowerProduct.class);//daService.getkey("seq_carower_product");
-                        Object[] va = new Object[]{id,comid,System.currentTimeMillis()/1000,btime,etime,v[3],v[4],total,v[7],id+"",v[6]};
+                        Object[] va = new Object[]{id, comid, System.currentTimeMillis() / 1000, btime, etime, v[3], v[4], total, v[7], id + "", v[6]};
                         insertValues.add(va);
-                        Object[] syncVa = new Object[]{comid,"carower_product",id,ntime,0};
+                        Object[] syncVa = new Object[]{comid, "carower_product", id, ntime, 0};
                         syncValues.add(syncVa);
 
                     }
+                }
                 if(!updateDatas.isEmpty()){//处理更新数据
                     for(Object[] o : updateDatas){
                         System.out.println(StringUtils.objArry2String(o));
@@ -436,6 +437,7 @@ public class CityVipServiceImpl implements CityVipService {
                         CarowerProduct carowerProduct = new CarowerProduct();
                         carowerProduct.setComId(comid);
                         carowerProduct.setCarNumber(o[7]+"");
+                        carowerProduct.setIsDelete(0L);
                         carowerProduct = (CarowerProduct) commonDao.selectObjectByConditions(carowerProduct);
 
                         Object[] syncVa = new Object[]{comid,"carower_product",carowerProduct.getId(),ntime,1};
@@ -489,6 +491,7 @@ public class CityVipServiceImpl implements CityVipService {
                     fields.setMobile((String)arr[7]);
                     conditions.setComId((Long)arr[5]);
                     conditions.setCarNumber((String)arr[6]);
+                    conditions.setIsDelete(0L);
                     r += commonDao.updateByConditions(fields,conditions);
 
                     ParkLogTb parkLogTb = new ParkLogTb();

@@ -22,6 +22,8 @@ import parkingos.com.bolink.service.OrderService;
 import parkingos.com.bolink.service.SupperSearchService;
 import parkingos.com.bolink.utils.*;
 
+import javax.servlet.http.HttpServletResponse;
+import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -154,98 +156,57 @@ public class OrderServiceImpl implements OrderService {
         String str = "{\"in\":[],\"out\":[]}";
         JSONObject result = JSONObject.parseObject(str);
 
-        Long groupId = orderMapper.getGroupIdByComId(comid);
-        Long cityid = -1L;
-        if(groupId!=null&&groupId>-1){
-            cityid = orderMapper.getCityIdByGroupId(groupId);
-        }else {
-            cityid = orderMapper.getCityIdByComId(comid);
-        }
+//        Long groupId = orderMapper.getGroupIdByComId(comid);
+//        Long cityid = -1L;
+//        if(groupId!=null&&groupId>-1){
+//            cityid = orderMapper.getCityIdByGroupId(groupId);
+//        }else {
+//            cityid = orderMapper.getCityIdByComId(comid);
+//        }
 
         DB db = MongoClientFactory.getInstance().getMongoDBBuilder("zld");
-        //根据订单编号查询出mongodb中存入的对应个表名
-        //Map map = daService.getMap("select * from order_tb where order_id_local=? and comid=?", new Object[]{orderid,comid});
-//        OrderTb orderTb = new OrderTb();
-//        orderTb.setOrderIdLocal(orderid + "");
-//        orderTb.setComid(comid);
-//        orderTb = (OrderTb) commonDao.selectObjectByConditions(orderTb);
-
-//        Calendar calendar = Calendar.getInstance();
-//        //获得当前时间的月份，月份从0开始所以结果要加1
-//        int month = calendar.get(Calendar.MONTH) + 1;
-//        logger.info("这是今年的" + month);
-//        String monthStr = "";
-//        if (month < 10) {
-//            monthStr = "0" + month;
-//        } else {
-//            monthStr = month + "";
-//        }
-//        String sql = "select * from order_tb_2018_" + monthStr + " where comid=" + comid + " and ishd = 0" + " and order_id_local = '" + orderid + "'";
-//        List<Map<String, Object>> list = commonDao.getObjectBySql(sql);
-//        if (list == null || list.isEmpty()) {
-//            month = month - 1;
-//            if (month < 10) {
-//                monthStr = "0" + month;
-//            } else {
-//                monthStr = month + "";
-//            }
-//            sql = "select * from order_tb_2018_" + monthStr + " where comid=" + comid + " and ishd = 0" + " and order_id_local = '" + orderid + "'";
-//            logger.info("==============sql2" + sql);
-//            list = commonDao.getObjectBySql(sql);
-//        }
-
-
         String collectionName = "";
-//        if (orderTb != null && orderTb.getCarpicTableName() != null) {
-//            collectionName = orderTb.getCarpicTableName();
+//        String tableName = "";
+//        if(cityid!=null&&cityid>-1){
+//            tableName = "order_tb_new_"+cityid%100;
+//        }else{
+//            tableName="order_tb_new";
 //        }
-        String tableName = "";
-        if(cityid!=null&&cityid>-1){
-            tableName = "order_tb_new_"+cityid%100;
-        }else{
-            tableName="order_tb_new";
-        }
-        List<OrderTb> list = orderServer.qryOrdersByComidAndOrderId(comid,orderid,tableName);
-//        List<Map<String, Object>> list = orderMapper.qryOrdersByComidAndOrderId(comid,orderid,tableName);
-        if (list != null && list.size() > 0) {
-//            if (list.get(0).get("carpic_table_name") != null) {
-//                collectionName = list.get(0).get("carpic_table_name") + "";
+//        List<OrderTb> list = orderServer.qryOrdersByComidAndOrderId(comid,orderid,tableName);
+//        if (list != null && list.size() > 0) {
+//            if (list.get(0).getCarpicTableName() != null) {
+//                collectionName = list.get(0).getCarpicTableName();
 //            }
-            if (list.get(0).getCarpicTableName() != null) {
-                collectionName = list.get(0).getCarpicTableName();
-            }
-        }
+//        }
 
-        logger.error("====>>获得订单图片..collectionName" + collectionName);
 //        DBCollection collection = db.getCollection("collectionName");
-        DBCollection collection = db.getCollection(collectionName);
-        logger.error("======>>>>.获取订单图片...collection" + collection);
+//        DBCollection collection = db.getCollection(collectionName);
 
         List<String> inlist = new ArrayList<>();
         List<String> outlist = new ArrayList<>();
-        inlist.add("/order/carpicsup?comid=" + comid + "&typeNew=in&orderid=" + orderid);
-        outlist.add("/order/carpicsup?comid=" + comid + "&typeNew=out&orderid=" + orderid);
-        logger.error("=======>>>获取订单图片..inlist..outlist" + inlist.size() + "==>>" + outlist.size());
-        if (collection != null) {
-            BasicDBObject document = new BasicDBObject();
-            document.put("parkid", String.valueOf(comid));
-            document.put("orderid", orderid + "");
-            document.put("gate", "in");
-            Long insize = collection.count(document);
-            document.put("gate", "out");
-            Long outsize = collection.count(document);
-
-            if (insize > 1) {
-                for (int i = 0; i < insize; i++) {
-                    inlist.add("/order/carpicsup?comid=" + comid + "&typeNew=in&currentnum=" + i + "&orderid=" + orderid);
-                }
-            }
-            if (outsize > 1) {
-                for (int i = 0; i < outsize; i++) {
-                    outlist.add("/order/carpicsup?comid=" + comid + "&typeNew=out&currentnum=" + i + "&orderid=" + orderid);
-                }
-            }
-        }
+        inlist.add("/order/carpicsup?comid=" + comid + "&typeNew=in&orderid=" + orderid+"&timestemp="+System.currentTimeMillis());
+        outlist.add("/order/carpicsup?comid=" + comid + "&typeNew=out&orderid=" + orderid+"&timestemp="+System.currentTimeMillis());
+//        logger.error("=======>>>获取订单图片..inlist..outlist" + inlist.size() + "==>>" + outlist.size());
+//        if (collection != null) {
+//            BasicDBObject document = new BasicDBObject();
+//            document.put("parkid", String.valueOf(comid));
+//            document.put("orderid", orderid + "");
+//            document.put("gate", "in");
+//            Long insize = collection.count(document);
+//            document.put("gate", "out");
+//            Long outsize = collection.count(document);
+//
+//            if (insize > 1) {
+//                for (int i = 0; i < insize; i++) {
+//                    inlist.add("/order/carpicsup?comid=" + comid + "&typeNew=in&currentnum=" + i + "&orderid=" + orderid);
+//                }
+//            }
+//            if (outsize > 1) {
+//                for (int i = 0; i < outsize; i++) {
+//                    outlist.add("/order/carpicsup?comid=" + comid + "&typeNew=out&currentnum=" + i + "&orderid=" + orderid);
+//                }
+//            }
+//        }
 
         result.put("in", JSON.toJSON(inlist));
         result.put("out", JSON.toJSON(outlist));
@@ -253,10 +214,10 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
-    public byte[] getCarPics(String orderid, Long comid, String type, Integer currentnum) {
-        logger.error("getcarPic from mongodb file:orderid=" + orderid + "type=" + type + ",comid:" + comid + ",currentnum=" + currentnum);
+    public String getCarPics(String orderid, Long comid, String type, HttpServletResponse response) throws Exception{
+        logger.error("getcarPic from mongodb file:orderid=" + orderid + "type=" + type + ",comid:" + comid);
         if (orderid != null && type != null) {
-            DB db = MongoClientFactory.getInstance().getMongoDBBuilder("zld");//
+
             //根据订单编号查询出mongodb中存入的对应个表名
             //Map map = daService.getMap("select * from carpic_tb where order_id=? and comid=?", new Object[]{orderidlocal,String.valueOf(comid)});
             CarpicTb carpicTb = new CarpicTb();
@@ -265,14 +226,28 @@ public class OrderServiceImpl implements OrderService {
             carpicTb = (CarpicTb) commonDao.selectObjectByConditions(carpicTb);
 
             String collectionName = "";
-            if (carpicTb != null && carpicTb.getCarpicTableName() != null) {
+            String picUrl = "";
+            if (carpicTb != null) {
+                if("in".equals(type)){
+                    if(!Check.isEmpty(carpicTb.getInOrderPic())){
+                        picUrl = carpicTb.getInOrderPic();
+                        response.sendRedirect(picUrl);
+                        return null;
+                    }
+                }else{
+                    if(!Check.isEmpty(carpicTb.getOutOrderPic())){
+                        picUrl = carpicTb.getOutOrderPic();
+                        response.sendRedirect(picUrl);
+                        return null;
+                    }
+                }
                 collectionName = carpicTb.getCarpicTableName();
             }
-
-            logger.error("table:" + collectionName);
+            DB db = MongoClientFactory.getInstance().getMongoDBBuilder("zld");
             if (collectionName == null || "".equals(collectionName) || "null".equals(collectionName)) {
                 logger.error(">>>>>>>>>>>>>查询图片错误........");
-                return new byte[0];
+                response.sendRedirect("http://sysimages.tq.cn/images/webchat_101001/common/kefu.png");
+                return null;
             }
 
             DBCollection collection = db.getCollection(collectionName);
@@ -281,28 +256,30 @@ public class OrderServiceImpl implements OrderService {
                 document.put("parkid", String.valueOf(comid));
                 document.put("orderid", orderid + "");
                 document.put("gate", type);
-                if (currentnum >= 0) {
-                    document.put("currentnum", currentnum);
-                }
                 DBObject obj = collection.findOne(document);
                 if (obj == null) {
-                    logger.error("取图片错误.....");
-                    return new byte[0];
+                    response.sendRedirect("http://sysimages.tq.cn/images/webchat_101001/common/kefu.png");
+                    return null;
                 }
                 byte[] content = (byte[]) obj.get("content");
                 db.requestDone();
                 logger.error("取图片成功.....大小:" + content.length);
-                System.out.println("mongdb over.....");
-                return content;
-
+                response.setDateHeader("Expires", System.currentTimeMillis()+12*60*60*1000);
+                response.setContentLength(content.length);
+                response.setContentType("image/jpeg");
+                OutputStream o = response.getOutputStream();
+                o.write(content);
+                o.flush();
+                o.close();
             } else {
-                return new byte[0];
-//                response.sendRedirect("http://sysimages.tq.cn/images/webchat_101001/common/kefu.png");
+                response.sendRedirect("http://sysimages.tq.cn/images/webchat_101001/common/kefu.png");
+                return null;
             }
         } else {
-            return new byte[0];
-//            response.sendRedirect("http://sysimages.tq.cn/images/webchat_101001/common/kefu.png");
+            response.sendRedirect("http://sysimages.tq.cn/images/webchat_101001/common/kefu.png");
+            return null;
         }
+        return null;
     }
 
     @Override

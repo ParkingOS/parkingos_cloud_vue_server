@@ -80,6 +80,9 @@ public class EquipmentManageMonitorAction {
 		monitorInfoTb.setState(1);
 
 		String result = equipmentManageMonitorService.insertResultByConditions(monitorInfoTb).toString();
+		JSONObject jsonResult = new JSONObject();
+		jsonResult.put("state",0);
+		jsonResult.put("msg","添加失败");
 		if("1".equals(result)){
 			ParkLogTb parkLogTb = new ParkLogTb();
 			parkLogTb.setOperateUser(nickname);
@@ -89,9 +92,11 @@ public class EquipmentManageMonitorAction {
 			parkLogTb.setType("equipment");
 			parkLogTb.setParkId(comid);
 			saveLogService.saveLog(parkLogTb);
+			jsonResult.put("state",1);
+			jsonResult.put("msg","添加成功");
 		}
 
-		StringUtils.ajaxOutput(response,result);
+		StringUtils.ajaxOutput(response,jsonResult.toJSONString());
 
 		return null;
 	}
@@ -130,6 +135,9 @@ public class EquipmentManageMonitorAction {
 		monitorInfoTb.setComid(comid+"");
 
 		String result = equipmentManageMonitorService.updateResultByConditions(monitorInfoTb).toString();
+		JSONObject jsonResult = new JSONObject();
+		jsonResult.put("state",0);
+		jsonResult.put("msg","编辑失败");
 		if("1".equals(result)){
 			ParkLogTb parkLogTb = new ParkLogTb();
 			parkLogTb.setOperateUser(nickname);
@@ -139,9 +147,11 @@ public class EquipmentManageMonitorAction {
 			parkLogTb.setType("equipment");
 			parkLogTb.setParkId(comid);
 			saveLogService.saveLog(parkLogTb);
+			jsonResult.put("state",1);
+			jsonResult.put("msg","编辑成功");
 		}
 
-		StringUtils.ajaxOutput(response,result);
+		StringUtils.ajaxOutput(response,jsonResult.toJSONString());
 
 		return null;
 	}
@@ -165,7 +175,9 @@ public class EquipmentManageMonitorAction {
 		monitorInfoTb.setState(0);
 
 		String result = equipmentManageMonitorService.removeResultByConditions(monitorInfoTb).toString();
-
+		JSONObject jsonResult = new JSONObject();
+		jsonResult.put("state",0);
+		jsonResult.put("msg","删除失败");
 		if("1".equals(result)){
 			ParkLogTb parkLogTb = new ParkLogTb();
 			parkLogTb.setOperateUser(nickname);
@@ -175,9 +187,10 @@ public class EquipmentManageMonitorAction {
 			parkLogTb.setType("equipment");
 			parkLogTb.setParkId(comid);
 			saveLogService.saveLog(parkLogTb);
+			jsonResult.put("state",1);
+			jsonResult.put("msg","删除成功");
 		}
-
-		StringUtils.ajaxOutput(response,result);
+		StringUtils.ajaxOutput(response,jsonResult.toJSONString());
 		return null;
 	}
 

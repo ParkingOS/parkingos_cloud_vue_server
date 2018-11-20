@@ -191,17 +191,18 @@ public class CityParkServiceImpl implements CityParkService {
                 return result;
             }
 
-            if (Check.isNumber(bolinkid)) {
-                //验证填写的泊链编号在yun是不是重复
-                Long comid = Long.parseLong(bolinkid);
-                ComInfoTb comInfoTb = new ComInfoTb();
-                comInfoTb.setId(comid);
-                int count = commonDao.selectCountByConditions(comInfoTb);
-                if (count > 0) {
-                    result.put("msg", "创建失败,云平台编号重复");
-                    return result;
-                }
-            }
+//            if (Check.isNumber(bolinkid)) {
+//                //验证填写的泊链编号在yun是不是重复
+//                Long comid = Long.parseLong(bolinkid);
+//                ComInfoTb comInfoTb = new ComInfoTb();
+//                comInfoTb.setId(comid);
+//                comInfoTb.setState(0);
+//                int count = commonDao.selectCountByConditions(comInfoTb);
+//                if (count > 0) {
+//                    result.put("msg", "创建失败,云平台编号重复");
+//                    return result;
+//                }
+//            }
         }
 
         Long id = RequestUtil.getLong(request, "id", -1L);
@@ -305,6 +306,8 @@ public class CityParkServiceImpl implements CityParkService {
 
             //判断车场是否要上传到泊链,如果没有写bolinkid,那么上传
             if (bolinkid == null || "".equals(bolinkid)) {
+
+                comInfoTb.setBolinkId(comid+"");
                 //查询他的厂商编号以及服务商编号 (查询有集团编号的)
 //                List<Map<String, Object>> unionInfoList = commonDao.getObjectBySql("select oc.union_id, oc.ukey union_key, og.operatorid operator_id from org_city_merchants oc " +
 //                        "left outer join org_group_tb og on oc.id = og.cityid " +

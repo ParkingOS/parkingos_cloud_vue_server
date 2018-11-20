@@ -10,7 +10,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import parkingos.com.bolink.models.ParkLogTb;
 import parkingos.com.bolink.service.LiftRodService;
 import parkingos.com.bolink.service.SaveLogService;
-import parkingos.com.bolink.utils.CustomDefind;
 import parkingos.com.bolink.utils.ExportDataExcel;
 import parkingos.com.bolink.utils.RequestUtil;
 import parkingos.com.bolink.utils.StringUtils;
@@ -56,22 +55,22 @@ public class LiftRodAction {
 //            comid = getComidByLift(Long.parseLong(id));
 //        }
 
-        byte[] content = liftRodService.getLiftRodPicture(comid, liftrodId);
+        liftRodService.getLiftRodPicture(comid, liftrodId,response);
 
-        if (content.length == 0) {
-            //测试用  之后读配置文件
-            response.sendRedirect(CustomDefind.IMAGEURL+"/images/nopic.jpg");
-//            response.sendRedirect("http://120.25.121.204:8080/cloud/images/nopic.jpg");
-            return null;
-        } else {
-            response.setDateHeader("Expires", System.currentTimeMillis() + 12 * 60 * 60 * 1000);
-            response.setContentLength(content.length);
-            response.setContentType("image/jpeg");
-            OutputStream o = response.getOutputStream();
-            o.write(content);
-            o.flush();
-            o.close();
-        }
+//        if (content.length == 0) {
+//            //测试用  之后读配置文件
+//            response.sendRedirect(CustomDefind.IMAGEURL+"/images/nopic.jpg");
+////            response.sendRedirect("http://120.25.121.204:8080/cloud/images/nopic.jpg");
+//            return null;
+//        } else {
+//            response.setDateHeader("Expires", System.currentTimeMillis() + 12 * 60 * 60 * 1000);
+//            response.setContentLength(content.length);
+//            response.setContentType("image/jpeg");
+//            OutputStream o = response.getOutputStream();
+//            o.write(content);
+//            o.flush();
+//            o.close();
+//        }
         return null;
     }
 

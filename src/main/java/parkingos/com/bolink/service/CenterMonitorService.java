@@ -9,7 +9,7 @@ public interface CenterMonitorService {
 
     public String getCenterMonitor(Long comid, Long groupid);
 
-    byte[]  getConfirmPic(String event_id, long comid, String car_number);
+    String  getConfirmPic(String event_id, long comid, String car_number, HttpServletResponse response) throws Exception;
 
     void matchConfirmPic(String event_id, long comid, String car_number,HttpServletRequest request,HttpServletResponse response);
 

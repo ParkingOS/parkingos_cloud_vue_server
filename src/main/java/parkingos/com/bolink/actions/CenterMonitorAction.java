@@ -13,9 +13,7 @@ import parkingos.com.bolink.utils.StringUtils;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.*;
 import java.net.URLDecoder;
-import java.util.Date;
 import java.util.Map;
 
 @Controller
@@ -43,51 +41,51 @@ public class CenterMonitorAction {
     * */
     @RequestMapping(value = "/getConfirmorder")
     public String getConfirmOrder(HttpServletRequest request, HttpServletResponse response) throws Exception {
-        System.out.println("进入获取单个图片的时间>>>>>>>>>>>" + new Date().getTime());
+        System.out.println("进入获取单个图片的时间>>>>>>>>>>>" + System.currentTimeMillis());
         String event_id = StringUtils.decodeUTF8(RequestUtil.getString(request, "event_id"));
         String car_number = StringUtils.decodeUTF8(RequestUtil.getString(request, "car_number"));
         String comid = StringUtils.decodeUTF8(RequestUtil.getString(request, "comid"));
 
         logger.error("获得指定的确认订单的图片" + event_id + "~~~" + car_number + "~~~" + comid);
 
-        byte[] content = centerMonitorService.getConfirmPic(event_id, Long.parseLong(comid), car_number);
-        System.out.println("出来获取单个图片的时间>>>>>>>>>>>" + new Date().getTime());
-        if (content.length == 0) {
-            response.sendRedirect("http://sysimages.tq.cn/images/webchat_101001/common/kefu.png");
+        centerMonitorService.getConfirmPic(event_id, Long.parseLong(comid), car_number,response);
+        System.out.println("出来获取单个图片的时间>>>>>>>>>>>" + System.currentTimeMillis());
+//        if (content.length == 0) {
+//            response.sendRedirect("http://sysimages.tq.cn/images/webchat_101001/common/kefu.png");
+//            return null;
+//        } else {
+//            try {
+//                String foldPath = request.getServletContext().getRealPath("/images/monitor/");
+//                File folder = new File(foldPath);
+//                if (!folder.exists() || !folder.isDirectory()) {
+//                    folder.mkdirs();
+//                }
+//                InputStream in = new ByteArrayInputStream(content);
+//                String filePath = request.getServletContext().getRealPath("/images/monitor/" + comid + "_" + event_id + "_" + car_number.substring(1) + ".jpg");
+//                File file = new File(filePath);//可以是任何图片格式.jpg,.png等
+//                FileOutputStream fos = new FileOutputStream(file);
+//                byte[] b = new byte[1024 * 8];
+//                int nRead = 0;
+//                while ((nRead = in.read(b)) != -1) {
+//                    fos.write(b, 0, nRead);
+//                }
+//                fos.flush();
+//                fos.close();
+//                in.close();
+//                response.setHeader("Content-type", "text/html;charset=UTF-8");
+//                PrintWriter out = response.getWriter();
+//                JSONObject retObj = new JSONObject();
+//                retObj.put("picName", comid + "_" + event_id + "_" + car_number.substring(1) + ".jpg");
+//                retObj.put("event_id", event_id);
+//                retObj.put("car_nmber", car_number);
+//                StringUtils.ajaxOutput(response, retObj.toJSONString());
+//            } catch (Exception e) {
+//                // TODO: handle exception
+//                logger.info(e.toString());
+//            }
+//            System.out.println("mongdb over.....");
             return null;
-        } else {
-            try {
-                String foldPath = request.getServletContext().getRealPath("/images/monitor/");
-                File folder = new File(foldPath);
-                if (!folder.exists() || !folder.isDirectory()) {
-                    folder.mkdirs();
-                }
-                InputStream in = new ByteArrayInputStream(content);
-                String filePath = request.getServletContext().getRealPath("/images/monitor/" + comid + "_" + event_id + "_" + car_number.substring(1) + ".jpg");
-                File file = new File(filePath);//可以是任何图片格式.jpg,.png等
-                FileOutputStream fos = new FileOutputStream(file);
-                byte[] b = new byte[1024 * 8];
-                int nRead = 0;
-                while ((nRead = in.read(b)) != -1) {
-                    fos.write(b, 0, nRead);
-                }
-                fos.flush();
-                fos.close();
-                in.close();
-                response.setHeader("Content-type", "text/html;charset=UTF-8");
-                PrintWriter out = response.getWriter();
-                JSONObject retObj = new JSONObject();
-                retObj.put("picName", comid + "_" + event_id + "_" + car_number.substring(1) + ".jpg");
-                retObj.put("event_id", event_id);
-                retObj.put("car_nmber", car_number);
-                StringUtils.ajaxOutput(response, retObj.toJSONString());
-            } catch (Exception e) {
-                // TODO: handle exception
-                logger.info(e.toString());
-            }
-            System.out.println("mongdb over.....");
-            return null;
-        }
+//        }
     }
 
     /*

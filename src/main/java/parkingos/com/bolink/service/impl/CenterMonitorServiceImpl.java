@@ -30,8 +30,6 @@ import parkingos.com.bolink.websocket.WebSocketServer;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.ByteArrayInputStream;
-import java.io.File;
-import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.net.InetAddress;
 import java.text.DecimalFormat;
@@ -260,21 +258,32 @@ public class CenterMonitorServiceImpl implements CenterMonitorService {
     }
 
     @Override
-    public byte[]  getConfirmPic(String eventId, long comid, String car_number) {
+    public String  getConfirmPic(String eventId, long comid, String car_number, HttpServletResponse response) throws Exception{
 
         logger.error("getConfirmPic from mongodb>>>>>>>>>eventId=" + eventId + ">>>>>>>comid=" + comid);
+        JSONObject retObj = new JSONObject();
         if (eventId != null) {
-            DB db = MongoClientFactory.getInstance().getMongoDBBuilder("zld");//
             //查询出mongodb中存入的对应个表名
             Map picMap = new HashMap();
             picMap = centerMonitorMapper.getPicMap(eventId,comid+"");
             String collectionName = "";
+            String picUrl ="";
             if (picMap != null && !picMap.isEmpty()) {
+                if(picMap.get("confirm_pic")!=null&&!"".equals(picMap.get("confirm_pic"))){
+                    picUrl=picMap.get("confirm_pic")+"";
+                    retObj.put("picName",picUrl);
+                    retObj.put("event_id", eventId);
+                    retObj.put("car_nmber", car_number);
+                    StringUtils.ajaxOutput(response, retObj.toJSONString());
+                    return null;
+                }
                 collectionName = (String) picMap.get("confirmpic_table_name");
             }
+            DB db = MongoClientFactory.getInstance().getMongoDBBuilder("zld");
             if (collectionName == null || "".equals(collectionName) || "null".equals(collectionName)) {
                 logger.error(">>>>>>>>>>>>>查询图片错误........");
-                return new byte[0];
+                response.sendRedirect("http://sysimages.tq.cn/images/webchat_101001/common/kefu.png");
+                return null;
             }
             logger.error("table:" + collectionName);
             DBCollection collection = db.getCollection(collectionName);
@@ -285,18 +294,27 @@ public class CenterMonitorServiceImpl implements CenterMonitorService {
                 DBObject obj = collection.findOne(document);
                 if (obj == null) {
                     logger.error("取图片错误.....");
-                    return new byte[0];
+                    response.sendRedirect("http://sysimages.tq.cn/images/webchat_101001/common/kefu.png");
+                    return null;
                 }
                 byte[] content = (byte[]) obj.get("content");
                 logger.error("取图片成功.....大小:" + content.length);
-                return content;
 
+                InputStream in = new ByteArrayInputStream(content);
+                picUrl= QiNiuFileUtil.upload(in);
+                retObj.put("picName",picUrl);
+                retObj.put("event_id", eventId);
+                retObj.put("car_nmber", car_number);
+                StringUtils.ajaxOutput(response, retObj.toJSONString());
             } else {
-                return new byte[0];
+                response.sendRedirect("http://sysimages.tq.cn/images/webchat_101001/common/kefu.png");
+                return null;
             }
         } else {
-            return new byte[0];
+            response.sendRedirect("http://sysimages.tq.cn/images/webchat_101001/common/kefu.png");
+            return null;
         }
+        return null;
     }
 
     @Override
@@ -318,14 +336,25 @@ public class CenterMonitorServiceImpl implements CenterMonitorService {
             }
             String orderid = orderTb.getOrderIdLocal();
             String car_number = orderTb.getCarNumber();
-            DB db = MongoClientFactory.getInstance().getMongoDBBuilder("zld");//
+
             //根据编号查询出mongodb中存入的对应个表
             Map map = centerMonitorMapper.matchPicMap(orderid,comid+"");
             String collectionName = "";
+            String picUrl = "";
             if (map != null && !map.isEmpty()) {
+                if(map.get("in_order_pic")!=null&&!"".equals(map.get("in_order_pic"))){
+                    picUrl=map.get("in_order_pic")+"";
+                    JSONObject jsonObject = new JSONObject();
+                    jsonObject.put("comid",comid);
+                    jsonObject.put("orderId", orderid);
+                    jsonObject.put("carNumber", car_number);
+                    jsonObject.put("picName", picUrl);
+                    jsonArray.add(jsonObject);
+                    continue;
+                }
                 collectionName = (String) map.get("carpic_table_name");
             }
-
+            DB db = MongoClientFactory.getInstance().getMongoDBBuilder("zld");
             if (collectionName == null || "".equals(collectionName) || "null".equals(collectionName)) {
                 logger.error(">>>>>>>>>>>>>根据车牌" + carNumber + "匹配到orderid" + orderid + "查询图片错误........");
                 continue;
@@ -344,33 +373,17 @@ public class CenterMonitorServiceImpl implements CenterMonitorService {
                     continue;
                 }
                 byte[] content = (byte[]) obj.get("content");
-                System.out.println("进入获取多个图片开始第" + (i + 1) + "次循环得到图片的时间>>>>>>>>>>>" + new Date().getTime());
+                System.out.println("进入获取多个图片开始第" + (i + 1) + "次循环得到图片的时间>>>>>>>>>>>" + System.currentTimeMillis());
                 logger.error(">>>>>>>>>>>>>根据车牌" + carNumber + "匹配到orderid" + orderid + "取图片成功.....大小:" + content.length);
                 db.requestDone();
                 try {
-                    String foldPath = request.getServletContext().getRealPath("/images/monitor/");
-                    File folder = new File(foldPath);
-                    if (!folder.exists() || !folder.isDirectory()) {
-                        folder.mkdirs();
-                    }
                     InputStream in = new ByteArrayInputStream(content);
-                    String filePath = request.getServletContext().getRealPath("/images/monitor/" + comid + "_" + orderid + ".jpg");
-                    File file = new File(filePath);//可以是任何图片格式.jpg,.png等
-                    FileOutputStream fos = new FileOutputStream(file);
-                    byte[] b = new byte[1024 * 8];
-                    int nRead = 0;
-                    while ((nRead = in.read(b)) != -1) {
-                        fos.write(b, 0, nRead);
-                    }
-                    fos.flush();
-                    fos.close();
-                    in.close();
-                    System.out.println("进入获取多个图片开始第" + (i + 1) + "次循环生成图片的时间>>>>>>>>>>>" + new Date().getTime());
+                    picUrl = QiNiuFileUtil.upload(in);
                     JSONObject jsonObject = new JSONObject();
                     jsonObject.put("comid",comid);
                     jsonObject.put("orderId", orderid);
                     jsonObject.put("carNumber", car_number);
-                    jsonObject.put("picName", comid + "_" + orderid + ".jpg");
+                    jsonObject.put("picName", picUrl);
                     jsonArray.add(jsonObject);
                 } catch (Exception e) {
                     // TODO: handle exception
@@ -379,7 +392,6 @@ public class CenterMonitorServiceImpl implements CenterMonitorService {
                 System.out.println("mongdb over.....");
             }
         }
-
         response.setHeader("Content-type", "text/html;charset=UTF-8");
         StringUtils.ajaxOutput(response, jsonArray.toString());
         return;

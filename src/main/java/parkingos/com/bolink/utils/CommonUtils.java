@@ -274,12 +274,13 @@ public class CommonUtils<T> {
         String result = "0";
         if (visitor != null ) {
             jsonSend.put("visitor_id", visitor.getId());
-            jsonSend.put("car_number", visitor.getCarNumber());//black.getBlackUuid());
-            jsonSend.put("begin_time", visitor.getBeginTime());//black.getCarNumber());
-            jsonSend.put("end_time", visitor.getEndTime());//black.getOperator());
-            jsonSend.put("mobile", visitor.getMobile());//black.getCtime());
-            jsonSend.put("remark", visitor.getRemark());//black.getRemark());
+            jsonSend.put("car_number", visitor.getCarNumber());
+            jsonSend.put("begin_time", visitor.getBeginTime());
+            jsonSend.put("end_time", visitor.getEndTime());
+            jsonSend.put("mobile", visitor.getMobile());
+            jsonSend.put("remark", visitor.getRemark());
             jsonSend.put("operate_type", operate);
+            jsonSend.put("park_id", getBolinkId(visitor.getComid()));
             jsonSend.put("state", visitor.getState());
         } else {
             logger.error(">>>>>>>>>>>>>没有查询到访客");
@@ -322,6 +323,7 @@ public class CommonUtils<T> {
             jsonSend.put("create_time", black.getCtime());//black.getCtime());
             jsonSend.put("resume", black.getRemark());//black.getRemark());
             jsonSend.put("operate_type", operate);
+            jsonSend.put("park_id", getBolinkId(black.getComid()));
         } else {
             logger.error(">>>>>>>>>>>>>没查到对应的需要下传的信息，可能是删除操作");
             return result;
@@ -369,6 +371,7 @@ public class CommonUtils<T> {
             jsonSend.put("start_time",renewTb.getStartTime());
             jsonSend.put("operate_type", operate);
             jsonSend.put("amount_pay",renewTb.getAmountPay());
+            jsonSend.put("park_id", getBolinkId(Long.parseLong(renewTb.getComid())));
         } else {
             logger.error(">>>>>>>>>>>>>没查到对应的需要下传的信息，可能是删除操作");
             return result;
@@ -409,6 +412,7 @@ public class CommonUtils<T> {
             jsonSend.put("sort",carTypeTb.getSort());
             jsonSend.put("update_time", carTypeTb.getUpdateTime());
             jsonSend.put("operate_type", operate);
+            jsonSend.put("park_id", getBolinkId(carTypeTb.getComid()));
         } else {
             logger.error(">>>>>>>>>>>>>没查到对应的需要下传的信息，可能是删除操作");
             return result;
@@ -458,6 +462,7 @@ public class CommonUtils<T> {
             jsonSend.put("name", userInfoTb.getNickname());
             jsonSend.put("create_time",userInfoTb.getRegTime());
             jsonSend.put("operate_type", operate);
+            jsonSend.put("park_id", getBolinkId(userInfoTb.getComid()));
         } else {
             logger.error(">>>>>>>>>>>>>没查到对应的需要下传的信息，可能是删除操作");
             return result;
@@ -507,6 +512,7 @@ public class CommonUtils<T> {
             jsonSend.put("update_time",packageTb.getUpdateTime());
             jsonSend.put("period",packageTb.getPeriod());
             jsonSend.put("operate_type", operate);
+            jsonSend.put("park_id", getBolinkId(packageTb.getComid()));
         } else {
             logger.error(">>>>>>>>>>>>>没查到对应的需要下传的信息，可能是删除操作");
             return result;
@@ -547,6 +553,7 @@ public class CommonUtils<T> {
             jsonSend.put("create_time",priceTb.getCreateTime());
             jsonSend.put("describe",priceTb.getDescribe());
             jsonSend.put("operate_type", operate);
+            jsonSend.put("park_id", getBolinkId(priceTb.getComid()));
         } else {
             logger.error(">>>>>>>>>>>>>没查到对应的需要下传的信息，可能是删除操作");
             return result;
@@ -604,6 +611,7 @@ public class CommonUtils<T> {
             jsonSend.put("p_lot",  product.getpLot()==null?"":product.getpLot());
             jsonSend.put("amount_receivable", StringUtils.formatDouble(product.getTotal()));
             jsonSend.put("operate_type", operate);
+            jsonSend.put("park_id", getBolinkId(product.getComId()));
             logger.error(">>>>>>>>>>>>>>>>>>>>>>>>>>传输的数据内容为：" + jsonSend);
         } else {
             logger.error(">>>>>>>>>>>>>没查到对应的需要下传的信息，可能是删除操作");
@@ -645,6 +653,7 @@ public class CommonUtils<T> {
             jsonSend.put("passtype",comPassTb.getPasstype());
             jsonSend.put("operate_type",operate);
             jsonSend.put("channel_id",comPassTb.getChannelId());//comPassTb.getparkTokenTb());
+            jsonSend.put("park_id", getBolinkId(comPassTb.getComid()));
 
         }else {
             logger.error(">>>>>>>>>>>>>没查到对应的需要下传的信息，可能是删除操作");
@@ -687,5 +696,15 @@ public class CommonUtils<T> {
         return id+"";
     }
 
+
+    private String getBolinkId(Long comid){
+        ComInfoTb con = new ComInfoTb();
+        con.setId(comid);
+        con = (ComInfoTb) commonDao.selectObjectByConditions(con);
+        if(con!=null&&con.getBolinkId()!=null&&!"".equals(con.getBolinkId())){
+            return con.getBolinkId();
+        }
+        return "";
+    }
 
 }

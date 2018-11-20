@@ -41,6 +41,33 @@ public class CarRenewServiceImpl implements CarRenewService {
 		//测试期间设置登录有效期为1小时
 		CardRenewTb cardRenewTb = new CardRenewTb();
 		cardRenewTb.setComid(reqmap.get("comid"));
+
+		String time_type = reqmap.get("time_type");
+		Integer timeType = 3;
+		if(Check.isNumber(time_type)){
+			timeType = Integer.parseInt(time_type);
+		}
+		if(reqmap.get("ctime")!=null) {
+			//开始时间
+			if (timeType == 1) {
+				reqmap.put("start_time", reqmap.get("ctime"));
+				reqmap.put("start_time_start", reqmap.get("ctime_start"));
+				reqmap.put("start_time_end", reqmap.get("ctime_end"));
+			}
+			//结束时间
+			if (timeType == 2) {
+				reqmap.put("limit_time", reqmap.get("ctime"));
+				reqmap.put("limit_time_start", reqmap.get("ctime_start"));
+				reqmap.put("limit_time_end", reqmap.get("ctime_end"));
+			}
+
+			if (timeType == 3) {
+				reqmap.put("pay_time", reqmap.get("ctime"));
+				reqmap.put("pay_time_start", reqmap.get("ctime_start"));
+				reqmap.put("pay_time_end", reqmap.get("ctime_end"));
+			}
+		}
+
 		JSONObject result = supperSearchService.supperSearch(cardRenewTb,reqmap);
 
 

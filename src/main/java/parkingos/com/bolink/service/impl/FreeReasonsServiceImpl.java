@@ -7,7 +7,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import parkingos.com.bolink.dao.spring.CommonDao;
 import parkingos.com.bolink.models.FreeReasonsTb;
-import parkingos.com.bolink.models.SyncInfoPoolTb;
 import parkingos.com.bolink.service.FreeReasonsService;
 import parkingos.com.bolink.service.SupperSearchService;
 
@@ -47,7 +46,7 @@ public class FreeReasonsServiceImpl implements FreeReasonsService {
             result.put("state",1);
             result.put("msg","添加成功");
             result.put("id",id);
-            insertSysn(freeReasonsTb,0);
+//            insertSysn(freeReasonsTb,0);
         }
         return result;
     }
@@ -68,7 +67,7 @@ public class FreeReasonsServiceImpl implements FreeReasonsService {
             if(res==1){
                 result.put("state",1);
                 result.put("msg","删除成功");
-                insertSysn(freeReasonsTb,2);
+//                insertSysn(freeReasonsTb,2);
             }
         }
         return result;
@@ -86,20 +85,20 @@ public class FreeReasonsServiceImpl implements FreeReasonsService {
         if(res==1){
             result.put("state",1);
             result.put("msg","更新成功");
-            insertSysn(freeReasonsTb,1);
+//            insertSysn(freeReasonsTb,1);
         }
 
         return result;
     }
 
-    private void insertSysn(FreeReasonsTb freeReasonsTb, Integer operater){
-        SyncInfoPoolTb syncInfoPoolTb = new SyncInfoPoolTb();
-        syncInfoPoolTb.setComid(freeReasonsTb.getComid());
-        syncInfoPoolTb.setTableId(freeReasonsTb.getId());
-        syncInfoPoolTb.setTableName("free_reasons_tb");
-        syncInfoPoolTb.setCreateTime(System.currentTimeMillis()/1000);
-        syncInfoPoolTb.setOperate(operater);
-        commonDao.insert(syncInfoPoolTb);
-    }
+//    private void insertSysn(FreeReasonsTb freeReasonsTb, Integer operater){
+//        SyncInfoPoolTb syncInfoPoolTb = new SyncInfoPoolTb();
+//        syncInfoPoolTb.setComid(freeReasonsTb.getComid());
+//        syncInfoPoolTb.setTableId(freeReasonsTb.getId());
+//        syncInfoPoolTb.setTableName("free_reasons_tb");
+//        syncInfoPoolTb.setCreateTime(System.currentTimeMillis()/1000);
+//        syncInfoPoolTb.setOperate(operater);
+//        commonDao.insert(syncInfoPoolTb);
+//    }
 
 }

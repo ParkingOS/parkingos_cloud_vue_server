@@ -16,11 +16,10 @@ import parkingos.com.bolink.models.LiftRodTb;
 import parkingos.com.bolink.models.UserInfoTb;
 import parkingos.com.bolink.service.LiftRodService;
 import parkingos.com.bolink.service.SupperSearchService;
-import parkingos.com.bolink.utils.CustomDefind;
-import parkingos.com.bolink.utils.MongoClientFactory;
-import parkingos.com.bolink.utils.OrmUtil;
-import parkingos.com.bolink.utils.TimeTools;
+import parkingos.com.bolink.utils.*;
 
+import javax.servlet.http.HttpServletResponse;
+import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -58,20 +57,29 @@ public class LiftRodServiceImpl implements LiftRodService {
     }
 
     @Override
-    public byte[] getLiftRodPicture(String comid, String liftrodId) {
+    public String getLiftRodPicture(String comid, String liftrodId,HttpServletResponse response) throws Exception{
         if(liftrodId!=null && comid !=null){
-            DB db = MongoClientFactory.getInstance().getMongoDBBuilder("zld");
+
             CarpicTb carpicTb = new CarpicTb();
             carpicTb.setLiftrodId(liftrodId);
             carpicTb.setComid(comid);
             carpicTb = (CarpicTb)commonDao.selectObjectByConditions(carpicTb);
+
             String collectionName = "";
-            if(carpicTb !=null && carpicTb.getLiftpicTableName()!=null){
+            String picUrl = "";
+            if(carpicTb !=null){
+                if(!Check.isEmpty(carpicTb.getLiftrodPic())){
+                    picUrl = carpicTb.getLiftrodPic();
+                    response.sendRedirect(picUrl);
+                    return null;
+                }
                 collectionName = carpicTb.getLiftpicTableName();
             }
+            DB db = MongoClientFactory.getInstance().getMongoDBBuilder("zld");
             if(collectionName==null||"".equals(collectionName)||"null".equals(collectionName)){
                 logger.error(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>没有查到对应的图片！"+liftrodId);
-                return new byte[0];
+                response.sendRedirect("http://sysimages.tq.cn/images/webchat_101001/common/kefu.png");
+                return null;
             }
             DBCollection collection = db.getCollection(collectionName);
             if(collection != null){
@@ -81,21 +89,31 @@ public class LiftRodServiceImpl implements LiftRodService {
                 DBObject obj  = collection.findOne(document);
                 if(obj == null){
                     logger.error("取图片错误.....");
-                    return new byte[0];
+                    response.sendRedirect("http://sysimages.tq.cn/images/webchat_101001/common/kefu.png");
+                    return null;
                 }
                 byte[] content = (byte[])obj.get("content");
                 logger.error("取图片成功.....大小:"+content.length);
                 db.requestDone();
                 System.out.println("mongdb over.....");
-                return content;
+                response.setDateHeader("Expires", System.currentTimeMillis() + 12 * 60 * 60 * 1000);
+                response.setContentLength(content.length);
+                response.setContentType("image/jpeg");
+                OutputStream o = response.getOutputStream();
+                o.write(content);
+                o.flush();
+                o.close();
             }else{
                 logger.error(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>没有查到对应的图片！"+liftrodId);
-                return new byte[0];
+                response.sendRedirect("http://sysimages.tq.cn/images/webchat_101001/common/kefu.png");
+                return null;
             }
         }else{
             logger.error(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>没有查到对应的图片！"+liftrodId);
-            return new byte[0];
+            response.sendRedirect("http://sysimages.tq.cn/images/webchat_101001/common/kefu.png");
+            return null;
         }
+        return null;
     }
 
     @Override

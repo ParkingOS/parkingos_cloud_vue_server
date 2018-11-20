@@ -13,6 +13,7 @@ import parkingos.com.bolink.service.OrderService;
 import parkingos.com.bolink.utils.Check;
 import parkingos.com.bolink.utils.OrmUtil;
 
+import javax.servlet.http.HttpServletResponse;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -109,8 +110,8 @@ public class OrderServiceMybatisImpl implements OrderService {
     }
 
     @Override
-    public byte[] getCarPics(String orderid, Long comid, String type, Integer currentnum) {
-        return new byte[0];
+    public String getCarPics(String orderid, Long comid, String type, HttpServletResponse response) {
+        return null;
     }
 
     @Override
