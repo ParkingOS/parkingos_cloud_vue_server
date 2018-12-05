@@ -11,6 +11,7 @@ import parkingos.com.bolink.service.LoginService;
 import parkingos.com.bolink.service.SaveLogService;
 import parkingos.com.bolink.utils.*;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -247,7 +248,7 @@ public class LoginServiceImpl implements LoginService {
             user.put("allauth", allAuthList);
 
             if (roleId == 0) {//总管理员拥有所有权限
-
+                user.put("name","总后台");
                // AuthTb authTb = new AuthTb();
                // authTb.setOid(userRoleTb.getOid());
                // authTb.setState(0);
@@ -381,6 +382,13 @@ public class LoginServiceImpl implements LoginService {
         parkLogTb.setType("login");
         saveLogService.saveLog(parkLogTb);
 
+
+        //更新用户最新登录时间
+        UserInfoTb con = new UserInfoTb();
+        con.setId(userInfoTb.getId());
+        con.setLogonTime(System.currentTimeMillis()/1000);
+        commonDao.updateByPrimaryKey(con);
+
         return result;
     }
 
@@ -431,8 +439,7 @@ public class LoginServiceImpl implements LoginService {
         //生成code,存库
         Long cTime = System.currentTimeMillis()/1000;
         Long code = Math.round(Math.random()*(9999-1000+1)+1000);
-        logger.error("reguser>>>生成验证码:"+code);
-        logger.error("验证码写入数据库");
+        logger.info("reguser>>>生成验证码:"+code);
         //存入数据库
         VerificationCodeTb verificationCodeTb = new VerificationCodeTb();
         verificationCodeTb.setMobile(mobile);
@@ -458,12 +465,15 @@ public class LoginServiceImpl implements LoginService {
             return result;
         }
 
-        //4.发送验证码【泊链联盟】
-        String content = CustomDefind.MESSAGESIGN+code+" (请完成验证,有效期5分钟),如非本人操作,请忽略本短信。";
+        //4.发送验证码
         try {
-            MessageUtils.sendMsg(mobile, content);
-            logger.error("reguser>>>验证码已发送:"+code);
-            result.put("state", 1);
+            String sendResult = AliMessageUtil.sendMessage(mobile,code+"");
+            if("1".equals(sendResult)){
+                logger.info("reguser>>>验证码已发送:"+code);
+                result.put("state", 1);
+            }else{
+                result.put("errmsg", "发送验证码失败!");
+            }
         } catch (Exception e) {
             logger.error(e.getMessage());
         }
@@ -518,5 +528,41 @@ public class LoginServiceImpl implements LoginService {
             result.put("state",1);
         }
         return result;
+    }
+
+    @Override
+    public String sendCode(String mobile, Long userid, String ticket, String randstr,String ip) {
+        /*
+        *   aid (必填)	2043299115
+            AppSecretKey (必填)	0ZDpi7hCP4sTt1HpdBhnUeA**
+            Ticket (必填)	验证码客户端验证回调的票据
+            Randstr (必填)	验证码客户端验证回调的随机串
+            UserIP (必填)	提交验证的用户的IP地址（eg: 10.127.10.2）
+        * */
+
+//        ticket="t020uTO_h0GZEKFfByfZmIX5C7I2se7Kso00hXvDzCsErEh8hqBceCjr_Tpa0vvwssoBgL1UrL2ENBMIu5DD_jWXcj0a65gdJHfwrnxSsPaHsTRuIXEPW4ljA**";
+//        randstr="@PIH";
+        JSONObject jsonData = new JSONObject();
+        jsonData.put("state",0);
+        String url="https://ssl.captcha.qq.com/ticket/verify?Ticket="+ticket+"&Randstr="+randstr+"&UserIP="+ip+"&aid=2043299115&AppSecretKey=0ZDpi7hCP4sTt1HpdBhnUeA**";
+        logger.info("进行发送验证码校验:"+url);
+
+        HttpProxy httpProxy = new HttpProxy();
+        String result = httpProxy.doGet(url);
+        logger.info("验证码校验结果:"+result);
+        JSONObject jsonResult = JSONObject.parseObject(result);
+        if("1".equals(jsonResult.get("response")+"")){
+            String sendUrl = "http://"+CustomDefind.getValue("DOMAIN")+"/cloud/user/reguser";
+            HttpProxy httpProxy1 = new HttpProxy();
+            Map<String,Object> map = new HashMap<>();
+            map.put("userid",userid);
+            map.put("mobile",mobile);
+            String codeResult = httpProxy1.doPostTwo(sendUrl,map);
+            logger.info("send code result:"+codeResult);
+            return codeResult;
+
+        }
+        jsonData.put("msg",result);
+        return jsonData.toString();
     }
 }

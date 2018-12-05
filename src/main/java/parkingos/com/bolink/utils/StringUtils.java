@@ -1156,7 +1156,7 @@ public class StringUtils {
 	}
 
 	/**
-	 * 生成减免劵code
+	 * 生成减免券code
 	 * @param ids
 	 * @return
 	 */

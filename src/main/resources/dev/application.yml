@@ -9,7 +9,7 @@ mybatis:
     mapUnderscoreToCamelCase: true
 logging:
   level:
-    com.zld.mapper: DEBUG
+    parkingos.com.bolink.dao.spring: DEBUG
 spring:
   cloud:
     consul:

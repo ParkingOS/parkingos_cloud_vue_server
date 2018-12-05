@@ -108,6 +108,9 @@ public class VipServiceImpl implements VipService {
         JSONObject result = JSONObject.parseObject(str);
 
         Long comid = RequestUtil.getLong(req, "comid", -1L);
+
+        String parkName = getParkName(comid);
+
         Long pid = RequestUtil.getLong(req, "p_name", -1L);
 
         Long carTypeId = RequestUtil.getLong(req, "car_type_id", -1L);
@@ -298,6 +301,9 @@ public class VipServiceImpl implements VipService {
             int ins = insertSysn(carowerProduct1, 0, comid);
             boolean issend1 = commonUtils.sendMessage(cardRenewTb,comid,renewId.longValue(),1);
             int reNew = insertCardSysn(cardRenewTb, 0, comid);
+
+            commonUtils.sendNotice(1,comid,carNumber,etime,months,mobile,parkName);
+
         }
 
         return result;
@@ -358,6 +364,9 @@ public class VipServiceImpl implements VipService {
                     result.put("msg", "修改车牌成功");
                     boolean issend1 = commonUtils.sendMessage(carowerProduct1,comid,id,2);
                     int r = insertSysn(carowerProduct1, 1, comid);
+
+//                    commonUtils.sendNotice(2,comid,carowerProduct.getCarNumber(),carowerProduct.geteTime(),0,carowerProduct.getMobile());
+
                     logger.error("parkadmin or admin:" + carowerProduct1 + " add comid:" + comid + " vipuser ,add sync ret:" + r);
                     String allSql = "select * from carower_product where car_number= '" + carNumberBefore + "' and com_id=" + comid + " and is_delete=0";
                     List<Map> list = commonDao.getObjectBySql(allSql);
@@ -395,6 +404,8 @@ public class VipServiceImpl implements VipService {
         JSONObject result = JSONObject.parseObject(str);
 
         Long comid = RequestUtil.getLong(req, "comid", -1L);
+
+        String parkName = getParkName(comid);
         Long pid = RequestUtil.getLong(req, "p_name", -1L);
         String name = StringUtils.decodeUTF8(RequestUtil.processParams(req, "name").trim());
         //起始时间
@@ -498,6 +509,7 @@ public class VipServiceImpl implements VipService {
                 if (ins != 1) {
                     logger.error("======>>>>插入同步表失败");
                 }
+                commonUtils.sendNotice(3,comid,carowerProduct.getCarNumber(),etime,months,carowerProduct.getMobile(),parkName);
             }
 
         } else {
@@ -640,7 +652,7 @@ public class VipServiceImpl implements VipService {
 
     @Override
     public JSONObject editVip(HttpServletRequest req) {
-        String str = "{\"state\":0,\"msg\":\"续费失败\"}";
+        String str = "{\"state\":0,\"msg\":\"编辑失败\"}";
         JSONObject result = JSONObject.parseObject(str);
 
         Long comid = RequestUtil.getLong(req, "comid", -1L);
@@ -672,34 +684,185 @@ public class VipServiceImpl implements VipService {
 
 
         Long id = RequestUtil.getLong(req, "id", -1L);
-
+        String carNumber = RequestUtil.getString(req,"car_number");
         Integer limit_day_type = RequestUtil.getInteger(req, "limit_day_type", 0);
-
 
 
         CarowerProduct carowerProduct = new CarowerProduct();
         carowerProduct.setId(id);
-        carowerProduct.setMobile(mobile);
-        carowerProduct.setpLot(pLot);
-        carowerProduct.setName(name);
-        carowerProduct.setLimitDayType(limit_day_type);
-        int ret = commonDao.updateByPrimaryKey(carowerProduct);
-        if (ret == 1) {
-            carowerProduct = (CarowerProduct) commonDao.selectObjectByConditions(carowerProduct);
-
-            result.put("state", 1);
-            result.put("msg", "续费成功");
-            //下发 更新月卡信息
-            boolean issend = commonUtils.sendMessage(carowerProduct,comid,id,2);
-            int ins = insertSysn(carowerProduct, 1, comid);
-
-            if (ins != 1) {
-                logger.error("======>>>>插入同步表失败");
-            }
-
-        } else {
-            logger.error("==>>>>没有这张月卡会员信息");
+        carowerProduct = (CarowerProduct) commonDao.selectObjectByConditions(carowerProduct);
+        String carNumberBefore = "";
+        if (carowerProduct != null) {
+            carNumberBefore = carowerProduct.getCarNumber();
+        }else{
+            logger.error("===>>>>没有该月卡");
+            return result;
         }
+        int ret = 0;
+        logger.info("=====>>>>>更改车牌carNumber" + carNumber+"~~"+carNumberBefore);
+        if (carNumber != null && !carNumber.equals("")) {
+            if (!carNumber.equals(carNumberBefore)) {
+
+                String parkName = getParkName(comid);
+
+                //对修改车牌的逻辑加一层校验，验证车牌是否有效
+                //添加修改月卡会员车牌时的车主编号
+                Long uin = -1L;
+                String[] carNumStrings = carNumber.split(",");
+                Long validuin = -1L;
+                logger.error("===========carNumStrings" + carNumStrings.length);
+                if (carNumStrings != null && carNumStrings.length > 0) {
+                    for (String strNum : carNumStrings) {
+                        strNum.toUpperCase();
+                        if (StringUtils.checkPlate(strNum)) {
+                            CarInfoTb carInfoTb = new CarInfoTb();
+                            carInfoTb.setCarNumber(strNum);
+                            carInfoTb = (CarInfoTb) commonDao.selectObjectByConditions(carInfoTb);
+                            if (carInfoTb != null && carInfoTb.getId() != null) {
+                                uin = carInfoTb.getUin();
+                            }
+                            if (uin > 0) {
+                                validuin = uin;
+                            }
+                        } else {
+                            result.put("msg", "车牌号有误");
+                            return result;
+                        }
+                    }
+                    uin = validuin;
+                }
+                CarowerProduct carowerProduct1 = new CarowerProduct();
+                if (id > 0 && carNumber.length() > 6) {
+                    carowerProduct1.setId(id);
+                    carowerProduct1.setCarNumber(carNumber.toUpperCase());
+                    carowerProduct1.setUin(uin);
+                    carowerProduct1.setMobile(mobile);
+                    carowerProduct1.setpLot(pLot);
+                    carowerProduct1.setName(name);
+                    carowerProduct1.setLimitDayType(limit_day_type);
+                    ret = commonDao.updateByPrimaryKey(carowerProduct1);
+                }
+                if (ret > 0) {
+                    result.put("state", 1);
+                    result.put("msg", "修改车牌成功");
+                    boolean issend1 = commonUtils.sendMessage(carowerProduct1,comid,id,2);
+                    int r = insertSysn(carowerProduct1, 1, comid);
+
+                    commonUtils.sendNotice(2,comid,carowerProduct1.getCarNumber(),carowerProduct.geteTime(),0,carowerProduct1.getMobile(),parkName);
+
+                    logger.error("parkadmin or admin:" + carowerProduct1 + " add comid:" + comid + " vipuser ,add sync ret:" + r);
+                    String allSql = "select * from carower_product where car_number= '" + carNumberBefore + "' and com_id=" + comid + " and is_delete=0";
+                    List<Map> list = commonDao.getObjectBySql(allSql);
+                    for (Iterator iterator = list.iterator(); iterator.hasNext(); ) {
+                        Map uinmap = (Map) iterator.next();
+                        Long idLong = Long.valueOf(String.valueOf(uinmap.get("id")));
+                        //根据查询出来对应的月卡会员id修改所有的车牌记录
+                        CarowerProduct carowerProduct2 = new CarowerProduct();
+                        carowerProduct2.setId(idLong);
+                        carowerProduct2.setCarNumber(carNumber);
+                        int ins = commonDao.updateByPrimaryKey(carowerProduct2);
+                        if (ins == 1) {
+                            boolean issend = commonUtils.sendMessage(carowerProduct2,comid,idLong,2);
+                            insertSysn(carowerProduct2, 1, comid);
+                            logger.error(">>>>>>>>>>>>>>新添加月卡会员修改记录id:" + idLong);
+                        }
+                    }
+                } else {
+                    logger.error(">>>>>>>>>>>>>>>>对应的月卡会员车牌编号未修改成功，id：" + id);
+                }
+            } else {
+                carowerProduct.setMobile(mobile);
+                carowerProduct.setpLot(pLot);
+                carowerProduct.setName(name);
+                carowerProduct.setLimitDayType(limit_day_type);
+                int update = commonDao.updateByPrimaryKey(carowerProduct);
+                if (update == 1) {
+                    carowerProduct = (CarowerProduct) commonDao.selectObjectByConditions(carowerProduct);
+
+                    result.put("state", 1);
+                    result.put("msg", "编辑成功");
+                    //下发 更新月卡信息
+                    boolean issend = commonUtils.sendMessage(carowerProduct,comid,id,2);
+                    int ins = insertSysn(carowerProduct, 1, comid);
+
+                    if (ins != 1) {
+                        logger.error("======>>>>插入同步表失败");
+                    }
+
+                } else {
+                    logger.error("==>>>>没有这张月卡会员信息");
+                }
+            }
+        } else {
+            result.put("msg", "修改车牌车牌不能为空");
+            return result;
+        }
+
+
+
+        return result;
+    }
+
+    private String getParkName(Long comid) {
+        ComInfoTb comInfoTb = new ComInfoTb();
+        comInfoTb.setId(comid);
+        comInfoTb=(ComInfoTb)commonDao.selectObjectByConditions(comInfoTb);
+        if(comInfoTb!=null){
+            return comInfoTb.getCompanyName();
+        }
+        return "";
+    }
+
+    @Override
+    public JSONObject messageSet(ParkMessageSet parkMessageSet) {
+        JSONObject result = new JSONObject();
+        ParkMessageSet con = new ParkMessageSet();
+        con.setParkId(parkMessageSet.getParkId());
+        int count = commonDao.selectCountByConditions(con);
+        int doUpdate =0;
+        if(count==0){
+            parkMessageSet.setCreateTime(System.currentTimeMillis()/1000);
+            doUpdate=commonDao.insert(parkMessageSet);
+        }else{
+            parkMessageSet.setUpdateTime(System.currentTimeMillis()/1000);
+            doUpdate=commonDao.updateByConditions(parkMessageSet,con);
+        }
+        result.put("state",doUpdate);
+        if(doUpdate==1){
+            result.put("msg","短信通知设置成功！");
+        }else{
+            result.put("msg","短信通知设置失败！");
+        }
+        return result;
+    }
+
+    @Override
+    public JSONObject getMessageSet(ParkMessageSet parkMessageSet) {
+
+        Long parkId = parkMessageSet.getParkId();
+        JSONObject result = new JSONObject();
+        result.put("state",1);
+
+        parkMessageSet = (ParkMessageSet)commonDao.selectObjectByConditions(parkMessageSet);
+        if(parkMessageSet!=null){
+            result.put("before_notice",parkMessageSet.getBeforeNotice());
+            result.put("send_freq",parkMessageSet.getSendFreq());
+            result.put("notice_switch",parkMessageSet.getNoticeSwitch());
+        }else{
+            result.put("before_notice",30);
+            result.put("send_freq",0);
+            result.put("notice_switch",1);
+        }
+
+        ShortMessageAccount shortMessageAccount = new ShortMessageAccount();
+        shortMessageAccount.setParkId(parkId);
+        shortMessageAccount=(ShortMessageAccount)commonDao.selectObjectByConditions(shortMessageAccount);
+        if(shortMessageAccount!=null){
+            result.put("message_count",shortMessageAccount.getCount());
+        }else{
+            result.put("message_count",0);
+        }
+
         return result;
     }
 

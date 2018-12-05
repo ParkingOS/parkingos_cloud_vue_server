@@ -14,4 +14,6 @@ public interface LoginService {
     JSONObject checkCode(String mobile, String code);
 
     JSONObject resetPwd(String passwd, Long userId);
+
+    String sendCode(String mobile, Long userid, String ticket, String randstr,String ip);
 }

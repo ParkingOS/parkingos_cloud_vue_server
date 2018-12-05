@@ -3,6 +3,7 @@ package parkingos.com.bolink.service;
 
 import com.alibaba.fastjson.JSONObject;
 import parkingos.com.bolink.models.CarowerProduct;
+import parkingos.com.bolink.models.ParkMessageSet;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.List;
@@ -26,4 +27,8 @@ public interface VipService {
     List<List<String>> exportExcel(Map<String, String> reqParameterMap);
 
     JSONObject editVip(HttpServletRequest req);
+
+    JSONObject messageSet(ParkMessageSet parkMessageSet);
+
+    JSONObject getMessageSet(ParkMessageSet parkMessageSet);
 }

@@ -27,6 +27,8 @@ public class FixCodeTb {
 
     private Integer usePwd;
 
+    private String timeInuse;
+
     public String getPassWord() {
         return passWord;
     }
@@ -179,5 +181,13 @@ public class FixCodeTb {
 
     public void setState(Integer state) {
         this.state = state;
+    }
+
+    public String getTimeInuse() {
+        return timeInuse;
+    }
+
+    public void setTimeInuse(String timeInuse) {
+        this.timeInuse = timeInuse;
     }
 }

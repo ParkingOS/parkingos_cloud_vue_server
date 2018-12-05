@@ -9,6 +9,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import parkingos.com.bolink.dao.spring.CommonDao;
 import parkingos.com.bolink.models.ParkLogTb;
+import parkingos.com.bolink.models.ParkMessageSet;
 import parkingos.com.bolink.service.SaveLogService;
 import parkingos.com.bolink.service.VipService;
 import parkingos.com.bolink.utils.ExportDataExcel;
@@ -75,7 +76,7 @@ public class VipManageAction {
         return null;
     }
 
-//    @ApiOperation(value="获取指定id用户详细信息", notes="根据user的id来获取用户详细信息")
+    //    @ApiOperation(value="获取指定id用户详细信息", notes="根据user的id来获取用户详细信息")
 //    @ApiImplicitParam(name = "id",value = "用户id", dataType = "String", paramType = "path")
     @RequestMapping(value = "/add")
     /**
@@ -205,6 +206,38 @@ public class VipManageAction {
         parkLogTb.setParkId(comid);
         saveLogService.saveLog(parkLogTb);
 
+        return null;
+    }
+
+    @RequestMapping(value = "tomessageset")
+    public String messageSet(HttpServletRequest request, HttpServletResponse response){
+        Long comid = RequestUtil.getLong(request,"comid",-1L);
+        //续费提前多少天通知
+        Integer beforeNotice = RequestUtil.getInteger(request,"before_notice",30);
+        //发送频率  0每天一条  1发送一次
+        Integer sendFreq = RequestUtil.getInteger(request,"send_freq",0);
+        //是否开启月卡购买通知，如果开启  那么不管客户哪次操作都会有消息下发  默认开启
+        Integer noticeSwitch = RequestUtil.getInteger(request,"notice_switch",1);
+        logger.info("begin message set:"+comid+"~~"+beforeNotice+"~~"+sendFreq+"~~"+noticeSwitch);
+        ParkMessageSet parkMessageSet = new ParkMessageSet();
+        parkMessageSet.setBeforeNotice(beforeNotice);
+        parkMessageSet.setNoticeSwitch(noticeSwitch);
+        parkMessageSet.setSendFreq(sendFreq);
+        parkMessageSet.setParkId(comid);
+        JSONObject result = vipService.messageSet(parkMessageSet);
+        StringUtils.ajaxOutput(response,result.toJSONString());
+        return null;
+    }
+
+
+
+    @RequestMapping(value = "getmessageset")
+    public String getMessageSet(HttpServletRequest request, HttpServletResponse response){
+        Long comid = RequestUtil.getLong(request,"comid",-1L);
+        ParkMessageSet parkMessageSet = new ParkMessageSet();
+        parkMessageSet.setParkId(comid);
+        JSONObject result = vipService.getMessageSet(parkMessageSet);
+        StringUtils.ajaxOutput(response,result.toJSONString());
         return null;
     }
 

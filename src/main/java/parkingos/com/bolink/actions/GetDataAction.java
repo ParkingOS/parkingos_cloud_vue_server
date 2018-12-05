@@ -230,4 +230,12 @@ public class GetDataAction {
         StringUtils.ajaxOutput(resp,result);
         return null;
     }
+
+    @RequestMapping(value = "/getmessageprice")
+    public String getmessageprice(HttpServletRequest request, HttpServletResponse resp){
+        String result = getDataService.getMessagePrice();
+        StringUtils.ajaxOutput(resp,result);
+        return null;
+    }
+
 }

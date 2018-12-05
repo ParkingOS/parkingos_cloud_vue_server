@@ -193,7 +193,7 @@ public class FixCodeServiceImpl implements FixCodeService {
                     }else{
                         Map<String,Object> retMap = ticketService.createTicket(shopid,amount,5,0,1,0,fixCodeTb.getUin());
                         if((int)retMap.get("result") == -1 || (int)retMap.get("result") == -2){
-                            logger.info("生成减免劵出错，用劵失败");
+                            logger.info("生成减免券出错，用券失败");
                             result.put("state",0);
                             result.put("error",retMap.get("error"));
                             return result;
@@ -218,7 +218,7 @@ public class FixCodeServiceImpl implements FixCodeService {
                     }else{
                         Map<String,Object> retMap = ticketService.createTicket(shopid,amount,3,0,1,0,fixCodeTb.getUin());
                         if((int)retMap.get("result") == -1 || (int)retMap.get("result") == -2){
-                            logger.info("生成减免劵出错，用劵失败");
+                            logger.info("生成减免券出错，用券失败");
                             result.put("state",0);
                             result.put("error",retMap.get("error"));
                             return result;
@@ -244,7 +244,7 @@ public class FixCodeServiceImpl implements FixCodeService {
                 }else{
                     Map<String,Object> retMap = ticketService.createTicket(shopid,0,4,0,1,0,fixCodeTb.getUin());
                     if((int)retMap.get("result") == -1 || (int)retMap.get("result") == -2){
-                        logger.info("生成减免劵出错，用劵失败");
+                        logger.info("生成减免券出错，用券失败");
                         result.put("state",0);
                         result.put("error",retMap.get("error"));
                         return result;

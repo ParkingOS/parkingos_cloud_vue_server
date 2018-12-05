@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import parkingos.com.bolink.dao.spring.CommonDao;
 import parkingos.com.bolink.models.ComInfoTb;
+import parkingos.com.bolink.models.MessagePriceTb;
 import parkingos.com.bolink.models.ProductPackageTb;
 import parkingos.com.bolink.models.UserInfoTb;
 import parkingos.com.bolink.service.GetDataService;
@@ -488,6 +489,13 @@ public class GetDataServiceImpl implements GetDataService {
         }
         result+="]";
         return result;
+    }
+
+    @Override
+    public String getMessagePrice() {
+        MessagePriceTb messagePriceTb = new MessagePriceTb();
+        List<MessagePriceTb> list =commonDao.selectListByConditions(messagePriceTb);
+        return JSONObject.toJSONString(list);
     }
 
     private List<Map<String, Object>> getcollectors(Long cityid){

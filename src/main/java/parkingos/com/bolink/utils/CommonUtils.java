@@ -16,6 +16,8 @@ import javax.net.ssl.X509TrustManager;
 import javax.security.cert.CertificateException;
 import javax.security.cert.X509Certificate;
 import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ExecutorService;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -671,7 +673,132 @@ public class CommonUtils<T> {
         return result;
     }
 
+    /*
+       *type 1新建月卡
+       *     2修改月卡车牌
+       *     3月卡续费
+       *
+       *     4月卡到期提醒
+       * */
+    public void sendNotice(Integer type,Long parkId,String carNumber,Long eTime,Integer month,String mobile,String parkName) {
+        logger.info("==>>>vip send notice:"+type+"~"+parkId+"~"+carNumber+"~"+eTime+"~"+month+"~"+mobile);
+        if(mobile==null||"".equals(mobile)){
+            logger.info("该车主没有可发送短信的手机号！");
+            return;
+        }
+        String date = "";
+        if(eTime!=null&&eTime>0){
+            date = TimeTools.secondsToDateStr(eTime);
+        }
+        ParkMessageSet parkMessageSet = new ParkMessageSet();
+        parkMessageSet.setParkId(parkId);
+        parkMessageSet = (ParkMessageSet)commonDao.selectObjectByConditions(parkMessageSet);
+        Integer noticeSwitch =1;
+        if(parkMessageSet!=null){
+            noticeSwitch=parkMessageSet.getNoticeSwitch();
+        }
+        //如果设置为1 才需要发送短信通知车主
+        if((noticeSwitch==1&&type<4)||type==4){
+            ShortMessageAccount shortMessageAccount = new ShortMessageAccount();
+            shortMessageAccount.setParkId(parkId);
+            shortMessageAccount=(ShortMessageAccount)commonDao.selectObjectByConditions(shortMessageAccount);
+            int count =0;
+            if(shortMessageAccount!=null){
+                count=shortMessageAccount.getCount();
+            }
+            logger.info("===>>>>>>>send message:"+count);
+            if(count>0) {
+                Map<String,Object> result = AliMessageUtil.sendVipNotice(type, carNumber, date, month, mobile,parkName);
+                if ((int)result.get("state") == 1) {
+                    String dateStr = TimeTools.getToDayStr();
+                    /*state为1 证明阿里通道请求成功，但是 不是发送成功，有可能手机号错误问题发送失败
+                      这时候开异步线程去查状态  查到成功再记流水
+                     */
+                    String bizId=(String)result.get("biz_id");
+                    //开线程处理
+                    ExecutorService es = ExecutorsUtil.getExecutorService();
+                    es.execute(new Runnable() {
+                        @Override
+                        public void run() {
+                            int temp=1;
+                            while (true) {
+                                logger.info("===>>>进入线程："+temp);
+                                try {
+                                    Thread.sleep(700);
+                                }catch (Exception e){
 
+                                }
+                                logger.info("===>>>bizId:"+bizId);
+                                Map<String,Object> map = AliMessageUtil.getSendState(mobile, bizId, dateStr);
+                                logger.info("===>>>get send state:"+map);
+                                long state = (long)map.get("state");
+                                if(state==3){//发送成功
+                                    //记录发送流水
+                                    SendMessageTb sendMessageTb = new SendMessageTb();
+                                    sendMessageTb.setCtime(System.currentTimeMillis() / 1000);
+                                    sendMessageTb.setParkId(parkId);
+                                    sendMessageTb.setMobile(mobile);
+                                    sendMessageTb.setType(1);
+                                    sendMessageTb.setState(1);
+                                    sendMessageTb.setErrmsg("OK");
+                                    commonDao.insert(sendMessageTb);
+                                    //更新账户总数
+                                    //计算阿里云发送条数
+                                    String content=map.get("content")+"";
+                                    int size = getSizeByCon(content);
+                                    logger.info("===>>>>"+size);
+                                    ShortMessageAccount con = new ShortMessageAccount();
+                                    con.setParkId(parkId);
+                                    con=(ShortMessageAccount)commonDao.selectObjectByConditions(con);
+                                    int updateCount = con.getCount()-size;
+                                    con.setCount(updateCount);
+                                    commonDao.updateByPrimaryKey(con);
+                                    break;
+                                }else if(state==2){//发送失败
+                                    SendMessageTb sendMessageTb = new SendMessageTb();
+                                    sendMessageTb.setCtime(System.currentTimeMillis() / 1000);
+                                    sendMessageTb.setParkId(parkId);
+                                    sendMessageTb.setMobile(mobile);
+                                    sendMessageTb.setType(1);
+                                    sendMessageTb.setState(0);
+                                    sendMessageTb.setErrmsg(result.get("errmsg")+"");
+                                    commonDao.insert(sendMessageTb);
+                                    break;
+                                }
+                                temp++;
+                            }
+                        }
+                    });
+                }else{//发送失败，记失败记录
+                    SendMessageTb sendMessageTb = new SendMessageTb();
+                    sendMessageTb.setCtime(System.currentTimeMillis() / 1000);
+                    sendMessageTb.setParkId(parkId);
+                    sendMessageTb.setMobile(mobile);
+                    sendMessageTb.setType(1);
+                    sendMessageTb.setState(0);
+                    sendMessageTb.setErrmsg(result.get("errmsg")+"");
+                    commonDao.insert(sendMessageTb);
+                }
+            }else{
+                SendMessageTb sendMessageTb = new SendMessageTb();
+                sendMessageTb.setCtime(System.currentTimeMillis() / 1000);
+                sendMessageTb.setParkId(parkId);
+                sendMessageTb.setMobile(mobile);
+                sendMessageTb.setType(1);
+                sendMessageTb.setState(0);
+                sendMessageTb.setErrmsg("账户余额不足！");
+                commonDao.insert(sendMessageTb);
+            }
+        }
+    }
+
+    private int getSizeByCon(String content) {
+        int length = content.length();
+        if(length>70){
+            return (length-70)/67+2;
+        }
+        return 1;
+    }
 
 
     private String getCarTypd(Long id){

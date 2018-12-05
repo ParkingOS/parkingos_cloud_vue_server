@@ -374,7 +374,7 @@ public class TicketServiceImpl implements TicketService {
 
         logger.info("后台创建优惠券:" + isAuto + "~~~~" + type + "~~~~" + reduce);
 
-        Integer free = 0;//全免劵(张)
+        Integer free = 0;//全免券(张)
         Map<String, Object> rMap = new HashMap<String, Object>();
         if (shop_id == -1) {
             rMap.put("state", -1);
@@ -404,7 +404,7 @@ public class TicketServiceImpl implements TicketService {
         //截止有效时间
         Long etime = btime + validite_time.longValue() * 60 * 60;
         logger.info("=======etime"+etime);
-        //判断商户额度是否可以发劵
+        //判断商户额度是否可以发券
         if (type == 3) {//优惠券-时长
             if (reduce <= 0) {
                 logger.error("优惠券额度必须为正数" + ",商户shop_id:" + shop_id);
@@ -444,7 +444,7 @@ public class TicketServiceImpl implements TicketService {
             }
         }
         List<Map<String, Object>> bathSql = new ArrayList<Map<String, Object>>();
-        //取当前最大减免劵的id然后+1
+        //取当前最大减免券的id然后+1
         Long ticketid = qryMaxTicketId() + 1;
 //        Long ticketid = commonDao.selectSequence(TicketTb.class);
         String code = null;
@@ -454,7 +454,7 @@ public class TicketServiceImpl implements TicketService {
             code = codes[0];
         }
         if (code != null) {
-            //生成一张劵
+            //生成一张券
             TicketTb ticketTb = new TicketTb();
             ticketTb.setId(ticketid);
             ticketTb.setCreateTime(btime);
@@ -505,7 +505,7 @@ public class TicketServiceImpl implements TicketService {
             }
         }
         rMap.put("state", -1);
-        rMap.put("error", "生成减免劵出错，用劵失败");
+        rMap.put("error", "生成减免券出错，用券失败");
         return rMap;
     }
 
@@ -517,7 +517,7 @@ public class TicketServiceImpl implements TicketService {
         if (ticketTbs != null && ticketTbs.size() > 0) {
             return ticketTbs.get(0).getId();
         } else {
-            return 0L;//没有生成过减免劵
+            return 0L;//没有生成过减免券
         }
     }
 

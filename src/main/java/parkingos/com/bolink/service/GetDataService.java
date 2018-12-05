@@ -33,4 +33,6 @@ public interface GetDataService {
     String getAllShops(String comid);
 
     String getPnameByCar(Long comid, String carId);
+
+    String getMessagePrice();
 }

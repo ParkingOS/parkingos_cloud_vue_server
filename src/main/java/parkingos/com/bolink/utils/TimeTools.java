@@ -238,6 +238,7 @@ public class TimeTools {
 		return strStart;
 	}
 
+
 	public static String getTwoLaterday() {
 		Calendar c = Calendar.getInstance();
 		c.add(Calendar.DAY_OF_MONTH, +2);
@@ -300,6 +301,22 @@ public class TimeTools {
 		String strStart = mDateTime.substring(0, 10);//
 		return strStart;
 	}
+
+
+	// 得到两年后的时间
+	public static Long getTwoYearsSeconds() {
+		Calendar c = Calendar.getInstance();
+		c.add(Calendar.YEAR, +2);
+		SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+		String mDateTime = formatter.format(c.getTime());
+		String strStart = mDateTime.substring(0, 19);//
+		return getLongMilliSecondFrom_HHMMDDHHmmss(strStart);
+	}
+
+//	public static void main(String[] args){
+//		getToDayStr();
+//	}
+
 
 	public static Long getStrDateToSecond(String strDate) {
 		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
@@ -387,6 +404,13 @@ public class TimeTools {
 		String today = sdf.format(new Date());
 		today = today.substring(0, 10) + " 00:00:00";
 		return getStrDateToSecond(today);
+	}
+
+	public static String getToDayStr() {
+		SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");
+		String today = sdf.format(new Date());
+		logger.info("==>>>"+today);
+		return today;
 	}
 
 	/*

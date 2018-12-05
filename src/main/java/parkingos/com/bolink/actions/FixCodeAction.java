@@ -90,6 +90,14 @@ public class FixCodeAction {
 //            validite_time = Integer.parseInt(validiteTime);
 //        }
 
+        //可用的分段时间
+        String timeInuse0 = RequestUtil.getString(request,"time_inuse[0]");
+        String timeInuse1 = RequestUtil.getString(request,"time_inuse[1]");
+
+        String timeInuse="00:00-23:59";
+        if(!"".equals(timeInuse0)&&!"".equals(timeInuse1)) {
+            timeInuse = timeInuse0 + "-" + timeInuse1;
+        }
 
         //根据shopid获得该商户的用券单位
         ShopTb shopTb  =shopAcccountService.getShopByid(shopid);
@@ -149,6 +157,7 @@ public class FixCodeAction {
         FixCodeTb fixCodeTb = new FixCodeTb();
         fixCodeTb.setShopId(shopid);
         fixCodeTb.setId(id);
+        fixCodeTb.setTimeInuse(timeInuse);
         fixCodeTb.setName(name);
         fixCodeTb.setValiditeTime(validite_time);
         fixCodeTb.setState(state);
@@ -240,6 +249,26 @@ public class FixCodeAction {
         }
 
         QrCodeUtil.downAllFile(request,resp,"FixCode");
+        return null;
+    }
+
+    @RequestMapping(value = "/editAndPwd")
+    public String editAndPwd(HttpServletRequest request, HttpServletResponse resp){
+        Long id = RequestUtil.getLong(request,"id",-1L);
+        Integer state = RequestUtil.getInteger(request,"state",0);
+        String password = RequestUtil.getString(request,"password");
+        Integer usePwd = RequestUtil.getInteger(request,"pwd_state",-1);
+        logger.info("修改是否可用:"+id+"~~~:"+state+"~~"+password+"~~"+usePwd);
+        FixCodeTb fixCodeTb = new FixCodeTb();
+        fixCodeTb.setId(id);
+        fixCodeTb.setState(state);
+        fixCodeTb.setUsePwd(usePwd);
+        fixCodeTb.setPassWord(password);
+
+        JSONObject result = fixCodeService.updateRole(fixCodeTb);
+
+
+        StringUtils.ajaxOutput(resp,result.toJSONString());
         return null;
     }
 

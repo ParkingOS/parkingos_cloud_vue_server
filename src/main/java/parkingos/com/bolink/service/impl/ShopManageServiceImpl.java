@@ -73,7 +73,7 @@ public class ShopManageServiceImpl implements ShopManageService {
             }
         } else {
             if (0 > ticket_money) {
-                //StringUtils.ajaxOutput( resp, "减免劵必须输入正整数" );
+                //StringUtils.ajaxOutput( resp, "减免券必须输入正整数" );
                 return "{\"state\":0}";
             }
         }
@@ -348,7 +348,7 @@ public class ShopManageServiceImpl implements ShopManageService {
         double discount_money = RequestUtil.getDouble( request, "discount_money", 1.00 );//商户折扣---每小时/元
         Integer validite_time = RequestUtil.getInteger( request, "validite_time", 24 );//有效期/小时
         Integer ticket_unit = RequestUtil.getInteger(request, "ticket_unit", 1);//单位
-        double free_money = RequestUtil.getDouble(request, "free_money",1.00);//全免劵单价---每张/元
+        double free_money = RequestUtil.getDouble(request, "free_money",1.00);//全免券单价---每张/元
 
 //        if(validite_time==0||validite_time>500000){
 //            return "{\"state\":0,\"msg\":\"请设置一个合理的有效期。\"}";

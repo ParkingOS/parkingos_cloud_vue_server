@@ -322,7 +322,7 @@ public class ParkOrderanlysisServiceImpl implements ParkOrderAnlysisService {
                 //电子支付
                 elec_money += StringUtils.formatDouble(oMap.get("electronic_pay"))+StringUtils.formatDouble(oMap.get("electronic_prepay"));
                 work.put("electronic_pay", StringUtils.formatDouble(oMap.get("electronic_pay"))+StringUtils.formatDouble(oMap.get("electronic_prepay")));
-                //减免劵支付
+                //减免券支付
                 reduce_money +=StringUtils.formatDouble(oMap.get("reduce_pay"));
                 work.put("reduce_pay", StringUtils.formatDouble(oMap.get("reduce_pay")));
             }
@@ -336,7 +336,7 @@ public class ParkOrderanlysisServiceImpl implements ParkOrderAnlysisService {
         }
         String title = "总订单数："+count+"，月卡订单数："+monthcount+"，总结算金额："+String.format("%.2f",amountmoney)+"元，其中现金结算："+String.format("%.2f",cashpay)
                 +"元，现金预付 : "+String.format("%.2f",cashprepay)+"元, 电子支付 ："+StringUtils.formatDouble(elec_money)+"元，" +
-                "免费金额："+String.format("%.2f",free_money)+"元,减免劵支付："+String.format("%.2f",reduce_money)+"元";
+                "免费金额："+String.format("%.2f",free_money)+"元,减免券支付："+String.format("%.2f",reduce_money)+"元";
 
         result.put("rows",JSON.toJSON(list));
         result.put("title",title);
