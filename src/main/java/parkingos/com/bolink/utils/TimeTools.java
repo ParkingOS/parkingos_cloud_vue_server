@@ -360,6 +360,27 @@ public class TimeTools {
 		return second;
 	}
 
+
+	// 转换
+	public static String secondsToDateStryMd(Long seconds) {
+
+		String second = "1";
+		if (seconds.equals("") && seconds == null) {
+			seconds = new Long(1);
+		}
+		try {
+
+			dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+			gCalendar = new GregorianCalendar();
+			gCalendar.setTimeInMillis(seconds.longValue() * 1000);
+			second = dateFormat.format(gCalendar.getTime());
+		} catch (Exception e) {
+			second = "1";
+
+		}
+		return second;
+	}
+
 	public static String MillsecondsToDateStr(Long seconds) {
 
 		String second = "1";

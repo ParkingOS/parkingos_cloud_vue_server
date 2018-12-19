@@ -220,36 +220,109 @@ public class CommonUtils<T> {
         }
         if (tableName.equals("carower_product")) {
             result= sendcardMember( tableId, comid, operate,parkTokenTb);
-            logger.error(">>>>>>>>>>>>>>>>>>>>>发送月卡会员信息结果" + result);
+            logger.info(">>>>>>>>>>>>>>>>>>>>>发送月卡会员信息结果" + result);
         } else if (tableName.equals("price_tb")) {
              result = sendPriceInfo( tableId, comid, operate,parkTokenTb);
-            logger.error(">>>>>>>>>>>>>>>>>>>>>发送价格信息结果" + result);
+            logger.info(">>>>>>>>>>>>>>>>>>>>>发送价格信息结果" + result);
         } else if (tableName.equals("product_package_tb")) {
              result = sendProductPackageInfo(tableId, comid, operate,parkTokenTb);
-            logger.error(">>>>>>>>>>>>>>>>>>>>>发送月卡套餐信息结果" + result);
+            logger.info(">>>>>>>>>>>>>>>>>>>>>发送月卡套餐信息结果" + result);
         } else if (tableName.equals("user_info_tb")) {
              result = sendUserInfo(tableId, comid, operate,parkTokenTb);
-            logger.error(">>>>>>>>>>>>>>>>>>>>>发送收费员信息结果" + result);
+            logger.info(">>>>>>>>>>>>>>>>>>>>>发送收费员信息结果" + result);
         } else if (tableName.equals("car_type_tb")) {
              result = sendCarTypeInfo( tableId, comid, operate,parkTokenTb);
             logger.error(">>>>>>>>>>>>>>>>>>>>>发送车型信息结果" + result);
         } else if (tableName.equals("zld_black_tb")) {
              result = sendBlackUser(tableId, comid, operate,parkTokenTb);
-            logger.error(">>>>>>>>>>>>>>>>>>>>>发送黑名单信息结果" + result);
+            logger.info(">>>>>>>>>>>>>>>>>>>>>发送黑名单信息结果" + result);
         } else if (tableName.equals("card_renew_tb")) {
              result = sendCardReNewInfo(tableId, comid, operate,parkTokenTb);
-            logger.error(">>>>>>>>>>>>>>>>>>>>>发送月卡续费信息结果" + result);
+            logger.info(">>>>>>>>>>>>>>>>>>>>>发送月卡续费信息结果" + result);
         }  else if(tableName.equals("com_pass_tb")){
              result = sendComPassInfo(tableId, comid, operate,parkTokenTb);
-            logger.error(">>>>>>>>>>>>>>>>>>>>>发送通道结果" + result);
+            logger.info(">>>>>>>>>>>>>>>>>>>>>发送通道结果" + result);
         } else if(tableName.equals("visitor_tb")){
-             result = sendVisitorInfo(tableId, comid, operate,parkTokenTb);
-            logger.error(">>>>>>>>>>>>>>>>>>>>>发送访客结果" + result);
+            result = sendVisitorInfo(tableId, comid, operate,parkTokenTb);
+            logger.info(">>>>>>>>>>>>>>>>>>>>>发送访客结果" + result);
+        }else if("prepay_card_tb".equals(tableName)){
+            result = sendPrepayCard(tableId, comid, operate,parkTokenTb);
+            logger.info(">>>>>>>>>>>>>>>>>>>>>发送储值卡结果" + result);
+        }else if("prepay_card_trade".equals(tableName)){
+            result = sendPrepayCardTrade(tableId, comid, operate,parkTokenTb);
+            logger.info(">>>>>>>>>>>>>>>>>>>>>发送储值卡流水结果" + result);
         }
         if("1".equals(result)){
             return true;
         }
         return false;
+    }
+
+    private String sendPrepayCardTrade(Long tableId, Long comid, Integer operate, ParkTokenTb parkTokenTb) {
+        PrepayCardTrade trade = new PrepayCardTrade();
+        trade.setId(tableId);
+        trade =(PrepayCardTrade)commonDao.selectObjectByConditions(trade);
+        JSONObject jsonSend = new JSONObject();
+        String result = "0";
+        if (trade != null ) {
+            jsonSend.put("car_number", trade.getCarNumber());
+            jsonSend.put("card_id", trade.getCardId());
+            jsonSend.put("pay_time", trade.getPayTime());
+            jsonSend.put("trade_no", trade.getTradeNo());
+            jsonSend.put("mobile", trade.getMobile());
+            jsonSend.put("pay_type", trade.getPayType());
+//            jsonSend.put("operate_type", operate);
+            jsonSend.put("park_id", getBolinkId(trade.getParkId()));
+            jsonSend.put("total_price", trade.getAddMoney()+"");
+        } else {
+            logger.error(">>>>>>>>>>>>>没有查询到访客");
+            return result;
+        }
+        JSONObject jsonMesg = new JSONObject();
+        jsonMesg.put("service_name", "prepay_card_trade_sync");
+        jsonMesg.put("data", jsonSend);
+        logger.error(jsonMesg+"");
+
+        boolean isSend = doSendMessage(jsonMesg,parkTokenTb);
+        logger.error(">>>>>>>>>>>>>>云端发送数据到停车收费系统结果：" + isSend);
+        if (isSend) {
+            result = "1";
+        }
+        return result;
+
+    }
+
+    private String sendPrepayCard(Long tableId, Long comid, Integer operate, ParkTokenTb parkTokenTb) {
+        PrepayCardTb prepayCardTb = new PrepayCardTb();
+        prepayCardTb.setId(tableId);
+        prepayCardTb = (PrepayCardTb)commonDao.selectObjectByConditions(prepayCardTb);
+        JSONObject jsonSend = new JSONObject();
+        String result = "0";
+        if (prepayCardTb != null ) {
+            jsonSend.put("car_number", prepayCardTb.getCarNumber());
+            jsonSend.put("card_id", prepayCardTb.getCardId());
+            jsonSend.put("create_time", prepayCardTb.getCtime());
+            jsonSend.put("update_time", prepayCardTb.getUtime());
+            jsonSend.put("mobile", prepayCardTb.getMobile());
+            jsonSend.put("remark", prepayCardTb.getRemark());
+            jsonSend.put("operate_type", operate);
+            jsonSend.put("park_id", getBolinkId(prepayCardTb.getParkId()));
+            jsonSend.put("total_price", prepayCardTb.getMoney()+"");
+        } else {
+            logger.error(">>>>>>>>>>>>>没有查询到访客");
+            return result;
+        }
+        JSONObject jsonMesg = new JSONObject();
+        jsonMesg.put("service_name", "prepay_card_sync");
+        jsonMesg.put("data", jsonSend);
+        logger.error(jsonMesg+"");
+
+        boolean isSend = doSendMessage(jsonMesg,parkTokenTb);
+        logger.error(">>>>>>>>>>>>>>云端发送数据到停车收费系统结果：" + isSend);
+        if (isSend) {
+            result = "1";
+        }
+        return result;
     }
 
     public static String camel2Underline(String line){
@@ -688,7 +761,7 @@ public class CommonUtils<T> {
         }
         String date = "";
         if(eTime!=null&&eTime>0){
-            date = TimeTools.secondsToDateStr(eTime);
+            date = TimeTools.secondsToDateStryMd(eTime);
         }
         ParkMessageSet parkMessageSet = new ParkMessageSet();
         parkMessageSet.setParkId(parkId);
@@ -834,4 +907,22 @@ public class CommonUtils<T> {
         return "";
     }
 
+    public int  insertSync(T t, int operateType, Long comid,Long id) {
+        String tableName  = t.getClass().getName();
+        tableName = camel2Underline(tableName.substring(tableName.lastIndexOf(".")));
+        SyncInfoPoolTb syncInfoPoolTb  =new SyncInfoPoolTb();
+        syncInfoPoolTb.setComid(comid);
+        syncInfoPoolTb.setTableId(id);
+        syncInfoPoolTb.setTableName(tableName);
+        syncInfoPoolTb.setCreateTime(System.currentTimeMillis() / 1000);
+        syncInfoPoolTb.setOperate(operateType);
+        syncInfoPoolTb.setUpdateTime(System.currentTimeMillis()/1000);
+        return commonDao.insert(syncInfoPoolTb);
+    }
+
+//    public static void main(String[] args){
+//        PrepayCardTb prepayCardTb = new PrepayCardTb();
+//        CommonUtils commonUtils = new CommonUtils();
+//        commonUtils.insertSync(prepayCardTb,0,21782L);
+//    }
 }
