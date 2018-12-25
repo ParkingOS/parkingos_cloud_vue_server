@@ -78,7 +78,7 @@ public class LiftRodServiceImpl implements LiftRodService {
             DB db = MongoClientFactory.getInstance().getMongoDBBuilder("zld");
             if(collectionName==null||"".equals(collectionName)||"null".equals(collectionName)){
                 logger.error(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>没有查到对应的图片！"+liftrodId);
-                response.sendRedirect("http://sysimages.tq.cn/images/webchat_101001/common/kefu.png");
+                response.sendRedirect("http://"+CustomDefind.getValue("DOMAIN")+"/default.png");
                 return null;
             }
             DBCollection collection = db.getCollection(collectionName);
@@ -89,7 +89,7 @@ public class LiftRodServiceImpl implements LiftRodService {
                 DBObject obj  = collection.findOne(document);
                 if(obj == null){
                     logger.error("取图片错误.....");
-                    response.sendRedirect("http://sysimages.tq.cn/images/webchat_101001/common/kefu.png");
+                    response.sendRedirect("http://"+CustomDefind.getValue("DOMAIN")+"/default.png");
                     return null;
                 }
                 byte[] content = (byte[])obj.get("content");
@@ -105,12 +105,12 @@ public class LiftRodServiceImpl implements LiftRodService {
                 o.close();
             }else{
                 logger.error(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>没有查到对应的图片！"+liftrodId);
-                response.sendRedirect("http://sysimages.tq.cn/images/webchat_101001/common/kefu.png");
+                response.sendRedirect("http://"+CustomDefind.getValue("DOMAIN")+"/default.png");
                 return null;
             }
         }else{
             logger.error(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>没有查到对应的图片！"+liftrodId);
-            response.sendRedirect("http://sysimages.tq.cn/images/webchat_101001/common/kefu.png");
+            response.sendRedirect("http://"+CustomDefind.getValue("DOMAIN")+"/default.png");
             return null;
         }
         return null;

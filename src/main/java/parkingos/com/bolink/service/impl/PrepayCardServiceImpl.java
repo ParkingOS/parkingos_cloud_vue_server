@@ -95,6 +95,7 @@ public class PrepayCardServiceImpl implements PrepayCardService {
             trade.setParkId(comid);
             trade.setPayTime(System.currentTimeMillis()/1000);
             trade.setRemark(remark);
+            trade.setTradeType("云平台续费");
             trade.setPayType("现金");//现金
             int insert = commonDao.insert(trade);
 
@@ -155,6 +156,7 @@ public class PrepayCardServiceImpl implements PrepayCardService {
             trade.setPayTime(System.currentTimeMillis()/1000);
             trade.setRemark(remark);
             trade.setPayType("现金");
+            trade.setTradeType("云平台续费");
             trade.setAddMoneyAfter(new BigDecimal(0.0));
             trade.setAddMoneyBefore(new BigDecimal(0.0));
             int insertTrde = commonDao.insert(trade);

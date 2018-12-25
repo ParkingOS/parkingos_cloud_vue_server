@@ -213,7 +213,7 @@ public class CommonUtils<T> {
 //        operate += 1;
         ParkTokenTb parkTokenTb = getChannel(comid);
         String result="0";
-        logger.info("开始发送数据。。。。。。。。"+tableName+"~~~"+parkTokenTb);
+        logger.info("开始发送数据。。。。。。。。"+tableName+"~~~"+parkTokenTb+"~~"+tableId);
         if(parkTokenTb==null){
             logger.error("sdk 没有在线，第一次发送失败");
             return false;
@@ -271,6 +271,7 @@ public class CommonUtils<T> {
             jsonSend.put("trade_no", trade.getTradeNo());
             jsonSend.put("mobile", trade.getMobile());
             jsonSend.put("pay_type", trade.getPayType());
+            jsonSend.put("name", trade.getName());
 //            jsonSend.put("operate_type", operate);
             jsonSend.put("park_id", getBolinkId(trade.getParkId()));
             jsonSend.put("total_price", trade.getAddMoney()+"");
@@ -305,6 +306,7 @@ public class CommonUtils<T> {
             jsonSend.put("update_time", prepayCardTb.getUtime());
             jsonSend.put("mobile", prepayCardTb.getMobile());
             jsonSend.put("remark", prepayCardTb.getRemark());
+            jsonSend.put("name", prepayCardTb.getName());
             jsonSend.put("operate_type", operate);
             jsonSend.put("park_id", getBolinkId(prepayCardTb.getParkId()));
             jsonSend.put("total_price", prepayCardTb.getMoney()+"");

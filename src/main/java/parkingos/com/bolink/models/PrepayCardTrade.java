@@ -31,6 +31,16 @@ public class PrepayCardTrade {
 
     private Integer state;
 
+    private String tradeType;
+
+    public String getTradeType() {
+        return tradeType;
+    }
+
+    public void setTradeType(String tradeType) {
+        this.tradeType = tradeType;
+    }
+
     public Integer getState() {
         return state;
     }
