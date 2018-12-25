@@ -52,6 +52,7 @@ public class CityParkOrderanlysisServiceImpl implements CityParkOrderAnlysisServ
 
         String tableName = "order_tb_new";
         if(cityid!=null&&cityid>-1){
+            reqmap.put("cityId",cityid+"");
             tableName += "_"+cityid%100;
         }
         reqmap.put("end_time","between");

@@ -25,4 +25,8 @@ public interface OrderMapper {
     int selectOrdersCount(OrderTbExample example);
 
     List<Map<String,Object>> qryOrdersByComidAndOrderId(@Param("comid") Long comid, @Param("orderIdLocal") String orderIdLocal, @Param("tableName") String tableName);
+
+    Map<String,Object> getParkNameById(long comid);
+
+    String getUserInfo(long l);
 }

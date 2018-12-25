@@ -55,6 +55,7 @@ public class BaseServer {
             String hostName = server.getHost();
             int grpcPort = Integer.parseInt(server.getMetadata().get("grpc.port"));
             String key = hostName+":"+grpcPort;
+            logger.info("===>>>>>get server:"+key);
             if(channelMap.containsKey(key)){
                 return channelMap.get(key);
             }

@@ -13,6 +13,7 @@ import parkingos.com.bolink.models.ComInfoTb;
 import parkingos.com.bolink.models.ComPassTb;
 import parkingos.com.bolink.models.OrderTb;
 import parkingos.com.bolink.models.UserInfoTb;
+import parkingos.com.bolink.orderserver.OrderServer;
 import parkingos.com.bolink.service.CityUnorderService;
 import parkingos.com.bolink.service.SupperSearchService;
 import parkingos.com.bolink.utils.*;
@@ -35,6 +36,8 @@ public class CityUnorderServiceImpl implements CityUnorderService {
     private CommonMethods commonMethods;
     @Autowired
     private OrderMapper orderMapper;
+    @Autowired
+    private OrderServer orderServer;
 
 
     @Override
@@ -57,6 +60,7 @@ public class CityUnorderServiceImpl implements CityUnorderService {
             cityID = orderMapper.getCityIdByGroupId(groupId);
         }
         if(cityID!=null&&cityID>-1){
+            reqmap.put("cityId",cityID+"");
             reqmap.put("tableName","order_tb_new_"+cityID%100);
         }else{
             reqmap.put("tableName","order_tb_new");
@@ -76,12 +80,14 @@ public class CityUnorderServiceImpl implements CityUnorderService {
             rp = reqmap.get("rp");
         }
 
-        count = getOrdersCountByGroupid(reqmap);
+//        count = getOrdersCountByGroupid(reqmap);
+        count = orderServer.selectOrdersCount(reqmap);
         if(count>0){
             if(reqmap.get("export")==null){//不是导出
                 reqmap.put("rp",rp);
             }
-            list = getOrdersListByGroupid(reqmap);
+//            list = getOrdersListByGroupid(reqmap);
+            list=orderServer.getOrdersByMapConditons(reqmap);
             if (list != null && !list.isEmpty()) {
                 for (OrderTb orderTb1 : list) {
                     OrmUtil<OrderTb> otm = new OrmUtil<OrderTb>();

@@ -57,6 +57,7 @@ public class ParkOrderanlysisServiceImpl implements ParkOrderAnlysisService {
 
         String tableName = "order_tb_new";
         if(cityId!=null&&cityId>-1){
+            reqmap.put("cityId",cityId+"");
             tableName += "_"+cityId%100;
         }
         reqmap.put("tableName",tableName);

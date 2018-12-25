@@ -52,6 +52,7 @@ public class ParkCollectorOrderanlysisServiceImpl implements ParkCollectorOrderA
         }
         String tableName = "order_tb_new";
         if(cityId!=null&&cityId>-1){
+            reqmap.put("cityId",cityId+"");
             tableName = "order_tb_new_"+cityId%100;
         }
 

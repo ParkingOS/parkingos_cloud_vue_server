@@ -75,6 +75,7 @@ public class CityOrderServiceImpl implements CityOrderService {
         }
 
         if(cityid!=null&&cityid>-1){
+            reqmap.put("cityId",cityid+"");
             reqmap.put("tableName","order_tb_new_"+cityid%100);
         }else{
             reqmap.put("tableName","order_tb_new");

@@ -46,6 +46,7 @@ public class CityOrderanlysisServiceImpl implements CityOrderAnlysisService {
         Long cityid=orderMapper.getCityIdByGroupId(groupid);
         String tableName = "order_tb_new";
         if(cityid!=null&&cityid>-1){
+            reqmap.put("cityId",cityid+"");
             tableName +="_"+cityid%100;
         }
         reqmap.put("tableName",tableName);

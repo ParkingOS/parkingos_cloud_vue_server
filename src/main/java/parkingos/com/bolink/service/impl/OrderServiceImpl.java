@@ -67,6 +67,7 @@ public class OrderServiceImpl implements OrderService {
         }
         logger.info("select city by comid:" + cityid);
         if (cityid != null && cityid > -1) {
+            reqmap.put("cityId",cityid+"");
             reqmap.put("tableName","order_tb_new_"+cityid%100);
         }else{
             reqmap.put("tableName","order_tb_new");
@@ -246,7 +247,7 @@ public class OrderServiceImpl implements OrderService {
             DB db = MongoClientFactory.getInstance().getMongoDBBuilder("zld");
             if (collectionName == null || "".equals(collectionName) || "null".equals(collectionName)) {
                 logger.error(">>>>>>>>>>>>>查询图片错误........");
-                response.sendRedirect("http://sysimages.tq.cn/images/webchat_101001/common/kefu.png");
+                response.sendRedirect("http://"+CustomDefind.getValue("DOMAIN")+"/default.png");
                 return null;
             }
 
@@ -258,7 +259,7 @@ public class OrderServiceImpl implements OrderService {
                 document.put("gate", type);
                 DBObject obj = collection.findOne(document);
                 if (obj == null) {
-                    response.sendRedirect("http://sysimages.tq.cn/images/webchat_101001/common/kefu.png");
+                    response.sendRedirect("http://"+CustomDefind.getValue("DOMAIN")+"/default.png");
                     return null;
                 }
                 byte[] content = (byte[]) obj.get("content");
@@ -272,11 +273,11 @@ public class OrderServiceImpl implements OrderService {
                 o.flush();
                 o.close();
             } else {
-                response.sendRedirect("http://sysimages.tq.cn/images/webchat_101001/common/kefu.png");
+                response.sendRedirect("http://"+CustomDefind.getValue("DOMAIN")+"/default.png");
                 return null;
             }
         } else {
-            response.sendRedirect("http://sysimages.tq.cn/images/webchat_101001/common/kefu.png");
+            response.sendRedirect("http://"+CustomDefind.getValue("DOMAIN")+"/default.png");
             return null;
         }
         return null;
@@ -453,7 +454,7 @@ public class OrderServiceImpl implements OrderService {
         if(cityid!=null&&cityid>0){
             tableName= tableName+"_"+cityid;
         }
-        orderServer.resetDataByComid(comid,tableName);
+        orderServer.resetDataByComid(comid,tableName,cityid);
     }
 
     private String getPassName(Long comId, Integer passId) {

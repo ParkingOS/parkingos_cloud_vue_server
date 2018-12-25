@@ -52,8 +52,8 @@ public class GetParkInfoServiceImpl implements GetParkInfoService {
         long tday = calendar.getTimeInMillis() / 1000;
         //获取进场和离场数据
 
-        List<Map<String, String>> entryCarList=orderServer.getEntryCar(tday, Long.parseLong(groupid + ""),tableName);
-        List<Map<String, String>> outCarList=orderServer.getExitCar(tday, Long.parseLong(groupid + ""),tableName);
+        List<Map<String, String>> entryCarList=orderServer.getEntryCar(tday, Long.parseLong(groupid + ""),tableName,cityid);
+        List<Map<String, String>> outCarList=orderServer.getExitCar(tday, Long.parseLong(groupid + ""),tableName,cityid);
 
         int parkingtotal = parkInfoMapper.getBerthTotal(groupid);
         //获取今日电子支付，现金支付，减免金额的统计
@@ -96,11 +96,11 @@ public class GetParkInfoServiceImpl implements GetParkInfoService {
         totalIncomPie.add(electronicPaymap);
         totalIncomPie.add(reduceamap);
         //获取收费排行数据
-        List<Map<String, String>> parkRankList = orderServer.getParkRank(tday, groupid,tableName);
+        List<Map<String, String>> parkRankList = orderServer.getParkRank(tday, groupid,tableName,cityid);
         //获取车辆进场，离场，在场的数量统计
-        int inCars =orderServer.getEntryCount(tday, groupid,tableName);
-        int outCars =orderServer.getExitCount(tday, groupid,tableName);
-        int inPark =orderServer.getInparkCount(tday, groupid,tableName);
+        int inCars =orderServer.getEntryCount(tday, groupid,tableName,cityid);
+        int outCars =orderServer.getExitCount(tday, groupid,tableName,cityid);
+        int inPark =orderServer.getInparkCount(tday, groupid,tableName,cityid);
         HashMap<String, Object> countMap = new HashMap<String, Object>();
         countMap.put("inCars", inCars);
         countMap.put("outCars", outCars);
@@ -184,8 +184,8 @@ public class GetParkInfoServiceImpl implements GetParkInfoService {
         //获取访客未处理
         int vistorCount = parkInfoMapper.getVisitorCount(comid);
         //获取进场和离场数据
-        List<Map<String, String>> entryCarList = orderServer.getEntryCarByComid(tday, comid,tableName);//parkInfoMapper.getEntryCarByComid(tday, comid,tableName);
-        List<Map<String, String>> outCarList =orderServer.getExitCarByComid(tday, comid,tableName); //parkInfoMapper.getExitCarByComid(tday, comid,tableName);
+        List<Map<String, String>> entryCarList = orderServer.getEntryCarByComid(tday, comid,tableName,cityid);//parkInfoMapper.getEntryCarByComid(tday, comid,tableName);
+        List<Map<String, String>> outCarList =orderServer.getExitCarByComid(tday, comid,tableName,cityid); //parkInfoMapper.getExitCarByComid(tday, comid,tableName);
         int berthtotal = parkInfoMapper.getBerthTotalbc(comid);
         //获取今日电子支付，现金支付，减免金额的统计
         Map<String,String> parammap = new HashMap<String,String>();
@@ -233,11 +233,11 @@ public class GetParkInfoServiceImpl implements GetParkInfoService {
         totalIncomPie.add(electronicPaymap);
         totalIncomPie.add(reduceamap);
         //获取收费排行数据
-        List<Map<String, String>> parkRankList = orderServer.getRankByout(tday, comid,tableName);
+        List<Map<String, String>> parkRankList = orderServer.getRankByout(tday, comid,tableName,cityid);
         //获取车辆进场，离场，在场的数量统计
-        int inCars = orderServer.getEntryCountbc(tday, comid,tableName);
-        int outCars = orderServer.getExitCountbc(tday, comid,tableName);
-        int inPark = orderServer.getInparkCountbc(tday, comid,tableName);
+        int inCars = orderServer.getEntryCountbc(tday, comid,tableName,cityid);
+        int outCars = orderServer.getExitCountbc(tday, comid,tableName,cityid);
+        int inPark = orderServer.getInparkCountbc(tday, comid,tableName,cityid);
 //        int inCars = parkInfoMapper.getEntryCountbc(tday, comid,tableName);
 //        int outCars = parkInfoMapper.getExitCountbc(tday, comid,tableName);
 //        int inPark = parkInfoMapper.getInparkCountbc(tday, comid,tableName);

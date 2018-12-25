@@ -135,5 +135,24 @@
 
 
 
+  <select id="getParkNameById"  resultType="map">
+
+    SELECT
+    company_name as name
+    FROM
+    com_info_tb
+    WHERE
+    ID = #{comid,jdbcType=BIGINT}
+    and state = 0
+  </select>
+
+  <select id="getUserInfo"  resultType="java.lang.String">
+    select
+    a.nickname nickname
+    from user_info_tb a
+    where a.id= #{id,jdbcType=BIGINT}
+    limit 1
+  </select>
+
 
 </mapper>
