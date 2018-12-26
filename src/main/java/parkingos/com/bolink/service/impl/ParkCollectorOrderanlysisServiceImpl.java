@@ -48,7 +48,7 @@ public class ParkCollectorOrderanlysisServiceImpl implements ParkCollectorOrderA
         if(groupId!=null&&groupId>-1){
             cityId = orderMapper.getCityIdByGroupId(groupId);
         }else{
-            cityId = orderMapper.getGroupIdByComId(comid);
+            cityId = orderMapper.getCityIdByComId(comid);
         }
         String tableName = "order_tb_new";
         if(cityId!=null&&cityId>-1){

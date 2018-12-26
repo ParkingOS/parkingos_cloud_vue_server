@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import parkingos.com.bolink.dao.mybatis.mapper.OrderMapper;
 import parkingos.com.bolink.models.OrderTb;
+import parkingos.com.bolink.utils.Check;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -223,9 +224,22 @@ public class OrderServer extends BaseServer {
         List<Map<String,String>> list = new ArrayList<>();
         if(u!=null) {
             for (OrderMap orderMap : u.getMapList()) {
-                list.add(orderMap.getMapMap());
+                Map<String,String> resultMap = new HashMap<>();
+                Map<String,String> map1 = orderMap.getMapMap();
+                String comid = map1.get("comid");
+                String parkName = getParkNameById(comid);
+                resultMap.putAll(map1);
+                resultMap.put("comid",parkName);
+                list.add(resultMap);
             }
         }
+
+//        List<Map<String,String>> list = new ArrayList<>();
+//        if(u!=null) {
+//            for (OrderMap orderMap : u.getMapList()) {
+//                list.add(orderMap.getMapMap());
+//            }
+//        }
         return list;
     }
 
@@ -258,9 +272,22 @@ public class OrderServer extends BaseServer {
         List<Map<String,String>> list = new ArrayList<>();
         if(u!=null) {
             for (OrderMap orderMap : u.getMapList()) {
-                list.add(orderMap.getMapMap());
+                Map<String,String> resultMap = new HashMap<>();
+                Map<String,String> map1 = orderMap.getMapMap();
+                String comid = map1.get("comid");
+                String parkName = getParkNameById(comid);
+                resultMap.putAll(map1);
+                resultMap.put("comid",parkName);
+                list.add(resultMap);
             }
         }
+
+//        List<Map<String,String>> list = new ArrayList<>();
+//        if(u!=null) {
+//            for (OrderMap orderMap : u.getMapList()) {
+//                list.add(orderMap.getMapMap());
+//            }
+//        }
         return list;
     }
 
@@ -327,9 +354,22 @@ public class OrderServer extends BaseServer {
         List<Map<String,String>> list = new ArrayList<>();
         if(u!=null) {
             for (OrderMap orderMap : u.getMapList()) {
-                list.add(orderMap.getMapMap());
+                Map<String,String> resultMap = new HashMap<>();
+                Map<String,String> map1 = orderMap.getMapMap();
+                String userId = map1.get("name");
+                String parkName = getUserName(userId);
+                resultMap.putAll(map1);
+                resultMap.put("name",parkName);
+                list.add(resultMap);
             }
         }
+
+//        List<Map<String,String>> list = new ArrayList<>();
+//        if(u!=null) {
+//            for (OrderMap orderMap : u.getMapList()) {
+//                list.add(orderMap.getMapMap());
+//            }
+//        }
         return list;
     }
 
@@ -395,11 +435,25 @@ public class OrderServer extends BaseServer {
         List<Map<String,String>> list = new ArrayList<>();
         if(u!=null) {
             for (OrderMap orderMap : u.getMapList()) {
-                list.add(orderMap.getMapMap());
+                Map<String,String> resultMap = new HashMap<>();
+                Map<String,String> map1 = orderMap.getMapMap();
+                String userId = map1.get("name");
+                String parkName = getUserName(userId);
+                resultMap.putAll(map1);
+                resultMap.put("name",parkName);
+                list.add(resultMap);
             }
         }
+
+//        List<Map<String,String>> list = new ArrayList<>();
+//        if(u!=null) {
+//            for (OrderMap orderMap : u.getMapList()) {
+//                list.add(orderMap.getMapMap());
+//            }
+//        }
         return list;
     }
+
 
     public int resetDataByComid(Long comid,String tableName,Long cityId) {
         OrderCount u =null;
@@ -610,7 +664,7 @@ public class OrderServer extends BaseServer {
                 Map<String,String> resultMap = new HashMap<>();
                 resultMap.putAll(orderMap.getMapMap());
                 String parkId = orderMap.getMapMap().get("parkName");
-                String parkName = getParkNameById(Long.parseLong(parkId));
+                String parkName = getParkNameById(parkId);
                 resultMap.put("parkName",parkName);
                 list.add(resultMap);
             }
@@ -650,7 +704,7 @@ public class OrderServer extends BaseServer {
                 Map<String,String> resultMap = new HashMap<>();
                 Map<String,String> map = orderMap.getMapMap();
                 String parkId = map.get("parkName");
-                String parkName = getParkNameById(Long.parseLong(parkId));
+                String parkName = getParkNameById(parkId);
                 resultMap.putAll(map);
                 resultMap.put("parkName",parkName);
                 list.add(resultMap);
@@ -952,12 +1006,25 @@ public class OrderServer extends BaseServer {
         return 0;
     }
 
-    private String getParkNameById(long comid) {
-        Map<String,Object> map = orderMapper.getParkNameById(comid);
-        if(map!=null&&map.get("name")!=null){
-            return map.get("name")+"";
+    private String getParkNameById(String comid) {
+        if(Check.isLong(comid)) {
+            Map<String, Object> map = orderMapper.getParkNameById(Long.parseLong(comid));
+            if (map != null && map.get("name") != null) {
+                return map.get("name") + "";
+            }
         }
-        return "";
+        return comid;
+    }
+
+    private String getUserName(String userId) {
+
+        if(Check.isLong(userId)) {
+            String name = orderMapper.getUserInfo(Long.parseLong(userId));
+            if (name != null) {
+                return name;
+            }
+        }
+        return userId;
     }
 
 }
