@@ -104,7 +104,7 @@ public class MessageAction {
         Long uin = RequestUtil.getLong(request, "loginuin", -1L);
         Map<String, String> reqParameterMap = RequestUtil.readBodyFormRequset(request);
 
-        String [][] heards = new String[][]{{"使用日期","STR"},{"手机号","STR"},{"使用模块","STR"},{"触发类型","STR"}};
+        String [][] heards = new String[][]{{"使用日期","STR"},{"手机号","STR"},{"使用模块","STR"}};
         //获取要到处的数据
         List<List<Object>> bodyList = messageService.exportSendTrade(reqParameterMap);
 

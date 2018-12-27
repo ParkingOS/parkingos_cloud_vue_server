@@ -114,6 +114,7 @@ public class MessageServiceImpl implements MessageService {
         int count = getMessageCount(comid);
         SendMessageTb sendMessageTb = new SendMessageTb();
         sendMessageTb.setParkId(comid);
+        sendMessageTb.setState(1);
         JSONObject result = supperSearchService.supperSearch(sendMessageTb, reqmap);
         result.put("message_count",count);
         return result;
@@ -143,11 +144,13 @@ public class MessageServiceImpl implements MessageService {
 
     @Override
     public List<List<Object>> exportSendTrade(Map<String, String> reqParameterMap) {
+        reqParameterMap.remove("orderby");
+
         JSONObject result =getSendTrade(reqParameterMap);
         List<SendMessageTb> sendList = JSON.parseArray(result.get("rows").toString(), SendMessageTb.class);
         List<List<Object>> bodyList = new ArrayList<List<Object>>();
         if(sendList!=null&&sendList.size()>0){
-            String [] f = new String[]{"ctime","mobile","type","click_type"};
+            String [] f = new String[]{"ctime","mobile","type"};
             for(SendMessageTb sendMessageTb : sendList){
                 List<Object> values = new ArrayList<Object>();
                 OrmUtil<SendMessageTb> otm = new OrmUtil<SendMessageTb>();
@@ -160,19 +163,13 @@ public class MessageServiceImpl implements MessageService {
                             int type = (int)value;
                             if(type==1){
                                 values.add("月卡模块");
-                            }else{
+                            }else if(type==2){
+                                values.add("访客模块");
+                            }
+                            else{
                                 values.add("");
                             }
                         }
-                    }else if("click_type".equals(field)){
-                       if(value!=null){
-                           int clickType =(int)value;
-                           if(clickType==1){
-                               values.add("自动");
-                           }else{
-                               values.add("手动");
-                           }
-                       }
                     }else{
                         if("ctime".equals(field)){
                             if(map.get(field)!=null){
@@ -193,6 +190,7 @@ public class MessageServiceImpl implements MessageService {
 
     @Override
     public List<List<Object>> exportBuyTrade(Map<String, String> reqParameterMap) {
+        reqParameterMap.remove("orderby");
         JSONObject result =getBuyTrade(reqParameterMap);
         List<ShortMessageTb> buyList = JSON.parseArray(result.get("rows").toString(), ShortMessageTb.class);
         List<List<Object>> bodyList = new ArrayList<List<Object>>();
