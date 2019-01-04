@@ -15,6 +15,16 @@ public class MessagePriceTb {
 
     private Long utime;
 
+    private Integer type;
+
+    public Integer getType() {
+        return type;
+    }
+
+    public void setType(Integer type) {
+        this.type = type;
+    }
+
     public Long getId() {
         return id;
     }

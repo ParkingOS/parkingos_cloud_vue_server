@@ -7,4 +7,6 @@ import java.util.Map;
 public interface AddValueService {
 
     JSONObject getMessage(Map<String, String> reqParameterMap);
+
+    JSONObject getBigScreen(Map<String, String> reqParameterMap);
 }

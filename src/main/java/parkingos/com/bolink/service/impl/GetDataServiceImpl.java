@@ -492,8 +492,9 @@ public class GetDataServiceImpl implements GetDataService {
     }
 
     @Override
-    public String getMessagePrice() {
+    public String getMessagePrice(int type) {
         MessagePriceTb messagePriceTb = new MessagePriceTb();
+        messagePriceTb.setType(type);
         List<MessagePriceTb> list =commonDao.selectListByConditions(messagePriceTb);
         return JSONObject.toJSONString(list);
     }

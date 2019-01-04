@@ -232,8 +232,15 @@ public class GetDataAction {
     }
 
     @RequestMapping(value = "/getmessageprice")
-    public String getmessageprice(HttpServletRequest request, HttpServletResponse resp){
-        String result = getDataService.getMessagePrice();
+    public String getMessagePrice(HttpServletRequest request, HttpServletResponse resp){
+        String result = getDataService.getMessagePrice(1);
+        StringUtils.ajaxOutput(resp,result);
+        return null;
+    }
+
+    @RequestMapping(value = "/getbigscreenprice")
+    public String getBigScreenPrice(HttpServletRequest request, HttpServletResponse resp){
+        String result = getDataService.getMessagePrice(2);
         StringUtils.ajaxOutput(resp,result);
         return null;
     }

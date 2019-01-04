@@ -180,32 +180,24 @@ public class CityParkServiceImpl implements CityParkService {
         result.put("state", 0);
         result.put("msg", "创建车场失败");
 
-        String bolinkid = RequestUtil.getString(request, "bolink_id");
-        if (bolinkid != null && !"".equals(bolinkid)) {
-            ComInfoTb infoTb = new ComInfoTb();
-            infoTb.setBolinkId(bolinkid);
-            infoTb.setState(0);
-            int infoCount = commonDao.selectCountByConditions(infoTb);
-            if(infoCount>0){
-                result.put("msg", "创建失败,泊链车场编号重复");
-                return result;
-            }
+        Long id = RequestUtil.getLong(request, "id", -1L);
 
-//            if (Check.isNumber(bolinkid)) {
-//                //验证填写的泊链编号在yun是不是重复
-//                Long comid = Long.parseLong(bolinkid);
-//                ComInfoTb comInfoTb = new ComInfoTb();
-//                comInfoTb.setId(comid);
-//                comInfoTb.setState(0);
-//                int count = commonDao.selectCountByConditions(comInfoTb);
-//                if (count > 0) {
-//                    result.put("msg", "创建失败,云平台编号重复");
-//                    return result;
-//                }
-//            }
+
+        String bolinkid = RequestUtil.getString(request, "bolink_id");
+        if(id==-1) {
+            if (bolinkid != null && !"".equals(bolinkid)) {
+                ComInfoTb infoTb = new ComInfoTb();
+                infoTb.setBolinkId(bolinkid);
+                infoTb.setState(0);
+                int infoCount = commonDao.selectCountByConditions(infoTb);
+                if (infoCount > 0) {
+                    result.put("msg", "创建失败,泊链车场编号重复");
+                    return result;
+                }
+            }
         }
 
-        Long id = RequestUtil.getLong(request, "id", -1L);
+
         Long cityid = RequestUtil.getLong(request, "cityid", -1L);
 
         Long groupId = RequestUtil.getLong(request, "groupid", -1L);

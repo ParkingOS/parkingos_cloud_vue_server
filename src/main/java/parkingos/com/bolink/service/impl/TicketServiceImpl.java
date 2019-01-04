@@ -445,8 +445,8 @@ public class TicketServiceImpl implements TicketService {
         }
         List<Map<String, Object>> bathSql = new ArrayList<Map<String, Object>>();
         //取当前最大减免券的id然后+1
-        Long ticketid = qryMaxTicketId() + 1;
-//        Long ticketid = commonDao.selectSequence(TicketTb.class);
+//        Long ticketid = qryMaxTicketId() + 1;
+        Long ticketid = commonDao.selectSequence(TicketTb.class);
         String code = null;
         Long ticketids[] = new Long[]{ticketid};
         String[] codes = StringUtils.getGRCode(ticketids);

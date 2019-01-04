@@ -42,7 +42,7 @@ public class MessageAction {
         Double money = RequestUtil.getDouble(request,"money",0.0);
         //生成流水号
         String seed = (new Random().nextDouble() + "").substring(2, 9);
-        String tradeNo = System.currentTimeMillis() + seed;
+        String tradeNo = "Msg"+System.currentTimeMillis() + seed;
         //购买短信的厂商
         Long union_id = RequestUtil.getLong(request,"union_id",-1L);
         //如果细化到车场购买

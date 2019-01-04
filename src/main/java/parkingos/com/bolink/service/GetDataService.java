@@ -34,5 +34,5 @@ public interface GetDataService {
 
     String getPnameByCar(Long comid, String carId);
 
-    String getMessagePrice();
+    String getMessagePrice(int type);
 }

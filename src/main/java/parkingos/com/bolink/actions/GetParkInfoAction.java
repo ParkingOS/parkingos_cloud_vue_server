@@ -22,6 +22,9 @@ public class GetParkInfoAction {
     @RequestMapping(value = "/bygroupid")
     public String getInfoById(HttpServletRequest request, HttpServletResponse resp){
         int groupid = RequestUtil.getInteger(request,"groupid",0);
+        if(groupid<=0){
+            return null;
+        }
         logger.debug("数据中心请求groupId:"+groupid);
         String  ret=getParkInfoService.getInfo(groupid);
         logger.debug("数据中心返回："+ret);
@@ -32,6 +35,9 @@ public class GetParkInfoAction {
     public String getInfoBycomId(HttpServletRequest request, HttpServletResponse resp){
         logger.info("数据中心请求comid"+request.getParameter("comid"));
         int comid = RequestUtil.getInteger(request,"comid",0);
+        if(comid<=0){
+            return null;
+        }
         String ret =getParkInfoService.getInfoByComid(comid);
         StringUtils.ajaxOutput(resp,ret);
         return null;

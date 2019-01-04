@@ -5,6 +5,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import parkingos.com.bolink.models.BigScreenTrade;
 import parkingos.com.bolink.models.ShortMessageTb;
 import parkingos.com.bolink.service.AddValueService;
 import parkingos.com.bolink.service.SupperSearchService;
@@ -23,6 +24,14 @@ public class AddValueServiceImpl implements AddValueService {
         ShortMessageTb shortMessageTb = new ShortMessageTb();
         shortMessageTb.setState(1);
         JSONObject result = supperSearchService.supperSearch(shortMessageTb, reqParameterMap);
+        return result;
+    }
+
+    @Override
+    public JSONObject getBigScreen(Map<String, String> reqParameterMap) {
+        BigScreenTrade trade = new BigScreenTrade();
+        trade.setState(1);
+        JSONObject result = supperSearchService.supperSearch(trade, reqParameterMap);
         return result;
     }
 }
