@@ -330,17 +330,27 @@ public class ShopManageServiceImpl implements ShopManageService {
         if(default_limit.endsWith(",")){
             return "{\"state\":0,\"msg\":\"请输入正确的默认额度\"}";
         }
-        String[] defaultArr = default_limit.split(",");
-//        System.out.println("====默认显示额度:"+defaultArr.length);
-        if(defaultArr.length<1){
-            return "{\"state\":0,\"msg\":\"请输入正确的默认额度\"}";
-        }
-        if(defaultArr.length>11){
-            return "{\"state\":0,\"msg\":\"最多支持十一个默认额度\"}";
-        }
-        for(String str:defaultArr){
-            if(!Check.isNumber(str)){
+
+        if(ticket_type!=3) {
+            String[] defaultArr = default_limit.split(",");
+            if(defaultArr.length<1){
                 return "{\"state\":0,\"msg\":\"请输入正确的默认额度\"}";
+            }
+            if(defaultArr.length>11){
+                return "{\"state\":0,\"msg\":\"最多支持十一个默认额度\"}";
+            }
+            for (String str : defaultArr) {
+                if (!Check.isNumber(str)) {
+                    return "{\"state\":0,\"msg\":\"请输入正确的默认额度\"}";
+                }
+            }
+        }else{
+            if (default_limit.length()>3||!Check.isDouble(default_limit)) {
+                return "{\"state\":0,\"msg\":\"请输入正确的默认额度(0.1-9.9)\"}";
+            }
+            Double dis = Double.parseDouble(default_limit);
+            if(dis<=0||dis>=10){
+                return "{\"state\":0,\"msg\":\"请输入正确的默认额度(0.1-9.9)\"}";
             }
         }
 

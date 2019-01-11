@@ -43,4 +43,10 @@ public interface ParkInfoMapper {
     int getMonthTotal(@Param("comid")int comid,@Param("create_time") long create_time);
     int getTicketCount(@Param("comid")int comid, @Param("create_time")long tday);
     int getVisitorCount(@Param("comid")int comid);
+
+    int getMonthTotalByGroupid(@Param("groupid")int groupid);
+
+    int parkAliveCount(@Param("groupid")int groupid);
+
+    int getBlackTotal(@Param("groupid")int groupid);
 }

@@ -276,6 +276,60 @@ and a.is_delete = 0
         ANd is_delete=0
     </select>
 
+
+    <select id="getBlackTotal"  resultType="java.lang.Integer">
+       SELECT
+	"count" (*)
+FROM
+	zld_black_tb
+WHERE
+	comid IN (
+		SELECT
+			ID
+		FROM
+			com_info_tb
+		WHERE
+			groupid = #{groupid,jdbcType=BIGINT}
+		AND STATE = 0
+	)
+AND STATE = 0
+    </select>
+
+    <select id="parkAliveCount"  resultType="java.lang.Integer">
+       SELECT
+	count(DISTINCT(park_id))
+FROM
+	park_token_tb
+WHERE
+	park_id IN (
+	SELECT
+		id||''
+	FROM
+		com_info_tb
+	WHERE
+		groupid = #{groupid,jdbcType=BIGINT}
+	AND STATE = 0
+)
+    </select>
+
+    <select id="getMonthTotalByGroupid"  resultType="java.lang.Integer">
+        SELECT
+	"count" (*)
+    FROM
+	carower_product
+    WHERE
+	is_delete = 0
+      AND com_id IN (
+	SELECT
+		ID
+	FROM
+		com_info_tb
+	WHERE
+		groupid = #{groupid,jdbcType=BIGINT}
+	AND STATE = 0
+)
+    </select>
+
     <select id="getTicketCount"  resultType="java.lang.Integer">
         SELECT
 	    COUNT (*)

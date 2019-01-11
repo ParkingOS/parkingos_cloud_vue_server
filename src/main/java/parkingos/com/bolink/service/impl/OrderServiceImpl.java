@@ -452,7 +452,7 @@ public class OrderServiceImpl implements OrderService {
         }
         String tableName = "order_tb_new";
         if(cityid!=null&&cityid>0){
-            tableName= tableName+"_"+cityid;
+            tableName= tableName+"_"+cityid%100;
         }
         orderServer.resetDataByComid(comid,tableName,cityid);
     }

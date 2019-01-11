@@ -13,6 +13,7 @@ import parkingos.com.bolink.orderserver.OrderServer;
 import parkingos.com.bolink.service.CityOrderAnlysisService;
 import parkingos.com.bolink.service.GetParkInfoService;
 import parkingos.com.bolink.service.ParkOrderAnlysisService;
+import parkingos.com.bolink.utils.StringUtils;
 import parkingos.com.bolink.utils.TimeTools;
 
 import java.text.DecimalFormat;
@@ -38,11 +39,41 @@ public class GetParkInfoServiceImpl implements GetParkInfoService {
     DecimalFormat af1 = new DecimalFormat("0");
     @Override
     public String getInfo(int groupid) {
+
+        Map<String, String> reqmap = new HashMap<>();
+
         Long cityid = orderMapper.getCityIdByGroupId(Long.parseLong(groupid+""));
         String tableName = "order_tb_new";
         if (cityid!=null&&cityid>-1){
             tableName = "order_tb_new_"+cityid%100;
         }
+        //查询集团下面共收入
+        reqmap.put("cityId",cityid+"");
+        reqmap.put("tableName",tableName);
+        reqmap.put("end_time","1");
+        reqmap.put("end_time_start",(TimeTools.getToDayBeginTime()+""));
+        reqmap.put("groupid",groupid+"");
+
+        Map moneymap=orderServer.selectMoneyByExample(reqmap);
+        Double groupTotal=0.0;
+        if(moneymap!=null){
+            String cashPay = moneymap.get("cashpay")+"";
+            String elePay=moneymap.get("elepay")+"";
+            groupTotal = StringUtils.formatDouble(cashPay)+StringUtils.formatDouble(elePay);
+        }
+        //查询该集团下面所有月卡
+        int monthTotal = parkInfoMapper.getMonthTotalByGroupid(groupid);
+        //查询该集团下面在线的车场数
+//        int parkAliveCount = parkInfoMapper.parkAliveCount(groupid);
+        //查询集团下面黑名单总数
+        int blackTotal = parkInfoMapper.getBlackTotal(groupid);
+
+        Map<String,Object> otherData = new HashMap<>();
+        otherData.put("receiveTotal",groupTotal);
+        otherData.put("monthTotal",monthTotal);
+
+        otherData.put("blackTotal",blackTotal);
+
         HashMap<String, Object> retMap = new HashMap<String, Object>();
         Calendar calendar = Calendar.getInstance();
         calendar.setTime(new Date());
@@ -139,8 +170,21 @@ public class GetParkInfoServiceImpl implements GetParkInfoService {
         berthPercentData.put("percent",df.format(parkOnpecent));
         //计算车场在线
         List<HashMap<String,Object>> parkState = getParkStatus(groupid);
+
+        int parkAliveCount = 0;
+        if(parkState!=null&&!parkState.isEmpty()) {
+            for (HashMap<String, Object> map : parkState) {
+                if ((int) map.get("state") == 1) {
+                    parkAliveCount++;
+                }
+            }
+        }
+        otherData.put("parkAliveCount",parkAliveCount);
+
         //查询抬杆异常信息
         List<HashMap<String,Object>> exceptionEvents = getExceptions(groupid,"groupid",tday);
+
+
         retMap.put("inPartData", entryCarList); //存入进场车辆
         retMap.put("outPartData", outCarList); //存入离场车辆
         retMap.put("totalIncomPie", totalIncomPie); //存入金额分类统计list
@@ -150,6 +194,7 @@ public class GetParkInfoServiceImpl implements GetParkInfoService {
         retMap.put("berthPercentData", ss);//泊位使用率
         retMap.put("parkState", parkState); //车场状态
         retMap.put("exceptionEvents", exceptionEvents);//车场异常信息
+        retMap.put("otherData", otherData);
         String result = JSON.toJSON(retMap).toString();
         return result;
     }
@@ -382,7 +427,7 @@ public class GetParkInfoServiceImpl implements GetParkInfoService {
                           parkstatusmap.put("parkName",parkName);
                           parkstatusmap.put("state",0);
                       }
-                    }else{
+                }else{
                     parkstatusmap.put("parkName",parkName);
                     parkstatusmap.put("state",0);
                 }

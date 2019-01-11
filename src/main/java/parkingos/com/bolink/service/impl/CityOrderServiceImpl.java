@@ -95,7 +95,7 @@ public class CityOrderServiceImpl implements CityOrderService {
         }
 
         count = orderServer.selectOrdersCount(reqmap);
-        Map moneymap = new HashMap();
+        Map moneymap = null;
         if(count>0){
             //价格统计不需要分页  要查询所有
 //            logger.info("///////////"+reqmap);

@@ -138,24 +138,34 @@ public class ShopAccountServiceImpl implements ShopAcccountService {
 
             if (list != null && !list.isEmpty()) {
                 //查询商户额度类型
-                ShopTb shopTb = new ShopTb();
-                shopTb.setState(0);
-                shopTb.setComid(Long.valueOf(reqmap.get("comid")));
-
-                List<ShopTb> shops = commonDao.selectListByConditions(shopTb);
+//                ShopTb shopTb = new ShopTb();
+//                shopTb.setState(0);
+//                shopTb.setComid(Long.valueOf(reqmap.get("comid")));
+//
+//                List<ShopTb> shops = commonDao.selectListByConditions(shopTb);
                 Map<Long, Integer> shopUnits = new HashMap<>();
-
-                if (shops != null && !shops.isEmpty()) {
-                    for (ShopTb shop : shops) {
-                        shopUnits.put(shop.getId(), shop.getTicketUnit());
-                    }
-                }
+//
+//                if (shops != null && !shops.isEmpty()) {
+//                    for (ShopTb shop : shops) {
+//                        shopUnits.put(shop.getId(), shop.getTicketUnit());
+//                    }
+//                }
 
                 for (ShopAccountTb product : list) {
+                    Long shopId = Long.valueOf(product.getShopId());
+                    Integer unit = shopUnits.get(shopId);
+                    if(unit==null){
+                        ShopTb shopTb = new ShopTb();
+                        shopTb.setId(shopId);
+                        shopTb = (ShopTb) commonDao.selectObjectByConditions(shopTb);
+                        unit = shopTb.getTicketUnit();
+                        shopUnits.put(shopId,unit);
+                    }
+
                     OrmUtil<ShopAccountTb> otm = new OrmUtil<>();
                     Map<String, Object> map = otm.pojoToMap(product);
                     map.put("nickname", names.get(product.getOperator()));
-                    map.put("ticket_unit", shopUnits.get(Long.valueOf(product.getShopId())));
+                    map.put("ticket_unit", unit);
                     resList.add(map);
                 }
                 result.put("rows", JSON.toJSON(resList));
@@ -202,7 +212,6 @@ public class ShopAccountServiceImpl implements ShopAcccountService {
         }
 
         String date = StringUtils.decodeUTF8(StringUtils.decodeUTF8(reqmap.get("date")));
-        System.out.println("日期====" + date);
 
         Long start = null;
         Long end = null;
@@ -213,7 +222,6 @@ public class ShopAccountServiceImpl implements ShopAcccountService {
             start = TimeTools.getLongMilliSecondFrom_HHMMDDHHmmss(date.split("至")[0]);
             end = TimeTools.getLongMilliSecondFrom_HHMMDDHHmmss(date.split("至")[1]);
         }
-        System.out.println("开始时间和结束时间" + start + end);
         int count = 0;
         List<ShopAccountTb> list = null;
         List<Map<String, Object>> resList = new ArrayList<>();
@@ -229,17 +237,24 @@ public class ShopAccountServiceImpl implements ShopAcccountService {
                 config = (PageOrderConfig) searchMap.get("config");
 
 
-            //封装searchbean  集团或城市下面所有车场
+            //封装searchbean
             SearchBean searchBean = new SearchBean();
             searchBean.setOperator(FieldOperator.BETWEEN);
             searchBean.setFieldName("operate_time");
             searchBean.setStartValue(start);
             searchBean.setEndValue(end);
 
+            SearchBean searchBean1 = new SearchBean();
+            searchBean1.setOperator(FieldOperator.LESS_THAN);
+            searchBean1.setFieldName("operate_type");
+            searchBean1.setEndValue(3);
+
+
             if (supperQuery == null) {
                 supperQuery = new ArrayList<>();
             }
             supperQuery.add(searchBean);
+            supperQuery.add(searchBean1);
 
 
             count = commonDao.selectCountByConditions(baseQuery, supperQuery);

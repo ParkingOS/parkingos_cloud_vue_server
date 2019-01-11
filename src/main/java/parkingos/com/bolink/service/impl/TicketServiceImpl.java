@@ -231,16 +231,39 @@ public class TicketServiceImpl implements TicketService {
 
                 //优惠时长
                 Integer money = (Integer) map.get("money");
+                Double umoney = Double.valueOf(map.get("umoney") + "");
                 Integer ticketUnit = (Integer) map.get("ticket_unit");
-                if(money>0&&ticketUnit!=null){
+                if(ticketUnit!=null){
                     if (ticketUnit == 1 ) {
-                        list.add(map.get("money")+"分钟");
-                    }
-                    else if (ticketUnit == 2 ) {
-                        list.add(map.get("money")+"小时");
-                    }
-                    else if (ticketUnit == 3 ) {
-                        list.add(map.get("money")+"天");
+                        if(money!=null&&money>0) {
+                            list.add(money + "分钟");
+                        }else{
+                            list.add("");
+                        }
+                    } else if (ticketUnit == 2 ) {
+                        if(money!=null&&money>0) {
+                            list.add(money+"小时");
+                        }else{
+                            list.add("");
+                        }
+                    } else if (ticketUnit == 3 ) {
+                        if(money!=null&&money>0) {
+                            list.add(money+"天");
+                        }else{
+                            list.add("");
+                        }
+                    }else if(ticketUnit == 4){
+                        if(umoney!=null&&umoney>0){
+                            list.add(umoney+"元");
+                        }else {
+                            list.add("");
+                        }
+                    }else if(ticketUnit == 5){
+                        if(umoney!=null&&umoney>0){
+                            list.add(umoney+"折");
+                        }else {
+                            list.add("");
+                        }
                     }else{
                         list.add("");
                     }
@@ -248,12 +271,6 @@ public class TicketServiceImpl implements TicketService {
                     list.add("");
                 }
 
-                Double umoney = Double.valueOf(map.get("umoney") + "");
-                if (umoney!=null&&umoney > 0) {
-                    list.add(map.get("umoney")+"元");
-                } else {
-                    list.add("");
-                }
                 Integer type = (Integer) map.get("type");
                 if(type!=null){
                     if (type == 3) {
@@ -262,7 +279,9 @@ public class TicketServiceImpl implements TicketService {
                         list.add("金额减免");
                     } else if (type == 4) {
                         list.add("全免券");
-                    } else {
+                    } else if(type==6){
+                        list.add("折扣券");
+                    }else{
                         list.add(type);
                     }
                 }else{
@@ -442,6 +461,13 @@ public class TicketServiceImpl implements TicketService {
                 rMap.put("error", "优惠券额度不够");
                 return rMap;
             }
+        }else if (type==6){
+            if (ticket_money < number) {
+                logger.error("折扣券已用完，还剩余额度" + ticket_money + ",商户shop_id:" + shop_id);
+                rMap.put("state", -2);
+                rMap.put("error", "优惠券额度不够");
+                return rMap;
+            }
         }
         List<Map<String, Object>> bathSql = new ArrayList<Map<String, Object>>();
         //取当前最大减免券的id然后+1
@@ -464,6 +490,9 @@ public class TicketServiceImpl implements TicketService {
                 ticketTb.setMoney(reduce);
             } else if (type == 5) {
                 BigDecimal amountDecimal = new BigDecimal(reduce + "");
+                ticketTb.setUmoney(amountDecimal);
+            }else if(type==6){
+                BigDecimal amountDecimal = new BigDecimal(shopInfo.getDefaultLimit());
                 ticketTb.setUmoney(amountDecimal);
             }
             ticketTb.setState(0);
@@ -492,6 +521,8 @@ public class TicketServiceImpl implements TicketService {
                 shopTbInfo.setTicketMoney(shopInfo.getTicketMoney() - reduce);
             } else if (type == 4) {
                 shopTbInfo.setTicketfreeLimit(shopInfo.getTicketfreeLimit() - free);
+            }else if(type==6){
+                shopTbInfo.setTicketMoney(shopInfo.getTicketMoney()-1);
             }
             ShopTb shopConditions = new ShopTb();
             shopConditions.setId(shopInfo.getId());
@@ -596,6 +627,7 @@ public class TicketServiceImpl implements TicketService {
 
         Map<Long, String> nameMap = new HashMap<>();
         Map<Long, Integer> unitMap = new HashMap<>();
+        double discount=0.0;
         String path = request.getSession().getServletContext().getRealPath("/resource/images/" +code);
         File file = new File(path);
         File[] codeList=file.listFiles();
@@ -674,7 +706,6 @@ public class TicketServiceImpl implements TicketService {
                     if(nameMap.containsKey(shopid)){
                         name = nameMap.get(shopid);
                         unit = unitMap.get(shopid);
-
                     }else{
                         ShopTb shopTb = new ShopTb();
                         shopTb.setId(shopid);
@@ -695,6 +726,9 @@ public class TicketServiceImpl implements TicketService {
                         }
                     }else if(type==5){
                         reduce = ticketTb.getUmoney()+"元";
+                    }else if(type==6){
+                        discount = ticketTb.getUmoney().doubleValue();
+                        reduce=discount+"折";
                     }else{
                         reduce = "全免";
                     }
@@ -794,7 +828,7 @@ public class TicketServiceImpl implements TicketService {
 
 
             String [] f = new String[]{"car_number","money","umoney","uin","state","type","use_time","create_time","limit_day"};
-            if(hiddenType==1){
+            if(hiddenType==1||hiddenType==3){
                 f = new String[]{"car_number","umoney","uin","state","type","use_time","create_time","limit_day"};
             }else if(hiddenType==2){
                 f= new String[]{"car_number","money","uin","state","type","use_time","create_time","limit_day"};
@@ -848,7 +882,9 @@ public class TicketServiceImpl implements TicketService {
                                 values.add("金额减免");
                             } else if (type == 4) {
                                 values.add("全免券");
-                            } else {
+                            } else if(type==6){
+                                values.add("折扣券");
+                            }else{
                                 values.add(type);
                             }
                         }else{
@@ -878,8 +914,10 @@ public class TicketServiceImpl implements TicketService {
                     }else if("umoney".equals(field)){
                         if(map.get(field)!=null){
                             Double umoney = Double.valueOf(map.get("umoney") + "");
-                            if(umoney>0){
+                            if(umoney>0&&hiddenType==1){
                                 values.add(umoney+"元");
+                            }else if (umoney>0&&hiddenType==3){
+                                values.add(umoney+"折");
                             }else{
                                 values.add("");
                             }

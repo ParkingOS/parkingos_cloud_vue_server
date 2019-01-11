@@ -17,6 +17,7 @@ import parkingos.com.bolink.service.SupperSearchService;
 import parkingos.com.bolink.utils.Check;
 import parkingos.com.bolink.utils.CommonUtils;
 import parkingos.com.bolink.utils.OrmUtil;
+import parkingos.com.bolink.utils.TimeTools;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -161,6 +162,12 @@ public class CityBlackUserServiceImpl implements CityBlackUserService {
                             values.add(comName);
                         }else {
                             values.add(v+"");
+                        }
+                    }else if("ctime".equals(field)||"utime".equals(field)){
+                        if(v==null){
+                            values.add("");
+                        }else{
+                            values.add(TimeTools.getTime_yyyyMMdd_HHmmss((Long)v*1000));
                         }
                     }else if("state".equals(field)){
                         switch(Integer.valueOf(v + "")){

@@ -50,9 +50,6 @@ public class CityUnorderServiceImpl implements CityUnorderService {
         List<OrderTb> list =null;
         List<Map<String, Object>> resList =new ArrayList<Map<String, Object>>();
 
-        //查询今天的数据显示
-        logger.error("=========..req"+reqmap.size());
-
         String groupIdStr = reqmap.get("groupid");
         Long cityID = -1L;
         if(!Check.isEmpty(groupIdStr)){
@@ -66,6 +63,9 @@ public class CityUnorderServiceImpl implements CityUnorderService {
             reqmap.put("tableName","order_tb_new");
         }
 
+
+        reqmap.put("state","0");
+        reqmap.put("state_start","0");
 
         String createTime = reqmap.get("create_time");
         logger.error("===>>>createTime"+createTime);

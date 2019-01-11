@@ -121,6 +121,15 @@ public class FixCodeAction {
                     StringUtils.ajaxOutput(resp,result.toJSONString());
                     return null;
                 }
+            }else if(ticketUnit==5){
+                if(freeLimit>shopTb.getTicketMoney()){//固定码额度大于商户总额度
+                    result.put("state",0);
+                    result.put("msg","商户余额不足，生成固定码失败");
+                    StringUtils.ajaxOutput(resp,result.toJSONString());
+                    return null;
+                }
+                //生成的券是折扣券
+                type=3;
             }
         }else if(type==2){//全免券
             if(freeLimit>shopTb.getTicketfreeLimit()){
