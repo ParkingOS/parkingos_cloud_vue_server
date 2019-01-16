@@ -69,6 +69,7 @@ public class ProductPackageServiceImpl implements ProductPackageService {
 
         CarowerProduct carowerProduct = new CarowerProduct();
         carowerProduct.setPid(id);
+        carowerProduct.setIsDelete(0L);
         int count = commonDao.selectCountByConditions(carowerProduct);
         if(count>0){
             result.put("msg","该套餐已被使用，共"+count+"条，请在会员管理中解除绑定后删除");

@@ -13,6 +13,8 @@ import parkingos.com.bolink.orderserver.OrderServer;
 import parkingos.com.bolink.service.CityOrderAnlysisService;
 import parkingos.com.bolink.service.GetParkInfoService;
 import parkingos.com.bolink.service.ParkOrderAnlysisService;
+import parkingos.com.bolink.service.redis.RedisService;
+import parkingos.com.bolink.utils.CustomDefind;
 import parkingos.com.bolink.utils.StringUtils;
 import parkingos.com.bolink.utils.TimeTools;
 
@@ -35,6 +37,8 @@ public class GetParkInfoServiceImpl implements GetParkInfoService {
     private OrderMapper orderMapper;
     @Autowired
     private OrderServer orderServer;
+    @Autowired
+    private RedisService redisService;
 
     DecimalFormat af1 = new DecimalFormat("0");
     @Override
@@ -202,12 +206,34 @@ public class GetParkInfoServiceImpl implements GetParkInfoService {
     @Override
     public String getInfoByComid(int comid) {
         logger.info("===>>>>comid"+comid);
-        Long groupid = orderMapper.getGroupIdByComId(Long.parseLong(comid+""));
-        Long cityid=-1L;
-        if(groupid!=null&&groupid>-1){
-            cityid = orderMapper.getCityIdByGroupId(groupid);
-        }else {
-            cityid = orderMapper.getCityIdByComId(Long.parseLong(comid+""));
+//        Long groupid = orderMapper.getGroupIdByComId(Long.parseLong(comid+""));
+//        Long cityid=-1L;
+//        if(groupid!=null&&groupid>-1){
+//            cityid = orderMapper.getCityIdByGroupId(groupid);
+//        }else {
+//            cityid = orderMapper.getCityIdByComId(Long.parseLong(comid+""));
+//        }
+        Long cityid =-1L;
+        try {
+            String cityidStr = redisService.get(CustomDefind.getValue("REDISKEY4CITY")+comid);
+            logger.info("===>>>>>>cityidstr:"+cityidStr);
+            if(cityidStr!=null){
+                cityid=Long.parseLong(cityidStr);
+            }else{
+                Long groupid = orderMapper.getGroupIdByComId(Long.parseLong(comid+""));
+                if(groupid!=null&&groupid>-1){
+                    cityid = orderMapper.getCityIdByGroupId(groupid);
+                }else {
+                    cityid = orderMapper.getCityIdByComId(Long.parseLong(comid+""));
+                }
+            }
+        }catch (Exception e){
+            Long groupid = orderMapper.getGroupIdByComId(Long.parseLong(comid+""));
+            if(groupid!=null&&groupid>-1){
+                cityid = orderMapper.getCityIdByGroupId(groupid);
+            }else {
+                cityid = orderMapper.getCityIdByComId(Long.parseLong(comid+""));
+            }
         }
         String tableName = "order_tb_new";
         if(cityid!=null&&cityid>-1){
