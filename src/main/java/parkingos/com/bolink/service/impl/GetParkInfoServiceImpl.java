@@ -18,6 +18,7 @@ import parkingos.com.bolink.utils.CustomDefind;
 import parkingos.com.bolink.utils.StringUtils;
 import parkingos.com.bolink.utils.TimeTools;
 
+import java.math.BigDecimal;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -44,7 +45,7 @@ public class GetParkInfoServiceImpl implements GetParkInfoService {
     @Override
     public String getInfo(int groupid) {
 
-        Map<String, String> reqmap = new HashMap<>();
+//        Map<String, String> reqmap = new HashMap<>();
 
         Long cityid = orderMapper.getCityIdByGroupId(Long.parseLong(groupid+""));
         String tableName = "order_tb_new";
@@ -52,19 +53,19 @@ public class GetParkInfoServiceImpl implements GetParkInfoService {
             tableName = "order_tb_new_"+cityid%100;
         }
         //查询集团下面共收入
-        reqmap.put("cityId",cityid+"");
-        reqmap.put("tableName",tableName);
-        reqmap.put("end_time","1");
-        reqmap.put("end_time_start",(TimeTools.getToDayBeginTime()+""));
-        reqmap.put("groupid",groupid+"");
+//        reqmap.put("cityId",cityid+"");
+//        reqmap.put("tableName",tableName);
+//        reqmap.put("end_time","1");
+//        reqmap.put("end_time_start",(TimeTools.getToDayBeginTime()+""));
+//        reqmap.put("groupid",groupid+"");
 
-        Map moneymap=orderServer.selectMoneyByExample(reqmap);
+//        Map moneymap=orderServer.selectMoneyByExample(reqmap);
         Double groupTotal=0.0;
-        if(moneymap!=null){
-            String cashPay = moneymap.get("cashpay")+"";
-            String elePay=moneymap.get("elepay")+"";
-            groupTotal = StringUtils.formatDouble(cashPay)+StringUtils.formatDouble(elePay);
-        }
+//        if(moneymap!=null){
+//            String cashPay = moneymap.get("cashpay")+"";
+//            String elePay=moneymap.get("elepay")+"";
+//            groupTotal = StringUtils.formatDouble(cashPay)+StringUtils.formatDouble(elePay);
+//        }
         //查询该集团下面所有月卡
         int monthTotal = parkInfoMapper.getMonthTotalByGroupid(groupid);
         //查询该集团下面在线的车场数
@@ -106,11 +107,15 @@ public class GetParkInfoServiceImpl implements GetParkInfoService {
             if(object.getString("cash_pay")!=null&&!"".equals(object.getString("cash_pay"))) {
                 cashPay = Double.parseDouble(object.getString("cash_pay"));
             }
-            if(object.getString("electronic_pay")!=null&&!"".equals(object.getString("electronic_pay"))) {
-                electronicPay = Double.parseDouble(object.getString("electronic_pay"));
+            if(object.getString("ele_pay")!=null&&!"".equals(object.getString("ele_pay"))) {
+                electronicPay = Double.parseDouble(object.getString("ele_pay"));
             }
             if(object.getString("free_pay")!=null&&!"".equals(object.getString("free_pay"))) {
                 freePay = Double.parseDouble(object.getString("free_pay"));
+            }
+            if(object.getString("act_total")!=null&&!"".equals(object.getString("act_total"))){
+                groupTotal = Double.parseDouble(object.getString("act_total"));
+                otherData.put("receiveTotal",groupTotal);
             }
         };
         HashMap<String, Object> cashPaymap = new HashMap<String, Object>();
@@ -270,14 +275,14 @@ public class GetParkInfoServiceImpl implements GetParkInfoService {
         Double freePay=0d;
         if(retarry!=null&&retarry.size()>0){
             JSONObject object =(JSONObject)retarry.get(retarry.size()-1);
-            if(object.getString("cash_pay")!=null&&!"".equals(object.getString("cash_pay"))) {
-                cashPay = Double.parseDouble(object.getString("cash_pay"));
+            if(object.getString("cash_total")!=null&&!"".equals(object.getString("cash_total"))) {
+                cashPay = Double.parseDouble(object.getString("cash_total"));
             }
             if(object.getString("free_pay")!=null&&!"".equals(object.getString("free_pay"))) {
                 freePay = Double.parseDouble(object.getString("free_pay"));
             }
-            if(object.getString("electronic_pay")!=null&&!"".equals(object.getString("electronic_pay"))) {
-                electronicPay = Double.parseDouble(object.getString("electronic_pay"));
+            if(object.getString("ele_total")!=null&&!"".equals(object.getString("ele_total"))) {
+                electronicPay = Double.parseDouble(object.getString("ele_total"));
             }
         }
         Map<String,Object> otherData = new HashMap<>();
@@ -290,9 +295,28 @@ public class GetParkInfoServiceImpl implements GetParkInfoService {
         otherData.put("monthTotal",monthTotal);
         otherData.put("ticketCount",ticketCount);
         otherData.put("vistorCount",vistorCount);
-        totalIncomemap.put("elePay", af1.format(electronicPay));
-        totalIncomemap.put("cashPay", af1.format(cashPay));
-        totalIncomemap.put("freePay", af1.format(freePay));
+
+        totalIncomemap.put("elePay", StringUtils.formatDouble(electronicPay));
+        totalIncomemap.put("cashPay", StringUtils.formatDouble(cashPay));
+        totalIncomemap.put("freePay", StringUtils.formatDouble(freePay));
+        totalIncomemap.put("payTotal", StringUtils.formatDouble(electronicPay+cashPay));
+
+        Map<String,Object> persentData = new HashMap<>();
+
+        double total = StringUtils.formatDouble(cashPay+freePay+electronicPay);
+        double cashPersent =0;
+        double elePersent =0;
+        double freePersent =0;
+        if(total>0) {
+            cashPersent=new BigDecimal(cashPay / total).setScale(4, BigDecimal.ROUND_HALF_UP).doubleValue();
+            elePersent = new BigDecimal(electronicPay / total).setScale(4, BigDecimal.ROUND_HALF_UP).doubleValue();
+            freePersent=new BigDecimal(freePay / total).setScale(4, BigDecimal.ROUND_HALF_UP).doubleValue();
+        }
+        persentData.put("cash_percent",cashPersent*100);
+        persentData.put("ele_percent",elePersent*100);
+        persentData.put("free_percent",freePersent*100);
+
+
         cashPaymap.put("name", "电子");
         cashPaymap.put("value", af1.format(electronicPay));
         electronicPaymap.put("name", "现金");
@@ -360,6 +384,7 @@ public class GetParkInfoServiceImpl implements GetParkInfoService {
         retMap.put("parkState", parkState);//在线状态
         retMap.put("exceptionEvents", exceptionEvents);//车场异常信息
         retMap.put("otherData", otherData);//总收入，会员，访客，优惠券，空车位
+        retMap.put("percentData",persentData);
         String result = JSON.toJSON(retMap).toString();
         return result;
     }

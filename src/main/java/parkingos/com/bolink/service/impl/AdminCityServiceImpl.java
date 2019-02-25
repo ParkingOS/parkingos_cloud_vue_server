@@ -40,6 +40,17 @@ public class AdminCityServiceImpl implements AdminCityService {
         orgCityMerchants.setUnionId(union_id);
         orgCityMerchants.setUkey(ukey);
         if(id==null){
+
+            OrgCityMerchants con = new OrgCityMerchants();
+            con.setUnionId(union_id);
+            con.setState(0);
+            int count = commonDao.selectCountByConditions(con);
+            if(count>0){
+                result.put("state",0);
+                result.put("msg","union_id重复！");
+                return result;
+            }
+
             orgCityMerchants.setCtime(System.currentTimeMillis()/1000);
             int res = commonDao.insert(orgCityMerchants);
             if(res==1){

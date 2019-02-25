@@ -499,6 +499,80 @@ public class GetDataServiceImpl implements GetDataService {
         return JSONObject.toJSONString(list);
     }
 
+    @Override
+    public List<Object> getAllBolinkParks(Long cityId) {
+
+        List<Object> parks = new ArrayList<Object>();
+        try {
+            List<Object> params = new ArrayList<Object>();
+            String sql = "select bolink_id from com_info_tb where state<>1 " ;
+            List<Object> groups = commonMethods.getGroups(cityId);
+            if(groups != null && !groups.isEmpty()){
+                String preParams  ="";
+                for(Object groupid : groups){
+                    if(preParams.equals("")) {
+                        preParams = groupid + "";
+                    }
+                    else {
+                        preParams += "," + groupid;
+                    }
+                }
+                sql += " and groupid in ("+preParams+") or cityid = "+ cityId;
+                List<Map<String, Object>> list = commonDao.getObjectBySql(sql);
+                if(list != null && !list.isEmpty()){
+                    for(Map<String, Object> map : list){
+                        parks.add(map.get("bolink_id"));
+                    }
+                }
+            }else{
+                sql +="and cityid = "+cityId;
+                List<Map<String, Object>> list = commonDao.getObjectBySql(sql);
+                if(list != null && !list.isEmpty()){
+                    for(Map<String, Object> map : list){
+                        parks.add(map.get("bolink_id"));
+                    }
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return parks;
+
+//        List<Map<String,Object>> list = new ArrayList<Map<String,Object>>();
+//        String sql = "select bolink_id,company_name from com_info_tb ";
+//        List<Object> parks = null;
+//        if(cityId != null&&!"".equals(cityId)){
+//            parks = commonMethods.getparks(cityId);
+//        }
+//        if(parks != null && !parks.isEmpty()){
+//            String preParams  ="";
+//            for(Object parkid : parks){
+//                if(preParams.equals("")) {
+//                    preParams = parkid + "";
+//                } else {
+//                    preParams += "," + parkid;
+//                }
+//            }
+//            sql += " where id in ("+preParams+") ";
+//            list = commonDao.getObjectBySql(sql);
+//        }
+//        String result = "[";
+//        if(list != null && !list.isEmpty()){
+//            int i = 1;
+//            for(Map map : list){
+//                if(i==1){
+//                    result+="{\"value_no\":\""+map.get("id")+"\",\"value_name\":\""+map.get("company_name")+"\"}";
+//                }else{
+//                    result+=",{\"value_no\":\""+map.get("id")+"\",\"value_name\":\""+map.get("company_name")+"\"}";
+//                }
+//                i++;
+//            }
+//        }
+//        result += "]";
+//        return result;
+
+    }
+
     private List<Map<String, Object>> getcollectors(Long cityid){
         try {
             if(cityid != null && cityid > 0){

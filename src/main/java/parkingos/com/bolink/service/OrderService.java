@@ -22,4 +22,6 @@ public interface OrderService {
     Long getComidByOrder(Long id);
 
     void resetDataByComid(Long comid);
+
+    JSONObject getOrderDetail(String orderid, Long comid, String carNumber);
 }

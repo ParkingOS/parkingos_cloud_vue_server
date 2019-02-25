@@ -47,4 +47,17 @@ public class AddValueAction {
         return null;
     }
 
+
+    @RequestMapping(value = "/program")
+    public String userProgram(HttpServletRequest request, HttpServletResponse resp){
+
+        Map<String, String> reqParameterMap = RequestUtil.readBodyFormRequset(request);
+
+        JSONObject result = addValueService.userProgram(reqParameterMap);
+
+        //把结果返回页面
+        StringUtils.ajaxOutput(resp,result.toJSONString());
+        return null;
+    }
+
 }

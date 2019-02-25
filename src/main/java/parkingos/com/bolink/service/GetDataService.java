@@ -1,5 +1,7 @@
 package parkingos.com.bolink.service;
 
+import java.util.List;
+
 public interface GetDataService {
 
     String getNicknameById(Long id);
@@ -35,4 +37,6 @@ public interface GetDataService {
     String getPnameByCar(Long comid, String carId);
 
     String getMessagePrice(int type);
+
+    List<Object> getAllBolinkParks(Long cityId);
 }

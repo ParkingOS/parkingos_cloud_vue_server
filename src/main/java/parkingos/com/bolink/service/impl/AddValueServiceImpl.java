@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import parkingos.com.bolink.models.BigScreenTrade;
 import parkingos.com.bolink.models.ShortMessageTb;
+import parkingos.com.bolink.models.UserProgramTrade;
 import parkingos.com.bolink.service.AddValueService;
 import parkingos.com.bolink.service.SupperSearchService;
 
@@ -30,6 +31,14 @@ public class AddValueServiceImpl implements AddValueService {
     @Override
     public JSONObject getBigScreen(Map<String, String> reqParameterMap) {
         BigScreenTrade trade = new BigScreenTrade();
+        trade.setState(1);
+        JSONObject result = supperSearchService.supperSearch(trade, reqParameterMap);
+        return result;
+    }
+
+    @Override
+    public JSONObject userProgram(Map<String, String> reqParameterMap) {
+        UserProgramTrade trade = new UserProgramTrade();
         trade.setState(1);
         JSONObject result = supperSearchService.supperSearch(trade, reqParameterMap);
         return result;

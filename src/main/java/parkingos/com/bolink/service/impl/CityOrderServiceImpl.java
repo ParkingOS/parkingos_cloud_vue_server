@@ -16,6 +16,7 @@ import parkingos.com.bolink.models.OrderTb;
 import parkingos.com.bolink.models.UserInfoTb;
 import parkingos.com.bolink.orderserver.OrderServer;
 import parkingos.com.bolink.service.CityOrderService;
+import parkingos.com.bolink.service.OrderService;
 import parkingos.com.bolink.service.SupperSearchService;
 import parkingos.com.bolink.utils.*;
 
@@ -32,9 +33,7 @@ public class CityOrderServiceImpl implements CityOrderService {
     @Autowired
     private CommonDao commonDao;
     @Autowired
-    private SupperSearchService<OrderTb> supperSearchService;
-    @Autowired
-    private CommonMethods commonMethods;
+    private OrderService orderService;
     @Autowired
     private OrderTbMapper orderTbMapper;
     @Autowired
@@ -100,7 +99,7 @@ public class CityOrderServiceImpl implements CityOrderService {
             //价格统计不需要分页  要查询所有
 //            logger.info("///////////"+reqmap);
 //            moneymap = getMoneyMap(reqmap);
-            moneymap=orderServer.selectMoneyByExample(reqmap);
+//            moneymap=orderServer.selectMoneyByExample(reqmap);
                 //带分页的 要显示在页面  的数据list
             if(reqmap.get("export")==null){//不是导出
                 reqmap.put("rp",rp);
@@ -118,20 +117,27 @@ public class CityOrderServiceImpl implements CityOrderService {
                     } else {
                         map.put("duration","");
                     }
+                    String carNumber = map.get("car_number")+"";
+                    String orderId = map.get("order_id_local")+"";
+                    Long comid = (Long)map.get("comid");
+                    JSONObject moneyData = orderService.getOrderDetail(orderId,comid,carNumber);
+                    map.put("electronic_prepay",moneyData.get("ele_prepay"));
+                    map.put("electronic_pay",moneyData.get("ele_pay"));
+                    map.put("cash_prepay",moneyData.get("cash_prepay"));
                     resList.add(map);
                 }
                 result.put("rows", JSON.toJSON(resList));
             }
         }
-        if(moneymap!=null){
-            result.put("sumtotal",moneymap.get("total"));
-            result.put("cashpay",moneymap.get("cashpay"));
-            result.put("elepay",moneymap.get("elepay"));
-        }else {
-            result.put("sumtotal", 0.00);
-            result.put("cashpay", 0.00);
-            result.put("elepay", 0.00);
-        }
+//        if(moneymap!=null){
+//            result.put("sumtotal",moneymap.get("total"));
+//            result.put("cashpay",moneymap.get("cashpay"));
+//            result.put("elepay",moneymap.get("elepay"));
+//        }else {
+//            result.put("sumtotal", 0.00);
+//            result.put("cashpay", 0.00);
+//            result.put("elepay", 0.00);
+//        }
         result.put("total",count);
         if(reqmap.get("page")!=null){
             result.put("page",Integer.parseInt(reqmap.get("page")));
