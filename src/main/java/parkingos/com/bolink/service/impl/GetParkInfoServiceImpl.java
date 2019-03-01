@@ -9,6 +9,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import parkingos.com.bolink.dao.mybatis.mapper.OrderMapper;
 import parkingos.com.bolink.dao.mybatis.mapper.ParkInfoMapper;
+import parkingos.com.bolink.dao.spring.CommonDao;
+import parkingos.com.bolink.models.ParkChannelsTb;
 import parkingos.com.bolink.orderserver.OrderServer;
 import parkingos.com.bolink.service.CityOrderAnlysisService;
 import parkingos.com.bolink.service.GetParkInfoService;
@@ -39,6 +41,8 @@ public class GetParkInfoServiceImpl implements GetParkInfoService {
     private OrderServer orderServer;
     @Autowired
     private RedisService redisService;
+    @Autowired
+    private CommonDao commonDao;
 
     DecimalFormat af1 = new DecimalFormat("0");
     @Override
@@ -482,12 +486,21 @@ public class GetParkInfoServiceImpl implements GetParkInfoService {
                     isonline = isParkOnline(logintime.longValue(), 10);
                 }
             }
+            parkstatusmap.put("localid", localid.substring(localid.indexOf("_")+1));
+            String localIdNoVersion = localid.replace(localid.substring(localid.indexOf("_"),localid.indexOf("_",localid.indexOf("_")+1)),"");
+            ParkChannelsTb parkChannelsTb = new ParkChannelsTb();
+            parkChannelsTb.setParkId(Long.valueOf(parkid));
+            parkChannelsTb.setLocalIdNoVersion(localIdNoVersion);
+            parkChannelsTb =(ParkChannelsTb)commonDao.selectObjectByConditions(parkChannelsTb);
+            if(parkChannelsTb!=null&&parkChannelsTb.getLocalName()!=null){
+                parkstatusmap.put("localid", parkChannelsTb.getLocalName());
+            }
             if (isonline) {
                 parkstatusmap.put("state", 1);
-                parkstatusmap.put("localid", localid.substring(localid.indexOf("_")+1));
+//                parkstatusmap.put("localid", localid.substring(localid.indexOf("_")+1));
             } else {
                 parkstatusmap.put("state", 0);
-                parkstatusmap.put("localid", localid.substring(localid.indexOf("_")+1));
+//                parkstatusmap.put("localid", localid.substring(localid.indexOf("_")+1));
             }
                 parkState.add(parkstatusmap);
         }

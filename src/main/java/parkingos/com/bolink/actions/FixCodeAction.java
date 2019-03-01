@@ -7,6 +7,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
+import parkingos.com.bolink.enums.AddValueServerEnum;
 import parkingos.com.bolink.models.FixCodeTb;
 import parkingos.com.bolink.models.ShopTb;
 import parkingos.com.bolink.service.FixCodeService;
@@ -18,6 +19,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Map;
+import java.util.Random;
 
 @Controller
 @RequestMapping("/fixcode")
@@ -345,5 +347,41 @@ public class FixCodeAction {
         StringUtils.ajaxOutput(resp,result.toJSONString());
         return null;
     }
+
+    @RequestMapping(value = "/tobuy")
+    public String toBuy(HttpServletRequest request, HttpServletResponse resp){
+
+        //需要支付金额
+        Double money = RequestUtil.getDouble(request,"money",0.0);
+        //生成流水号
+        String seed = (new Random().nextDouble() + "").substring(2, 9);
+        String tradeNo = AddValueServerEnum.SHOPAPP.type+System.currentTimeMillis() + seed;
+        Long park_id = RequestUtil.getLong(request,"comid",-1L);
+        Long shop_id = RequestUtil.getLong(request,"shop_id",-1L);
+        logger.info("buy fixcode app:"+shop_id+"~~"+money);
+        JSONObject result = fixCodeService.buyApp(money,tradeNo,park_id,shop_id);
+        StringUtils.ajaxOutput(resp, result.toJSONString());
+        return null;
+    }
+
+    @RequestMapping(value = "/getofficialstate")
+    public String getOfficialState(HttpServletRequest request, HttpServletResponse resp){
+        Long shopId = RequestUtil.getLong(request,"shop_id",-1L);
+        logger.info("===>>>>get official state:"+shopId);
+        int result = fixCodeService.getOfficialState(shopId);
+        StringUtils.ajaxOutput(resp, result+"");
+        return null;
+    }
+
+    @RequestMapping(value = "/getbuytrade")
+    public String getBuyTrade(HttpServletRequest request,HttpServletResponse resp) {
+        Map<String, String> reqParameterMap = RequestUtil.readBodyFormRequset(request);
+
+        JSONObject result = fixCodeService.getBuyTrade(reqParameterMap);
+        //把结果返回页面
+        StringUtils.ajaxOutput(resp, result.toJSONString());
+        return null;
+    }
+
 
 }
