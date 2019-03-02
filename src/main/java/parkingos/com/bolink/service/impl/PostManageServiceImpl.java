@@ -34,7 +34,7 @@ public class PostManageServiceImpl implements PostManageService {
             Integer offset = (page - 1) * rp;
             list = postManageMapper.getChannels(comid, rp, offset);
         }
-        result.put("count",count);
+        result.put("total",count);
         result.put("rows", JSON.toJSON(list));
         result.put("page",page);
         return result;
