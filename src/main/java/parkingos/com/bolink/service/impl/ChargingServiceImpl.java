@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 import parkingos.com.bolink.dao.spring.CommonDao;
 import parkingos.com.bolink.models.ParkChargingTb;
 import parkingos.com.bolink.service.ChargingService;
@@ -13,7 +14,7 @@ import parkingos.com.bolink.utils.Check;
 import javax.script.Invocable;
 import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;
-
+@Service
 public class ChargingServiceImpl implements ChargingService {
 
     Logger logger = LoggerFactory.getLogger(ChargingServiceImpl.class);

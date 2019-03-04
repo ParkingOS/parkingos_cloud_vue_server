@@ -99,6 +99,7 @@ public class ChargingAction {
     public String cloudFirst(HttpServletRequest request, HttpServletResponse resp){
         Long comid = RequestUtil.getLong(request,"comid",-1L);
         Integer cloudFirst = RequestUtil.getInteger(request,"cloud_first",0);
+        logger.info("====平台优先:"+comid+"~~"+cloudFirst);
         JSONObject result = chargingService.cloudFirst(comid,cloudFirst);
         StringUtils.ajaxOutput(resp,result.toString());
         return null;
