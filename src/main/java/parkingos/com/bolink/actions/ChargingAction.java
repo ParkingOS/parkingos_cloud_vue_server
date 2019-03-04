@@ -78,7 +78,7 @@ public class ChargingAction {
     @RequestMapping("testjs")
     public String testJs(HttpServletRequest request, HttpServletResponse resp){
         Long id = RequestUtil.getLong(request,"id",-1L);
-        Long createTime = RequestUtil.getLong(request,"create_time",-1L);
+        Long createTime = RequestUtil.getLong(request,"begin_time",-1L);
         Long endTime = RequestUtil.getLong(request,"end_time",-1L);
         String result = chargingService.testJs(id,createTime,endTime);
         StringUtils.ajaxOutput(resp,result);
