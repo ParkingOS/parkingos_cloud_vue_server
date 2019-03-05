@@ -9,4 +9,6 @@ public interface AddValueService {
     JSONObject getMessage(Map<String, String> reqParameterMap);
 
     JSONObject getBigScreen(Map<String, String> reqParameterMap);
+
+    JSONObject getShopOfficial(Map<String, String> reqParameterMap);
 }

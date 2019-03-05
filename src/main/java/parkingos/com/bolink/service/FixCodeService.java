@@ -21,4 +21,10 @@ public interface FixCodeService {
     JSONObject setPublic(ShopTb shopTb);
 
     JSONObject setPwd(FixCodeTb fixCodeTb);
+
+    JSONObject buyApp(Double money, String tradeNo, Long park_id, Long shop_id);
+
+    int getOfficialState(Long shopId);
+
+    JSONObject getBuyTrade(Map<String, String> reqParameterMap);
 }
