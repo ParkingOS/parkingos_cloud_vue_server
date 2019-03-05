@@ -359,6 +359,20 @@ public class FixCodeServiceImpl implements FixCodeService {
 
     @Override
     public int getOfficialState(Long shopId) {
+        //先判断是不是虎门的商户  虎门车场是交了钱的 所有的商户
+        ShopTb shopTb = new ShopTb();
+        shopTb.setId(shopId);
+        shopTb=(ShopTb)commonDao.selectObjectByConditions(shopTb);
+        if(shopTb==null){
+            return 0;
+        }
+        String comids = CustomDefind.SECRETPARK;
+        String[] comidArr = comids.split(",");
+        for(String parkId:comidArr){
+            if(parkId.equals(shopTb.getComid()+"")){
+                return 1;
+            }
+        }
         ShopOfficialAccount account = new ShopOfficialAccount();
         account.setShopId(shopId);
         return commonDao.selectCountByConditions(account);
