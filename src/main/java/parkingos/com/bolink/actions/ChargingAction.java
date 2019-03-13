@@ -105,4 +105,13 @@ public class ChargingAction {
         return null;
     }
 
+    @RequestMapping("getfirstornot")
+    public String getFirstOrNot(HttpServletRequest request, HttpServletResponse resp){
+        Long comid = RequestUtil.getLong(request,"comid",-1L);
+        logger.info("====getfirstornot:"+comid);
+        int result = chargingService.getFirstOrNot(comid);
+        StringUtils.ajaxOutput(resp,result+"");
+        return null;
+    }
+
 }

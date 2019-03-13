@@ -15,4 +15,6 @@ public interface ChargingService {
     JSONObject openOrClose(Long id, Integer isOpen);
 
     JSONObject cloudFirst(Long comid, Integer cloudFirst);
+
+    int getFirstOrNot(Long comid);
 }

@@ -6,6 +6,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import parkingos.com.bolink.dao.spring.CommonDao;
+import parkingos.com.bolink.models.ComInfoTb;
 import parkingos.com.bolink.models.ParkChargingTb;
 import parkingos.com.bolink.service.ChargingService;
 import parkingos.com.bolink.service.redis.RedisService;
@@ -88,6 +89,13 @@ public class ChargingServiceImpl implements ChargingService {
     @Override
     public String testJs(Long id,Long createTime,Long endTime) {
 
+
+        if(createTime.toString().length()>10){
+            createTime = createTime/1000;
+        }
+        if(endTime.toString().length()>10){
+            endTime = endTime/1000;
+        }
         ParkChargingTb parkChargingTb = new ParkChargingTb();
         parkChargingTb.setId(id);
         parkChargingTb = (ParkChargingTb)commonDao.selectObjectByConditions(parkChargingTb);
@@ -108,7 +116,7 @@ public class ChargingServiceImpl implements ChargingService {
             // 注意：JavaScript engine 实现了 Invocable 接口
             Invocable inv = (Invocable) engine;
             // 执行这个名字为 "hello"的全局的函数
-            result = (String)inv.invokeFunction("getPrice", createTime, endTime);
+            result = inv.invokeFunction("getPrice", createTime, endTime)+"";
             logger.info("===>>>>get result from js:"+result);
             return result;
         }catch (Exception e){
@@ -134,7 +142,7 @@ public class ChargingServiceImpl implements ChargingService {
 
 
             result.put("state",1);
-            result.put("msg","更新失败！");
+            result.put("msg","更新成功！");
         }
         return result;
     }
@@ -142,8 +150,27 @@ public class ChargingServiceImpl implements ChargingService {
     @Override
     public JSONObject cloudFirst(Long comid, Integer cloudFirst) {
         JSONObject result = new JSONObject();
+        result.put("state", 0);
+        ComInfoTb comInfoTb = new ComInfoTb();
+        comInfoTb.setId(comid);
+        comInfoTb.setCloudFirst(cloudFirst);
+        int update = commonDao.updateByPrimaryKey(comInfoTb);
+        if(update==1) {
+            result.put("state", update);
+            result.put("msg","更新成功！");
+        }
+        return result;
+    }
 
-        return null;
+    @Override
+    public int getFirstOrNot(Long comid) {
+        ComInfoTb comInfoTb = new ComInfoTb();
+        comInfoTb.setId(comid);
+        comInfoTb=(ComInfoTb)commonDao.selectObjectByConditions(comInfoTb);
+        if(comInfoTb!=null){
+            return comInfoTb.getCloudFirst();
+        }
+        return 0;
     }
 
 }
