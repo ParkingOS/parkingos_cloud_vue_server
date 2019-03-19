@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="parkingos.com.bolink.dao.mybatis.mapper.PostManageMapper" >
+    <!--获取入场车辆-->
+    <select id="getChannels"  resultType="map">
+        <![CDATA[
+        SELECT DISTINCT
+            (A .local_id_no_version),
+            A .local_id,
+            b.*
+        FROM
+            park_login_anly A
+        LEFT JOIN park_channels_tb b ON A .local_id_no_version = b.local_id_no_version
+        WHERE
+            A .park_id = #{comid,jdbcType=BIGINT}
+        AND A .local_id_no_version IS NOT NULL
+        limit ${limit} offset ${offset}
+    ]]>
+    </select>
+
+
+    <select id="getChannelsCount"  resultType="int">
+        <![CDATA[
+        SELECT "count"(*) from (SELECT DISTINCT
+	A .local_id_no_version,
+	A .local_id,
+	b.*
+FROM
+	park_login_anly A
+LEFT JOIN park_channels_tb b ON A .local_id_no_version = b.local_id_no_version
+WHERE
+	A .park_id = #{comid,jdbcType=BIGINT}
+AND A .local_id_no_version IS NOT NULL) a
+    ]]>
+    </select>
+
+</mapper>

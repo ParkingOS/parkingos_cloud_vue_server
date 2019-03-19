@@ -60,4 +60,17 @@ public class AddValueAction {
         return null;
     }
 
+
+    @RequestMapping(value = "/shopofficial")
+    public String shopOfficial(HttpServletRequest request, HttpServletResponse resp){
+
+        Map<String, String> reqParameterMap = RequestUtil.readBodyFormRequset(request);
+
+        JSONObject result = addValueService.getShopOfficial(reqParameterMap);
+
+        //把结果返回页面
+        StringUtils.ajaxOutput(resp,result.toJSONString());
+        return null;
+    }
+
 }

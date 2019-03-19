@@ -7,8 +7,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import parkingos.com.bolink.dao.spring.CommonDao;
-import parkingos.com.bolink.models.FixCodeTb;
-import parkingos.com.bolink.models.ShopTb;
+import parkingos.com.bolink.models.*;
 import parkingos.com.bolink.qo.PageOrderConfig;
 import parkingos.com.bolink.qo.SearchBean;
 import parkingos.com.bolink.service.FixCodeService;
@@ -18,7 +17,9 @@ import parkingos.com.bolink.utils.CustomDefind;
 import parkingos.com.bolink.utils.ExecutorsUtil;
 import parkingos.com.bolink.utils.OrmUtil;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutorService;
@@ -32,6 +33,8 @@ public class FixCodeServiceImpl implements FixCodeService {
     private CommonDao commonDao;
     @Autowired
     private SupperSearchService<FixCodeTb> supperSearchService;
+    @Autowired
+    private SupperSearchService<ShopOfficialTrade> searchService4Official;
     @Autowired
     private TicketService ticketService;
 
@@ -286,6 +289,102 @@ public class FixCodeServiceImpl implements FixCodeService {
             result.put("state",1);
             result.put("msg","修改成功");
         }
+        return result;
+    }
+
+    @Override
+    public JSONObject buyApp(Double money, String tradeNo, Long park_id, Long shop_id) {
+        JSONObject result = new JSONObject();
+        result.put("state",0);
+
+        Long union_id =-1L;
+        ComInfoTb comInfoTb = new ComInfoTb();
+        comInfoTb.setId(park_id);
+        comInfoTb = (ComInfoTb)commonDao.selectObjectByConditions(comInfoTb);
+        if(comInfoTb==null){
+            return result;
+        }
+
+        String parkName = comInfoTb.getCompanyName()+"("+comInfoTb.getBolinkId()+")";
+        if(comInfoTb.getCityid()>0){
+            union_id = comInfoTb.getCityid();
+        }else{
+            OrgGroupTb orgGroupTb= new OrgGroupTb();
+            orgGroupTb.setId(comInfoTb.getGroupid());
+            orgGroupTb=(OrgGroupTb)commonDao.selectObjectByConditions(orgGroupTb);
+            if(orgGroupTb!=null){
+                union_id = orgGroupTb.getCityid();
+            }
+        }
+
+        String unionName = "";
+        if(union_id>0){
+            OrgCityMerchants orgCityMerchants = new OrgCityMerchants();
+            orgCityMerchants.setId(union_id);
+            orgCityMerchants=(OrgCityMerchants)commonDao.selectObjectByConditions(orgCityMerchants);
+            if(orgCityMerchants!=null){
+                unionName=orgCityMerchants.getName();
+            }
+        }
+
+        String shopName = "";
+        ShopTb shopTb = new ShopTb();
+        shopTb.setId(shop_id);
+        shopTb=(ShopTb)commonDao.selectObjectByConditions(shopTb);
+        if(shopTb!=null&&shopTb.getName()!=null){
+            shopName=shopTb.getName();
+        }
+
+        ShopOfficialTrade trade = new ShopOfficialTrade();
+        trade.setTradeNo(tradeNo);
+        trade.setMoney(new BigDecimal(money+""));
+        trade.setShopId(shop_id);
+        trade.setParkId(park_id);
+        trade.setParkName(parkName);
+        trade.setState(0);
+        trade.setUnionId(union_id);
+        trade.setUnionName(unionName);
+        trade.setShopName(shopName);
+        trade.setCtime(System.currentTimeMillis()/1000);
+
+
+        int insert = commonDao.insert(trade);
+        if(insert==1) {
+            result.put("state", 1);
+            result.put("trade_no",tradeNo);
+        }
+
+        return result;
+    }
+
+    @Override
+    public int getOfficialState(Long shopId) {
+        //先判断是不是虎门的商户  虎门车场是交了钱的 所有的商户
+        ShopTb shopTb = new ShopTb();
+        shopTb.setId(shopId);
+        shopTb=(ShopTb)commonDao.selectObjectByConditions(shopTb);
+        if(shopTb==null){
+            return 0;
+        }
+        String comids = CustomDefind.SECRETPARK;
+        String[] comidArr = comids.split(",");
+        for(String parkId:comidArr){
+            if(parkId.equals(shopTb.getComid()+"")){
+                return 1;
+            }
+        }
+        ShopOfficialAccount account = new ShopOfficialAccount();
+        account.setShopId(shopId);
+        return commonDao.selectCountByConditions(account);
+    }
+
+    @Override
+    public JSONObject getBuyTrade(Map<String, String> reqParameterMap) {
+        Long comid = Long.parseLong(reqParameterMap.get("comid"));
+        ShopOfficialTrade trade = new ShopOfficialTrade();
+        trade.setParkId(comid);
+        trade.setState(1);
+        JSONObject result = searchService4Official.supperSearch(trade, reqParameterMap);
         return result;
     }
 
