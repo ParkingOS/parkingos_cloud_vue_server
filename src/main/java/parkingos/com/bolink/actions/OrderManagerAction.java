@@ -127,4 +127,16 @@ public class OrderManagerAction {
         saveLogService.saveLog(parkLogTb);
         return null;
     }
+
+
+    @RequestMapping(value = "/getorderdetail")
+    public String getOrderDetail(HttpServletRequest request, HttpServletResponse response) throws Exception{
+        String orderid = RequestUtil.getString(request, "orderid");
+        Long comid = RequestUtil.getLong(request, "comid", -1L);
+        String carNumber = StringUtils.decodeUTF8(RequestUtil.getString(request, "car_number"));
+        logger.info("===>>>>>getOrderDetail:"+orderid+"~~"+carNumber+"~~"+comid);
+        JSONObject result = orderService.getOrderDetail(orderid,comid,carNumber);
+        StringUtils.ajaxOutput(response, result.toJSONString());
+        return null;
+    }
 }

@@ -278,7 +278,7 @@ public class CityVipServiceImpl implements CityVipService {
                 e2.printStackTrace();
             }
         }
-        System.out.println("====上传月卡会员:"+filename);
+        logger.info("====上传月卡会员:"+filename);
 
         if(is!=null&&filename!=null){
             List<Object[]> syncValues = new ArrayList<>();
@@ -303,7 +303,10 @@ public class CityVipServiceImpl implements CityVipService {
 //                    }
                     boolean isValid = true;
                     Long comid =null;//车场编号
-                    String car_number = o[7]+"";//车牌
+                    String car_number = "";
+                    if(o.length>7) {
+                        car_number= o[7] + "";//车牌
+                    }
                     String btime = o[1]+"";
                     String etime = o[2]+"";
                     if(Check.isLong(o[0]+"")){
@@ -328,7 +331,7 @@ public class CityVipServiceImpl implements CityVipService {
                         isValid = false;
                     }
                     if(isValid){
-                        System.out.println("============comid:"+comid);
+                        logger.info("============comid:"+comid);
                         //数据库检验车场编号和月卡会员中同一车场同一车牌是否存在
                         //校验车场
                         if(comMaps.containsKey(comid)){
@@ -349,15 +352,16 @@ public class CityVipServiceImpl implements CityVipService {
                                 parks = commonMethods.getparks(cityid);
                             }
 
-                            System.out.println("=======parks:"+parks);
-
-                            //封装searchbean  集团和城市下面所有车场
-                            SearchBean searchBean = new SearchBean();
-                            searchBean.setOperator(FieldOperator.CONTAINS);
-                            searchBean.setFieldName("id");
-                            searchBean.setBasicValue(parks);
+                            logger.info("=======parks:"+parks);
                             List<SearchBean> searchBeanList = new ArrayList<>();
-                            searchBeanList.add(searchBean);
+                            //封装searchbean  集团和城市下面所有车场
+                            if(parks!=null&&parks.size()>0) {
+                                SearchBean searchBean = new SearchBean();
+                                searchBean.setOperator(FieldOperator.CONTAINS);
+                                searchBean.setFieldName("id");
+                                searchBean.setBasicValue(parks);
+                                searchBeanList.add(searchBean);
+                            }
 
                             comInfoTb.setState(0);
                             int count = commonDao.selectCountByConditions(comInfoTb,searchBeanList);

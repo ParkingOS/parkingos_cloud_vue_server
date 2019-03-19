@@ -1,5 +1,7 @@
 package parkingos.com.bolink.utils;
 
+import parkingos.com.bolink.dao.mybatis.BolinkExpenseTbExample;
+import parkingos.com.bolink.dao.mybatis.BolinkIncomeTbExample;
 import parkingos.com.bolink.dao.mybatis.OrderTbExample;
 
 import java.math.BigDecimal;
@@ -222,4 +224,196 @@ public class ExampleUtis {
         }
 	    return example;
     }
+
+
+    public static BolinkIncomeTbExample createIncomeExampleByMap(Map<String, String> reqmap){
+	    BolinkIncomeTbExample example = new BolinkIncomeTbExample();
+	    if(reqmap!=null&&reqmap.size()>0) {
+            for (String key : reqmap.keySet()) {
+                switch (key) {
+
+                    case "tableName":
+                        example.setTableName(reqmap.get("tableName"));
+                        break;
+                    case "rp":
+                        example.setLimit(Integer.parseInt(reqmap.get("rp")));
+                        example.setOffset(Integer.parseInt(reqmap.get("rp")) * (Integer.parseInt(reqmap.get("page")) - 1));
+                        break;
+                    case "orderby":
+                        example.setOrderType(reqmap.get("orderby"));
+                        break;
+                    case "orderfield":
+                        if(reqmap.get("orderfield")!=null&&!"".equals(reqmap.get("orderfield"))){
+                            example.setOrderByClause(reqmap.get("orderfield"));
+                        }
+                        break;
+
+                    case "comid":
+                        String startvalue = reqmap.get("comid");
+                        System.out.println("===========>>>>>>>>>>>>>>>>comid:"+startvalue);
+                        if (Check.isLong(startvalue)) {
+                            example.createCriteria().andParkIdEqualTo(Long.parseLong(startvalue));
+                        }
+                        break;
+
+                    case "car_number":
+                        String car_number = reqmap.get("car_number");
+                        if (!Check.isEmpty(car_number)) {
+                            example.createCriteria().andCarNumberLike("%"+car_number+"%");
+                        }
+                        break;
+                    case "pay_time":
+                        String pay_time = reqmap.get("pay_time");
+                        String pay_time_start = reqmap.get("pay_time_start");
+                        String pay_time_end = reqmap.get("pay_time_end");
+
+                        if (pay_time_start != null && pay_time_start.length() > 10) {
+                            pay_time_start = pay_time_start.substring(0, 10);
+                        }
+                        if (pay_time_end != null && pay_time_end.length() > 10) {
+                            pay_time_end = pay_time_end.substring(0, 10);
+                        }
+
+                        if (pay_time.equals("between")) {
+                            if (Check.isLong(pay_time_start) && Check.isLong(pay_time_end)) {
+                                example.createCriteria().andPayTimeBetween(Long.valueOf(pay_time_start), Long.valueOf(pay_time_end));
+                            }
+                        }
+                        break;
+
+                    case "type":
+                        String type = reqmap.get("type");
+                        if (Check.isLong(type)) {
+                            example.createCriteria().andTypeEqualTo(Integer.parseInt(type));
+                        }
+                        break;
+
+
+                    case "collector":
+                        String collector = reqmap.get("collector_start");
+                        if (Check.isLong(collector)) {
+                            example.createCriteria().andCollectorEqualTo(Long.parseLong(collector));
+                        }
+                        break;
+
+                    case "order_id":
+                        String orderId = reqmap.get("order_id");
+                        if (!Check.isEmpty(orderId)) {
+                            example.createCriteria().andOrderIdLike("%"+orderId+"%");
+                        }
+                        break;
+
+                    case "trade_no":
+                        String tradeNo = reqmap.get("trade_no");
+                        if (!Check.isEmpty(tradeNo)) {
+                            example.createCriteria().andTradeNoLike("%"+tradeNo+"%");
+                        }
+                        break;
+                    default:
+                        break;
+                }
+            }
+        }
+        return example;
+    }
+
+
+    public static BolinkExpenseTbExample createExpenseExampleByMap(Map<String, String> reqmap){
+        BolinkExpenseTbExample example = new BolinkExpenseTbExample();
+        if(reqmap!=null&&reqmap.size()>0) {
+            for (String key : reqmap.keySet()) {
+                switch (key) {
+
+                    case "tableName":
+                        example.setTableName(reqmap.get("tableName"));
+                        break;
+                    case "rp":
+                        example.setLimit(Integer.parseInt(reqmap.get("rp")));
+                        example.setOffset(Integer.parseInt(reqmap.get("rp")) * (Integer.parseInt(reqmap.get("page")) - 1));
+                        break;
+                    case "orderby":
+                        example.setOrderType(reqmap.get("orderby"));
+                        break;
+                    case "orderfield":
+                        if(reqmap.get("orderfield")!=null&&!"".equals(reqmap.get("orderfield"))){
+                            example.setOrderByClause(reqmap.get("orderfield"));
+                        }
+                        break;
+
+                    case "comid":
+                        String startvalue = reqmap.get("comid");
+                        System.out.println("===========>>>>>>>>>>>>>>>>comid:"+startvalue);
+                        if (Check.isLong(startvalue)) {
+                            example.createCriteria().andParkIdEqualTo(Long.parseLong(startvalue));
+                        }
+                        break;
+
+                    case "car_number":
+                        String car_number = reqmap.get("car_number");
+                        if (!Check.isEmpty(car_number)) {
+                            example.createCriteria().andCarNumberLike("%"+car_number+"%");
+                        }
+                        break;
+                    case "pay_time":
+                        String pay_time = reqmap.get("pay_time");
+                        String pay_time_start = reqmap.get("pay_time_start");
+                        String pay_time_end = reqmap.get("pay_time_end");
+
+                        if (pay_time_start != null && pay_time_start.length() > 10) {
+                            pay_time_start = pay_time_start.substring(0, 10);
+                        }
+                        if (pay_time_end != null && pay_time_end.length() > 10) {
+                            pay_time_end = pay_time_end.substring(0, 10);
+                        }
+
+                        if (pay_time.equals("between")) {
+                            if (Check.isLong(pay_time_start) && Check.isLong(pay_time_end)) {
+                                example.createCriteria().andPayTimeBetween(Long.valueOf(pay_time_start), Long.valueOf(pay_time_end));
+                            }
+                        }
+                        break;
+
+                    case "type":
+                        String type = reqmap.get("type");
+                        if (Check.isLong(type)) {
+                            example.createCriteria().andTypeEqualTo(Integer.parseInt(type));
+                        }
+                        break;
+
+
+                    case "collector":
+                        String collector = reqmap.get("collector_start");
+                        if (Check.isLong(collector)) {
+                            example.createCriteria().andCollectorEqualTo(Long.parseLong(collector));
+                        }
+                        break;
+
+                    case "pay_channel":
+                        String payChannel = reqmap.get("pay_channel_start");
+                        if (Check.isNumber(payChannel)) {
+                            example.createCriteria().andPayChannelEqualTo(Integer.parseInt(payChannel));
+                        }
+                        break;
+
+                    case "order_id":
+                        String orderId = reqmap.get("order_id");
+                        if (!Check.isEmpty(orderId)) {
+                            example.createCriteria().andOrderIdLike("%"+orderId+"%");
+                        }
+                        break;
+
+                    case "trade_no":
+                        String tradeNo = reqmap.get("trade_no");
+                        if (!Check.isEmpty(tradeNo)) {
+                            example.createCriteria().andTradeNoLike("%"+tradeNo+"%");
+                        }
+                        break;
+                    default:
+                        break;
+                }
+            }
+        }
+        return example;
+    }
+
 }

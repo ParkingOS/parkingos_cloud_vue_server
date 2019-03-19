@@ -221,25 +221,25 @@ public class OrderServer extends BaseServer {
             return null;
         }
 
-        List<Map<String,String>> list = new ArrayList<>();
-        if(u!=null) {
-            for (OrderMap orderMap : u.getMapList()) {
-                Map<String,String> resultMap = new HashMap<>();
-                Map<String,String> map1 = orderMap.getMapMap();
-                String comid = map1.get("comid");
-                String parkName = getParkNameById(comid);
-                resultMap.putAll(map1);
-                resultMap.put("comid",parkName);
-                list.add(resultMap);
-            }
-        }
-
 //        List<Map<String,String>> list = new ArrayList<>();
 //        if(u!=null) {
 //            for (OrderMap orderMap : u.getMapList()) {
-//                list.add(orderMap.getMapMap());
+//                Map<String,String> resultMap = new HashMap<>();
+//                Map<String,String> map1 = orderMap.getMapMap();
+//                String comid = map1.get("comid");
+//                String parkName = getParkNameById(comid);
+//                resultMap.putAll(map1);
+//                resultMap.put("comid",parkName);
+//                list.add(resultMap);
 //            }
 //        }
+
+        List<Map<String,String>> list = new ArrayList<>();
+        if(u!=null) {
+            for (OrderMap orderMap : u.getMapList()) {
+                list.add(orderMap.getMapMap());
+            }
+        }
         return list;
     }
 
@@ -269,25 +269,25 @@ public class OrderServer extends BaseServer {
             return null;
         }
 
-        List<Map<String,String>> list = new ArrayList<>();
-        if(u!=null) {
-            for (OrderMap orderMap : u.getMapList()) {
-                Map<String,String> resultMap = new HashMap<>();
-                Map<String,String> map1 = orderMap.getMapMap();
-                String comid = map1.get("comid");
-                String parkName = getParkNameById(comid);
-                resultMap.putAll(map1);
-                resultMap.put("comid",parkName);
-                list.add(resultMap);
-            }
-        }
-
 //        List<Map<String,String>> list = new ArrayList<>();
 //        if(u!=null) {
 //            for (OrderMap orderMap : u.getMapList()) {
-//                list.add(orderMap.getMapMap());
+//                Map<String,String> resultMap = new HashMap<>();
+//                Map<String,String> map1 = orderMap.getMapMap();
+//                String comid = map1.get("comid");
+//                String parkName = getParkNameById(comid);
+//                resultMap.putAll(map1);
+//                resultMap.put("comid",parkName);
+//                list.add(resultMap);
 //            }
 //        }
+
+        List<Map<String,String>> list = new ArrayList<>();
+        if(u!=null) {
+            for (OrderMap orderMap : u.getMapList()) {
+                list.add(orderMap.getMapMap());
+            }
+        }
         return list;
     }
 
@@ -356,10 +356,10 @@ public class OrderServer extends BaseServer {
             for (OrderMap orderMap : u.getMapList()) {
                 Map<String,String> resultMap = new HashMap<>();
                 Map<String,String> map1 = orderMap.getMapMap();
-                String userId = map1.get("name");
-                String parkName = getUserName(userId);
+//                String userId = map1.get("name");
+//                String parkName = getUserName(userId);
                 resultMap.putAll(map1);
-                resultMap.put("name",parkName);
+//                resultMap.put("name",parkName);
                 list.add(resultMap);
             }
         }
@@ -432,25 +432,25 @@ public class OrderServer extends BaseServer {
             return null;
         }
 
-        List<Map<String,String>> list = new ArrayList<>();
-        if(u!=null) {
-            for (OrderMap orderMap : u.getMapList()) {
-                Map<String,String> resultMap = new HashMap<>();
-                Map<String,String> map1 = orderMap.getMapMap();
-                String userId = map1.get("name");
-                String parkName = getUserName(userId);
-                resultMap.putAll(map1);
-                resultMap.put("name",parkName);
-                list.add(resultMap);
-            }
-        }
-
 //        List<Map<String,String>> list = new ArrayList<>();
 //        if(u!=null) {
 //            for (OrderMap orderMap : u.getMapList()) {
-//                list.add(orderMap.getMapMap());
+//                Map<String,String> resultMap = new HashMap<>();
+//                Map<String,String> map1 = orderMap.getMapMap();
+//                String userId = map1.get("name");
+//                String parkName = getUserName(userId);
+//                resultMap.putAll(map1);
+//                resultMap.put("name",parkName);
+//                list.add(resultMap);
 //            }
 //        }
+
+        List<Map<String,String>> list = new ArrayList<>();
+        if(u!=null) {
+            for (OrderMap orderMap : u.getMapList()) {
+                list.add(orderMap.getMapMap());
+            }
+        }
         return list;
     }
 

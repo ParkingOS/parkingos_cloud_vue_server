@@ -11,6 +11,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import parkingos.com.bolink.dao.mybatis.OrderTbExample;
+import parkingos.com.bolink.dao.mybatis.mapper.BolinkDataMapper;
 import parkingos.com.bolink.dao.mybatis.mapper.OrderMapper;
 import parkingos.com.bolink.dao.spring.CommonDao;
 import parkingos.com.bolink.models.CarpicTb;
@@ -18,6 +19,7 @@ import parkingos.com.bolink.models.ComPassTb;
 import parkingos.com.bolink.models.OrderTb;
 import parkingos.com.bolink.models.UserInfoTb;
 import parkingos.com.bolink.orderserver.OrderServer;
+import parkingos.com.bolink.service.CommonService;
 import parkingos.com.bolink.service.OrderService;
 import parkingos.com.bolink.service.SupperSearchService;
 import parkingos.com.bolink.utils.*;
@@ -42,6 +44,10 @@ public class OrderServiceImpl implements OrderService {
     private OrderMapper orderMapper;
     @Autowired
     private OrderServer orderServer;
+    @Autowired
+    private BolinkDataMapper bolinkDataMapper;
+    @Autowired
+    private CommonService commonService;
 
     @Override
     public int selectCountByConditions(OrderTb orderTb) {
@@ -102,10 +108,10 @@ public class OrderServiceImpl implements OrderService {
             orderList = orderServer.getOrdersByMapConditons(reqmap);
             if (orderList != null && orderList.size() > 0) {
                 for (OrderTb order : orderList) {
-                    logger.info("get order ======:"+order);
+//                    logger.info("get order ======:"+order);
                     OrmUtil<OrderTb> om = new OrmUtil<OrderTb>();
                     Map map = om.pojoToMap(order);
-                    logger.info("get order map======:"+map);
+//                    logger.info("get order map======:"+map);
                     Long start = (Long) map.get("create_time");
                     Long end = (Long) map.get("end_time");
                     if (start != null && end != null) {
@@ -113,6 +119,13 @@ public class OrderServiceImpl implements OrderService {
                     } else {
                         map.put("duration", "");
                     }
+
+                    String carNumber = map.get("car_number")+"";
+                    String orderId = map.get("order_id_local")+"";
+                    JSONObject moneyData = getOrderDetail(orderId,comid,carNumber);
+                    map.put("electronic_prepay",moneyData.get("ele_prepay"));
+                    map.put("electronic_pay",moneyData.get("ele_pay"));
+                    map.put("cash_prepay",moneyData.get("cash_prepay"));
                     resList.add(map);
                 }
             }
@@ -455,6 +468,30 @@ public class OrderServiceImpl implements OrderService {
             tableName= tableName+"_"+cityid%100;
         }
         orderServer.resetDataByComid(comid,tableName,cityid);
+    }
+
+    @Override
+    public JSONObject getOrderDetail(String orderid, Long comid, String carNumber) {
+
+        String tableName = commonService.getTableNameByComid(comid,1);
+        List<Map<String,Object>> list = bolinkDataMapper.getOrderMoneys(tableName,orderid,comid,carNumber);
+        JSONObject result = new JSONObject();
+        result.put("cash_prepay",0.0);
+        result.put("ele_prepay",0.0);
+        result.put("ele_pay",0.0);
+        // 1现金预付 2电子预付 3电子支付
+        if(list!=null&&list.size()>0){
+            for(Map moneyMap:list){
+                if((int)moneyMap.get("type")==1){
+                    result.put("cash_prepay",moneyMap.get("pay_money"));
+                }else if((int)moneyMap.get("type")==2){
+                    result.put("ele_prepay",moneyMap.get("pay_money"));
+                }else if((int)moneyMap.get("type")==3){
+                    result.put("ele_pay",moneyMap.get("pay_money"));
+                }
+            }
+        }
+        return result;
     }
 
     private String getPassName(Long comId, Integer passId) {

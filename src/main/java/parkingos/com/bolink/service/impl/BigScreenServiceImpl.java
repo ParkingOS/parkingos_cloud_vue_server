@@ -116,7 +116,9 @@ public class BigScreenServiceImpl implements BigScreenService {
         account.setParkId(park_id);
         account =(BigScreenAccount)commonDao.selectObjectByConditions(account);
         if(account!=null&&account.getEndTime()!=null){
-            beginTime = account.getEndTime();
+            if(account.getEndTime()>beginTime) {
+                beginTime = account.getEndTime();
+            }
         }
 
         trade.setBeginTime(beginTime);

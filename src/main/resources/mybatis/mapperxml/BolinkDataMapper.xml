@@ -1,0 +1,270 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="parkingos.com.bolink.dao.mybatis.mapper.BolinkDataMapper" >
+    <!--查询交易记录-->
+    <select id="getTransactions" resultType="map">
+        SELECT
+            TYPE,
+            to_char(
+                to_timestamp(pay_time),
+                'yyyy-MM-dd'
+            ) p_time,
+            SUM (pay_money) pay_money
+        FROM
+            ${table_name}
+        WHERE
+            park_id = #{comid,jdbcType=BIGINT}
+        AND pay_time BETWEEN #{b_time,jdbcType=BIGINT}
+        AND #{e_time,jdbcType=BIGINT}
+        GROUP BY
+            p_time,
+            TYPE
+        ORDER BY
+            p_time
+    </select>
+
+    <!--查询所有收费员记录-->
+    <select id="getTransactionsByAllUid" resultType="map">
+        <![CDATA[
+        SELECT
+        SUM (pay_money) pay_money,
+        collector,
+        type
+        FROM
+        ${table_name}
+        WHERE
+        collector  <> 10000000
+        AND pay_time BETWEEN #{b_time,jdbcType=BIGINT}
+        AND #{e_time,jdbcType=BIGINT}
+        and park_id = #{comid,jdbcType=BIGINT}
+        GROUP BY
+        collector,
+        TYPE
+        ]]>
+    </select>
+
+
+    <!--查询某个收费员记录-->
+    <select id="getTransactionsByUid" resultType="map">
+        SELECT
+            SUM (pay_money) pay_money,
+            collector,
+            TYPE
+        FROM
+            ${table_name}
+        WHERE
+            collector = #{userId,jdbcType=BIGINT}
+        AND pay_time BETWEEN #{b_time,jdbcType=BIGINT}
+        AND #{e_time,jdbcType=BIGINT}
+        and park_id = #{comid,jdbcType=BIGINT}
+        GROUP BY
+            collector,
+            TYPE
+    </select>
+
+
+    <!--查询某个订单的预付金额-->
+    <select id="getOrderMoneys" resultType="map">
+        SELECT
+        sum(pay_money) pay_money,
+        type
+        FROM
+        ${table_name}
+        WHERE
+        park_id = #{comid,jdbcType=BIGINT}
+        AND
+        order_id = #{orderId,jdbcType=VARCHAR}
+        AND
+        car_number = #{carNumber,jdbcType=VARCHAR}
+        GROUP BY
+        TYPE
+    </select>
+
+
+    <!--查询交易记录-->
+    <select id="getMonthTransactionsByComid" resultType="map">
+        SELECT
+        TYPE,
+        to_char(
+        to_timestamp(pay_time),
+        'yyyy-MM'
+        ) sdate,
+        SUM (pay_money) pay_money
+        FROM
+        ${table_name}
+        WHERE
+        park_id = #{comid,jdbcType=BIGINT}
+        AND pay_time BETWEEN #{b_time,jdbcType=BIGINT}
+        AND #{e_time,jdbcType=BIGINT}
+        GROUP BY
+        sdate,
+        TYPE
+        ORDER BY
+        sdate
+    </select>
+
+
+    <!--查询交易记录-->
+    <select id="getMonthOutTransactionsByComid" resultType="map">
+        SELECT
+        to_char(
+        to_timestamp(pay_time),
+        'yyyy-MM'
+        ) sdate,
+        SUM (pay_money) pay_money
+        FROM
+        ${table_name}
+        WHERE
+        park_id = #{comid,jdbcType=BIGINT}
+        AND pay_time BETWEEN #{b_time,jdbcType=BIGINT}
+        AND #{e_time,jdbcType=BIGINT}
+        GROUP BY
+        sdate
+        ORDER BY
+        sdate
+    </select>
+
+
+    <select id="getTransactionsByComid" resultType="map">
+        SELECT
+        TYPE,
+        park_id as comid,
+        SUM (pay_money) pay_money
+        FROM
+        ${table_name}
+        WHERE
+        park_id = #{comid,jdbcType=BIGINT}
+        AND pay_time BETWEEN #{b_time,jdbcType=BIGINT}
+        AND #{e_time,jdbcType=BIGINT}
+        GROUP BY
+        TYPE
+    </select>
+
+    <select id="getTransactionsByGroupId" resultType="map">
+        SELECT
+        TYPE,
+        park_id as comid,
+        SUM (pay_money) pay_money
+        FROM
+        ${table_name}
+        WHERE
+        group_id = #{groupId,jdbcType=BIGINT}
+        AND pay_time BETWEEN #{b_time,jdbcType=BIGINT}
+        AND #{e_time,jdbcType=BIGINT}
+        GROUP BY
+        comid,
+        TYPE
+    </select>
+
+
+    <select id="getOutTransactionsByComid" resultType="map">
+        SELECT
+        SUM (pay_money) pay_money,
+        park_id as comid
+        FROM
+        ${table_name}
+        WHERE
+        park_id = #{comid,jdbcType=BIGINT}
+        AND pay_time BETWEEN #{b_time,jdbcType=BIGINT}
+        AND #{e_time,jdbcType=BIGINT}
+    </select>
+
+    <select id="getOutTransactionsByGroupId" resultType="map">
+        SELECT
+        SUM (pay_money) pay_money,
+        park_id as comid
+        FROM
+        ${table_name}
+        WHERE
+        group_id = #{groupId,jdbcType=BIGINT}
+        AND pay_time BETWEEN #{b_time,jdbcType=BIGINT}
+        AND #{e_time,jdbcType=BIGINT}
+        GROUP BY
+        comid
+    </select>
+
+
+    <select id="getDailyTransactionsByGroupId" resultType="map">
+        SELECT
+        TYPE,
+        to_char(
+        to_timestamp(pay_time),
+        'yyyy-MM-dd'
+        ) as time,
+        SUM (pay_money) pay_money
+        FROM
+        ${table_name}
+        WHERE
+        group_id = #{groupId,jdbcType=BIGINT}
+        AND pay_time BETWEEN #{b_time,jdbcType=BIGINT}
+        AND #{e_time,jdbcType=BIGINT}
+        GROUP BY
+        time,
+        TYPE
+        ORDER BY
+        time
+    </select>
+
+
+    <select id="getDailyOutTransactionsByGroupId" resultType="map">
+        SELECT
+        to_char(
+        to_timestamp(pay_time),
+        'yyyy-MM-dd'
+        ) as time,
+        SUM (pay_money) pay_money
+        FROM
+        ${table_name}
+        WHERE
+        group_id = #{groupId,jdbcType=BIGINT}
+        AND pay_time BETWEEN #{b_time,jdbcType=BIGINT}
+        AND #{e_time,jdbcType=BIGINT}
+        GROUP BY
+        time
+        ORDER BY
+        time
+    </select>
+
+
+    <select id="getMonthTransactionsByGroupId" resultType="map">
+        SELECT
+        type,
+        to_char(
+        to_timestamp(pay_time),
+        'yyyy-MM'
+        ) as time,
+        SUM (pay_money) pay_money
+        FROM
+        ${table_name}
+        WHERE
+        group_id = #{groupId,jdbcType=BIGINT}
+        AND pay_time BETWEEN #{b_time,jdbcType=BIGINT}
+        AND #{e_time,jdbcType=BIGINT}
+        GROUP BY
+        time,
+        type
+        ORDER BY
+        time
+    </select>
+
+
+    <select id="getMonthOutTransactionsByGroupId" resultType="map">
+        SELECT
+        to_char(
+        to_timestamp(pay_time),
+        'yyyy-MM'
+        ) as time,
+        SUM (pay_money) pay_money
+        FROM
+        ${table_name}
+        WHERE
+        group_id = #{groupId,jdbcType=BIGINT}
+        AND pay_time BETWEEN #{b_time,jdbcType=BIGINT}
+        AND #{e_time,jdbcType=BIGINT}
+        GROUP BY
+        time
+        ORDER BY
+        time
+    </select>
+
+</mapper>

@@ -573,15 +573,30 @@ public class StringUtils {
 		return new ArrayList<Object>();
 	}
 //	 public static void main(String[] args) {
-//	 String s = "1";
-//	 String s1="a";
-//	 try {
-//	  int i = compareStr(s,s1);
-//		 System.out.println(i);
-//	 } catch (Exception e) {
-//
-//	 }
-
+////		 String s = "1";
+////		 String s1="a";
+////		 try {
+////		  int i = compareStr(s,s1);
+////			 System.out.println(i);
+////		 } catch (Exception e) {
+////
+////		 }
+////		 double cash = 4.45;
+////		 double ele = 3.88;
+////		 double free = 0.99;
+////		 double total = cash+ele+free;
+////		 System.out.println(total);
+////		 double f1 = new BigDecimal(cash/total).setScale(4, BigDecimal.ROUND_HALF_UP).doubleValue();
+////		 double f2 = new BigDecimal(ele/total).setScale(4, BigDecimal.ROUND_HALF_UP).doubleValue();
+////		 double f3 = new BigDecimal(free/total).setScale(4, BigDecimal.ROUND_HALF_UP).doubleValue();
+////		 System.out.println(f1+"~~"+f2+"~~"+f3);
+//		 List<String> list = new ArrayList<>();
+//		 list.add("2018-09-10");
+//		 list.add("2018-09-09");
+//		 list.add("2018-09-11");
+//		 System.out.println(list);
+//		 Collections.sort(list);
+//		 System.out.println(list);
 //	 }
 	public static String getMondayOfThisWeek() {
 		Calendar c = Calendar.getInstance();

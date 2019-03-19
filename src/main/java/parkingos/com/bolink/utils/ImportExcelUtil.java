@@ -14,6 +14,9 @@ import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import parkingos.com.bolink.service.impl.CityVipServiceImpl;
 
 import java.io.InputStream;
 import java.io.PushbackInputStream;
@@ -27,7 +30,7 @@ public class ImportExcelUtil {
 	/**
 	 * 操作Excel表格的功能类
 	 */
-
+	static Logger logger = LoggerFactory.getLogger(CityVipServiceImpl.class);
 
 	/**
 	 * 导入报表Excel数据，生成用户表的数据库导入语句
@@ -59,11 +62,11 @@ public class ImportExcelUtil {
 			boolean is2003Excel = false;
 			boolean is2007Excel = false;
 			if(POIFSFileSystem.hasPOIFSHeader(in)) {
-				System.out.println("2003及以下");
+				logger.info("2003及以下");
 				is2003Excel = true;
 			}
 			if(POIXMLDocument.hasOOXMLHeader(in)) {
-				System.out.println("2007及以上");
+				logger.info("2007及以上");
 				is2007Excel = true;
 			}
 
@@ -80,19 +83,21 @@ public class ImportExcelUtil {
 				sheet = wb.getSheetAt(i);
 				if(sheet!=null){
 					int count = i+1;
-					System.err.println(">>>>>文件行数 ："+sheet.getPhysicalNumberOfRows());
+					logger.info(">>>>>文件行数 ："+sheet.getPhysicalNumberOfRows());
 					for (int j=isTitle; j<sheet.getPhysicalNumberOfRows(); j++) {//获取每行，j=isTitle表示从第j行开始获取数据
 //	            		 Object[] valStr = new String[row.getPhysicalNumberOfCells()];//用数组来存放每一行的数据，9表示每一行的数据不能超过9，可以<=9
 						ArrayList<Object> arrayList = new ArrayList<Object>();
 						row = sheet.getRow(j);
 						StringBuffer str = new StringBuffer();
 
-						//System.out.println("第"+j+"行：长度："+row.getPhysicalNumberOfCells()+",getLastCellNum:"+row.getLastCellNum());
+						logger.info("第"+j+"行：长度："+row.getPhysicalNumberOfCells()+",getLastCellNum:"+row.getLastCellNum());
 						for (int k=0; k<row.getLastCellNum(); k++) {//获取每个单元格
 							Cell cell = row.getCell(k);
-							if((k<1||k>2))
-								if(cell!=null)
+							logger.info("====>>>>>:"+cell);
+//							if((k<1||k>2))
+								if(cell!=null) {
 									cell.setCellType(HSSFCell.CELL_TYPE_STRING);
+								}
 							String content = getCellFormatValue(cell).trim();
 							arrayList.add(content);
 						}
@@ -102,7 +107,7 @@ public class ImportExcelUtil {
 //						}
 
 						//company_name,parking_type,address,city,parking_total,longitude,latitude,create_time,update_time,state,type,mobile,remarks,chanid,groupid
-						System.out.println(arrayList);
+						logger.info(arrayList+"");
 						Object[] values = arrayList.toArray();
 						list.add(values);
 					}

@@ -252,4 +252,11 @@ public class GetDataAction {
         return null;
     }
 
+    @RequestMapping(value = "/getprogramprice")
+    public String getProgramPrice(HttpServletRequest request, HttpServletResponse resp){
+        String result = getDataService.getMessagePrice(3);
+        StringUtils.ajaxOutput(resp,result);
+        return null;
+    }
+
 }

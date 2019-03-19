@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="parkingos.com.bolink.dao.mybatis.mapper.BolinkIncomeTbMapper" >
+  <resultMap id="BaseResultMap" type="parkingos.com.bolink.models.BolinkIncomeTb" >
+    <id column="id" property="id" jdbcType="BIGINT" />
+    <result column="car_number" property="carNumber" jdbcType="VARCHAR" />
+    <result column="order_id" property="orderId" jdbcType="VARCHAR" />
+    <result column="trade_no" property="tradeNo" jdbcType="VARCHAR" />
+    <result column="type" property="type" jdbcType="INTEGER" />
+    <result column="park_id" property="parkId" jdbcType="BIGINT" />
+    <result column="union_id" property="unionId" jdbcType="BIGINT" />
+    <result column="pay_time" property="payTime" jdbcType="BIGINT" />
+    <result column="bolink_park_id" property="bolinkParkId" jdbcType="VARCHAR" />
+    <result column="collector" property="collector" jdbcType="BIGINT" />
+    <result column="pay_money" property="payMoney" jdbcType="NUMERIC" />
+    <result column="ctime" property="ctime" jdbcType="BIGINT" />
+    <result column="query_order_no" property="queryOrderNo" jdbcType="VARCHAR" />
+    <result column="remark" property="remark" jdbcType="VARCHAR" />
+    <result column="group_id" property="groupId" jdbcType="BIGINT" />
+  </resultMap>
+  <sql id="Example_Where_Clause" >
+    <where >
+      <foreach collection="oredCriteria" item="criteria" separator="and" >
+        <if test="criteria.valid" >
+          <trim prefix="(" suffix=")" prefixOverrides="and" >
+            <foreach collection="criteria.criteria" item="criterion" >
+              <choose >
+                <when test="criterion.noValue" >
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue" >
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue" >
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue" >
+                  and ${criterion.condition}
+                  <foreach collection="criterion.value" item="listItem" open="(" close=")" separator="," >
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+
+
+
+  <select id="getIncomes" resultType="map" parameterType="parkingos.com.bolink.dao.mybatis.BolinkIncomeTbExample" >
+    select
+    *
+    from ${tableName}
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+    <if test="orderByClause != null" >
+      order by ${orderByClause} ${orderType}
+    </if>
+    <if test="limit != null" >
+      limit ${limit} offset ${offset}
+    </if>
+  </select>
+
+
+
+  <select id="getIncomeCounts" resultType="int" parameterType="parkingos.com.bolink.dao.mybatis.BolinkIncomeTbExample" >
+    select
+    count(*)
+    from ${tableName}
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+  </select>
+
+
+</mapper>

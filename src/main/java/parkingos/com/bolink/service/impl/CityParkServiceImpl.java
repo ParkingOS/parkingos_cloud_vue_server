@@ -9,10 +9,7 @@ import org.springframework.stereotype.Service;
 import parkingos.com.bolink.dao.mybatis.mapper.ParkInfoMapper;
 import parkingos.com.bolink.dao.spring.CommonDao;
 import parkingos.com.bolink.enums.FieldOperator;
-import parkingos.com.bolink.models.ComInfoTb;
-import parkingos.com.bolink.models.LiftRodTb;
-import parkingos.com.bolink.models.ParkLogTb;
-import parkingos.com.bolink.models.UserInfoTb;
+import parkingos.com.bolink.models.*;
 import parkingos.com.bolink.qo.PageOrderConfig;
 import parkingos.com.bolink.qo.SearchBean;
 import parkingos.com.bolink.service.CityParkService;
@@ -325,6 +322,7 @@ public class CityParkServiceImpl implements CityParkService {
 //                    paramMap.put("server_id", server_id);
                 paramMap.put("operator_id", operator_id);
                 paramMap.put("rand", Math.random());
+                paramMap.put("is_cloud_park", 1);
                 String ret = "";
                 try {
                     logger.error(url+paramMap);
@@ -336,7 +334,9 @@ public class CityParkServiceImpl implements CityParkService {
                     //param = DesUtils.encrypt(param,"NQ0eSXs720170114");
                     String param = StringUtils.createJson(paramMap);
                     logger.error(param);
-                    ret = HttpsProxy.doPost(url, param, "utf-8", 20000, 20000);
+                    HttpProxy httpProxy = new HttpProxy();
+                    ret = httpProxy.doHeadPost(url,param);
+//                    ret = HttpsProxy.doPost(url, param, "utf-8", 20000, 20000);
                     logger.error(ret);
                     JSONObject object = JSONObject.parseObject(ret);
                     if (object != null) {
@@ -387,15 +387,47 @@ public class CityParkServiceImpl implements CityParkService {
                 paramMap.put("union_id",union_id);
                 String param = StringUtils.createJson(paramMap);
                 try{
-                    String ret = HttpsProxy.doPost(url, param, "utf-8", 20000, 20000);
+//                    String ret = HttpsProxy.doPost(url, param, "utf-8", 20000, 20000);
+                    HttpProxy httpProxy = new HttpProxy();
+                    String ret = httpProxy.doHeadPost(url,param);
                     JSONObject object = JSONObject.parseObject(ret);
                     Integer checkstate = Integer.parseInt(object.get("state") + "");
                     if(checkstate==1){//泊链车场编号正确
                         int insert = commonDao.insert(comInfoTb);
-                        logger.error("填写了泊链编号进行校验新建车场:"+insert);
-                        result.put("state", 1);
-                        result.put("msg","新建车场成功");
-                        return result;
+                        logger.error("填写了泊链编号进行校验新建车场:" + insert);
+                        if(insert==1) {
+                            JSONObject jsonObject = new JSONObject();
+                            jsonObject.put("park_id", bolinkid);
+                            jsonObject.put("union_id",union_id);
+                            url = CustomDefind.UNIONIP + "newpark/updatepark";
+                            try{
+                                jsonObject.put("is_cloud_park",1);
+                                jsonObject.put("type",3);
+                                jsonObject.put("rand", Math.random());
+
+
+                                String _signStr = jsonObject.toJSONString() + "key=" + union_key;
+                                System.out.println(_signStr);
+                                String _sign = StringUtils.MD5(_signStr).toUpperCase();
+                                System.out.println(_sign);
+                                JSONObject json = new JSONObject();
+                                json.put("data",jsonObject.toJSONString());
+                                json.put("sign",_sign);
+
+                                httpProxy = new HttpProxy();
+                                ret = httpProxy.doHeadPost(url,json.toJSONString());
+                                logger.info("=======>>>>"+ret);
+//                                ret = HttpsProxy.doPost(url, param, "utf-8", 20000, 20000);
+
+//                                int updateState = Integer.parseInt(object.get("state") + "");
+//                                logger.info("====>>>>>update bolink park state:"+updateState);
+                            }catch (Exception e){
+                                logger.error("update bolink park state error",e);
+                            }
+                            result.put("state", insert);
+                            result.put("msg", "新建车场成功");
+                            return result;
+                        }
                     }else{
                         result.put("state", 0);
                         result.put("msg","新建车场失败,泊链车场编号错误");
@@ -481,6 +513,64 @@ public class CityParkServiceImpl implements CityParkService {
 
         int count = commonDao.updateByPrimaryKey(comInfoTb);
         if (count == 1) {
+
+            Long id = comInfoTb.getId();
+            comInfoTb=(ComInfoTb)commonDao.selectObjectByConditions(comInfoTb);
+            Long union_id = -1L;
+            Long cityId = -1L;
+            if(comInfoTb.getCityid()!=null&&comInfoTb.getCityid()>0){
+                cityId = comInfoTb.getCityid();
+            }else{
+                Long groupId = comInfoTb.getGroupid();
+                OrgGroupTb orgGroupTb = new OrgGroupTb();
+                orgGroupTb.setId(groupId);
+                orgGroupTb.setState(0);
+                orgGroupTb=(OrgGroupTb)commonDao.selectObjectByConditions(orgGroupTb);
+                if(orgGroupTb!=null){
+                    cityId = orgGroupTb.getCityid();
+                }
+            }
+            if(cityId!=null&&cityId>0) {
+                OrgCityMerchants city = new OrgCityMerchants();
+                city.setId(cityId);
+                city.setState(0);
+                city = (OrgCityMerchants)commonDao.selectObjectByConditions(city);
+                if(city!=null&&city.getUnionId()!=null) {
+
+                    JSONObject paramMap = new JSONObject();
+                    paramMap.put("park_id", comInfoTb.getBolinkId());
+                    paramMap.put("union_id", city.getUnionId());
+                    paramMap.put("is_cloud_park", 0);
+                    paramMap.put("type",3);
+                    paramMap.put("rand", Math.random());
+//                    String param = StringUtils.createJson(paramMap);
+                    String url = CustomDefind.UNIONIP + "newpark/updatepark";
+                    try {
+                        String ukey = city.getUkey();
+                        String _signStr = paramMap.toJSONString() + "key=" + ukey;
+                        System.out.println(_signStr);
+                        String _sign = StringUtils.MD5(_signStr).toUpperCase();
+                        System.out.println(_sign);
+                        JSONObject json = new JSONObject();
+                        json.put("data",paramMap.toJSONString());
+                        json.put("sign",_sign);
+
+                        HttpProxy httpProxy = new HttpProxy();
+
+                        String ret = httpProxy.doHeadPost(url,json.toJSONString());
+//                        String ret = HttpsProxy.doPost(url, param, "utf-8", 20000, 20000);
+//                        HttpProxy httpProxy = new HttpProxy();
+//                        String ret = httpProxy.doHeadPost(url,param);
+//                        JSONObject object = JSONObject.parseObject(ret);
+                        logger.info("====>>>>>>>>>>>>>>>"+ret);
+//                        int updateState = Integer.parseInt(object.get("state") + "");
+//                        logger.info("====>>>>>update bolink park state:" + updateState);
+                    } catch (Exception e) {
+                        logger.error("update bolink park state error", e);
+                    }
+                }
+            }
+
             result.put("state", 1);
             result.put("msg", "删除成功");
         }
