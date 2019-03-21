@@ -16,6 +16,7 @@ import parkingos.com.bolink.service.CityParkService;
 import parkingos.com.bolink.service.OrderService;
 import parkingos.com.bolink.service.SaveLogService;
 import parkingos.com.bolink.service.SupperSearchService;
+import parkingos.com.bolink.service.redis.RedisService;
 import parkingos.com.bolink.utils.*;
 
 import javax.annotation.Resource;
@@ -41,6 +42,8 @@ public class CityParkServiceImpl implements CityParkService {
     @Autowired
     @Resource(name = "orderSpring")
     private OrderService orderService;
+    @Autowired
+    RedisService redisService;
 
     @Override
     public JSONObject selectResultByConditions(Map<String, String> reqmap) {
@@ -720,28 +723,22 @@ public class CityParkServiceImpl implements CityParkService {
         if (parkLoginList != null && parkLoginList.size() > 0) {
             for (HashMap<String, Object> loginmap : parkLoginList){
                 HashMap<String, Object> parkstatusmap = new HashMap<String, Object>();
-                Long beattime = (Long) loginmap.get("beattime");
                 Long logintime = (Long) loginmap.get("logintime");
                 String localid = (String) loginmap.get("localid");
+                String sourceIp=(String)loginmap.get("sourceIp");
+                logger.info("==>>>>localId:"+localid+"~~"+sourceIp+"~~"+parkid);
+                String cacheKey = "parkingos_dobeat_"+parkid+"_"+localid+sourceIp;
+                if(cacheKey.length() >200){
+                    cacheKey = "parkingos_dobeat_"+StringUtils.MD5(parkid+"_"+localid+sourceIp);
+                }
+                logger.info("===>>>>cacheKey:"+cacheKey);
+                Long beattime = null;
+                if(redisService.get(cacheKey)!=null){
+                    beattime = Long.parseLong(redisService.get(cacheKey));
+                }
+                logger.info("===>>>>>beatTime:"+beattime);
                 if(localid == null)localid="";
-                boolean isonline = false;
-                if (beattime != null) {
-                    //心跳在60秒内证明在线
-                    isonline = isParkOnline(beattime.longValue(), 60);
 
-                    if (!isonline) {
-                        isonline = isParkOnline(logintime.longValue(), 10);
-                    }
-                }
-                if (isonline) {
-                    parkstatusmap.put("state", 1);
-//                    parkstatusmap.put("localid", localid.substring(localid.indexOf("_")+1));
-//                    parkstatusmap.put("beat_time",beattime);
-                } else {
-                    parkstatusmap.put("state", 0);
-
-//                    parkstatusmap.put("localid", localid.substring(localid.indexOf("_")+1));
-                }
                 if(beattime!=null){
                     parkstatusmap.put("beat_time",beattime);
                 }else{

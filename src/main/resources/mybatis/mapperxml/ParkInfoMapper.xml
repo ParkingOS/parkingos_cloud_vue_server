@@ -98,7 +98,8 @@
     <select id="getParkLogin"  resultType="map">
         select a.login_time logintime,
         a.beat_time beattime,
-        a.local_id AS "localid"
+        a.local_id AS "localid",
+        a.source_ip AS "sourceIp"
         from park_token_tb a
         where
         a.park_id= #{parkid,jdbcType=VARCHAR}

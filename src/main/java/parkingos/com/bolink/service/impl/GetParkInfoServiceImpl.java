@@ -224,6 +224,7 @@ public class GetParkInfoServiceImpl implements GetParkInfoService {
 //        }
         Long cityid =-1L;
         try {
+
             String cityidStr = redisService.get(CustomDefind.getValue("REDISKEY4CITY")+comid);
             logger.info("===>>>>>>cityidstr:"+cityidStr);
             if(cityidStr!=null){
@@ -464,16 +465,27 @@ public class GetParkInfoServiceImpl implements GetParkInfoService {
                 List<HashMap<String, Object>> parkLoginList = parkInfoMapper.getParkLogin(parkid + "");
                 if (parkLoginList != null && parkLoginList.size() > 0) {
                     HashMap<String, Object> loginmap = parkLoginList.get(0);
-                    Long beattime = (Long) loginmap.get("beattime");
+//                    Long beattime = (Long) loginmap.get("beattime");
                     Long logintime = (Long) loginmap.get("logintime");
+                    String sourceIp=(String)loginmap.get("sourceIp");
+                    String localid = (String) loginmap.get("localid");
+                    logger.info("==>>>>localId:"+localid+"~~"+sourceIp+"~~"+parkid);
+                    String cacheKey = "parkingos_dobeat_"+parkid+"_"+localid+sourceIp;
+                    if(cacheKey.length() >200){
+                        cacheKey = "parkingos_dobeat_"+StringUtils.MD5(parkid+"_"+localid+sourceIp);
+                    }
+                    logger.info("===>>>>cacheKey:"+cacheKey);
+                    Long beattime = null;
+                    if(redisService.get(cacheKey)!=null){
+                        beattime = Long.parseLong(redisService.get(cacheKey));
+                    }
+                    logger.info("===>>>>>beatTime:"+beattime);
                     boolean isonline = false;
                     if(beattime!=null) {
                         //心跳在60秒内证明在线
                         isonline=isParkOnline(beattime.longValue(),60);
-
-                      if(!isonline){
-                          isonline=isParkOnline(logintime.longValue(),10);
-                      }
+                    }else{
+                        isonline=isParkOnline(logintime.longValue(),10);
                     }
                       if(isonline){
                           parkstatusmap.put("parkName",parkName);
@@ -498,18 +510,32 @@ public class GetParkInfoServiceImpl implements GetParkInfoService {
         if (parkLoginList != null && parkLoginList.size() > 0) {
             for (HashMap<String, Object> loginmap : parkLoginList){
                 HashMap<String, Object> parkstatusmap = new HashMap<String, Object>();
-            Long beattime = (Long) loginmap.get("beattime");
+//            Long beattime = (Long) loginmap.get("beattime");
+                logger.info("===>>>>loginMap:"+loginmap);
             Long logintime = (Long) loginmap.get("logintime");
             String localid = (String) loginmap.get("localid");
-            if(localid == null)localid="";
+            String sourceIp=(String)loginmap.get("sourceIp");
+            logger.info("==>>>>localId:"+localid+"~~"+sourceIp+"~~"+parkid);
+            String cacheKey = "parkingos_dobeat_"+parkid+"_"+localid+sourceIp;
+            if(cacheKey.length() >200){
+                cacheKey = "parkingos_dobeat_"+StringUtils.MD5(parkid+"_"+localid+sourceIp);
+            }
+            logger.info("===>>>>cacheKey:"+cacheKey);
+            Long beattime = null;
+            if(redisService.get(cacheKey)!=null){
+                beattime = Long.parseLong(redisService.get(cacheKey));
+            }
+
+            logger.info("===>>>>>beatTime:"+beattime);
+            if(localid == null) {
+                localid = "";
+            }
             boolean isonline = false;
             if (beattime != null) {
                 //心跳在60秒内证明在线
                 isonline = isParkOnline(beattime.longValue(), 60);
-
-                if (!isonline) {
-                    isonline = isParkOnline(logintime.longValue(), 10);
-                }
+            }else{
+                isonline = isParkOnline(logintime.longValue(), 10);
             }
             parkstatusmap.put("localid", localid.substring(localid.indexOf("_")+1));
             String localIdNoVersion = localid.replace(localid.substring(localid.indexOf("_"),localid.indexOf("_",localid.indexOf("_")+1)),"");
