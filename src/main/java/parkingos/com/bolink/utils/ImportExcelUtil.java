@@ -93,11 +93,12 @@ public class ImportExcelUtil {
 						logger.info("第"+j+"行：长度："+row.getPhysicalNumberOfCells()+",getLastCellNum:"+row.getLastCellNum());
 						for (int k=0; k<row.getLastCellNum(); k++) {//获取每个单元格
 							Cell cell = row.getCell(k);
-							logger.info("====>>>>>:"+cell);
-//							if((k<1||k>2))
-								if(cell!=null) {
+							logger.info("====>>>>>:" + cell);
+							if ((k < 1 || k > 2)){
+								if (cell != null) {
 									cell.setCellType(HSSFCell.CELL_TYPE_STRING);
 								}
+							}
 							String content = getCellFormatValue(cell).trim();
 							arrayList.add(content);
 						}

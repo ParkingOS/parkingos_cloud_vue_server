@@ -126,22 +126,20 @@ public class LoginServiceImpl implements LoginService {
                         comInfoTb = (ComInfoTb)commonDao.selectObjectByConditions(comInfoTb);
                         if(comInfoTb!=null){
                             user.put("name",comInfoTb.getCompanyName());
-                            if(comInfoTb.getCityid()!=null&&comInfoTb.getCityid()>-1){
-                                Long cityid = comInfoTb.getCityid();
-                                OrgCityMerchants orgCityMerchants = new OrgCityMerchants();
-                                orgCityMerchants.setId(cityid);
-                                orgCityMerchants.setState(0);
-                                orgCityMerchants = (OrgCityMerchants)commonDao.selectObjectByConditions(orgCityMerchants);
-                                if(orgCityMerchants!=null&&orgCityMerchants.getSelfRefillSetting()!=null){
-                                    user.put("self_setting",orgCityMerchants.getSelfRefillSetting());
-                                }
-                            }else{
+
+                            if(comInfoTb.getGroupid()!=null&&comInfoTb.getGroupid()>-1){
                                 Long groupid = comInfoTb.getGroupid();
                                 OrgGroupTb orgGroupTb = new OrgGroupTb();
                                 orgGroupTb.setId(groupid);
                                 orgGroupTb.setState(0);
                                 orgGroupTb= (OrgGroupTb)commonDao.selectObjectByConditions(orgGroupTb);
                                 if (orgGroupTb!=null&&orgGroupTb.getCityid()!=null){
+                                    if(!Check.isEmpty(orgGroupTb.getLogo1())){
+                                        user.put("logo1",orgGroupTb.getLogo1());
+                                    }
+                                    if(!Check.isEmpty(orgGroupTb.getLogo2())){
+                                        user.put("logo2",orgGroupTb.getLogo2());
+                                    }
                                     Long cityid = orgGroupTb.getCityid();
                                     OrgCityMerchants orgCityMerchants = new OrgCityMerchants();
                                     orgCityMerchants.setId(cityid);
@@ -151,6 +149,37 @@ public class LoginServiceImpl implements LoginService {
                                         user.put("self_setting",orgCityMerchants.getSelfRefillSetting());
                                     }
                                 }
+                            }else if(comInfoTb.getCityid()!=null&&comInfoTb.getCityid()>-1){
+                                Long cityid = comInfoTb.getCityid();
+                                OrgCityMerchants orgCityMerchants = new OrgCityMerchants();
+                                orgCityMerchants.setId(cityid);
+                                orgCityMerchants.setState(0);
+                                orgCityMerchants = (OrgCityMerchants)commonDao.selectObjectByConditions(orgCityMerchants);
+                                if(orgCityMerchants!=null&&orgCityMerchants.getSelfRefillSetting()!=null){
+                                    user.put("self_setting",orgCityMerchants.getSelfRefillSetting());
+                                }
+                            }else{
+                                result.put("state", false);
+                                result.put("msg", "该车场没有所属厂商！");
+                                return result;
+//                                Long groupid = comInfoTb.getGroupid();
+//                                OrgGroupTb orgGroupTb = new OrgGroupTb();
+//                                orgGroupTb.setId(groupid);
+//                                orgGroupTb.setState(0);
+//                                orgGroupTb= (OrgGroupTb)commonDao.selectObjectByConditions(orgGroupTb);
+//                                if (orgGroupTb!=null&&orgGroupTb.getCityid()!=null){
+//                                    if(!Check.isEmpty(orgGroupTb.getSelfLogo())){
+//                                        user.put("logo",orgGroupTb.getSelfLogo());
+//                                    }
+//                                    Long cityid = orgGroupTb.getCityid();
+//                                    OrgCityMerchants orgCityMerchants = new OrgCityMerchants();
+//                                    orgCityMerchants.setId(cityid);
+//                                    orgCityMerchants.setState(0);
+//                                    orgCityMerchants = (OrgCityMerchants)commonDao.selectObjectByConditions(orgCityMerchants);
+//                                    if(orgCityMerchants!=null&&orgCityMerchants.getSelfRefillSetting()!=null){
+//                                        user.put("self_setting",orgCityMerchants.getSelfRefillSetting());
+//                                    }
+//                                }
                             }
                         }
 
@@ -197,6 +226,12 @@ public class LoginServiceImpl implements LoginService {
                         orgGroupTb=(OrgGroupTb) commonDao.selectObjectByConditions(orgGroupTb);
                         if(orgGroupTb!=null){
                             user.put("name",orgGroupTb.getName());
+                            if(!Check.isEmpty(orgGroupTb.getLogo1())){
+                                user.put("logo1",orgGroupTb.getLogo1());
+                            }
+                            if(!Check.isEmpty(orgGroupTb.getLogo2())){
+                                user.put("logo2",orgGroupTb.getLogo2());
+                            }
                         }
                     }
                 } else if (orgname.contains("城市")) {
