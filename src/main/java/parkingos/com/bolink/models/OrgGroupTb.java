@@ -29,6 +29,27 @@ public class OrgGroupTb {
 
     private String operatorid;
 
+    private String logo1;
+
+    public String getLogo1() {
+        return logo1;
+    }
+
+    public void setLogo1(String logo1) {
+        this.logo1 = logo1;
+    }
+
+    public String getLogo2() {
+        return logo2;
+    }
+
+    public void setLogo2(String logo2) {
+        this.logo2 = logo2;
+    }
+
+    private String logo2;
+
+
     public Long getId() {
         return id;
     }
