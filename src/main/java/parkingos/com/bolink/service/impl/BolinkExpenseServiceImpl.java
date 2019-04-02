@@ -42,17 +42,26 @@ public class BolinkExpenseServiceImpl implements BolinkExpenseService {
 //        BolinkExpenseTb bolinkExpenseTb = new BolinkExpenseTb();
 //        bolinkExpenseTb.setParkId(comid);
 //        JSONObject result = supperSearchService.supperSearch(bolinkExpenseTb,reqParameterMap);
-        JSONObject result = getExpenses(reqParameterMap);
+        JSONObject result = getExpenses(reqParameterMap,1);
         return result;
     }
 
-    private JSONObject getExpenses(Map<String, String> reqParameterMap) {
+    @Override
+    public JSONObject groupQuery(Map<String, String> reqParameterMap) {
+        JSONObject result = getExpenses(reqParameterMap,2);
+        return result;
+    }
+
+    private JSONObject getExpenses(Map<String, String> reqParameterMap,int type) {
         JSONObject result = new JSONObject();
-        Long comid = Long.parseLong(reqParameterMap.get("comid"));
-        Long unionId = commonService.getUnionIdByComid(comid);
         String tableName = "bolink_expense_tb";
-        if(unionId>0){
-            tableName += "_"+unionId%10;
+        if(type==1) {
+            Long comid = Long.parseLong(reqParameterMap.get("comid"));
+            tableName = commonService.getTableNameByComid(comid,2);
+            reqParameterMap.put("comid_start",comid+"");
+        }else if (type==2){
+            Long groupId = Long.parseLong(reqParameterMap.get("groupid"));
+            tableName=commonService.getTableNameByGroupId(groupId,2);
         }
         reqParameterMap.put("tableName",tableName);
         //增加默认的pay_time,默认今天一天的数据
@@ -64,9 +73,7 @@ public class BolinkExpenseServiceImpl implements BolinkExpenseService {
             reqParameterMap.put("pay_time_end",payEnd+"");
         }
 
-
         BolinkExpenseTbExample example = ExampleUtis.createExpenseExampleByMap(reqParameterMap);
-        logger.info("====>>>>>>>>>>>example:"+example);
         int count = bolinkExpenseTbMapper.getExpenseCounts(example);
         List<Map<String, Object>> resList = new ArrayList<Map<String, Object>>();
         if(count>0){
