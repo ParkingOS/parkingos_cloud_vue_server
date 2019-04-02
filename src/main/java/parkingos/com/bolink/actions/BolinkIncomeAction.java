@@ -34,5 +34,15 @@ public class BolinkIncomeAction {
         return null;
     }
 
+    @RequestMapping(value = "/groupquery")
+    public String groupQuery(HttpServletRequest request, HttpServletResponse resp){
+
+        Map<String, String> reqParameterMap = RequestUtil.readBodyFormRequset(request);
+        JSONObject result = bolinkIncomeService.groupQuery(reqParameterMap);
+        //把结果返回页面
+        StringUtils.ajaxOutput(resp,result.toJSONString());
+        return null;
+    }
+
 
 }

@@ -7,4 +7,6 @@ import java.util.Map;
 public interface BolinkIncomeService {
 
     JSONObject query(Map<String, String> reqParameterMap);
+
+    JSONObject groupQuery(Map<String, String> reqParameterMap);
 }
