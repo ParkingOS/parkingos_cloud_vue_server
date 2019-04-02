@@ -120,12 +120,12 @@ public class OrderServiceImpl implements OrderService {
                         map.put("duration", "");
                     }
 
-                    String carNumber = map.get("car_number")+"";
-                    String orderId = map.get("order_id_local")+"";
-                    JSONObject moneyData = getOrderDetail(orderId,comid,carNumber);
-                    map.put("electronic_prepay",moneyData.get("ele_prepay"));
-                    map.put("electronic_pay",moneyData.get("ele_pay"));
-                    map.put("cash_prepay",moneyData.get("cash_prepay"));
+//                    String carNumber = map.get("car_number")+"";
+//                    String orderId = map.get("order_id_local")+"";
+//                    JSONObject moneyData = getOrderDetail(orderId,comid,carNumber);
+//                    map.put("electronic_prepay",moneyData.get("ele_prepay"));
+//                    map.put("electronic_pay",moneyData.get("ele_pay"));
+//                    map.put("cash_prepay",moneyData.get("cash_prepay"));
                     resList.add(map);
                 }
             }
