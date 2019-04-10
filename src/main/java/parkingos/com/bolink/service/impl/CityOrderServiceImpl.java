@@ -287,6 +287,14 @@ public class CityOrderServiceImpl implements CityOrderService {
                         }else{
                             values.add("");
                         }
+                    }else if("total".equals(field)){
+                        //"electronic_prepay", "cash_prepay", "electronic_pay", "cash_pay"
+                        Double elePrepay = Double.parseDouble(map.get("electronic_prepay")+"");
+                        Double elePay = Double.parseDouble(map.get("electronic_pay")+"");
+                        Double cashPrepay = Double.parseDouble(map.get("cash_prepay")+"");
+                        Double cashPay = Double.parseDouble(map.get("cash_pay")+"");
+                        Double total = StringUtils.formatDouble(elePrepay+elePay+cashPrepay+cashPay);
+                        values.add(total + "");
                     }else{
                         values.add(v + "");
                     }

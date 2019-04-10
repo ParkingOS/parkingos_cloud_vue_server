@@ -71,15 +71,20 @@ public class AdminRoleServiceImpl implements AdminRoleService {
             }
 
             //封装searchbean  要求同一级账号登录员工可以看到相同的内容
-            SearchBean searchBean = new SearchBean();
-            searchBean.setOperator(FieldOperator.CONTAINS);
-            searchBean.setFieldName("adminid");
-            searchBean.setBasicValue(idList);
+            SearchBean searchBean = null;
+            if(idList!=null&&idList.size()>0) {
+                searchBean = new SearchBean();
+                searchBean.setOperator(FieldOperator.CONTAINS);
+                searchBean.setFieldName("adminid");
+                searchBean.setBasicValue(idList);
+            }
 
             if (supperQuery == null) {
                 supperQuery = new ArrayList<SearchBean>();
             }
-            supperQuery.add( searchBean );
+            if(searchBean!=null) {
+                supperQuery.add(searchBean);
+            }
 
             count = commonDao.selectCountByConditions(baseQuery,supperQuery);
             if(count>0){

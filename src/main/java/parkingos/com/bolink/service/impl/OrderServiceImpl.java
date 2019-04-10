@@ -425,7 +425,15 @@ public class OrderServiceImpl implements OrderService {
                         } else {
                             values.add(v + "");
                         }
-                    } else {
+                    } else if("total".equals(field)){
+                        //"electronic_prepay", "cash_prepay", "electronic_pay", "cash_pay"
+                        Double elePrepay = Double.parseDouble(map.get("electronic_prepay")+"");
+                        Double elePay = Double.parseDouble(map.get("electronic_pay")+"");
+                        Double cashPrepay = Double.parseDouble(map.get("cash_prepay")+"");
+                        Double cashPay = Double.parseDouble(map.get("cash_pay")+"");
+                        Double total = StringUtils.formatDouble(elePrepay+elePay+cashPrepay+cashPay);
+                        values.add(total + "");
+                    }else {
                         if ("create_time".equals(field) || "end_time".equals(field)) {
                             if (!"".equals(v.toString())) {
                                 values.add(TimeTools.getTime_yyyyMMdd_HHmmss(Long.valueOf((v + "")) * 1000));
