@@ -42,7 +42,7 @@ public class CityParkOrderanlysisServiceImpl implements CityParkOrderAnlysisServ
     public JSONObject selectResultByConditions(Map<String, String> reqmap) {
 
         //map  里面放 time
-
+        logger.info("===>>>>集团车场日报："+reqmap);
         String str = "{\"page\":1,\"rows\":[]}";
         JSONObject result = JSONObject.parseObject(str);
 
@@ -81,7 +81,7 @@ public class CityParkOrderanlysisServiceImpl implements CityParkOrderAnlysisServ
         List<Map<String, Object>> inTransactions = new ArrayList<>();
         List<Map<String, Object>> outTransactions = new ArrayList<>();
 
-        if(!Check.isEmpty(comidStr)) {
+        if(!Check.isEmpty(comidStr)&&Long.parseLong(comidStr)>0) {
             //查询某一个车场的收入和支出
             inTransactions = bolinkDataMapper.getTransactionsByComid(bolinkTableName, btime, etime, Long.parseLong(comidStr));
 

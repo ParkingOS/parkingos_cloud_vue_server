@@ -208,8 +208,8 @@ public class ParkCollectorOrderanlysisServiceImpl implements ParkCollectorOrderA
                 Map<String,Object> map = (Map)object;
                 List<Object> values = new ArrayList<Object>();
                 values.add(map.get("name"));
-                values.add(map.get("cash_pay"));
                 values.add(map.get("cash_prepay"));
+                values.add(map.get("cash_pay"));
 //                values.add(map.get("ele_prepay"));
                 values.add(map.get("act_total"));
                 values.add(map.get("free_pay"));
