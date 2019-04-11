@@ -36,4 +36,20 @@ public class ReduceRecordServiceImpl implements ReduceRecordService {
         JSONObject result = supperSearchService.supperSearch(ticketDeductionTb,reqParameterMap);
         return result;
     }
+
+    @Override
+    public JSONObject groupQuery(Map<String, String> reqParameterMap) {
+        Long groupid = Long.parseLong(reqParameterMap.get("groupid"));
+        TicketDeductionTb ticketDeductionTb = new TicketDeductionTb();
+        ticketDeductionTb.setGroupid(groupid);
+        String useTime = reqParameterMap.get("use_time_start");
+        if(Check.isEmpty(useTime)){
+            Long begin = TimeTools.getToDayBeginTime();
+            Long end = begin+86399;
+            reqParameterMap.put("use_time_start",begin+"");
+            reqParameterMap.put("use_time_end",end+"");
+        }
+        JSONObject result = supperSearchService.supperSearch(ticketDeductionTb,reqParameterMap);
+        return result;
+    }
 }

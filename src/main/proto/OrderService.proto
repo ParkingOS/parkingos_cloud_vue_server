@@ -107,4 +107,10 @@ service OrderService {
     rpc getExitCountbc(Order) returns(OrderCount);
     rpc getInparkCountbc(Order) returns(OrderCount);
 
+    //后台零元结算
+    rpc toZero(Order) returns(OrderCount);
+
+    //根据id查询订单
+    rpc qryOrderById(Order) returns(Order);
+
 }

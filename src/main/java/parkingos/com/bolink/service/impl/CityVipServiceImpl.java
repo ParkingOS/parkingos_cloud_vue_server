@@ -22,10 +22,11 @@ import parkingos.com.bolink.utils.*;
 import java.io.IOException;
 import java.io.InputStream;
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.text.SimpleDateFormat;
+import java.util.*;
+import java.util.concurrent.ExecutorService;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 
 @Service
@@ -36,13 +37,13 @@ public class CityVipServiceImpl implements CityVipService {
     @Autowired
     private CommonDao commonDao;
     @Autowired
-    private GetDataService getDataService;
-    @Autowired
     private SupperSearchService<CarowerProduct> supperSearchService;
     @Autowired
     private CommonMethods commonMethods;
     @Autowired
     private SaveLogService saveLogService;
+    @Autowired
+    CommonUtils commonUtils;
 
     @Override
     public JSONObject selectResultByConditions(Map<String, String> reqmap) {
@@ -253,6 +254,306 @@ public class CityVipServiceImpl implements CityVipService {
             }
         }
         return bodyList;
+    }
+
+    @Override
+    public JSONObject createVip(Long groupId,Long comid, String carNumber, String b_time, Integer months, Integer limit_day_type, Long pid, Long carTypeId, String mobile, String name, String address, String pLot,String remark,String nickname,Long uin) throws Exception{
+        JSONObject result = new JSONObject();
+        result.put("state",0);
+        //时间转换
+        b_time = b_time.replace("Z", " UTC");//注意是空格+UTC
+        SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS Z");//注意格式化的表达式
+        Date d = format.parse(b_time);
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        b_time = sdf.format(d);
+
+        //校验carNumber
+        if (!Check.isEmpty(carNumber)) {
+            String[] carNumStrings = carNumber.split(",");
+            if (carNumStrings != null && carNumStrings.length > 0) {
+                for (String strNum : carNumStrings) {
+                    strNum = strNum.toUpperCase();
+                    if (StringUtils.checkPlate(strNum)) {
+                        continue;
+                    } else {
+                        result.put("msg", "车牌号有误");
+                        return result;
+                    }
+                }
+            }
+        }
+
+        //校验车位号
+        if(!Check.isEmpty(pLot)){
+            Pattern letter = Pattern.compile("[\u4e00-\u9fa5a-zA-Z0-9,/_-]+");
+            String[] bytes = pLot.split("");
+            boolean flag = true;
+            for(int i=1;i<bytes.length;i++){
+                Matcher matcher = letter.matcher(bytes[i]);
+                if(!matcher.matches()){
+                    flag = false;
+                    break;
+                }
+            }
+
+            if(!flag){
+                result.put("state", 0);
+                result.put("msg", "请输入正确的车位");
+                return result;
+            }
+        }
+
+        Long ntime = System.currentTimeMillis() / 1000;
+        Long btime = TimeTools.getLongMilliSecondFrom_HHMMDD(b_time) / 1000;
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTimeInMillis(btime * 1000);
+        calendar.set(Calendar.MONTH, calendar.get(Calendar.MONTH) + months);
+        Long etime = calendar.getTimeInMillis() / 1000 - 1;
+
+        //如果有套餐编号校验
+        if(pid>-1) {
+            ProductPackageTb productPackageTb = new ProductPackageTb();
+            productPackageTb.setId(pid);
+            productPackageTb = (ProductPackageTb) commonDao.selectObjectByConditions(productPackageTb);
+            Long limitDay = null;
+            if (productPackageTb != null && productPackageTb.getLimitday() != null) {
+                limitDay = productPackageTb.getLimitday();
+            }
+            if (limitDay != null) {
+                if (limitDay < etime) {//超出有效期
+                    result.put("msg", "产品已超出有效期，请重新选择产品或更改购买月数");
+                    return result;
+                }
+            }
+        }
+
+
+        //入库
+        List<Long> comList = new ArrayList<>();
+        if(comid>-1) {
+            comList.add(comid);
+        }else {
+            ComInfoTb comInfoTb = new ComInfoTb();
+            comInfoTb.setGroupid(groupId);
+            comInfoTb.setState(0);
+            List<ComInfoTb> list = commonDao.selectListByConditions(comInfoTb);
+            if(list!=null&&list.size()>0){
+                for(ComInfoTb com:list){
+                    comList.add(com.getId());
+                }
+            }
+        }
+        logger.info("集团创建月卡："+carNumber+"~~"+comList);
+        if(comList.size()<1){
+            result.put("msg","参数错误！");
+            return result;
+        }
+
+        result = createVipByComs(result,comList,groupId,pid,carTypeId,ntime,btime,etime,remark,name,address,pLot,carNumber,mobile,limit_day_type,months,nickname,uin);
+
+        return result;
+    }
+
+    @Override
+    public JSONObject editVip(Long groupId, Long id, String carNumber, Integer limit_day_type, String mobile, String name, String pLot,String nickname,Long uin) {
+        JSONObject result = new JSONObject();
+        //校验carNumber
+        if (!Check.isEmpty(carNumber)) {
+            String[] carNumStrings = carNumber.split(",");
+            if (carNumStrings != null && carNumStrings.length > 0) {
+                for (String strNum : carNumStrings) {
+                    strNum = strNum.toUpperCase();
+                    if (StringUtils.checkPlate(strNum)) {
+                        continue;
+                    } else {
+                        result.put("msg", "车牌号有误");
+                        return result;
+                    }
+                }
+            }
+        }
+
+        //校验车位号
+        if(!Check.isEmpty(pLot)){
+            Pattern letter = Pattern.compile("[\u4e00-\u9fa5a-zA-Z0-9,/_-]+");
+            String[] bytes = pLot.split("");
+            boolean flag = true;
+            for(int i=1;i<bytes.length;i++){
+                Matcher matcher = letter.matcher(bytes[i]);
+                if(!matcher.matches()){
+                    flag = false;
+                    break;
+                }
+            }
+
+            if(!flag){
+                result.put("state", 0);
+                result.put("msg", "请输入正确的车位");
+                return result;
+            }
+        }
+
+        //验证通过  更新月卡信息
+        CarowerProduct carowerProduct = new CarowerProduct();
+        carowerProduct.setId(id);
+        carowerProduct.setCarNumber(carNumber.toUpperCase());
+        carowerProduct.setMobile(mobile);
+        carowerProduct.setpLot(pLot);
+        carowerProduct.setName(name);
+        carowerProduct.setLimitDayType(limit_day_type);
+        int update = commonDao.updateByPrimaryKey(carowerProduct);
+
+        if(update==1){
+            result.put("state",1);
+            result.put("msg","更新成功");
+            ExecutorService es = ExecutorsUtil.getExecutorService();
+            es.execute(new Runnable() {
+                @Override
+                public void run() {
+                    CarowerProduct carowerProduct1 = new CarowerProduct();
+                    carowerProduct1.setId(id);
+                    carowerProduct1 =(CarowerProduct) commonDao.selectObjectByConditions(carowerProduct1);
+                    String parkName = getParkName(carowerProduct1.getComId());
+                    boolean issend1 = commonUtils.sendMessage(carowerProduct1, carowerProduct1.getComId(), id, 2);
+                    int r = insertSysn(carowerProduct1, 1, carowerProduct1.getComId());
+                    commonUtils.sendNotice(2, carowerProduct1.getComId(), carowerProduct1.getCarNumber(), carowerProduct1.geteTime(), 0, carowerProduct1.getMobile(), parkName);
+
+                    ParkLogTb parkLogTb = new ParkLogTb();
+                    parkLogTb.setOperateUser(nickname);
+                    parkLogTb.setOperateTime(System.currentTimeMillis()/1000);
+                    parkLogTb.setOperateType(2);
+                    parkLogTb.setContent(uin+"("+nickname+")"+"集团修改了"+carowerProduct1.getComId()+"车场会员"+carowerProduct1.getCardId());
+                    parkLogTb.setType("vip");
+                    parkLogTb.setGroupId(groupId);
+                    saveLogService.saveLog(parkLogTb);
+
+                }
+            });
+        }
+        return result;
+    }
+
+    @Override
+    public JSONObject deleteVip(Long groupId, Long id, String nickname, Long uin) {
+        JSONObject result = new JSONObject();
+        result.put("state",0);
+
+        CarowerProduct carowerProduct = new CarowerProduct();
+        carowerProduct.setId(id);
+        carowerProduct.setIsDelete(1L);
+        int delete = commonDao.updateByPrimaryKey(carowerProduct);
+        if(delete==1){
+            result.put("state",1);
+            result.put("msg","删除成功！");
+            ExecutorService es = ExecutorsUtil.getExecutorService();
+            es.execute(new Runnable() {
+                @Override
+                public void run() {
+                    CarowerProduct carowerProduct1 = new CarowerProduct();
+                    carowerProduct1.setId(id);
+                    carowerProduct1 =(CarowerProduct) commonDao.selectObjectByConditions(carowerProduct1);
+                    String parkName = getParkName(carowerProduct1.getComId());
+                    boolean issend1 = commonUtils.sendMessage(carowerProduct1, carowerProduct1.getComId(), id, 3);
+                    int r = insertSysn(carowerProduct1, 2, carowerProduct1.getComId());
+//                    commonUtils.sendNotice(2, carowerProduct1.getComId(), carowerProduct1.getCarNumber(), carowerProduct1.geteTime(), 0, carowerProduct1.getMobile(), parkName);
+
+                    ParkLogTb parkLogTb = new ParkLogTb();
+                    parkLogTb.setOperateUser(nickname);
+                    parkLogTb.setOperateTime(System.currentTimeMillis()/1000);
+                    parkLogTb.setOperateType(3);
+                    parkLogTb.setContent(uin+"("+nickname+")"+"集团删除了"+carowerProduct1.getComId()+"车场会员"+carowerProduct1.getCardId());
+                    parkLogTb.setType("vip");
+                    parkLogTb.setGroupId(groupId);
+                    saveLogService.saveLog(parkLogTb);
+
+                }
+            });
+        }
+        return result;
+    }
+
+    private String getParkName(Long comid) {
+        ComInfoTb comInfoTb = new ComInfoTb();
+        comInfoTb.setId(comid);
+        comInfoTb=(ComInfoTb)commonDao.selectObjectByConditions(comInfoTb);
+        if(comInfoTb!=null){
+            return comInfoTb.getCompanyName();
+        }
+        return "";
+    }
+
+    private JSONObject createVipByComs(JSONObject result, List<Long> comList,Long groupId, Long pid, Long carTypeId, Long ntime, Long btime, Long etime, String remark, String name, String address, String pLot, String carNumber, String mobile, Integer limit_day_type,Integer months,String nickname,Long uin) {
+        String msg = "新建月卡成功";
+        ExecutorService es = ExecutorsUtil.getExecutorService();
+        for(Long comid:comList) {
+
+            String parkName = getParkName(comid);
+
+            Long nextid = commonDao.selectSequence(CarowerProduct.class);
+            String cardId = String.valueOf(nextid);
+
+            CarowerProduct carowerProduct = new CarowerProduct();
+            carowerProduct.setComId(comid);
+            carowerProduct.setCardId(cardId);
+            carowerProduct.setIsDelete(0L);
+            int count = commonDao.selectCountByConditions(carowerProduct);
+
+            logger.error("======>>>>>>>>count" + count);
+            if (count > 0) {
+                msg+= comid+"车场卡号重复！";
+//                result.put("msg", "月卡编号重复");
+//                return result;
+                continue;
+            }
+
+            CarowerProduct carowerProduct1 = new CarowerProduct();
+            carowerProduct1.setId(nextid);
+            carowerProduct1.setPid(pid);
+            carowerProduct1.setCarTypeId(carTypeId);
+            carowerProduct1.setCreateTime(ntime);
+            carowerProduct1.setUpdateTime(ntime);
+            carowerProduct1.setbTime(btime);
+            carowerProduct1.seteTime(etime);
+            carowerProduct1.setTotal(new BigDecimal("0.0"));
+            carowerProduct1.setRemark(remark);
+            carowerProduct1.setName(name);
+            carowerProduct1.setAddress(address);
+            carowerProduct1.setpLot(pLot);
+            carowerProduct1.setActTotal(new BigDecimal("0.0"));
+            carowerProduct1.setComId(comid);
+            carowerProduct1.setCarNumber(carNumber.toUpperCase());
+            carowerProduct1.setCardId(cardId);
+            carowerProduct1.setMobile(mobile);
+            carowerProduct1.setLimitDayType(limit_day_type);
+            int ret = commonDao.insert(carowerProduct1);
+
+            es.execute(new Runnable() {
+                @Override
+                public void run() {
+                    boolean issend = commonUtils.sendMessage(carowerProduct1, comid, nextid, 1);
+                    logger.info("........发送月卡数据" + issend);
+                    int ins = insertSysn(carowerProduct1, 0, comid);
+                    commonUtils.sendNotice(1, comid, carNumber, etime, months, mobile, parkName);
+                }
+            });
+        }
+        String comRes = "";
+        if(comList.size()>0){
+            comRes = "所有";
+        }else{
+            comRes =comList.get(0)+"";
+        }
+        ParkLogTb parkLogTb = new ParkLogTb();
+        parkLogTb.setOperateUser(nickname);
+        parkLogTb.setOperateTime(System.currentTimeMillis()/1000);
+        parkLogTb.setOperateType(1);
+        parkLogTb.setContent(uin+"("+nickname+")"+"集团给"+comRes+"车场创建了会员"+carNumber);
+        parkLogTb.setType("vip");
+        parkLogTb.setGroupId(groupId);
+        saveLogService.saveLog(parkLogTb);
+        result.put("state", 1);
+        result.put("msg", msg);
+        return result;
     }
 
     @Override

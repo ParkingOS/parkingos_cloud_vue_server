@@ -2,6 +2,7 @@ package parkingos.com.bolink.service.impl;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
+import com.zld.proto.Order;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -9,12 +10,10 @@ import org.springframework.stereotype.Service;
 import parkingos.com.bolink.dao.mybatis.OrderTbExample;
 import parkingos.com.bolink.dao.mybatis.mapper.OrderMapper;
 import parkingos.com.bolink.dao.spring.CommonDao;
-import parkingos.com.bolink.models.ComInfoTb;
-import parkingos.com.bolink.models.ComPassTb;
-import parkingos.com.bolink.models.OrderTb;
-import parkingos.com.bolink.models.UserInfoTb;
+import parkingos.com.bolink.models.*;
 import parkingos.com.bolink.orderserver.OrderServer;
 import parkingos.com.bolink.service.CityUnorderService;
+import parkingos.com.bolink.service.SaveLogService;
 import parkingos.com.bolink.service.SupperSearchService;
 import parkingos.com.bolink.utils.*;
 
@@ -22,6 +21,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ExecutorService;
 
 @Service("unorderSpring")
 public class CityUnorderServiceImpl implements CityUnorderService {
@@ -33,11 +33,13 @@ public class CityUnorderServiceImpl implements CityUnorderService {
     @Autowired
     private SupperSearchService<OrderTb> supperSearchService;
     @Autowired
-    private CommonMethods commonMethods;
-    @Autowired
     private OrderMapper orderMapper;
     @Autowired
     private OrderServer orderServer;
+    @Autowired
+    CommonUtils commonUtils;
+    @Autowired
+    SaveLogService saveLogService;
 
 
     @Override
@@ -259,6 +261,77 @@ public class CityUnorderServiceImpl implements CityUnorderService {
         return bodyList;
     }
 
+    @Override
+    public JSONObject toZero(Long id, Long cityid, Long createTime,String money,Long groupId,Long uin,String nickname) {
+        JSONObject result = new JSONObject();
+        result.put("state",0);
+        String tableName = "order_tb_new";
+        if(cityid>0){
+            tableName+="_"+cityid%100;
+            if(createTime>0){
+                String date = TimeTools.getTime_yyyyMMdd_HHmmss(createTime*1000);
+                date = date.substring(0,7).replace("-","");
+                tableName+= "_"+date;
+            }
+        }
+        logger.info("===>>>>>零元结算："+tableName+"~"+id);
+
+        int update = orderServer.toZero(id,cityid,tableName,money);
+        if(update==1){
+            result.put("state",1);
+            result.put("msg","零元结算成功");
+            ExecutorService es = ExecutorsUtil.getExecutorService();
+            es.execute(new Runnable() {
+                @Override
+                public void run() {
+
+                    String tableName = "order_tb_new";
+                    if(cityid>0){
+                        tableName+="_"+cityid%100;
+                        if(createTime>0){
+                            String date = TimeTools.getTime_yyyyMMdd_HHmmss(createTime*1000);
+                            date = date.substring(0,7).replace("-","");
+                            tableName+= "_"+date;
+                        }
+                    }
+
+                    Order order = Order.newBuilder()
+                            .setId(id)
+                            .setTableName(tableName)
+                            .setCityid(cityid)
+                            .build();
+                    OrderTb orderTb = orderServer.qryOrderById(order);
+
+                    boolean issend = commonUtils.sendMessage(orderTb, 2,tableName);
+                    logger.info("........发送月卡数据" + issend);
+                    int ins = insertSysn(orderTb, 1,tableName);
+
+                    ParkLogTb parkLogTb = new ParkLogTb();
+                    parkLogTb.setOperateUser(nickname);
+                    parkLogTb.setOperateTime(System.currentTimeMillis()/1000);
+                    parkLogTb.setOperateType(1);
+                    parkLogTb.setContent(uin+"("+nickname+")"+"集团零元结算订单："+id);
+                    parkLogTb.setType("vip");
+                    parkLogTb.setGroupId(groupId);
+                    saveLogService.saveLog(parkLogTb);
+
+                }
+            });
+
+        }
+        return result;
+    }
+
+
+    private int insertSysn(OrderTb orderTb, Integer operater,String tablename) {
+        SyncInfoPoolTb syncInfoPoolTb = new SyncInfoPoolTb();
+        syncInfoPoolTb.setComid(orderTb.getComid());
+        syncInfoPoolTb.setTableId(orderTb.getId());
+        syncInfoPoolTb.setTableName(tablename);
+        syncInfoPoolTb.setCreateTime(System.currentTimeMillis() / 1000);
+        syncInfoPoolTb.setOperate(operater);
+        return commonDao.insert(syncInfoPoolTb);
+    }
 
     private String getPassName(Long passId) {
         ComPassTb comPassTb = new ComPassTb();

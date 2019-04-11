@@ -1032,4 +1032,66 @@ public class OrderServer extends BaseServer {
         return userId;
     }
 
+
+    public int toZero(Long id, Long cityId, String tableName,String money) {
+        OrderCount u =null;
+        if(cityId==null||cityId<0){
+            logger.error("===>>>>cityId error:"+cityId+"~"+id);
+            return 0;
+        }
+        String grpcServer = getGrpcName(cityId);
+        ManagedChannel channel = this.createGrpcChannel(grpcServer);
+        if(channel!=null){
+            //获取
+            try{
+                OrderServiceGrpc.OrderServiceBlockingStub stub = OrderServiceGrpc.newBlockingStub(channel);
+                Order order = Order.newBuilder()
+                        .setId(id)
+                        .setTableName(tableName)
+                        .setCashPay(Double.parseDouble(money))
+                        .build();
+                u = stub.toZero(order);
+            }catch(Exception e){
+                logger.error("client to server error",e);
+            }
+        }
+        else{
+            logger.error("server is down!!");
+            return 0;
+        }
+        if(u!=null){
+            return u.getCount();
+        }
+        return 0;
+    }
+
+    public OrderTb qryOrderById(Order orderRequest) {
+        Order u = null;
+        if(orderRequest.getCityid()<=0){
+            logger.error("352===>>>>cityID error:");
+            return null;
+        }
+        String grpcServer = getGrpcName(orderRequest.getCityid());
+        ManagedChannel channel = this.createGrpcChannel(grpcServer);
+        if(channel!=null){
+            //获取
+            try{
+                OrderServiceGrpc.OrderServiceBlockingStub stub = OrderServiceGrpc.newBlockingStub(channel);
+                u = stub.qryOrderById(orderRequest);
+            }catch(Exception e){
+                logger.error("client to server error",e);
+            }
+        }
+        else{
+            logger.error("server is down!!");
+            return null;
+        }
+
+        OrderTb result = new OrderTb();
+        if(u!=null){
+            result=getOrderTbFromOrder(u);
+        }
+        return result;
+    }
+
 }

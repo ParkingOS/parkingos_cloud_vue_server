@@ -174,6 +174,19 @@ public class CommonServiceImpl implements CommonService {
         return comid+"";
     }
 
+    @Override
+    public Long getGroupIdByComid(Long parkId) {
+        Object group = redisService.get(CustomDefind.getValue("REDISCOMID4GROUPID")+parkId);
+        if(group==null) {
+            Long groupid = getGroupIdByComId(parkId);
+            redisService.set(CustomDefind.getValue("REDISCOMID4GROUPID")+parkId,groupid+"",7500);
+            return groupid;
+        }else{
+            return Long.parseLong(group+"");
+        }
+//        return getGroupIdByComId(parkId);
+    }
+
     private Long getUnionIdByGroupId(Long groupid) {
         Object union = redisService.get(CustomDefind.getValue("REDISGROUPID4UNIONID")+groupid);
         if(union==null){

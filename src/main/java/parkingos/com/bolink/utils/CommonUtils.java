@@ -1,6 +1,7 @@
 package parkingos.com.bolink.utils;
 
 import com.alibaba.fastjson.JSONObject;
+import com.zld.proto.Order;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -252,6 +253,10 @@ public class CommonUtils<T> {
             result = sendPrepayCardTrade(tableId, comid, operate,parkTokenTb);
             logger.info(">>>>>>>>>>>>>>>>>>>>>发送储值卡流水结果" + result);
         }
+//        else if("order_tb".equals(tableName)){
+//            result = sendOrderZeroBalance(tableId, comid, operate,parkTokenTb);
+//            logger.info(">>>>>>>>>>>>>>>>>>>>>发送零元结算结果" + result);
+//        }
         if("1".equals(result)){
             return true;
         }
@@ -877,24 +882,28 @@ public class CommonUtils<T> {
 
 
     private String getCarTypd(Long id){
-        if(Check.isEmpty(id+""))
-            return id+"";
+        if(Check.isEmpty(id+"")) {
+            return id + "";
+        }
         CarTypeTb typeTb = new CarTypeTb();
         typeTb.setId(id);
         typeTb = (CarTypeTb)commonDao.selectObjectByConditions(typeTb);
-        if(typeTb!=null&&typeTb.getCartypeId()!=null)
+        if(typeTb!=null&&typeTb.getCartypeId()!=null) {
             return typeTb.getCartypeId();
+        }
         return id+"";
     }
 
     private String getProudetId(Long id){
-        if(Check.isEmpty(id+""))
-            return id+"";
+        if(Check.isEmpty(id+"")) {
+            return id + "";
+        }
         ProductPackageTb packageTb = new ProductPackageTb();
         packageTb.setId(id);
         packageTb = (ProductPackageTb)commonDao.selectObjectByConditions(packageTb);
-        if(packageTb!=null&&packageTb.getCardId()!=null)
+        if(packageTb!=null&&packageTb.getCardId()!=null) {
             return packageTb.getCardId();
+        }
         return id+"";
     }
 
@@ -920,6 +929,60 @@ public class CommonUtils<T> {
         syncInfoPoolTb.setOperate(operateType);
         syncInfoPoolTb.setUpdateTime(System.currentTimeMillis()/1000);
         return commonDao.insert(syncInfoPoolTb);
+    }
+
+    public boolean sendMessage(OrderTb orderTb,  int operate, String tableName) {
+//        String tableName  = t.getClass().getName();
+//        tableName = camel2Underline(tableName.substring(tableName.lastIndexOf(".")));
+//        operate += 1;
+        ParkTokenTb parkTokenTb = getChannel(orderTb.getComid());
+        String result="0";
+        logger.info("开始发送数据。。。。。。。。"+tableName+"~~~"+parkTokenTb);
+        if(parkTokenTb==null){
+            logger.error("sdk 没有在线，第一次发送失败");
+            return false;
+        }
+        if (tableName.contains("order_tb")) {
+            result= sendOrderZeroBalance( orderTb, operate,parkTokenTb,tableName);
+            logger.info(">>>>>>>>>>>>>>>>>>>>>发送零元结算结果" + result);
+        }
+        if("1".equals(result)){
+            return true;
+        }
+        return false;
+    }
+
+    private String sendOrderZeroBalance(OrderTb orderTb, int operate, ParkTokenTb parkTokenTb, String tableName) {
+        String result = "0";
+        JSONObject jsonSend = new JSONObject();
+        if (orderTb != null ) {
+            logger.info(">>>>>>>零元结算订单信息：" + orderTb);
+
+            jsonSend.put("in_time",orderTb.getCreateTime());
+            jsonSend.put("out_time",  orderTb.getEndTime());
+            jsonSend.put("car_number",  orderTb.getCarNumber());
+            jsonSend.put("order_id",  orderTb.getOrderIdLocal());
+            jsonSend.put("cash_pay", orderTb.getCashPay());
+            jsonSend.put("cash_prepay",  orderTb.getCashPrepay());
+            jsonSend.put("ele_pay",  orderTb.getElectronicPay());
+            jsonSend.put("ele_prepay", orderTb.getElectronicPrepay());
+            jsonSend.put("operate_type",operate);
+            jsonSend.put("park_id", getBolinkId(orderTb.getComid()));
+            logger.info(">>>>>>>>>>>>>>>>>>>>>>>>>>零元结算下发本地：" + jsonSend);
+        } else {
+            logger.error(">>>>>>>>>>>>>零元结算下发订单为空");
+            return result;
+        }
+        JSONObject jsonMesg = new JSONObject();
+        jsonMesg.put("service_name", "order_zero_balance");
+        jsonMesg.put("data", jsonSend);
+
+        boolean isSend = doSendMessage(jsonMesg,parkTokenTb);
+        logger.info(">>>>>>>>>>>>>>云端发送数据到停车收费系统结果：" + isSend);
+        if (isSend) {
+            result = "1";
+        }
+        return result;
     }
 
 //    public static void main(String[] args){

@@ -21,6 +21,16 @@ public class TicketDeductionTb {
 
     private String deductionAmount;
 
+    private Long groupid;
+
+    public Long getGroupid() {
+        return groupid;
+    }
+
+    public void setGroupid(Long groupid) {
+        this.groupid = groupid;
+    }
+
     public Long getId() {
         return id;
     }

@@ -53,16 +53,79 @@ public class CityVipManageAction {
 
 
 
-//    @RequestMapping(value = "add")
-//    public String add(HttpServletRequest req, HttpServletResponse resp){
-//
-//        JSONObject result = cityVipService.createVip(req);
-//
-//        StringUtils.ajaxOutput(resp,result.toJSONString());
-//
-//        return null;
-//    }
+    @RequestMapping(value = "add")
+    public String add(HttpServletRequest req, HttpServletResponse resp){
+        try {
+            String nickname = StringUtils.decodeUTF8(RequestUtil.getString(req,"nickname1"));
+            Long uin = RequestUtil.getLong(req, "loginuin", -1L);
 
+            Long groupId = RequestUtil.getLong(req, "groupid", -1L);
+            Long comid = RequestUtil.getLong(req, "comid", -1L);
+            String carNumber = RequestUtil.getString(req, "car_number");
+            Integer limit_day_type = RequestUtil.getInteger(req, "limit_day_type", 0);
+            Long pid = RequestUtil.getLong(req, "p_name", -1L);
+            Long carTypeId = RequestUtil.getLong(req, "car_type_id", -1L);
+            String mobile = RequestUtil.getString(req, "mobile").trim();
+            String name = RequestUtil.getString(req, "name").trim();
+            String address = StringUtils.decodeUTF8(RequestUtil.getString(req, "address").trim());
+            //起始时间   "2015-12-7T16:00:00.000Z";
+            String b_time = RequestUtil.processParams(req, "b_time");
+            Integer months = RequestUtil.getInteger(req, "months", 1);
+            String pLot = RequestUtil.getString(req, "p_lot");
+            String remark = RequestUtil.getString(req,"remark");
+            logger.info("===>>>集团创建会员:" + comid + "~" + carNumber + "~" + b_time + "~" + months + "~" + limit_day_type + "~" + address+"~"+remark);
+
+            JSONObject result = cityVipService.createVip(groupId, comid, carNumber, b_time, months, limit_day_type, pid, carTypeId, mobile, name, address, pLot,remark,nickname,uin);
+            StringUtils.ajaxOutput(resp, result.toJSONString());
+        }catch (Exception e){
+            logger.error("==>>>>集团创建月卡异常",e);
+        }
+        return null;
+    }
+
+
+    @RequestMapping(value = "edit")
+    public String edit(HttpServletRequest req, HttpServletResponse resp){
+        try {
+            String nickname = StringUtils.decodeUTF8(RequestUtil.getString(req,"nickname1"));
+            Long uin = RequestUtil.getLong(req, "loginuin", -1L);
+            Long groupId = RequestUtil.getLong(req, "groupid", -1L);
+
+
+            Long id = RequestUtil.getLong(req,"id",-1L);
+
+            String carNumber = RequestUtil.getString(req, "car_number");
+            Integer limit_day_type = RequestUtil.getInteger(req, "limit_day_type", 0);
+            String mobile = RequestUtil.getString(req, "mobile").trim();
+            String name = RequestUtil.getString(req, "name").trim();
+            String pLot = RequestUtil.getString(req, "p_lot");
+            logger.info("===>>>集团修改会员:"  + carNumber + "~"  + limit_day_type+"~"+id+"~"+mobile+"~"+name+"~"+pLot);
+
+            JSONObject result = cityVipService.editVip(groupId, id,carNumber,limit_day_type,mobile,name,pLot,nickname,uin);
+            StringUtils.ajaxOutput(resp, result.toJSONString());
+        }catch (Exception e){
+            logger.error("==>>>>集团创建月卡异常",e);
+        }
+        return null;
+    }
+
+
+    @RequestMapping(value = "delete")
+    public String delete(HttpServletRequest req, HttpServletResponse resp){
+        try {
+            String nickname = StringUtils.decodeUTF8(RequestUtil.getString(req,"nickname1"));
+            Long uin = RequestUtil.getLong(req, "loginuin", -1L);
+            Long groupId = RequestUtil.getLong(req, "groupid", -1L);
+
+            Long id = RequestUtil.getLong(req,"id",-1L);
+
+            JSONObject result = cityVipService.deleteVip(groupId, id,nickname,uin);
+            StringUtils.ajaxOutput(resp, result.toJSONString());
+        }catch (Exception e){
+            logger.error("==>>>>集团创建月卡异常",e);
+        }
+        return null;
+    }
 
 
 

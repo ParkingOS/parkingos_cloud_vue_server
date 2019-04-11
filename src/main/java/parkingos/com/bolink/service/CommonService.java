@@ -20,4 +20,6 @@ public interface CommonService {
     String getTableNameByGroupId(Long groupid, int i);
 
     String getParkNameById(Long comId);
+
+    Long getGroupIdByComid(Long parkId);
 }

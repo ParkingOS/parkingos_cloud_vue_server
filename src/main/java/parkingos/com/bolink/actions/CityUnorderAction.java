@@ -85,4 +85,30 @@ public class CityUnorderAction {
 
         return null;
     }
+
+
+    @RequestMapping(value = "/tozero")
+    public String toZero(HttpServletRequest request, HttpServletResponse resp) {
+        try {
+
+            String nickname = StringUtils.decodeUTF8(RequestUtil.getString(request,"nickname1"));
+            Long uin = RequestUtil.getLong(request, "loginuin", -1L);
+            Long groupId = RequestUtil.getLong(request, "groupid", -1L);
+
+            Long id = RequestUtil.getLong(request, "id", -1L);
+            Long cityid = RequestUtil.getLong(request, "cityid", -1L);
+            Long createTime = RequestUtil.getLong(request, "in_time", -1L);
+            String money = RequestUtil.getString(request,"money");
+
+            logger.info("==>>>>0元结算:"+id+"~"+createTime+"~"+money+"~"+uin+"~"+groupId+"~"+nickname);
+
+            JSONObject result = cityUnorderService.toZero(id, cityid, createTime,money,groupId,uin,nickname);
+            //把结果返回页面
+            StringUtils.ajaxOutput(resp, result.toJSONString());
+        }catch (Exception e){
+            logger.error("零元结算异常",e);
+        }
+        return null;
+    }
+
 }

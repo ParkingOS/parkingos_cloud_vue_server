@@ -80,6 +80,10 @@ public class BolinkIncomeServiceImpl implements BolinkIncomeService {
         List<Map<String, Object>> resList = new ArrayList<Map<String, Object>>();
         if(count>0){
             resList = bolinkIncomeTbMapper.getIncomes(example);
+            if(type==2){
+                //查询交易记录的总金额
+
+            }
         }
         result.put("rows", JSON.toJSON(resList));
         result.put("total",count);
