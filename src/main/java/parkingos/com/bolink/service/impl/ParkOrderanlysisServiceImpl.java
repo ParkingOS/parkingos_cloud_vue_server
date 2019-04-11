@@ -560,8 +560,8 @@ public class ParkOrderanlysisServiceImpl implements ParkOrderAnlysisService {
                 values.add(map.get("month_pay"));
                 values.add(map.get("prepay_card"));
                 values.add(map.get("ele_total"));
-                values.add(map.get("cash_pay"));
                 values.add(map.get("cash_prepay"));
+                values.add(map.get("cash_pay"));
                 values.add(map.get("cash_total"));
                 values.add(map.get("refund"));
                 values.add(map.get("fee"));
