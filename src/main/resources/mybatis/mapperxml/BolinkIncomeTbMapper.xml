@@ -77,4 +77,14 @@
   </select>
 
 
+  <select id="getIncomesMoney" resultType="BigDecimal" parameterType="parkingos.com.bolink.dao.mybatis.BolinkIncomeTbExample" >
+    select
+    sum(pay_money)
+    from ${tableName}
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+  </select>
+
+
 </mapper>

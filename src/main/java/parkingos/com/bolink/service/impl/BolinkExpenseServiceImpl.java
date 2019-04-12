@@ -19,6 +19,7 @@ import parkingos.com.bolink.utils.Check;
 import parkingos.com.bolink.utils.ExampleUtis;
 import parkingos.com.bolink.utils.TimeTools;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -78,6 +79,11 @@ public class BolinkExpenseServiceImpl implements BolinkExpenseService {
         List<Map<String, Object>> resList = new ArrayList<Map<String, Object>>();
         if(count>0){
             resList = bolinkExpenseTbMapper.getExpenses(example);
+            if(type==2){
+                //查询交易记录的总金额
+                BigDecimal money = bolinkExpenseTbMapper.getExpensesMoney(example);
+                result.put("money",money);
+            }
         }
         result.put("rows", JSON.toJSON(resList));
         result.put("total",count);

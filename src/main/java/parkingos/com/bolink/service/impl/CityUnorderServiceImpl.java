@@ -303,14 +303,14 @@ public class CityUnorderServiceImpl implements CityUnorderService {
                     OrderTb orderTb = orderServer.qryOrderById(order);
 
                     boolean issend = commonUtils.sendMessage(orderTb, 2,tableName);
-                    logger.info("........发送月卡数据" + issend);
+                    logger.info("........发送零元结算" + issend);
                     int ins = insertSysn(orderTb, 1,tableName);
 
                     ParkLogTb parkLogTb = new ParkLogTb();
                     parkLogTb.setOperateUser(nickname);
                     parkLogTb.setOperateTime(System.currentTimeMillis()/1000);
                     parkLogTb.setOperateType(1);
-                    parkLogTb.setContent(uin+"("+nickname+")"+"集团零元结算订单："+id);
+                    parkLogTb.setContent(uin+"("+nickname+")"+"集团"+money+"结算订单："+id);
                     parkLogTb.setType("vip");
                     parkLogTb.setGroupId(groupId);
                     saveLogService.saveLog(parkLogTb);

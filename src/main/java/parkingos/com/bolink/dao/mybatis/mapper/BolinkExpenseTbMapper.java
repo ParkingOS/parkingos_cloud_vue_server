@@ -1,5 +1,6 @@
 package parkingos.com.bolink.dao.mybatis.mapper;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
 
@@ -36,4 +37,6 @@ public interface BolinkExpenseTbMapper {
     int getExpenseCounts(BolinkExpenseTbExample example);
 
     List<Map<String,Object>> getExpenses(BolinkExpenseTbExample example);
+
+    BigDecimal getExpensesMoney(BolinkExpenseTbExample example);
 }
