@@ -19,10 +19,7 @@ import parkingos.com.bolink.utils.Check;
 import parkingos.com.bolink.utils.StringUtils;
 import parkingos.com.bolink.utils.TimeTools;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Service
 public class GroupMonthParkOrderanlysisServiceImpl implements GroupMonthParkOrderAnlysisService {
@@ -118,6 +115,7 @@ public class GroupMonthParkOrderanlysisServiceImpl implements GroupMonthParkOrde
             }
         }
 
+        Collections.sort(dateList);
 
         if(dateList!=null&&dateList.size()>0){
             Double act_money = 0.0d;//所有的收入金额

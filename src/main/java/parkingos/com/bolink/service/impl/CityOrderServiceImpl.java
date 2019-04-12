@@ -117,13 +117,13 @@ public class CityOrderServiceImpl implements CityOrderService {
                     } else {
                         map.put("duration","");
                     }
-                    String carNumber = map.get("car_number")+"";
-                    String orderId = map.get("order_id_local")+"";
-                    Long comid = (Long)map.get("comid");
-                    JSONObject moneyData = orderService.getOrderDetail(orderId,comid,carNumber);
-                    map.put("electronic_prepay",moneyData.get("ele_prepay"));
-                    map.put("electronic_pay",moneyData.get("ele_pay"));
-                    map.put("cash_prepay",moneyData.get("cash_prepay"));
+//                    String carNumber = map.get("car_number")+"";
+//                    String orderId = map.get("order_id_local")+"";
+//                    Long comid = (Long)map.get("comid");
+//                    JSONObject moneyData = orderService.getOrderDetail(orderId,comid,carNumber);
+//                    map.put("electronic_prepay",moneyData.get("ele_prepay"));
+//                    map.put("electronic_pay",moneyData.get("ele_pay"));
+//                    map.put("cash_prepay",moneyData.get("cash_prepay"));
                     resList.add(map);
                 }
                 result.put("rows", JSON.toJSON(resList));
@@ -287,6 +287,14 @@ public class CityOrderServiceImpl implements CityOrderService {
                         }else{
                             values.add("");
                         }
+                    }else if("total".equals(field)){
+                        //"electronic_prepay", "cash_prepay", "electronic_pay", "cash_pay"
+                        Double elePrepay = Double.parseDouble(map.get("electronic_prepay")+"");
+                        Double elePay = Double.parseDouble(map.get("electronic_pay")+"");
+                        Double cashPrepay = Double.parseDouble(map.get("cash_prepay")+"");
+                        Double cashPay = Double.parseDouble(map.get("cash_pay")+"");
+                        Double total = StringUtils.formatDouble(elePrepay+elePay+cashPrepay+cashPay);
+                        values.add(total + "");
                     }else{
                         values.add(v + "");
                     }

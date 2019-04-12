@@ -137,6 +137,7 @@
         AND pay_time BETWEEN #{b_time,jdbcType=BIGINT}
         AND #{e_time,jdbcType=BIGINT}
         GROUP BY
+        comid,
         TYPE
     </select>
 
@@ -167,6 +168,8 @@
         park_id = #{comid,jdbcType=BIGINT}
         AND pay_time BETWEEN #{b_time,jdbcType=BIGINT}
         AND #{e_time,jdbcType=BIGINT}
+        GROUP BY
+        comid
     </select>
 
     <select id="getOutTransactionsByGroupId" resultType="map">

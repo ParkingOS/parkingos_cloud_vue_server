@@ -248,9 +248,15 @@ public class ExampleUtis {
                         }
                         break;
 
+                    case "groupid":
+                        String groupid = reqmap.get("groupid");
+                        if (Check.isLong(groupid)) {
+                            example.createCriteria().andGroupIdEqualTo(Long.parseLong(groupid));
+                        }
+                        break;
+
                     case "comid":
-                        String startvalue = reqmap.get("comid");
-                        System.out.println("===========>>>>>>>>>>>>>>>>comid:"+startvalue);
+                        String startvalue = reqmap.get("comid_start");
                         if (Check.isLong(startvalue)) {
                             example.createCriteria().andParkIdEqualTo(Long.parseLong(startvalue));
                         }
@@ -339,9 +345,14 @@ public class ExampleUtis {
                             example.setOrderByClause(reqmap.get("orderfield"));
                         }
                         break;
-
+                    case "groupid":
+                        String groupid = reqmap.get("groupid");
+                        if (Check.isLong(groupid)) {
+                            example.createCriteria().andGroupIdEqualTo(Long.parseLong(groupid));
+                        }
+                        break;
                     case "comid":
-                        String startvalue = reqmap.get("comid");
+                        String startvalue = reqmap.get("comid_start");
                         System.out.println("===========>>>>>>>>>>>>>>>>comid:"+startvalue);
                         if (Check.isLong(startvalue)) {
                             example.createCriteria().andParkIdEqualTo(Long.parseLong(startvalue));

@@ -41,19 +41,28 @@ public class BolinkIncomeServiceImpl implements BolinkIncomeService {
 //        Long comid = Long.parseLong(reqParameterMap.get("comid"));
 //        BolinkIncomeTb bolinkIncomeTb = new BolinkIncomeTb();
 //        bolinkIncomeTb.setParkId(comid);
-        JSONObject result = getIncomes(reqParameterMap);
+        JSONObject result = getIncomes(reqParameterMap,1);
 //        JSONObject result = supperSearchService.supperSearch(bolinkIncomeTb,reqParameterMap);
         return result;
     }
 
-    private JSONObject getIncomes(Map<String, String> reqParameterMap) {
+    @Override
+    public JSONObject groupQuery(Map<String, String> reqParameterMap) {
+        JSONObject result = getIncomes(reqParameterMap,2);
+        return result;
+    }
+
+    private JSONObject getIncomes(Map<String, String> reqParameterMap,int type) {
         logger.info("====>>>>>>>>>>>reqParameterMap:"+reqParameterMap);
-        JSONObject result = new JSONObject();
-        Long comid = Long.parseLong(reqParameterMap.get("comid"));
-        Long unionId = commonService.getUnionIdByComid(comid);
         String tableName = "bolink_income_tb";
-        if(unionId>0){
-            tableName += "_"+unionId%10;
+        JSONObject result = new JSONObject();
+        if(type==1) {
+            Long comid = Long.parseLong(reqParameterMap.get("comid"));
+            tableName = commonService.getTableNameByComid(comid,1);
+            reqParameterMap.put("comid_start",comid+"");
+        }else if(type==2){
+            Long groupId = Long.parseLong(reqParameterMap.get("groupid"));
+            tableName =commonService.getTableNameByGroupId(groupId,1);
         }
         reqParameterMap.put("tableName",tableName);
         //增加默认的pay_time,默认今天一天的数据
