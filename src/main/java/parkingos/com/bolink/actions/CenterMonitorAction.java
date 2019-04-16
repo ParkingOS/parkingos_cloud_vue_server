@@ -41,15 +41,15 @@ public class CenterMonitorAction {
     * */
     @RequestMapping(value = "/getConfirmorder")
     public String getConfirmOrder(HttpServletRequest request, HttpServletResponse response) throws Exception {
-        System.out.println("进入获取单个图片的时间>>>>>>>>>>>" + System.currentTimeMillis());
+        logger.info("进入获取单个图片的时间>>>>>>>>>>>" + System.currentTimeMillis());
         String event_id = StringUtils.decodeUTF8(RequestUtil.getString(request, "event_id"));
         String car_number = StringUtils.decodeUTF8(RequestUtil.getString(request, "car_number"));
         String comid = StringUtils.decodeUTF8(RequestUtil.getString(request, "comid"));
 
-        logger.error("获得指定的确认订单的图片" + event_id + "~~~" + car_number + "~~~" + comid);
+        logger.info("获得指定的确认订单的图片" + event_id + "~~~" + car_number + "~~~" + comid);
 
         centerMonitorService.getConfirmPic(event_id, Long.parseLong(comid), car_number,response);
-        System.out.println("出来获取单个图片的时间>>>>>>>>>>>" + System.currentTimeMillis());
+        logger.info("出来获取单个图片的时间>>>>>>>>>>>" + System.currentTimeMillis());
 //        if (content.length == 0) {
 //            response.sendRedirect("http://sysimages.tq.cn/images/webchat_101001/common/kefu.png");
 //            return null;
@@ -94,15 +94,15 @@ public class CenterMonitorAction {
     * */
     @RequestMapping(value = "/matchconfirmorder")
     public String matchConfirmOrder(HttpServletRequest request, HttpServletResponse response) throws Exception {
-        System.out.println("进入模糊获取多个图片的时间>>>>>>>>>>>" + System.currentTimeMillis());
+        logger.info("进入模糊获取多个图片的时间>>>>>>>>>>>" + System.currentTimeMillis());
         String event_id = StringUtils.decodeUTF8(RequestUtil.getString(request, "event_id"));
         String car_number = StringUtils.decodeUTF8(RequestUtil.getString(request, "car_number"));
         String comid = StringUtils.decodeUTF8(RequestUtil.getString(request, "comid"));
 
-        logger.error("获得模糊匹配到的确认订单的图片" + event_id + "~~~" + car_number + "~~~" + comid);
+        logger.info("获得模糊匹配到的确认订单的图片" + event_id + "~~~" + car_number + "~~~" + comid);
 
         centerMonitorService.matchConfirmPic(event_id, Long.parseLong(comid), car_number, request, response);
-        System.out.println("出来获取多个图片的时间>>>>>>>>>>>" + System.currentTimeMillis());
+        logger.info("出来获取多个图片的时间>>>>>>>>>>>" + System.currentTimeMillis());
 
         return null;
     }

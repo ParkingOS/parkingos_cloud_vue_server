@@ -18,6 +18,7 @@ import parkingos.com.bolink.dao.mybatis.mapper.CenterMonitorMapper;
 import parkingos.com.bolink.dao.mybatis.mapper.OrderMapper;
 import parkingos.com.bolink.dao.mybatis.mapper.ParkInfoMapper;
 import parkingos.com.bolink.dao.spring.CommonDao;
+import parkingos.com.bolink.models.CarpicTb;
 import parkingos.com.bolink.models.LiftrodInfoTb;
 import parkingos.com.bolink.models.OrderTb;
 import parkingos.com.bolink.orderserver.OrderServer;
@@ -263,53 +264,70 @@ public class CenterMonitorServiceImpl implements CenterMonitorService {
         logger.error("getConfirmPic from mongodb>>>>>>>>>eventId=" + eventId + ">>>>>>>comid=" + comid);
         JSONObject retObj = new JSONObject();
         if (eventId != null) {
-            //查询出mongodb中存入的对应个表名
-            Map picMap = new HashMap();
-            picMap = centerMonitorMapper.getPicMap(eventId,comid+"");
-            String collectionName = "";
-            String picUrl ="";
-            if (picMap != null && !picMap.isEmpty()) {
-                if(picMap.get("confirm_pic")!=null&&!"".equals(picMap.get("confirm_pic"))){
-                    picUrl=picMap.get("confirm_pic")+"";
-                    retObj.put("picName",picUrl);
-                    retObj.put("event_id", eventId);
-                    retObj.put("car_nmber", car_number);
-                    StringUtils.ajaxOutput(response, retObj.toJSONString());
-                    return null;
-                }
-                collectionName = (String) picMap.get("confirmpic_table_name");
-            }
-            DB db = MongoClientFactory.getInstance().getMongoDBBuilder("zld");
-            if (collectionName == null || "".equals(collectionName) || "null".equals(collectionName)) {
-                logger.error(">>>>>>>>>>>>>查询图片错误........");
-                response.sendRedirect("http://sysimages.tq.cn/images/webchat_101001/common/kefu.png");
-                return null;
-            }
-            logger.error("table:" + collectionName);
-            DBCollection collection = db.getCollection(collectionName);
-            if (collection != null) {
-                BasicDBObject document = new BasicDBObject();
-                document.put("parkid", String.valueOf(comid));
-                document.put("event_id", eventId);
-                DBObject obj = collection.findOne(document);
-                if (obj == null) {
-                    logger.error("取图片错误.....");
-                    response.sendRedirect("http://sysimages.tq.cn/images/webchat_101001/common/kefu.png");
-                    return null;
-                }
-                byte[] content = (byte[]) obj.get("content");
-                logger.error("取图片成功.....大小:" + content.length);
 
-                InputStream in = new ByteArrayInputStream(content);
-                picUrl= QiNiuFileUtil.upload(in);
+            //查询对应的七牛云的图片
+            CarpicTb carpicTb = new CarpicTb();
+            carpicTb.setComid(comid+"");
+            carpicTb.setEventId(eventId);
+            carpicTb = (CarpicTb)commonDao.selectObjectByConditions(carpicTb);
+            if(carpicTb!=null){
+                String picUrl= carpicTb.getConfirmPic();
                 retObj.put("picName",picUrl);
                 retObj.put("event_id", eventId);
                 retObj.put("car_nmber", car_number);
                 StringUtils.ajaxOutput(response, retObj.toJSONString());
-            } else {
+            }else{
                 response.sendRedirect("http://sysimages.tq.cn/images/webchat_101001/common/kefu.png");
                 return null;
             }
+
+//            //查询出mongodb中存入的对应个表名
+//            Map picMap = new HashMap();
+//            picMap = centerMonitorMapper.getPicMap(eventId,comid+"");
+//            String collectionName = "";
+//            String picUrl ="";
+//            if (picMap != null && !picMap.isEmpty()) {
+//                if(picMap.get("confirm_pic")!=null&&!"".equals(picMap.get("confirm_pic"))){
+//                    picUrl=picMap.get("confirm_pic")+"";
+//                    retObj.put("picName",picUrl);
+//                    retObj.put("event_id", eventId);
+//                    retObj.put("car_nmber", car_number);
+//                    StringUtils.ajaxOutput(response, retObj.toJSONString());
+//                    return null;
+//                }
+//                collectionName = (String) picMap.get("confirmpic_table_name");
+//            }
+//            DB db = MongoClientFactory.getInstance().getMongoDBBuilder("zld");
+//            if (collectionName == null || "".equals(collectionName) || "null".equals(collectionName)) {
+//                logger.error(">>>>>>>>>>>>>查询图片错误........");
+//                response.sendRedirect("http://sysimages.tq.cn/images/webchat_101001/common/kefu.png");
+//                return null;
+//            }
+//            logger.error("table:" + collectionName);
+//            DBCollection collection = db.getCollection(collectionName);
+//            if (collection != null) {
+//                BasicDBObject document = new BasicDBObject();
+//                document.put("parkid", String.valueOf(comid));
+//                document.put("event_id", eventId);
+//                DBObject obj = collection.findOne(document);
+//                if (obj == null) {
+//                    logger.error("取图片错误.....");
+//                    response.sendRedirect("http://sysimages.tq.cn/images/webchat_101001/common/kefu.png");
+//                    return null;
+//                }
+//                byte[] content = (byte[]) obj.get("content");
+//                logger.error("取图片成功.....大小:" + content.length);
+//
+//                InputStream in = new ByteArrayInputStream(content);
+//                picUrl= QiNiuFileUtil.upload(in);
+//                retObj.put("picName",picUrl);
+//                retObj.put("event_id", eventId);
+//                retObj.put("car_nmber", car_number);
+//                StringUtils.ajaxOutput(response, retObj.toJSONString());
+//            } else {
+//                response.sendRedirect("http://sysimages.tq.cn/images/webchat_101001/common/kefu.png");
+//                return null;
+//            }
         } else {
             response.sendRedirect("http://sysimages.tq.cn/images/webchat_101001/common/kefu.png");
             return null;
@@ -329,7 +347,7 @@ public class CenterMonitorServiceImpl implements CenterMonitorService {
             return;
         }
         for (int i = 0; i < mactchOrderList.size(); i++) {
-            System.out.println("进入获取多个图片开始进行第" + (i + 1) + "次循环的时间>>>>>>>>>>>" + System.currentTimeMillis());
+            logger.info("进入获取多个图片开始进行第" + (i + 1) + "次循环的时间>>>>>>>>>>>" + System.currentTimeMillis());
             OrderTb orderTb = mactchOrderList.get(i);
             if (orderTb.getOrderIdLocal() == null) {
                 continue;
@@ -337,60 +355,77 @@ public class CenterMonitorServiceImpl implements CenterMonitorService {
             String orderid = orderTb.getOrderIdLocal();
             String car_number = orderTb.getCarNumber();
 
+            CarpicTb carpicTb = new CarpicTb();
+            carpicTb.setComid(comid+"");
+            carpicTb.setOrderId(orderid);
+
+            carpicTb = (CarpicTb)commonDao.selectObjectByConditions(carpicTb);
+            if(carpicTb!=null){
+                String picUrl = carpicTb.getInOrderPic();
+                if(!Check.isEmpty(picUrl)) {
+                    JSONObject jsonObject = new JSONObject();
+                    jsonObject.put("comid", comid);
+                    jsonObject.put("orderId", orderid);
+                    jsonObject.put("carNumber", car_number);
+                    jsonObject.put("picName", picUrl);
+                    jsonArray.add(jsonObject);
+                }
+            }
+
             //根据编号查询出mongodb中存入的对应个表
-            Map map = centerMonitorMapper.matchPicMap(orderid,comid+"");
-            String collectionName = "";
-            String picUrl = "";
-            if (map != null && !map.isEmpty()) {
-                if(map.get("in_order_pic")!=null&&!"".equals(map.get("in_order_pic"))){
-                    picUrl=map.get("in_order_pic")+"";
-                    JSONObject jsonObject = new JSONObject();
-                    jsonObject.put("comid",comid);
-                    jsonObject.put("orderId", orderid);
-                    jsonObject.put("carNumber", car_number);
-                    jsonObject.put("picName", picUrl);
-                    jsonArray.add(jsonObject);
-                    continue;
-                }
-                collectionName = (String) map.get("carpic_table_name");
-            }
-            DB db = MongoClientFactory.getInstance().getMongoDBBuilder("zld");
-            if (collectionName == null || "".equals(collectionName) || "null".equals(collectionName)) {
-                logger.error(">>>>>>>>>>>>>根据车牌" + carNumber + "匹配到orderid" + orderid + "查询图片错误........");
-                continue;
-            }
-            logger.error(">>>>>>>>>>>>>根据车牌" + carNumber + "匹配到orderid" + orderid + ">>>>>table:" + collectionName);
-            DBCollection collection = db.getCollection(collectionName);
-            if (collection != null) {
-                BasicDBObject document = new BasicDBObject();
-                document.put("parkid", String.valueOf(comid));
-                document.put("orderid", orderid);
-                document.put("gate", "in");
-                DBObject obj = collection.findOne(document);
-                if (obj == null) {
-                    //AjaxUtil.ajaxOutput(response, "");
-                    logger.error(">>>>>>>>>>>>>根据车牌" + carNumber + "匹配到orderid" + orderid + "取图片错误.....");
-                    continue;
-                }
-                byte[] content = (byte[]) obj.get("content");
-                System.out.println("进入获取多个图片开始第" + (i + 1) + "次循环得到图片的时间>>>>>>>>>>>" + System.currentTimeMillis());
-                logger.error(">>>>>>>>>>>>>根据车牌" + carNumber + "匹配到orderid" + orderid + "取图片成功.....大小:" + content.length);
-                db.requestDone();
-                try {
-                    InputStream in = new ByteArrayInputStream(content);
-                    picUrl = QiNiuFileUtil.upload(in);
-                    JSONObject jsonObject = new JSONObject();
-                    jsonObject.put("comid",comid);
-                    jsonObject.put("orderId", orderid);
-                    jsonObject.put("carNumber", car_number);
-                    jsonObject.put("picName", picUrl);
-                    jsonArray.add(jsonObject);
-                } catch (Exception e) {
-                    // TODO: handle exception
-                    logger.info(e.toString());
-                }
-                System.out.println("mongdb over.....");
-            }
+//            Map map = centerMonitorMapper.matchPicMap(orderid,comid+"");
+//            String collectionName = "";
+//            String picUrl = "";
+//            if (map != null && !map.isEmpty()) {
+//                if(map.get("in_order_pic")!=null&&!"".equals(map.get("in_order_pic"))){
+//                    picUrl=map.get("in_order_pic")+"";
+//                    JSONObject jsonObject = new JSONObject();
+//                    jsonObject.put("comid",comid);
+//                    jsonObject.put("orderId", orderid);
+//                    jsonObject.put("carNumber", car_number);
+//                    jsonObject.put("picName", picUrl);
+//                    jsonArray.add(jsonObject);
+//                    continue;
+//                }
+//                collectionName = (String) map.get("carpic_table_name");
+//            }
+//            DB db = MongoClientFactory.getInstance().getMongoDBBuilder("zld");
+//            if (collectionName == null || "".equals(collectionName) || "null".equals(collectionName)) {
+//                logger.error(">>>>>>>>>>>>>根据车牌" + carNumber + "匹配到orderid" + orderid + "查询图片错误........");
+//                continue;
+//            }
+//            logger.error(">>>>>>>>>>>>>根据车牌" + carNumber + "匹配到orderid" + orderid + ">>>>>table:" + collectionName);
+//            DBCollection collection = db.getCollection(collectionName);
+//            if (collection != null) {
+//                BasicDBObject document = new BasicDBObject();
+//                document.put("parkid", String.valueOf(comid));
+//                document.put("orderid", orderid);
+//                document.put("gate", "in");
+//                DBObject obj = collection.findOne(document);
+//                if (obj == null) {
+//                    //AjaxUtil.ajaxOutput(response, "");
+//                    logger.error(">>>>>>>>>>>>>根据车牌" + carNumber + "匹配到orderid" + orderid + "取图片错误.....");
+//                    continue;
+//                }
+//                byte[] content = (byte[]) obj.get("content");
+//                System.out.println("进入获取多个图片开始第" + (i + 1) + "次循环得到图片的时间>>>>>>>>>>>" + System.currentTimeMillis());
+//                logger.error(">>>>>>>>>>>>>根据车牌" + carNumber + "匹配到orderid" + orderid + "取图片成功.....大小:" + content.length);
+//                db.requestDone();
+//                try {
+//                    InputStream in = new ByteArrayInputStream(content);
+//                    picUrl = QiNiuFileUtil.upload(in);
+//                    JSONObject jsonObject = new JSONObject();
+//                    jsonObject.put("comid",comid);
+//                    jsonObject.put("orderId", orderid);
+//                    jsonObject.put("carNumber", car_number);
+//                    jsonObject.put("picName", picUrl);
+//                    jsonArray.add(jsonObject);
+//                } catch (Exception e) {
+//                    // TODO: handle exception
+//                    logger.info(e.toString());
+//                }
+//                System.out.println("mongdb over.....");
+//            }
         }
         response.setHeader("Content-type", "text/html;charset=UTF-8");
         StringUtils.ajaxOutput(response, jsonArray.toString());
