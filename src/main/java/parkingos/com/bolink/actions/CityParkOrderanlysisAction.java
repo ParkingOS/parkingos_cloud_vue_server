@@ -59,10 +59,10 @@ public class CityParkOrderanlysisAction {
         List<List<Object>> resList = cityParkOrderanlysisService.exportExcel(reqParameterMap);
         String title = "车场日报统计";
         String sheeatName = "sheet1";
-        String headers[] =  { "车场","日期", "收入", "收入", "收入","支出","减免金额" } ;
-        String dataType []={"STR","STR","STR","STR","STR","STR","STR"};
+        String headers[] =  { "车场","日期", "收入", "收入", "收入","支出","电子结算","减免金额" } ;
+        String dataType []={"STR","STR","STR","STR","STR","STR","STR","STR"};
         String[] subHeads = new String[] {"现金支付", "电子支付", "合计"};
-        String[] headnum = new String[] { "1,2,0,0", "1,2,1,1","1,1,2,4","1,2,5,5","1,2,6,6"};
+        String[] headnum = new String[] { "1,2,0,0", "1,2,1,1","1,1,2,4","1,2,5,5","1,2,6,6","1,2,7,7"};
         String[] subheadnum = new String[] { "2,2,2,2", "2,2,3,3", "2,2,4,4"};
         ExportExcelUtil excelUtil = new ExportExcelUtil(title, headers, sheeatName, dataType, subHeads, headnum, subheadnum, new int[]{1,5});
         String fname = "车场日报统计";

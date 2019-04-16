@@ -178,6 +178,7 @@ public class GroupMonthParkOrderanlysisServiceImpl implements GroupMonthParkOrde
                     }
                 }
                 act_money+= StringUtils.formatDouble(actReceive);
+                resultMap.put("ele_total",StringUtils.formatDouble(eleTotal-outTotal)+"");
                 resultMap.put("act_total",StringUtils.formatDouble(actReceive)+"");
                 resultMap.put("cash_pay",StringUtils.formatDouble(cashTotal)+"");
                 resultMap.put("ele_pay",StringUtils.formatDouble(eleTotal)+"");
@@ -187,6 +188,7 @@ public class GroupMonthParkOrderanlysisServiceImpl implements GroupMonthParkOrde
 
             Map<String,String> resultMap = new HashMap<>();
             resultMap.put("sdate","合计");
+            resultMap.put("ele_total",StringUtils.formatDouble(ele_money-outMoney)+"");
             resultMap.put("cash_pay",StringUtils.formatDouble(cash_pay_money)+"");
             resultMap.put("ele_pay",StringUtils.formatDouble(ele_money)+"");
             resultMap.put("act_total",StringUtils.formatDouble(act_money)+"");
@@ -225,6 +227,7 @@ public class GroupMonthParkOrderanlysisServiceImpl implements GroupMonthParkOrde
                 values.add(map.get("ele_pay"));
                 values.add(map.get("act_total"));
                 values.add(map.get("out_money"));
+                values.add(map.get("ele_total"));
                 values.add(map.get("free_pay"));
                 bodyList.add(values);
             }

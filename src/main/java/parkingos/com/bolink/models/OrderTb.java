@@ -97,6 +97,16 @@ public class OrderTb {
 
     private String workStationUuid;
 
+    private Long cityid;
+
+    public Long getCityid() {
+        return cityid;
+    }
+
+    public void setCityid(Long cityid) {
+        this.cityid = cityid;
+    }
+
     public Long getId() {
         return id;
     }
@@ -471,5 +481,59 @@ public class OrderTb {
 
     public void setWorkStationUuid(String workStationUuid) {
         this.workStationUuid = workStationUuid == null ? null : workStationUuid.trim();
+    }
+
+    @Override
+    public String toString() {
+        return "OrderTb{" +
+                "id=" + id +
+                ", createTime=" + createTime +
+                ", comid=" + comid +
+                ", uin=" + uin +
+                ", total=" + total +
+                ", state=" + state +
+                ", endTime=" + endTime +
+                ", autoPay=" + autoPay +
+                ", payType=" + payType +
+                ", nfcUuid='" + nfcUuid + '\'' +
+                ", uid=" + uid +
+                ", carNumber='" + carNumber + '\'' +
+                ", imei='" + imei + '\'' +
+                ", pid=" + pid +
+                ", preState=" + preState +
+                ", type=" + type +
+                ", needSync=" + needSync +
+                ", ishd=" + ishd +
+                ", isclick=" + isclick +
+                ", prepaid=" + prepaid +
+                ", prepaidPayTime=" + prepaidPayTime +
+                ", berthnumber=" + berthnumber +
+                ", berthsecId=" + berthsecId +
+                ", groupid=" + groupid +
+                ", outUid=" + outUid +
+                ", isUnionUser=" + isUnionUser +
+                ", carTypeZh='" + carTypeZh + '\'' +
+                ", orderIdLocal='" + orderIdLocal + '\'' +
+                ", duration='" + duration + '\'' +
+                ", payTypeEn='" + payTypeEn + '\'' +
+                ", freereasonsLocal='" + freereasonsLocal + '\'' +
+                ", islocked=" + islocked +
+                ", lockKey='" + lockKey + '\'' +
+                ", inPassid='" + inPassid + '\'' +
+                ", outPassid='" + outPassid + '\'' +
+                ", amountReceivable=" + amountReceivable +
+                ", electronicPrepay=" + electronicPrepay +
+                ", electronicPay=" + electronicPay +
+                ", cashPrepay=" + cashPrepay +
+                ", cashPay=" + cashPay +
+                ", reduceAmount=" + reduceAmount +
+                ", cType='" + cType + '\'' +
+                ", carType='" + carType + '\'' +
+                ", freereasons='" + freereasons + '\'' +
+                ", remark='" + remark + '\'' +
+                ", carpicTableName='" + carpicTableName + '\'' +
+                ", workStationUuid='" + workStationUuid + '\'' +
+                ", cityid=" + cityid +
+                '}';
     }
 }

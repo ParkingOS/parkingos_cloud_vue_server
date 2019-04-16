@@ -21,7 +21,7 @@ public class SavaLogServiceImpl implements SaveLogService {
 
     @Override
     public void saveLog(ParkLogTb parkLogTb) {
-        if(parkLogTb.getParkId()!=null&&parkLogTb.getParkId()>0){
+        if(parkLogTb.getParkId()!=null&&parkLogTb.getParkId()>0&&parkLogTb.getGroupId()==null){
             Long groupId=commonService.getGroupIdByComid(parkLogTb.getParkId());
             parkLogTb.setGroupId(groupId);
         }

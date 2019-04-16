@@ -13,6 +13,8 @@ public class WhiteListTb {
 
     private Long parkId;
 
+    private Long groupId;
+
     private Long uTime;
 
     private Long bTime;
@@ -24,6 +26,24 @@ public class WhiteListTb {
     private String remark;
 
     private String carLocation;
+
+    private Integer endType;
+
+    public Integer getEndType() {
+        return endType;
+    }
+
+    public void setEndType(Integer endType) {
+        this.endType = endType;
+    }
+
+    public Long getGroupId() {
+        return groupId;
+    }
+
+    public void setGroupId(Long groupId) {
+        this.groupId = groupId;
+    }
 
     public Long getId() {
         return id;

@@ -108,8 +108,10 @@ public class CityOrderServiceImpl implements CityOrderService {
             list=orderServer.getOrdersByMapConditons(reqmap);
             if (list != null && !list.isEmpty()) {
                 for (OrderTb orderTb1 : list) {
+//                    logger.info("===>>>>orderTb1:"+orderTb1);
                     OrmUtil<OrderTb> otm = new OrmUtil<OrderTb>();
                     Map<String, Object> map = otm.pojoToMap(orderTb1);
+//                    logger.info("===>>>>map:"+map);
                     Long start = (Long) map.get("create_time");
                     Long end = (Long) map.get("end_time");
                     if (start != null && end != null) {

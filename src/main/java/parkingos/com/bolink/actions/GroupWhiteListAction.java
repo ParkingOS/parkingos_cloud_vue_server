@@ -4,6 +4,7 @@ package parkingos.com.bolink.actions;
 import com.alibaba.fastjson.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -37,7 +38,7 @@ public class GroupWhiteListAction {
 
         Map<String, String> reqParameterMap = RequestUtil.readBodyFormRequset(request);
 
-        JSONObject result = whiteListService.selectResultByConditions(reqParameterMap);
+        JSONObject result = whiteListService.groupQuery(reqParameterMap);
         //把结果返回页面
         StringUtils.ajaxOutput(resp, result.toJSONString());
         return null;
@@ -47,6 +48,10 @@ public class GroupWhiteListAction {
     @RequestMapping(value = "/add")
     public String add(HttpServletRequest request, HttpServletResponse resp) {
 
+        String nickname = StringUtils.decodeUTF8(RequestUtil.getString(request, "nickname1"));
+        Long uin = RequestUtil.getLong(request, "loginuin", -1L);
+        Long groupid = RequestUtil.getLong(request, "groupid", -1L);
+
         String remark = RequestUtil.getString(request, "remark");
         String carNumber =  RequestUtil.getString(request, "car_number");
         Long btime = RequestUtil.getLong(request,"b_time",-1L);
@@ -55,12 +60,41 @@ public class GroupWhiteListAction {
         String userName = RequestUtil.getString(request,"user_name");
         String mobile = RequestUtil.getString(request,"mobile");
         String carLocation = RequestUtil.getString(request,"car_location");
+
+        Integer endType = RequestUtil.getInteger(request,"end_type",0);
         logger.info("===.>>>:"+carNumber+"~~"+comid+"~~"+userName);
-        JSONObject result = whiteListService.add(remark,carNumber,btime,etime,comid,userName,mobile,carLocation);
+        JSONObject result = whiteListService.add(remark,carNumber,btime,etime,comid,userName,mobile,carLocation,nickname,uin,groupid,2,endType);
         //把结果返回页面
         StringUtils.ajaxOutput(resp, result.toJSONString());
         return null;
     }
+
+
+    @RequestMapping(value = "/edit")
+    public String edit(HttpServletRequest request, HttpServletResponse resp) {
+
+        String nickname = StringUtils.decodeUTF8(RequestUtil.getString(request, "nickname1"));
+        Long uin = RequestUtil.getLong(request, "loginuin", -1L);
+        Long groupid = RequestUtil.getLong(request, "groupid", -1L);
+
+
+        Long id = RequestUtil.getLong(request,"id",-1L);
+        String remark = RequestUtil.getString(request, "remark");
+        String carNumber =  RequestUtil.getString(request, "car_number");
+        Long btime = RequestUtil.getLong(request,"b_time",-1L);
+        Long etime = RequestUtil.getLong(request,"e_time",-1L);
+        Long comid = RequestUtil.getLong(request,"comid",-1L);
+        String userName = RequestUtil.getString(request,"user_name");
+        String mobile = RequestUtil.getString(request,"mobile");
+        String carLocation = RequestUtil.getString(request,"car_location");
+        Integer endType = RequestUtil.getInteger(request,"end_type",0);
+        logger.info("===.>>>集团修改白名单:"+carNumber+"~~"+comid+"~~"+userName+"~~"+id);
+        JSONObject result = whiteListService.edit(id,remark,carNumber,btime,etime,comid,userName,mobile,carLocation,nickname,uin,groupid,2,endType);
+        //把结果返回页面
+        StringUtils.ajaxOutput(resp, result.toJSONString());
+        return null;
+    }
+
 
 
     @RequestMapping(value = "/delete")
@@ -72,7 +106,7 @@ public class GroupWhiteListAction {
         Long groupid = RequestUtil.getLong(request, "groupid", -1L);
 
         logger.info("===.>>>white delete:"+id);
-        JSONObject result = whiteListService.delete(id,nickname,uin,groupid);
+        JSONObject result = whiteListService.delete(id,nickname,uin,-1L,groupid,2);
         //把结果返回页面
         StringUtils.ajaxOutput(resp, result.toJSONString());
         return null;

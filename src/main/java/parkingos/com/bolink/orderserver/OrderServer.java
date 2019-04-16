@@ -102,6 +102,7 @@ public class OrderServer extends BaseServer {
         orderTb.setInPassid(order.getInPassid());
         orderTb.setOutPassid(order.getOutPassid());
         orderTb.setFreereasons(order.getFreereasons());
+        orderTb.setCityid(order.getCityid());
         return orderTb;
     }
 

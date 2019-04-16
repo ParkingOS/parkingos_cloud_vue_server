@@ -6,11 +6,15 @@ import org.springframework.web.multipart.MultipartFile;
 import java.util.Map;
 
 public interface WhiteListService {
-    JSONObject selectResultByConditions(Map<String, String> reqParameterMap);
+    JSONObject groupQuery(Map<String, String> reqParameterMap);
 
-    JSONObject add(String remark, String carNumber, Long btime, Long etime, Long comid, String userName, String mobile, String carLocation);
+    JSONObject add(String remark, String carNumber, Long btime, Long etime, Long comid, String userName, String mobile, String carLocation,String nickname,Long uin,Long groupId,int type,int endType);
 
-    JSONObject delete(Long aLong, String nickname, Long uin, Long id);
+    JSONObject delete(Long id, String nickname, Long uin, Long comid,Long groupid,int type);
 
     JSONObject importExcel(MultipartFile file,String nickname, Long uin, Long groupid);
+
+    JSONObject edit(Long id, String remark, String carNumber, Long btime, Long etime, Long comid, String userName, String mobile, String carLocation, String nickname, Long uin, Long groupid, int i,int endType);
+
+    JSONObject parkQuery(Map<String, String> reqParameterMap);
 }

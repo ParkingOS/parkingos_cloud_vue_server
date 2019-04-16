@@ -309,9 +309,9 @@ public class CityUnorderServiceImpl implements CityUnorderService {
                     ParkLogTb parkLogTb = new ParkLogTb();
                     parkLogTb.setOperateUser(nickname);
                     parkLogTb.setOperateTime(System.currentTimeMillis()/1000);
-                    parkLogTb.setOperateType(1);
+                    parkLogTb.setOperateType(2);
                     parkLogTb.setContent(uin+"("+nickname+")"+"集团"+money+"结算订单："+id);
-                    parkLogTb.setType("vip");
+                    parkLogTb.setType("order");
                     parkLogTb.setGroupId(groupId);
                     saveLogService.saveLog(parkLogTb);
 
