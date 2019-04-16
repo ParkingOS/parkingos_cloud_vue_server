@@ -187,6 +187,23 @@ public class CommonServiceImpl implements CommonService {
 //        return getGroupIdByComId(parkId);
     }
 
+    @Override
+    public Long getParkIdByBolinkId(String comid) {
+        Object comidStr = redisService.get(CustomDefind.getValue("REDISBOLINKPARKKEY") + comid);
+        if(comidStr!=null){
+            return Long.parseLong((comidStr+"").split("_")[0]);
+        }
+        ComInfoTb comInfoTb = new ComInfoTb();
+        comInfoTb.setBolinkId(comid);
+        comInfoTb.setState(0);
+        comInfoTb=(ComInfoTb)commonDao.selectObjectByConditions(comInfoTb);
+        if(comInfoTb!=null){
+            return comInfoTb.getId();
+        }
+        return -1L;
+    }
+
+
     private Long getUnionIdByGroupId(Long groupid) {
         Object union = redisService.get(CustomDefind.getValue("REDISGROUPID4UNIONID")+groupid);
         if(union==null){
