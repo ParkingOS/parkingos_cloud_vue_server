@@ -540,7 +540,7 @@ public class CityVipServiceImpl implements CityVipService {
             });
         }
         String comRes = "";
-        if(comList.size()>0){
+        if(comList.size()>1){
             comRes = "所有";
         }else{
             comRes =comList.get(0)+"";

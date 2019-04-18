@@ -546,7 +546,7 @@ public class CenterMonitorServiceImpl implements CenterMonitorService {
             params.put("channelId", StringUtils.decodeUTF8(channel_id));
             params.put("operate", 0);
             String result = httpProxy.doPostTwo(url, params);
-            System.out.println(result);
+            logger.info(result);
             if ("1".equals(result)) {
                 //发送消息后查询数据库是否完成操作
                 Long state = -1L;
