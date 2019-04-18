@@ -15,11 +15,16 @@ import parkingos.com.bolink.models.ZldBlackTb;
 import parkingos.com.bolink.service.BlackUserService;
 import parkingos.com.bolink.service.SaveLogService;
 import parkingos.com.bolink.service.WhiteListService;
+import parkingos.com.bolink.utils.ExportDataExcel;
 import parkingos.com.bolink.utils.RequestUtil;
 import parkingos.com.bolink.utils.StringUtils;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.text.ParseException;
+import java.util.List;
 import java.util.Map;
 import java.util.Random;
 
@@ -134,6 +139,39 @@ public class GroupWhiteListAction {
 //            parkLogTb.setGroupId(groupid);
 //            saveLogService.saveLog(parkLogTb);
 //        }
+        return null;
+    }
+
+
+
+    @RequestMapping(value = "/exportExcel")
+    public String exportExcel(HttpServletRequest request, HttpServletResponse response) {
+
+        Long groupid = RequestUtil.getLong(request,"groupid",-1L);
+        String nickname = StringUtils.decodeUTF8(RequestUtil.getString(request,"nickname1"));
+        Long uin = RequestUtil.getLong(request, "loginuin", -1L);
+
+        Map<String, String> reqParameterMap = RequestUtil.readBodyFormRequset(request);
+
+        List<List<Object>> bodyList = whiteListService.groupExportExcel(reqParameterMap,groupid,nickname,uin);
+        /*
+        * 编号、车牌号、状态（正常/已过期）、开始时间、结束时间、更新时间、备注、操作；→→→二级：车主姓名、车主电话、车位
+        * */
+        String [][] heards = new String[][]{{"编号","STR"},{"车牌号","STR"},{"状态","STR"},{"所属车场","STR"},{"车主姓名","STR"},{"车主电话","STR"},{"车位","STR"},{"开始时间","STR"},{"结束时间","STR"},{"更新时间","STR"},{"备注","STR"}};
+        ExportDataExcel excel = new ExportDataExcel("集团白名单", heards, "sheet1");
+        String fname = "集团白名单";
+        fname = StringUtils.encodingFileName(fname)+".xls";
+        try {
+            OutputStream os = response.getOutputStream();
+            response.reset();
+            response.setHeader("Content-disposition", "attachment; filename="+fname);
+            excel.PoiWriteExcel_To2007(bodyList, os);
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+
         return null;
     }
 

@@ -1,7 +1,6 @@
 package parkingos.com.bolink.utils;
 
 import com.alibaba.fastjson.JSONObject;
-import com.zld.proto.Order;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -252,6 +251,9 @@ public class CommonUtils<T> {
         }else if("prepay_card_trade".equals(tableName)){
             result = sendPrepayCardTrade(tableId, comid, operate,parkTokenTb);
             logger.info(">>>>>>>>>>>>>>>>>>>>>发送储值卡流水结果" + result);
+        }else if("white_list_tb".equals(tableName)){
+            result = sendWhiteList(tableId, comid, operate,parkTokenTb);
+            logger.info(">>>>>>>>>>>>>>>>>>>>>发送白名单结果" + result);
         }
 //        else if("order_tb".equals(tableName)){
 //            result = sendOrderZeroBalance(tableId, comid, operate,parkTokenTb);
@@ -261,6 +263,44 @@ public class CommonUtils<T> {
             return true;
         }
         return false;
+    }
+
+    private String sendWhiteList(Long tableId, Long comid, Integer operate, ParkTokenTb parkTokenTb) {
+        WhiteListTb whiteListTb = new WhiteListTb();
+        whiteListTb.setId(tableId);
+        whiteListTb =(WhiteListTb)commonDao.selectObjectByConditions(whiteListTb);
+        JSONObject jsonSend = new JSONObject();
+        String result = "0";
+        if (whiteListTb != null ) {
+            /*
+            * carNumber;userName;mobile;state;parkId;bTime;eTime;collector;remark;carLocation;endType;
+            *
+            * */
+            jsonSend.put("car_number", whiteListTb.getCarNumber());
+            jsonSend.put("user_name", whiteListTb.getUserName());
+            jsonSend.put("mobile", whiteListTb.getMobile());
+            jsonSend.put("b_time", whiteListTb.getbTime());
+            jsonSend.put("e_time", whiteListTb.geteTime());
+            jsonSend.put("remark", whiteListTb.getRemark());
+            jsonSend.put("car_location", whiteListTb.getCarLocation());
+            jsonSend.put("end_type", whiteListTb.getEndType());
+            jsonSend.put("operate_type", operate);
+            jsonSend.put("park_id", getBolinkId(whiteListTb.getParkId()));
+        } else {
+            logger.error(">>>>>>>>>>>>>没有查询到白名单数据");
+            return result;
+        }
+        JSONObject jsonMesg = new JSONObject();
+        jsonMesg.put("service_name", "white_list_sync");
+        jsonMesg.put("data", jsonSend);
+        logger.error(jsonMesg+"");
+
+        boolean isSend = doSendMessage(jsonMesg,parkTokenTb);
+        logger.error(">>>>>>>>>>>>>>云端发送数据到停车收费系统结果：" + isSend);
+        if (isSend) {
+            result = "1";
+        }
+        return result;
     }
 
     private String sendPrepayCardTrade(Long tableId, Long comid, Integer operate, ParkTokenTb parkTokenTb) {
@@ -957,7 +997,7 @@ public class CommonUtils<T> {
         JSONObject jsonSend = new JSONObject();
         if (orderTb != null ) {
             logger.info(">>>>>>>零元结算订单信息：" + orderTb);
-
+            jsonSend.put("sync_id",orderTb.getId());
             jsonSend.put("in_time",orderTb.getCreateTime());
             jsonSend.put("out_time",  orderTb.getEndTime());
             jsonSend.put("car_number",  orderTb.getCarNumber());

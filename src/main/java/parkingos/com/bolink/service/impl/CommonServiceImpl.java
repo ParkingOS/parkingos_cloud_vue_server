@@ -188,6 +188,17 @@ public class CommonServiceImpl implements CommonService {
     }
 
     @Override
+    public String getComName(long comid) {
+        ComInfoTb comInfoTb  = new ComInfoTb();
+        comInfoTb.setId(comid);
+        comInfoTb = (ComInfoTb)commonDao.selectObjectByConditions(comInfoTb);
+        if(comInfoTb!=null&&comInfoTb.getCompanyName()!=null){
+            return comInfoTb.getCompanyName();
+        }
+        return "";
+    }
+
+    @Override
     public Long getParkIdByBolinkId(String comid) {
         Object comidStr = redisService.get(CustomDefind.getValue("REDISBOLINKPARKKEY") + comid);
         if(comidStr!=null){

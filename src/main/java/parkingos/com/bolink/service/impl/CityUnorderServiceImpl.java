@@ -279,7 +279,7 @@ public class CityUnorderServiceImpl implements CityUnorderService {
         int update = orderServer.toZero(id,cityid,tableName,money);
         if(update==1){
             result.put("state",1);
-            result.put("msg","零元结算成功");
+            result.put("msg","手动结算成功");
             ExecutorService es = ExecutorsUtil.getExecutorService();
             es.execute(new Runnable() {
                 @Override
@@ -303,7 +303,7 @@ public class CityUnorderServiceImpl implements CityUnorderService {
                     OrderTb orderTb = orderServer.qryOrderById(order);
 
                     boolean issend = commonUtils.sendMessage(orderTb, 2,tableName);
-                    logger.info("........发送零元结算" + issend);
+                    logger.info("........发送手动结算" + issend);
                     int ins = insertSysn(orderTb, 1,tableName);
 
                     ParkLogTb parkLogTb = new ParkLogTb();

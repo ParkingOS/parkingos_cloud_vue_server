@@ -336,7 +336,9 @@ public class CityVipServiceImpl implements CityVipService {
             ComInfoTb comInfoTb = new ComInfoTb();
             comInfoTb.setGroupid(groupId);
             comInfoTb.setState(0);
-            List<ComInfoTb> list = commonDao.selectListByConditions(comInfoTb);
+            PageOrderConfig pageOrderConfig = new PageOrderConfig();
+            pageOrderConfig.setPageInfo(null,null);
+            List<ComInfoTb> list = commonDao.selectListByConditions(comInfoTb,pageOrderConfig);
             if(list!=null&&list.size()>0){
                 for(ComInfoTb com:list){
                     comList.add(com.getId());

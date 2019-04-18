@@ -11,6 +11,7 @@ import parkingos.com.bolink.dao.spring.CommonDao;
 import parkingos.com.bolink.models.FixCodeTb;
 import parkingos.com.bolink.models.ParkLogTb;
 import parkingos.com.bolink.models.WhiteListTb;
+import parkingos.com.bolink.models.ZldBlackTb;
 import parkingos.com.bolink.qo.PageOrderConfig;
 import parkingos.com.bolink.qo.SearchBean;
 import parkingos.com.bolink.service.CommonService;
@@ -22,6 +23,7 @@ import parkingos.com.bolink.utils.*;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -38,6 +40,8 @@ public class WhiteListServiceImpl implements WhiteListService {
     CommonService commonService;
     @Autowired
     SaveLogService saveLogService;
+    @Autowired
+    CommonUtils commonUtils;
 
 
     @Override
@@ -58,7 +62,6 @@ public class WhiteListServiceImpl implements WhiteListService {
         int count =0;
         List<WhiteListTb> list =null;
         List<Map<String, Object>> resList =new ArrayList<Map<String, Object>>();
-        final List<Map<String, Object>> updateList =new ArrayList<Map<String, Object>>();
         Map searchMap = supperSearchService.getBaseSearch(whiteListTb,reqParameterMap);
         if(searchMap!=null&&!searchMap.isEmpty()){
             WhiteListTb t1 =(WhiteListTb)searchMap.get("base");
@@ -96,7 +99,10 @@ public class WhiteListServiceImpl implements WhiteListService {
                 }
             }
         }
-
+        result.put("total",count);
+        if(reqParameterMap.get("page")!=null){
+            result.put("page",Integer.parseInt(reqParameterMap.get("page")));
+        }
         return result;
 
     }
@@ -111,6 +117,8 @@ public class WhiteListServiceImpl implements WhiteListService {
             etime = etime/1000;
         }
 
+        Long id = -1L;
+
         WhiteListTb whiteListTb = new WhiteListTb();
         whiteListTb.setParkId(comid);
         whiteListTb.setCarNumber(carNumber);
@@ -121,6 +129,8 @@ public class WhiteListServiceImpl implements WhiteListService {
         result.put("msg","操作失败!");
         if(count==0){
             //插入新车牌
+            id = commonDao.selectSequence(WhiteListTb.class);
+            whiteListTb.setId(id);
             whiteListTb.setGroupId(groupId);
             whiteListTb.setEndType(endType);
             whiteListTb.setRemark(remark);
@@ -130,8 +140,14 @@ public class WhiteListServiceImpl implements WhiteListService {
             whiteListTb.setMobile(mobile);
             whiteListTb.setCarLocation(carLocation);
             doWhite= commonDao.insert(whiteListTb);
+
+            commonUtils.sendMessage(whiteListTb,comid,id,1);
+            commonUtils.insertSync(whiteListTb,0,comid,id);
+
         }else{
             //更新车场该车牌
+            whiteListTb = (WhiteListTb)commonDao.selectObjectByConditions(whiteListTb);
+            id = whiteListTb.getId();
             WhiteListTb update = new WhiteListTb();
             update.setEndType(endType);
             update.setRemark(remark);
@@ -141,7 +157,11 @@ public class WhiteListServiceImpl implements WhiteListService {
             update.setUserName(userName);
             update.setMobile(mobile);
             update.setCarLocation(carLocation);
-            doWhite = commonDao.updateByConditions(update,whiteListTb);
+            update.setId(id);
+            doWhite = commonDao.updateByPrimaryKey(update);
+
+            commonUtils.sendMessage(whiteListTb,comid,id,2);
+            commonUtils.insertSync(whiteListTb,1,comid,id);
         }
         if(doWhite==1){
             result.put("state",1);
@@ -181,6 +201,10 @@ public class WhiteListServiceImpl implements WhiteListService {
         if(delete==1){
             result.put("state",1);
             result.put("msg","删除成功!");
+
+
+            commonUtils.sendMessage(con,comid,id,3);
+            commonUtils.insertSync(con,2,comid,id);
 
             ParkLogTb parkLogTb = new ParkLogTb();
             parkLogTb.setOperateUser(nickname);
@@ -378,6 +402,10 @@ public class WhiteListServiceImpl implements WhiteListService {
             result.put("state",1);
             result.put("msg","更新成功！");
 
+
+            commonUtils.sendMessage(con,comid,id,2);
+            commonUtils.insertSync(con,1,comid,id);
+
             ParkLogTb parkLogTb = new ParkLogTb();
             parkLogTb.setOperateUser(nickname);
             parkLogTb.setOperateTime(System.currentTimeMillis()/1000);
@@ -399,12 +427,10 @@ public class WhiteListServiceImpl implements WhiteListService {
         WhiteListTb whiteListTb = new WhiteListTb();
         Long comid = Long.parseLong(reqParameterMap.get("comid"));
         whiteListTb.setParkId(comid);
-//        JSONObject result = supperSearchService.supperSearch(whiteListTb,reqParameterMap);
         JSONObject result = new JSONObject();
         int count =0;
         List<WhiteListTb> list =null;
         List<Map<String, Object>> resList =new ArrayList<Map<String, Object>>();
-        final List<Map<String, Object>> updateList =new ArrayList<Map<String, Object>>();
         Map searchMap = supperSearchService.getBaseSearch(whiteListTb,reqParameterMap);
         if(searchMap!=null&&!searchMap.isEmpty()){
             WhiteListTb t1 =(WhiteListTb)searchMap.get("base");
@@ -427,9 +453,9 @@ public class WhiteListServiceImpl implements WhiteListService {
                         Map<String, Object> map = otm.pojoToMap(whiteListTb1);
 
                         if((int)map.get("end_type")==0&&map.get("e_time")!=null&&(int)map.get("state")!=1){
-                            if(Long.parseLong(map.get("e_time")+"")<System.currentTimeMillis()/1000){//已过期
+                            if(Long.parseLong(map.get("e_time")+"")<System.currentTimeMillis()/1000){
+                                //已过期
                                 map.put("state",1);
-//                                updateList.add(map);
                                 WhiteListTb wh = new WhiteListTb();
                                 wh.setId((Long)map.get("id"));
                                 wh.setState(1);
@@ -442,7 +468,128 @@ public class WhiteListServiceImpl implements WhiteListService {
                 }
             }
         }
-
+        result.put("total",count);
+        if(reqParameterMap.get("page")!=null){
+            result.put("page",Integer.parseInt(reqParameterMap.get("page")));
+        }
         return result;
+    }
+
+    @Override
+    public List<List<Object>> groupExportExcel(Map<String, String> reqParameterMap,Long groupId,String nickName,Long uin) {
+        //删除分页条件  查询该条件下所有  不然为一页数据
+        reqParameterMap.remove("orderby");
+
+        //获得要导出的结果
+        JSONObject result = groupQuery(reqParameterMap);
+
+        List<WhiteListTb> blackList = JSON.parseArray(result.get("rows").toString(), WhiteListTb.class);
+
+        List<List<Object>> bodyList = new ArrayList<List<Object>>();
+        if (blackList != null && blackList.size() > 0) {
+            //{"编号","STR"},{"车牌号","STR"},{"状态","STR"},{"所属车场","STR"},{"车主姓名","STR"},{"车主电话","STR"},{"车位","STR"},{"开始时间","STR"},{"结束时间","STR"},{"更新时间","STR"},{"备注","STR"}
+            String[] f = new String[]{"id","car_number", "state",  "park_id", "user_name","mobile","car_location","b_time",  "e_time","u_time", "remark"};
+            for (WhiteListTb whiteListTb : blackList) {
+                List<Object> values = new ArrayList<Object>();
+                OrmUtil<WhiteListTb> otm = new OrmUtil<>();
+                Map map = otm.pojoToMap(whiteListTb);
+                for (String field : f) {
+                    Object v = map.get(field);
+                    if("park_id".equals(field)){
+                        if(Check.isLong(map.get("park_id")+"")){
+                            String comName = commonService.getComName(Long.parseLong(map.get("park_id")+""));
+                            values.add(comName);
+                        }else {
+                            values.add(v+"");
+                        }
+                    }else if("b_time".equals(field)||"e_time".equals(field)||"u_time".equals(field)){
+                        if(v==null){
+                            values.add("");
+                        }else{
+                            values.add(TimeTools.getTime_yyyyMMdd_HHmmss((Long)v*1000));
+                        }
+                    }else if("state".equals(field)){
+                        switch(Integer.valueOf(v + "")){
+                            case 0:values.add("正常");break;
+                            case 1:values.add("过期");break;
+                            default:values.add("");
+                        }
+                    }else {
+                        values.add(v+"");
+                    }
+                }
+                bodyList.add(values);
+            }
+        }
+
+        ParkLogTb parkLogTb = new ParkLogTb();
+        parkLogTb.setOperateUser(nickName);
+        parkLogTb.setOperateTime(System.currentTimeMillis()/1000);
+        parkLogTb.setOperateType(4);
+        parkLogTb.setContent(uin+"("+nickName+")"+"导出了白名单");
+        parkLogTb.setType("white");
+        parkLogTb.setGroupId(groupId);
+        saveLogService.saveLog(parkLogTb);
+
+        return bodyList;
+    }
+
+    @Override
+    public List<List<Object>> parkExportExcel(Map<String, String> reqParameterMap, Long comid, String nickname, Long uin) {
+        //删除分页条件  查询该条件下所有  不然为一页数据
+        reqParameterMap.remove("orderby");
+
+        //获得要导出的结果
+        JSONObject result = parkQuery(reqParameterMap);
+
+        List<WhiteListTb> blackList = JSON.parseArray(result.get("rows").toString(), WhiteListTb.class);
+
+        List<List<Object>> bodyList = new ArrayList<List<Object>>();
+        if (blackList != null && blackList.size() > 0) {
+            //{"编号","STR"},{"车牌号","STR"},{"状态","STR"},{"所属车场","STR"},{"车主姓名","STR"},{"车主电话","STR"},{"车位","STR"},{"开始时间","STR"},{"结束时间","STR"},{"更新时间","STR"},{"备注","STR"}
+            String[] f = new String[]{"id","car_number", "state",  "user_name","mobile","car_location","b_time",  "e_time","u_time", "remark"};
+            for (WhiteListTb whiteListTb : blackList) {
+                List<Object> values = new ArrayList<Object>();
+                OrmUtil<WhiteListTb> otm = new OrmUtil<>();
+                Map map = otm.pojoToMap(whiteListTb);
+                for (String field : f) {
+                    Object v = map.get(field);
+                    if("park_id".equals(field)){
+                        if(Check.isLong(map.get("park_id")+"")){
+                            String comName = commonService.getComName(Long.parseLong(map.get("comid")+""));
+                            values.add(comName);
+                        }else {
+                            values.add(v+"");
+                        }
+                    }else if("b_time".equals(field)||"e_time".equals(field)||"u_time".equals(field)){
+                        if(v==null){
+                            values.add("");
+                        }else{
+                            values.add(TimeTools.getTime_yyyyMMdd_HHmmss((Long)v*1000));
+                        }
+                    }else if("state".equals(field)){
+                        switch(Integer.valueOf(v + "")){
+                            case 0:values.add("正常");break;
+                            case 1:values.add("过期");break;
+                            default:values.add("");
+                        }
+                    }else {
+                        values.add(v+"");
+                    }
+                }
+                bodyList.add(values);
+            }
+        }
+
+        ParkLogTb parkLogTb = new ParkLogTb();
+        parkLogTb.setOperateUser(nickname);
+        parkLogTb.setOperateTime(System.currentTimeMillis()/1000);
+        parkLogTb.setOperateType(4);
+        parkLogTb.setContent(uin+"("+nickname+")"+"导出了白名单");
+        parkLogTb.setType("white");
+        parkLogTb.setParkId(comid);
+        saveLogService.saveLog(parkLogTb);
+
+        return bodyList;
     }
 }

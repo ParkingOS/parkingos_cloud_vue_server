@@ -24,4 +24,6 @@ public interface CommonService {
     Long getParkIdByBolinkId(String comid);
 
     Long getGroupIdByComid(Long parkId);
+
+    String getComName(long comid);
 }
