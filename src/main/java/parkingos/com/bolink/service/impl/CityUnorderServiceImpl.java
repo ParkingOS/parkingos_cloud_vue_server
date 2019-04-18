@@ -162,8 +162,9 @@ public class CityUnorderServiceImpl implements CityUnorderService {
                 Map map = otm.pojoToMap(orderTb);
                 for (String field : f) {
                     Object v = map.get(field);
-                    if(v == null)
+                    if(v == null) {
                         v = "";
+                    }
                     if("c_type".equals(field)){
                         try{
                             switch(Integer.valueOf(v + "")){
@@ -189,8 +190,9 @@ public class CityUnorderServiceImpl implements CityUnorderService {
                         }
                     }else if ("uid".equals(field) || "out_uid".equals(field)) {
                         Long uid = -1L;
-                        if (Check.isLong(v + ""))
+                        if (Check.isLong(v + "")) {
                             uid = Long.valueOf(v + "");
+                        }
                         if (uinNameMap.containsKey(uid)) {
                             values.add(uinNameMap.get(uid));
                         } else {
@@ -235,8 +237,9 @@ public class CityUnorderServiceImpl implements CityUnorderService {
                     }else if("in_passid".equals(field) || "out_passid".equals(field)){
                         if (!"".equals(v.toString()) && Check.isNumber(v.toString())) {
                             Long passId = Long.valueOf(v.toString());
-                            if (passNameMap.containsKey(passId))
+                            if (passNameMap.containsKey(passId)) {
                                 values.add(passNameMap.get(passId));
+                            }
                             else {
                                 String passName = getPassName(passId);
                                 values.add(passName);
@@ -310,7 +313,7 @@ public class CityUnorderServiceImpl implements CityUnorderService {
                     parkLogTb.setOperateUser(nickname);
                     parkLogTb.setOperateTime(System.currentTimeMillis()/1000);
                     parkLogTb.setOperateType(2);
-                    parkLogTb.setContent(uin+"("+nickname+")"+"集团"+money+"结算订单："+id);
+                    parkLogTb.setContent(uin+"("+nickname+")"+"集团"+money+"元结算了"+orderTb.getComid()+"车场的订单："+orderTb.getOrderIdLocal());
                     parkLogTb.setType("order");
                     parkLogTb.setGroupId(groupId);
                     saveLogService.saveLog(parkLogTb);

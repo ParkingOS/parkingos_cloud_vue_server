@@ -86,14 +86,14 @@ public class OrderServer extends BaseServer {
         if(order.getEndTime()>0){
             orderTb.setEndTime(order.getEndTime());
         }
-        orderTb.setAmountReceivable(new BigDecimal(order.getAmountReceivable()+""));
-        orderTb.setElectronicPrepay(new BigDecimal(order.getElectronicPrepay()+""));
-        orderTb.setElectronicPay(new BigDecimal(order.getElectronicPay()+""));
-        orderTb.setCashPrepay(new BigDecimal(order.getCashPrepay()+""));
-        orderTb.setCashPay(new BigDecimal(order.getCashPay()+""));
-        orderTb.setReduceAmount(new BigDecimal(order.getReduceAmount()+""));
+        orderTb.setAmountReceivable(new BigDecimal(order.getAmountReceivable()+"").setScale(2));
+        orderTb.setElectronicPrepay(new BigDecimal(order.getElectronicPrepay()+"").setScale(2));
+        orderTb.setElectronicPay(new BigDecimal(order.getElectronicPay()+"").setScale(2));
+        orderTb.setCashPrepay(new BigDecimal(order.getCashPrepay()+"").setScale(2));
+        orderTb.setCashPay(new BigDecimal(order.getCashPay()+"").setScale(2));
+        orderTb.setReduceAmount(new BigDecimal(order.getReduceAmount()+"").setScale(2));
         orderTb.setCreateTime(order.getCreateTime());
-        orderTb.setTotal(new BigDecimal(order.getTotal()+""));
+        orderTb.setTotal(new BigDecimal(order.getTotal()+"").setScale(2));
         orderTb.setUin(order.getUin());
         orderTb.setcType(order.getCType());
         orderTb.setOutUid(order.getOutUid());
