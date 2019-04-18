@@ -198,7 +198,7 @@
 
         SELECT
             mi.*, cp.passname,
-            cp.channel_id AS channelid
+            cp.id AS channelid
         FROM
             monitor_info_tb mi,
             com_pass_tb cp
