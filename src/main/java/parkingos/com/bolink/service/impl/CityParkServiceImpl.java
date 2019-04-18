@@ -253,6 +253,27 @@ public class CityParkServiceImpl implements CityParkService {
         comInfoTb.setParkingTotal(parking_total);
         comInfoTb.setBolinkId(bolinkid);
 
+
+        List<Map<String, Object>> unionInfoList = commonDao.getObjectBySql("select oc.union_id, oc.ukey union_key, og.operatorid operator_id from org_city_merchants oc " +
+                "left outer join org_group_tb og on oc.id = og.cityid " +
+                "where og.id = " + groupId);
+        String operator_id = "";
+        String union_key = "";
+        String union_id = "";
+        if (unionInfoList != null && unionInfoList.size() > 0) {
+            if (unionInfoList.get(0).get("operator_id") != null) {
+                operator_id = unionInfoList.get(0).get("operator_id") + "";
+            }
+            union_key = unionInfoList.get(0).get("union_key") + "";
+            union_id = unionInfoList.get(0).get("union_id") + "";
+        } else {
+            //查询没有集团编号的 车场
+            unionInfoList = commonDao.getObjectBySql("select oc.union_id, oc.ukey union_key from org_city_merchants oc " +
+                    "where oc.id = " + cityid);
+            union_key = unionInfoList.get(0).get("union_key") + "";
+            union_id = unionInfoList.get(0).get("union_id") + "";
+        }
+
         if (id == -1) {
 //            if(groupId==null||groupId==-1){
 //                groupId = RequestUtil.getLong(request,"group_id",-1L);
@@ -276,25 +297,6 @@ public class CityParkServiceImpl implements CityParkService {
 //            if (insert == 1) {
 //                result.put("state", 1);
 
-            List<Map<String, Object>> unionInfoList = commonDao.getObjectBySql("select oc.union_id, oc.ukey union_key, og.operatorid operator_id from org_city_merchants oc " +
-                    "left outer join org_group_tb og on oc.id = og.cityid " +
-                    "where og.id = " + groupId);
-            String operator_id = "";
-            String union_key = "";
-            String union_id = "";
-            if (unionInfoList != null && unionInfoList.size() > 0) {
-                if (unionInfoList.get(0).get("operator_id") != null) {
-                    operator_id = unionInfoList.get(0).get("operator_id") + "";
-                }
-                union_key = unionInfoList.get(0).get("union_key") + "";
-                union_id = unionInfoList.get(0).get("union_id") + "";
-            } else {
-                //查询没有集团编号的 车场
-                unionInfoList = commonDao.getObjectBySql("select oc.union_id, oc.ukey union_key from org_city_merchants oc " +
-                        "where oc.id = " + cityid);
-                union_key = unionInfoList.get(0).get("union_key") + "";
-                union_id = unionInfoList.get(0).get("union_id") + "";
-            }
 
             //判断车场是否要上传到泊链,如果没有写bolinkid,那么上传
             if (bolinkid == null || "".equals(bolinkid)) {
@@ -449,6 +451,34 @@ public class CityParkServiceImpl implements CityParkService {
             if (update == 1) {
                 result.put("state", 1);
                 result.put("msg", "修改车场成功");
+
+                JSONObject jsonObject = new JSONObject();
+                jsonObject.put("park_id", bolinkid);
+                jsonObject.put("union_id",union_id);
+                String url = CustomDefind.UNIONIP + "newpark/updatepark";
+                try{
+                    jsonObject.put("is_cloud_park",1);
+                    jsonObject.put("type",3);
+                    jsonObject.put("name",company);
+                    jsonObject.put("total_plot",parking_total);
+                    jsonObject.put("rand", Math.random());
+
+
+                    String _signStr = jsonObject.toJSONString() + "key=" + union_key;
+                    logger.info(_signStr);
+                    String _sign = StringUtils.MD5(_signStr).toUpperCase();
+                    logger.info(_sign);
+                    JSONObject json = new JSONObject();
+                    json.put("data",jsonObject.toJSONString());
+                    json.put("sign",_sign);
+
+                    HttpProxy httpProxy = new HttpProxy();
+                    String ret = httpProxy.doHeadPost(url,json.toJSONString());
+                    logger.info("=======>>>>"+ret);
+                }catch (Exception e){
+                    logger.error("update bolink park state error",e);
+                }
+
 
                 if(groupId>0){
                     ParkLogTb parkLogTb = new ParkLogTb();
