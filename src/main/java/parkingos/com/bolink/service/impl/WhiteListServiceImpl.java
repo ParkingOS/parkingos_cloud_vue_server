@@ -149,7 +149,6 @@ public class WhiteListServiceImpl implements WhiteListService {
         String msg = "新建白名单成功";
         ExecutorService es = ExecutorsUtil.getExecutorService();
         for(Long comid:comList) {
-//            String parkName = commonService.getComName(comid);
 
             Long id = -1L;
             WhiteListTb whiteListTb = new WhiteListTb();
@@ -196,40 +195,30 @@ public class WhiteListServiceImpl implements WhiteListService {
                 commonUtils.sendMessage(whiteListTb,comid,id,2);
                 commonUtils.insertSync(whiteListTb,1,comid,id);
             }
-            if(doWhite==1){
-                result.put("state",1);
-                result.put("msg","操作成功!");
-
-                ParkLogTb parkLogTb = new ParkLogTb();
-                parkLogTb.setOperateUser(nickname);
-                parkLogTb.setOperateTime(System.currentTimeMillis()/1000);
-                parkLogTb.setContent(uin+"("+nickname+")"+"新建白名单成功:"+carNumber);
-                parkLogTb.setType("white");
-                if(type==1){
-                    parkLogTb.setParkId(comid);
-                }
-                parkLogTb.setGroupId(groupId);
-                if(count==0){
-                    parkLogTb.setOperateType(1);
-                }else{
-                    parkLogTb.setOperateType(2);
-                }
-                saveLogService.saveLog(parkLogTb);
-
-            }
         }
+
+
+        ParkLogTb parkLogTb = new ParkLogTb();
         String comRes = "";
         if(comList.size()>1){
             comRes = "所有";
+            parkLogTb.setContent(uin+"("+nickname+")"+"集团给"+comRes+"车场创建了白名单"+carNumber);
         }else{
             comRes =comList.get(0)+"";
+            if(type==1) {
+                //车场级别注册
+                parkLogTb.setParkId(comList.get(0));
+                parkLogTb.setContent(uin + "(" + nickname + ")创建了白名单" + carNumber);
+            }else{
+                //集团级别注册
+                parkLogTb.setContent(uin+"("+nickname+")"+"集团给"+comRes+"车场创建了白名单"+carNumber);
+            }
         }
-        ParkLogTb parkLogTb = new ParkLogTb();
+
+
         parkLogTb.setOperateUser(nickname);
         parkLogTb.setOperateTime(System.currentTimeMillis()/1000);
-        parkLogTb.setOperateType(1);
-        parkLogTb.setContent(uin+"("+nickname+")"+"集团给"+comRes+"车场创建了白名单"+carNumber);
-        parkLogTb.setType("vip");
+        parkLogTb.setType("white");
         parkLogTb.setGroupId(groupId);
         saveLogService.saveLog(parkLogTb);
         result.put("state", 1);
@@ -297,7 +286,7 @@ public class WhiteListServiceImpl implements WhiteListService {
                 List<Object[]> datas = ImportExcelUtil.generateUserSql(is, filename, 1);
                 if (datas != null && !datas.isEmpty()) {
                     //车牌号*
-                    int i = 1;
+                    int i = 2;
                     for(Object[] o:datas){
                         if(o.length<8){
                             errmsg+= i+"行数据错误</br>";
@@ -305,6 +294,22 @@ public class WhiteListServiceImpl implements WhiteListService {
                             continue;
                         }
                         String comid = o[0]+"";
+
+                        if(!Check.isNumber(comid)){
+                            errmsg+= i+"行车场编号错误</br>";
+                            i++;
+                            continue;
+                        }
+
+                        Long parkId = Long.parseLong(comid);
+                        Long groupId = commonService.getGroupIdByComid(parkId);
+//                        logger.info("groupid equals:"+groupId.equals(groupid)+"~"+groupId+"~"+groupid);
+                        if(!groupId.equals(groupid)){
+                            errmsg+= i+"行车场编号错误</br>";
+                            i++;
+                            continue;
+                        }
+
                         String btime = o[1]+"";
                         String etime = o[2]+"";
                         String carNumber = o[7]+"";
@@ -325,20 +330,14 @@ public class WhiteListServiceImpl implements WhiteListService {
 
                         Long beginTime = TimeTools.getLongMilliSecondFrom_HHMMDD(btime) / 1000;
                         Long endTime = TimeTools.getLongMilliSecondFrom_HHMMDD(etime) / 1000;
-                        Long parkId =commonService.getParkIdByBolinkId(comid);
 
-                        if(parkId==null||parkId<0){
-                            errmsg+= i+"行车场编号错误</br>";
-                            i++;
-                            continue;
-                        }
-
-                        Long groupId = commonService.getGroupIdByComid(parkId);
-                        if(!groupId.equals(groupid)){
-                            errmsg+= i+"行车场编号错误</br>";
-                            i++;
-                            continue;
-                        }
+//                        Long parkId =commonService.getParkIdByBolinkId(comid);
+//
+//                        if(parkId==null||parkId<0){
+//                            errmsg+= i+"行车场编号错误</br>";
+//                            i++;
+//                            continue;
+//                        }
 
 
                         //如果判断通过
