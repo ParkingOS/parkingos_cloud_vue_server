@@ -8,10 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import parkingos.com.bolink.dao.spring.CommonDao;
-import parkingos.com.bolink.models.FixCodeTb;
-import parkingos.com.bolink.models.ParkLogTb;
-import parkingos.com.bolink.models.WhiteListTb;
-import parkingos.com.bolink.models.ZldBlackTb;
+import parkingos.com.bolink.models.*;
 import parkingos.com.bolink.qo.PageOrderConfig;
 import parkingos.com.bolink.qo.SearchBean;
 import parkingos.com.bolink.service.CommonService;
@@ -22,10 +19,12 @@ import parkingos.com.bolink.utils.*;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ExecutorService;
 
 @Service
 public class WhiteListServiceImpl implements WhiteListService {
@@ -109,81 +108,132 @@ public class WhiteListServiceImpl implements WhiteListService {
 
     @Override
     public JSONObject add(String remark, String carNumber, Long btime, Long etime, Long comid, String userName, String mobile, String carLocation,String nickname,Long uin,Long groupId,int type,int endType) {
-
-        if(btime>0){
-            btime = btime/1000;
-        }
-        if(etime>0){
-            etime = etime/1000;
-        }
-
-        Long id = -1L;
-
-        WhiteListTb whiteListTb = new WhiteListTb();
-        whiteListTb.setParkId(comid);
-        whiteListTb.setCarNumber(carNumber);
-        int count = commonDao.selectCountByConditions(whiteListTb);
-        int doWhite = 0;
         JSONObject result = new JSONObject();
         result.put("state",0);
         result.put("msg","操作失败!");
-        if(count==0){
-            //插入新车牌
-            id = commonDao.selectSequence(WhiteListTb.class);
-            whiteListTb.setId(id);
-            whiteListTb.setGroupId(groupId);
-            whiteListTb.setEndType(endType);
-            whiteListTb.setRemark(remark);
-            whiteListTb.setbTime(btime);
-            whiteListTb.seteTime(etime);
-            whiteListTb.setUserName(userName);
-            whiteListTb.setMobile(mobile);
-            whiteListTb.setCarLocation(carLocation);
-            doWhite= commonDao.insert(whiteListTb);
-
-            commonUtils.sendMessage(whiteListTb,comid,id,1);
-            commonUtils.insertSync(whiteListTb,0,comid,id);
-
-        }else{
-            //更新车场该车牌
-            whiteListTb = (WhiteListTb)commonDao.selectObjectByConditions(whiteListTb);
-            id = whiteListTb.getId();
-            WhiteListTb update = new WhiteListTb();
-            update.setEndType(endType);
-            update.setRemark(remark);
-            update.setbTime(btime);
-            update.seteTime(etime);
-            update.setuTime(System.currentTimeMillis()/1000);
-            update.setUserName(userName);
-            update.setMobile(mobile);
-            update.setCarLocation(carLocation);
-            update.setId(id);
-            doWhite = commonDao.updateByPrimaryKey(update);
-
-            commonUtils.sendMessage(whiteListTb,comid,id,2);
-            commonUtils.insertSync(whiteListTb,1,comid,id);
+        if(btime>0&&(btime+"").length()>10){
+            btime = btime/1000;
         }
-        if(doWhite==1){
-            result.put("state",1);
-            result.put("msg","操作成功!");
+        if(etime>0&&(etime+"").length()>10){
+            etime = etime/1000;
+        }
 
-            ParkLogTb parkLogTb = new ParkLogTb();
-            parkLogTb.setOperateUser(nickname);
-            parkLogTb.setOperateTime(System.currentTimeMillis()/1000);
-            parkLogTb.setContent(uin+"("+nickname+")"+"新建月卡会员成功:"+carNumber);
-            parkLogTb.setType("white");
-            if(type==1){
-                parkLogTb.setParkId(comid);
+        List<Long> comList = new ArrayList<>();
+        if(comid>-1) {
+            comList.add(comid);
+        }else {
+            ComInfoTb comInfoTb = new ComInfoTb();
+            comInfoTb.setGroupid(groupId);
+            comInfoTb.setState(0);
+            PageOrderConfig pageOrderConfig = new PageOrderConfig();
+            pageOrderConfig.setPageInfo(null,null);
+            List<ComInfoTb> list = commonDao.selectListByConditions(comInfoTb,pageOrderConfig);
+            if(list!=null&&list.size()>0){
+                for(ComInfoTb com:list){
+                    comList.add(com.getId());
+                }
             }
-            parkLogTb.setGroupId(groupId);
+        }
+        logger.info("集团创建白名单："+carNumber+"~~"+comList);
+        if(comList.size()<1){
+            result.put("msg","参数错误！");
+            return result;
+        }
+
+        result = createWhiteListByComs(result,comList,groupId,remark, carNumber,btime,etime,  userName, mobile, carLocation,nickname,uin,type,endType);
+
+        return result;
+    }
+
+    private JSONObject createWhiteListByComs(JSONObject result, List<Long> comList, Long groupId, String remark, String carNumber, Long btime, Long etime, String userName, String mobile, String carLocation, String nickname, Long uin, int type, int endType) {
+        String msg = "新建白名单成功";
+        ExecutorService es = ExecutorsUtil.getExecutorService();
+        for(Long comid:comList) {
+//            String parkName = commonService.getComName(comid);
+
+            Long id = -1L;
+            WhiteListTb whiteListTb = new WhiteListTb();
+            whiteListTb.setParkId(comid);
+            whiteListTb.setCarNumber(carNumber);
+            int count = commonDao.selectCountByConditions(whiteListTb);
+            int doWhite = 0;
             if(count==0){
-                parkLogTb.setOperateType(1);
-            }else{
-                parkLogTb.setOperateType(2);
-            }
-            saveLogService.saveLog(parkLogTb);
+                //插入新车牌
+                id = commonDao.selectSequence(WhiteListTb.class);
+                whiteListTb.setId(id);
+                whiteListTb.setGroupId(groupId);
+                whiteListTb.setEndType(endType);
+                whiteListTb.setRemark(remark);
+                whiteListTb.setbTime(btime);
+                whiteListTb.seteTime(etime);
+                whiteListTb.setUserName(userName);
+                whiteListTb.setMobile(mobile);
+                whiteListTb.setCarLocation(carLocation);
+                doWhite= commonDao.insert(whiteListTb);
 
+                commonUtils.sendMessage(whiteListTb,comid,id,1);
+                commonUtils.insertSync(whiteListTb,0,comid,id);
+
+            }else{
+                //更新车场该车牌
+                whiteListTb = (WhiteListTb)commonDao.selectObjectByConditions(whiteListTb);
+                id = whiteListTb.getId();
+                WhiteListTb update = new WhiteListTb();
+                if(endType==1||etime>System.currentTimeMillis()/1000){
+                    update.setState(0);
+                }
+                update.setEndType(endType);
+                update.setRemark(remark);
+                update.setbTime(btime);
+                update.seteTime(etime);
+                update.setuTime(System.currentTimeMillis()/1000);
+                update.setUserName(userName);
+                update.setMobile(mobile);
+                update.setCarLocation(carLocation);
+                update.setId(id);
+                doWhite = commonDao.updateByPrimaryKey(update);
+
+                commonUtils.sendMessage(whiteListTb,comid,id,2);
+                commonUtils.insertSync(whiteListTb,1,comid,id);
+            }
+            if(doWhite==1){
+                result.put("state",1);
+                result.put("msg","操作成功!");
+
+                ParkLogTb parkLogTb = new ParkLogTb();
+                parkLogTb.setOperateUser(nickname);
+                parkLogTb.setOperateTime(System.currentTimeMillis()/1000);
+                parkLogTb.setContent(uin+"("+nickname+")"+"新建白名单成功:"+carNumber);
+                parkLogTb.setType("white");
+                if(type==1){
+                    parkLogTb.setParkId(comid);
+                }
+                parkLogTb.setGroupId(groupId);
+                if(count==0){
+                    parkLogTb.setOperateType(1);
+                }else{
+                    parkLogTb.setOperateType(2);
+                }
+                saveLogService.saveLog(parkLogTb);
+
+            }
         }
+        String comRes = "";
+        if(comList.size()>1){
+            comRes = "所有";
+        }else{
+            comRes =comList.get(0)+"";
+        }
+        ParkLogTb parkLogTb = new ParkLogTb();
+        parkLogTb.setOperateUser(nickname);
+        parkLogTb.setOperateTime(System.currentTimeMillis()/1000);
+        parkLogTb.setOperateType(1);
+        parkLogTb.setContent(uin+"("+nickname+")"+"集团给"+comRes+"车场创建了白名单"+carNumber);
+        parkLogTb.setType("vip");
+        parkLogTb.setGroupId(groupId);
+        saveLogService.saveLog(parkLogTb);
+        result.put("state", 1);
+        result.put("msg", msg);
         return result;
     }
 
@@ -209,7 +259,7 @@ public class WhiteListServiceImpl implements WhiteListService {
             ParkLogTb parkLogTb = new ParkLogTb();
             parkLogTb.setOperateUser(nickname);
             parkLogTb.setOperateTime(System.currentTimeMillis()/1000);
-            parkLogTb.setContent(uin+"("+nickname+")"+"删除月卡会员"+id);
+            parkLogTb.setContent(uin+"("+nickname+")"+"删除了白名单"+id);
             parkLogTb.setType("white");
             if(type==1){
                 parkLogTb.setParkId(comid);
@@ -241,7 +291,7 @@ public class WhiteListServiceImpl implements WhiteListService {
                     e2.printStackTrace();
                 }
             }
-            logger.info("====上传车主会员:" + filename);
+            logger.info("====上传白名单:" + filename);
 
             if (is != null && filename != null) {
                 List<Object[]> datas = ImportExcelUtil.generateUserSql(is, filename, 1);
@@ -299,7 +349,7 @@ public class WhiteListServiceImpl implements WhiteListService {
                         ParkLogTb parkLogTb = new ParkLogTb();
                         parkLogTb.setOperateUser(nickname);
                         parkLogTb.setOperateTime(System.currentTimeMillis()/1000);
-                        parkLogTb.setContent(uin+"("+nickname+")"+"新建月卡会员成功:"+carNumber);
+                        parkLogTb.setContent(uin+"("+nickname+")"+"新建白名单成功:"+carNumber);
                         parkLogTb.setType("white");
                         parkLogTb.setGroupId(groupid);
                         //查询是不是已经存在这个车牌
@@ -313,6 +363,9 @@ public class WhiteListServiceImpl implements WhiteListService {
                             update.setMobile(mobile);
                             update.setCarLocation(carLocation);
                             update.setRemark(remark);
+                            if(endTime>System.currentTimeMillis()/1000){
+                                update.setState(0);
+                            }
                             commonDao.updateByConditions(update,whiteListTb);
 
                             parkLogTb.setOperateType(2);
@@ -321,6 +374,7 @@ public class WhiteListServiceImpl implements WhiteListService {
                             continue;
                         }
 
+                        whiteListTb.setGroupId(groupId);
                         whiteListTb.setbTime(beginTime);
                         whiteListTb.seteTime(endTime);
                         whiteListTb.setUserName(userName);
@@ -354,12 +408,13 @@ public class WhiteListServiceImpl implements WhiteListService {
     @Override
     public JSONObject edit(Long id, String remark, String carNumber, Long btime, Long etime, Long comid, String userName, String mobile, String carLocation, String nickname, Long uin, Long groupid, int type,int endType) {
 
-        if(btime>0){
+        if(btime>0&&(btime+"").length()>10){
             btime = btime/1000;
         }
-        if(etime>0){
+        if(etime>0&&(etime+"").length()>10){
             etime = etime/1000;
         }
+
         JSONObject result = new JSONObject();
         //查询以前的车牌
         WhiteListTb con = new WhiteListTb();
@@ -385,7 +440,9 @@ public class WhiteListServiceImpl implements WhiteListService {
                 return result;
             }
         }
-
+        if(endType==1||etime>System.currentTimeMillis()/1000){
+            whiteListTb.setState(0);
+        }
         whiteListTb.setEndType(endType);
         whiteListTb.setRemark(remark);
         whiteListTb.setCarLocation(carLocation);
@@ -409,7 +466,7 @@ public class WhiteListServiceImpl implements WhiteListService {
             ParkLogTb parkLogTb = new ParkLogTb();
             parkLogTb.setOperateUser(nickname);
             parkLogTb.setOperateTime(System.currentTimeMillis()/1000);
-            parkLogTb.setContent(uin+"("+nickname+")"+"更新了月卡会员"+id);
+            parkLogTb.setContent(uin+"("+nickname+")"+"更新了白名单"+id);
             parkLogTb.setType("white");
             if(type==1){
                 parkLogTb.setParkId(comid);
