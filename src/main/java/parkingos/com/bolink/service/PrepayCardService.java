@@ -8,11 +8,13 @@ import java.util.Map;
 public interface PrepayCardService {
     JSONObject selectResultByConditions(Map<String, String> reqParameterMap);
 
-    JSONObject renewProduct(HttpServletRequest req);
+    JSONObject renewProduct(HttpServletRequest req,Long comid);
 
-    JSONObject createPrepayCard(HttpServletRequest req);
+    JSONObject createPrepayCard(HttpServletRequest req,Long comid,Long groupId);
 
-    JSONObject editCard(HttpServletRequest req);
+    JSONObject editCard(HttpServletRequest req,Long comid);
 
     JSONObject deleteCard(Long id, Long comid);
+
+    JSONObject groupQuery(Map<String, String> reqParameterMap);
 }

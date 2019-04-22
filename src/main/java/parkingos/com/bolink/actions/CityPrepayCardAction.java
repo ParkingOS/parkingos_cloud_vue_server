@@ -9,7 +9,6 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import parkingos.com.bolink.dao.spring.CommonDao;
 import parkingos.com.bolink.models.ParkLogTb;
-import parkingos.com.bolink.service.CommonService;
 import parkingos.com.bolink.service.PrepayCardService;
 import parkingos.com.bolink.service.SaveLogService;
 import parkingos.com.bolink.utils.RequestUtil;
@@ -21,32 +20,31 @@ import java.util.Map;
 
 
 @Controller
-@RequestMapping("/prepaycard")
-public class PrepayCardAction {
+@RequestMapping("/cityprepaycard")
+public class CityPrepayCardAction {
 
-    Logger logger = LoggerFactory.getLogger(PrepayCardAction.class);
+    Logger logger = LoggerFactory.getLogger(CityPrepayCardAction.class);
 
     @Autowired
     private PrepayCardService prepayCardService;
     @Autowired
     private SaveLogService saveLogService;
-    @Autowired
-    CommonService commonService;
+
 
     @RequestMapping(value = "/query")
     public String query(HttpServletRequest request, HttpServletResponse response) {
         Map<String, String> reqParameterMap = RequestUtil.readBodyFormRequset(request);
-        JSONObject result = prepayCardService.selectResultByConditions(reqParameterMap);
+        JSONObject result = prepayCardService.groupQuery(reqParameterMap);
         StringUtils.ajaxOutput(response,result.toJSONString());
         return null;
     }
 
     @RequestMapping(value = "renewproduct")
     public String renewproduct(HttpServletRequest req, HttpServletResponse resp){
-        Long comid = RequestUtil.getLong(req,"comid",-1L);
+        Long comid = RequestUtil.getLong(req,"park_id",-1L);
+        Long groupId = RequestUtil.getLong(req,"groupid",-1L);
         String nickname = StringUtils.decodeUTF8(RequestUtil.getString(req,"nickname1"));
         Long uin = RequestUtil.getLong(req, "loginuin", -1L);
-
         JSONObject result = prepayCardService.renewProduct(req,comid);
 
         if((Integer)result.get("state")==1){
@@ -54,9 +52,9 @@ public class PrepayCardAction {
             parkLogTb.setOperateUser(nickname);
             parkLogTb.setOperateTime(System.currentTimeMillis()/1000);
             parkLogTb.setOperateType(2);
-            parkLogTb.setContent(uin+"("+nickname+")"+"续费了储值卡"+StringUtils.decodeUTF8(req.getParameter("card_id")));
+            parkLogTb.setContent(uin+"("+nickname+")"+"续费了"+comid+"车场的储值卡"+StringUtils.decodeUTF8(req.getParameter("card_id")));
             parkLogTb.setType("prepaycard");
-            parkLogTb.setParkId(comid);
+            parkLogTb.setGroupId(groupId);
             saveLogService.saveLog(parkLogTb);
         }
         StringUtils.ajaxOutput(resp,result.toJSONString());
@@ -66,19 +64,23 @@ public class PrepayCardAction {
     @RequestMapping(value = "/add")
     public String add(HttpServletRequest req, HttpServletResponse resp) throws Exception{
 
-        Long comid = RequestUtil.getLong(req,"comid",-1L);
+        Long comid = RequestUtil.getLong(req,"park_id",-1L);
+        Long groupId = RequestUtil.getLong(req,"groupid",-1L);
         String nickname = StringUtils.decodeUTF8(RequestUtil.getString(req,"nickname1"));
         Long uin = RequestUtil.getLong(req, "loginuin", -1L);
-        Long groupId = commonService.getGroupIdByComid(comid);
         JSONObject result = prepayCardService.createPrepayCard(req,comid,groupId);
         if((Integer)result.get("state")==1){
             ParkLogTb parkLogTb = new ParkLogTb();
             parkLogTb.setOperateUser(nickname);
             parkLogTb.setOperateTime(System.currentTimeMillis()/1000);
             parkLogTb.setOperateType(1);
-            parkLogTb.setContent(uin+"("+nickname+")"+"新建了储值卡"+req.getParameter("name")+",车牌:"+req.getParameter("car_number").toUpperCase());
+            if(comid>-1) {
+                parkLogTb.setContent(uin + "(" + nickname + ")" + "新建了" + comid + "车场的储值卡"  + req.getParameter("name") + ",车牌:" + req.getParameter("car_number").toUpperCase());
+            }else{
+                parkLogTb.setContent(uin + "(" + nickname + ")" + "新建了所有车场的储值卡"  + req.getParameter("name") + ",车牌:" + req.getParameter("car_number").toUpperCase());
+            }
             parkLogTb.setType("prepaycard");
-            parkLogTb.setParkId(comid);
+            parkLogTb.setGroupId(groupId);
             saveLogService.saveLog(parkLogTb);
         }
         StringUtils.ajaxOutput(resp,result.toJSONString());
@@ -89,7 +91,8 @@ public class PrepayCardAction {
 
     @RequestMapping(value = "edit")
     public String edit(HttpServletRequest req, HttpServletResponse resp) throws Exception{
-        Long comid = RequestUtil.getLong(req,"comid",-1L);
+        Long groupId= RequestUtil.getLong(req,"groupid",-1L);
+        Long comid = RequestUtil.getLong(req,"park_id",-1L);
         String nickname = StringUtils.decodeUTF8(RequestUtil.getString(req,"nickname1"));
         Long uin = RequestUtil.getLong(req, "loginuin", -1L);
         JSONObject result = prepayCardService.editCard(req,comid);
@@ -98,9 +101,9 @@ public class PrepayCardAction {
             parkLogTb.setOperateUser(nickname);
             parkLogTb.setOperateTime(System.currentTimeMillis()/1000);
             parkLogTb.setOperateType(2);
-            parkLogTb.setContent(uin+"("+nickname+")"+"修改了储值卡"+req.getParameter("card_id"));
+            parkLogTb.setContent(uin+"("+nickname+")"+"修改了"+comid+"车场的储值卡"+req.getParameter("card_id"));
             parkLogTb.setType("prepaycard");
-            parkLogTb.setParkId(comid);
+            parkLogTb.setGroupId(groupId);
             saveLogService.saveLog(parkLogTb);
         }
         StringUtils.ajaxOutput(resp,result.toJSONString());
@@ -113,8 +116,10 @@ public class PrepayCardAction {
 
         String nickname = StringUtils.decodeUTF8(RequestUtil.getString(req,"nickname1"));
         Long uin = RequestUtil.getLong(req, "loginuin", -1L);
+        Long groupId = RequestUtil.getLong(req,"groupid",-1L);
+
         Long id = RequestUtil.getLong(req, "id", -1L);
-        Long comid = RequestUtil.getLong(req,"comid",-1L);
+        Long comid = RequestUtil.getLong(req,"park_id",-1L);
 
         JSONObject result = prepayCardService.deleteCard(id,comid);
         if((Integer)result.get("state")==1){
@@ -122,9 +127,10 @@ public class PrepayCardAction {
             parkLogTb.setOperateUser(nickname);
             parkLogTb.setOperateTime(System.currentTimeMillis()/1000);
             parkLogTb.setOperateType(3);
-            parkLogTb.setContent(uin+"("+nickname+")"+"删除了储值卡"+req.getParameter("card_id"));
+            parkLogTb.setContent(uin+"("+nickname+")"+"删除了"+comid+"车场的储值卡"+req.getParameter("card_id"));
             parkLogTb.setType("prepaycard");
-            parkLogTb.setParkId(comid);
+            parkLogTb.setGroupId(groupId);
+//            parkLogTb.setParkId(comid);
             saveLogService.saveLog(parkLogTb);
         }
         StringUtils.ajaxOutput(resp,result.toJSONString());

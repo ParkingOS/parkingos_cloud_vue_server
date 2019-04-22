@@ -232,6 +232,16 @@ public class LoginServiceImpl implements LoginService {
                             if(!Check.isEmpty(orgGroupTb.getLogo2())){
                                 user.put("logo2",orgGroupTb.getLogo2());
                             }
+
+                            Long cityid = orgGroupTb.getCityid();
+                            OrgCityMerchants orgCityMerchants = new OrgCityMerchants();
+                            orgCityMerchants.setId(cityid);
+                            orgCityMerchants.setState(0);
+                            orgCityMerchants = (OrgCityMerchants)commonDao.selectObjectByConditions(orgCityMerchants);
+                            if(orgCityMerchants!=null&&orgCityMerchants.getSelfRefillSetting()!=null){
+                                user.put("self_setting",orgCityMerchants.getSelfRefillSetting());
+                            }
+
                         }
                     }
                 } else if (orgname.contains("城市")) {

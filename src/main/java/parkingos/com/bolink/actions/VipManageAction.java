@@ -59,6 +59,7 @@ public class VipManageAction {
         Long comid = RequestUtil.getLong(req,"comid",-1L);
         String nickname = StringUtils.decodeUTF8(RequestUtil.getString(req,"nickname1"));
         Long uin = RequestUtil.getLong(req, "loginuin", -1L);
+        Long groupId = RequestUtil.getLong(req,"groupid",-1L);
         JSONObject result = vipService.renewProduct(req);
 
         if((Integer)result.get("state")==1){
@@ -66,9 +67,15 @@ public class VipManageAction {
             parkLogTb.setOperateUser(nickname);
             parkLogTb.setOperateTime(System.currentTimeMillis()/1000);
             parkLogTb.setOperateType(2);
-            parkLogTb.setContent(uin+"("+nickname+")"+"续费了月卡会员"+StringUtils.decodeUTF8(req.getParameter("card_id")));
+            if(groupId>0){
+                parkLogTb.setGroupId(groupId);
+                parkLogTb.setContent(uin+"("+nickname+")"+"续费了"+comid+"车场的月卡会员"+StringUtils.decodeUTF8(req.getParameter("card_id")));
+            }else{
+                parkLogTb.setParkId(comid);
+                parkLogTb.setContent(uin+"("+nickname+")"+"续费了月卡会员"+StringUtils.decodeUTF8(req.getParameter("card_id")));
+            }
             parkLogTb.setType("vip");
-            parkLogTb.setParkId(comid);
+
             saveLogService.saveLog(parkLogTb);
         }
         StringUtils.ajaxOutput(resp,result.toJSONString());

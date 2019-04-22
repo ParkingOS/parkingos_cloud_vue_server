@@ -56,8 +56,8 @@ public class WhiteListServiceImpl implements WhiteListService {
         WhiteListTb whiteListTb = new WhiteListTb();
         Long groupId = Long.parseLong(reqParameterMap.get("groupid"));
         whiteListTb.setGroupId(groupId);
-//        JSONObject result = supperSearchService.supperSearch(whiteListTb,reqParameterMap);
-        JSONObject result = new JSONObject();
+        String str = "{\"total\":0,\"page\":1,\"rows\":[]}";
+        JSONObject result = JSONObject.parseObject(str);
         int count =0;
         List<WhiteListTb> list =null;
         List<Map<String, Object>> resList =new ArrayList<Map<String, Object>>();
@@ -348,7 +348,7 @@ public class WhiteListServiceImpl implements WhiteListService {
                         ParkLogTb parkLogTb = new ParkLogTb();
                         parkLogTb.setOperateUser(nickname);
                         parkLogTb.setOperateTime(System.currentTimeMillis()/1000);
-                        parkLogTb.setContent(uin+"("+nickname+")"+"新建白名单成功:"+carNumber);
+                        parkLogTb.setContent(uin+"("+nickname+")"+"导入白名单成功:"+carNumber);
                         parkLogTb.setType("white");
                         parkLogTb.setGroupId(groupid);
                         //查询是不是已经存在这个车牌
@@ -356,6 +356,7 @@ public class WhiteListServiceImpl implements WhiteListService {
                         if(count>0){
                             //如果已经存在这个车牌，那么更新
                             WhiteListTb update = new WhiteListTb();
+                            update.setuTime(System.currentTimeMillis()/1000);
                             update.setbTime(beginTime);
                             update.seteTime(endTime);
                             update.setUserName(userName);
@@ -483,7 +484,8 @@ public class WhiteListServiceImpl implements WhiteListService {
         WhiteListTb whiteListTb = new WhiteListTb();
         Long comid = Long.parseLong(reqParameterMap.get("comid"));
         whiteListTb.setParkId(comid);
-        JSONObject result = new JSONObject();
+        String str = "{\"total\":0,\"page\":1,\"rows\":[]}";
+        JSONObject result = JSONObject.parseObject(str);
         int count =0;
         List<WhiteListTb> list =null;
         List<Map<String, Object>> resList =new ArrayList<Map<String, Object>>();
@@ -567,7 +569,7 @@ public class WhiteListServiceImpl implements WhiteListService {
                     }else if("state".equals(field)){
                         switch(Integer.valueOf(v + "")){
                             case 0:values.add("正常");break;
-                            case 1:values.add("过期");break;
+                            case 1:values.add("已过期");break;
                             default:values.add("");
                         }
                     }else {
@@ -626,7 +628,7 @@ public class WhiteListServiceImpl implements WhiteListService {
                     }else if("state".equals(field)){
                         switch(Integer.valueOf(v + "")){
                             case 0:values.add("正常");break;
-                            case 1:values.add("过期");break;
+                            case 1:values.add("已过期");break;
                             default:values.add("");
                         }
                     }else {

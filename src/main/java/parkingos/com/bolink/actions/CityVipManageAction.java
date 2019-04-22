@@ -104,7 +104,7 @@ public class CityVipManageAction {
             JSONObject result = cityVipService.editVip(groupId, id,carNumber,limit_day_type,mobile,name,pLot,nickname,uin);
             StringUtils.ajaxOutput(resp, result.toJSONString());
         }catch (Exception e){
-            logger.error("==>>>>集团创建月卡异常",e);
+            logger.error("==>>>>集团修改月卡异常",e);
         }
         return null;
     }
@@ -122,11 +122,28 @@ public class CityVipManageAction {
             JSONObject result = cityVipService.deleteVip(groupId, id,nickname,uin);
             StringUtils.ajaxOutput(resp, result.toJSONString());
         }catch (Exception e){
-            logger.error("==>>>>集团创建月卡异常",e);
+            logger.error("==>>>>集团删除月卡异常",e);
         }
         return null;
     }
 
+
+//    @RequestMapping(value = "renewproduct")
+//    public String renewProduct(HttpServletRequest req, HttpServletResponse resp){
+//        try {
+//            String nickname = StringUtils.decodeUTF8(RequestUtil.getString(req,"nickname1"));
+//            Long uin = RequestUtil.getLong(req, "loginuin", -1L);
+//            Long groupId = RequestUtil.getLong(req, "groupid", -1L);
+//
+//            Long id = RequestUtil.getLong(req,"id",-1L);
+//
+//            JSONObject result = cityVipService.deleteVip(groupId, id,nickname,uin);
+//            StringUtils.ajaxOutput(resp, result.toJSONString());
+//        }catch (Exception e){
+//            logger.error("==>>>>集团删除月卡异常",e);
+//        }
+//        return null;
+//    }
 
 
     @RequestMapping(value = "/importExcel")

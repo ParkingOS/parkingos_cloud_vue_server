@@ -185,20 +185,20 @@ public class VipServiceImpl implements VipService {
 
         //金额
         Double total = RequestUtil.getDouble(req, "total", 0.0);//Double.parseDouble(getDataService.getprodsum(pid, months));
-        ProductPackageTb productPackageTb = new ProductPackageTb();
-        productPackageTb.setId(pid);
-        productPackageTb = (ProductPackageTb) commonDao.selectObjectByConditions(productPackageTb);
-        Long limitDay = null;
-        if (productPackageTb != null && productPackageTb.getLimitday() != null) {
-            limitDay = productPackageTb.getLimitday();
-        }
-        logger.error("======>>>>>>limitDay" + limitDay);
-        if (limitDay != null) {
-            if (limitDay < etime) {//超出有效期
-                result.put("msg", "产品已超出有效期，请重新选择产品或更改购买月数");
-                return result;
-            }
-        }
+//        ProductPackageTb productPackageTb = new ProductPackageTb();
+//        productPackageTb.setId(pid);
+//        productPackageTb = (ProductPackageTb) commonDao.selectObjectByConditions(productPackageTb);
+//        Long limitDay = null;
+//        if (productPackageTb != null && productPackageTb.getLimitday() != null) {
+//            limitDay = productPackageTb.getLimitday();
+//        }
+//        logger.error("======>>>>>>limitDay" + limitDay);
+//        if (limitDay != null) {
+//            if (limitDay < etime) {//超出有效期
+//                result.put("msg", "产品已超出有效期，请重新选择产品或更改购买月数");
+//                return result;
+//            }
+//        }
 
         logger.error("=======>>>>>act_total" + act_total);
 
@@ -321,8 +321,8 @@ public class VipServiceImpl implements VipService {
             carNumberBefore = carowerProduct.getCarNumber();
         }
         int ret = 0;
-        logger.error("=====>>>>>更改车牌carNumber" + carNumber);
-        logger.error("=======>>>更改车牌carNumberBefore" + carNumberBefore);
+        logger.info("=====>>>>>更改车牌carNumber" + carNumber+"~~"+carNumberBefore);
+//        logger.error("=======>>>更改车牌carNumberBefore" + carNumberBefore);
         if (carNumber != null && !carNumber.equals("")) {
             if (!carNumber.equals(carNumberBefore)) {
                 //对修改车牌的逻辑加一层校验，验证车牌是否有效
@@ -439,19 +439,19 @@ public class VipServiceImpl implements VipService {
             return result;
         }
 
-        ProductPackageTb productPackageTb = new ProductPackageTb();
-        productPackageTb.setId(pid);
-        productPackageTb = (ProductPackageTb) commonDao.selectObjectByConditions(productPackageTb);
-        Long limitDay = null;
-        if (productPackageTb != null && productPackageTb.getLimitday() != null) {
-            limitDay = productPackageTb.getLimitday();
-        }
-        if (limitDay != null) {
-            if (limitDay < etime) {//超出有效期
-                result.put("msg", "产品已超出有效期，请重新选择产品或更改购买月数");
-                return result;
-            }
-        }
+//        ProductPackageTb productPackageTb = new ProductPackageTb();
+//        productPackageTb.setId(pid);
+//        productPackageTb = (ProductPackageTb) commonDao.selectObjectByConditions(productPackageTb);
+//        Long limitDay = null;
+//        if (productPackageTb != null && productPackageTb.getLimitday() != null) {
+//            limitDay = productPackageTb.getLimitday();
+//        }
+//        if (limitDay != null) {
+//            if (limitDay < etime) {//超出有效期
+//                result.put("msg", "产品已超出有效期，请重新选择产品或更改购买月数");
+//                return result;
+//            }
+//        }
 
         Double act_total = 0.0;
         if (!acttotal.equals("")) {
@@ -467,6 +467,7 @@ public class VipServiceImpl implements VipService {
         CarowerProduct carowerProduct = new CarowerProduct();
         carowerProduct.setId(id);
         carowerProduct.seteTime(etime);
+//        carowerProduct.setPid(pid);
         int ret = commonDao.updateByPrimaryKey(carowerProduct);
         if (ret == 1) {
             carowerProduct = (CarowerProduct) commonDao.selectObjectByConditions(carowerProduct);

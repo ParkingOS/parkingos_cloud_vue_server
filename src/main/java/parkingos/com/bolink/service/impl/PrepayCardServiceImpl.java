@@ -6,8 +6,10 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import parkingos.com.bolink.dao.spring.CommonDao;
+import parkingos.com.bolink.models.ComInfoTb;
 import parkingos.com.bolink.models.PrepayCardTb;
 import parkingos.com.bolink.models.PrepayCardTrade;
+import parkingos.com.bolink.qo.PageOrderConfig;
 import parkingos.com.bolink.service.PrepayCardService;
 import parkingos.com.bolink.service.SupperSearchService;
 import parkingos.com.bolink.utils.Check;
@@ -17,6 +19,8 @@ import parkingos.com.bolink.utils.TimeTools;
 
 import javax.servlet.http.HttpServletRequest;
 import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 
@@ -43,11 +47,11 @@ public class PrepayCardServiceImpl implements PrepayCardService {
     }
 
     @Override
-    public JSONObject renewProduct(HttpServletRequest req) {
+    public JSONObject renewProduct(HttpServletRequest req,Long comid) {
         JSONObject result = new JSONObject();
         result.put("state",0);
         Long id = RequestUtil.getLong(req,"id",-1L);
-        Long comid = RequestUtil.getLong(req, "comid", -1L);
+//        Long comid = RequestUtil.getLong(req, "comid", -1L);
         String addMoney = RequestUtil.getString(req,"add_money");
         String remark = RequestUtil.getString(req,"remark");
         logger.info("===>>>"+id+"~~"+comid+"~~~"+addMoney+"~~"+remark);
@@ -106,75 +110,101 @@ public class PrepayCardServiceImpl implements PrepayCardService {
     }
 
     @Override
-    public JSONObject createPrepayCard(HttpServletRequest req) {
+    public JSONObject createPrepayCard(HttpServletRequest req,Long comid,Long groupId) {
 
         JSONObject result = new JSONObject();
         result.put("state",0);
-        Long comid = RequestUtil.getLong(req,"comid",-1L);
+//        Long comid = RequestUtil.getLong(req,"comid",-1L);
+        List<Long> comList = new ArrayList<>();
+        if(comid>-1){
+            comList.add(comid);
+        }else{
+            ComInfoTb comInfoTb = new ComInfoTb();
+            comInfoTb.setGroupid(groupId);
+            comInfoTb.setState(0);
+            PageOrderConfig pageOrderConfig = new PageOrderConfig();
+            pageOrderConfig.setPageInfo(null,null);
+            List<ComInfoTb> list = commonDao.selectListByConditions(comInfoTb,pageOrderConfig);
+            if(list!=null&&list.size()>0){
+                for(ComInfoTb com:list){
+                    comList.add(com.getId());
+                }
+            }
+        }
+
+
+
         String name = RequestUtil.getString(req,"name");
         String mobile = RequestUtil.getString(req,"mobile");
         String carNumber = RequestUtil.getString(req,"car_number");
         String remark = RequestUtil.getString(req,"remark");
 
-        Long id = commonDao.selectSequence(PrepayCardTb.class);
 
-        PrepayCardTb prepayCardTb = new PrepayCardTb();
-        prepayCardTb.setId(id);
-        prepayCardTb.setRemark(remark);
-        prepayCardTb.setMoney(new BigDecimal(0.0));
-        prepayCardTb.setState(0);
-        prepayCardTb.setParkId(comid);
-        prepayCardTb.setCardId(id+"");
-        prepayCardTb.setCtime(System.currentTimeMillis()/1000);
-        prepayCardTb.setMobile(mobile);
-        prepayCardTb.setCarNumber(carNumber);
-        prepayCardTb.setName(name);
+        result = createPrepayCards(comList,name,mobile,carNumber,remark,result,groupId);
 
-        int insert = commonDao.insert(prepayCardTb);
-        if(insert==1){
+        return result;
+    }
 
-            commonUtils.sendMessage(prepayCardTb,comid,id,1);
-            //插入同步表。。
-            int insertSync = commonUtils.insertSync(prepayCardTb,0,comid,id);
-            result.put("state",1);
-            result.put("msg","新建储值卡成功！");
-            result.put("id",id);
+    private JSONObject createPrepayCards(List<Long> comList, String name, String mobile, String carNumber, String remark, JSONObject result,Long groupId) {
+        for(Long comid:comList) {
+            Long id = commonDao.selectSequence(PrepayCardTb.class);
+            PrepayCardTb prepayCardTb = new PrepayCardTb();
+            prepayCardTb.setId(id);
+            prepayCardTb.setRemark(remark);
+            prepayCardTb.setMoney(new BigDecimal(0.0));
+            prepayCardTb.setState(0);
+            prepayCardTb.setParkId(comid);
+            prepayCardTb.setCardId(id + "");
+            prepayCardTb.setCtime(System.currentTimeMillis() / 1000);
+            prepayCardTb.setMobile(mobile);
+            prepayCardTb.setCarNumber(carNumber);
+            prepayCardTb.setName(name);
+            prepayCardTb.setGroupId(groupId);
 
-            //充值成功记流水，同样写入流水表
-            PrepayCardTrade trade = new PrepayCardTrade();
-            Long tradeId = commonDao.selectSequence(PrepayCardTrade.class);
-            String tradeNo = TimeTools.getTimeYYYYMMDDHHMMSS() + "" + comid;
-            trade.setId(tradeId);
-            trade.setName(name);
-            trade.setTradeNo(tradeNo);
-            trade.setAddMoney(new BigDecimal(0.0));
-            trade.setCardId(prepayCardTb.getCardId());
-            trade.setCarNumber(prepayCardTb.getCarNumber());
-            trade.setCreateTime(System.currentTimeMillis()/1000);
-            trade.setMobile(prepayCardTb.getMobile());
-            trade.setParkId(comid);
-            trade.setPayTime(System.currentTimeMillis()/1000);
-            trade.setRemark(remark);
-            trade.setPayType("现金");
-            trade.setTradeType("云平台续费");
-            trade.setAddMoneyAfter(new BigDecimal(0.0));
-            trade.setAddMoneyBefore(new BigDecimal(0.0));
-            int insertTrde = commonDao.insert(trade);
+            int insert = commonDao.insert(prepayCardTb);
+            if (insert == 1) {
 
-            commonUtils.sendMessage(trade,comid,tradeId,1);
-            int sync = commonUtils.insertSync(trade,0,comid,tradeId);
+                commonUtils.sendMessage(prepayCardTb, comid, id, 1);
+                //插入同步表。。
+                int insertSync = commonUtils.insertSync(prepayCardTb, 0, comid, id);
+                //充值成功记流水，同样写入流水表
+                PrepayCardTrade trade = new PrepayCardTrade();
+                Long tradeId = commonDao.selectSequence(PrepayCardTrade.class);
+                String tradeNo = TimeTools.getTimeYYYYMMDDHHMMSS() + "" + comid;
+                trade.setId(tradeId);
+                trade.setName(name);
+                trade.setTradeNo(tradeNo);
+                trade.setAddMoney(new BigDecimal(0.0));
+                trade.setCardId(prepayCardTb.getCardId());
+                trade.setCarNumber(prepayCardTb.getCarNumber());
+                trade.setCreateTime(System.currentTimeMillis() / 1000);
+                trade.setMobile(prepayCardTb.getMobile());
+                trade.setParkId(comid);
+                trade.setPayTime(System.currentTimeMillis() / 1000);
+                trade.setRemark(remark);
+                trade.setPayType("现金");
+                trade.setTradeType("云平台续费");
+                trade.setAddMoneyAfter(new BigDecimal(0.0));
+                trade.setAddMoneyBefore(new BigDecimal(0.0));
+                int insertTrde = commonDao.insert(trade);
 
+                commonUtils.sendMessage(trade, comid, tradeId, 1);
+                int sync = commonUtils.insertSync(trade, 0, comid, tradeId);
+
+            }
         }
+        result.put("state",1);
+        result.put("msg","新建储值卡成功");
         return result;
     }
 
     @Override
-    public JSONObject editCard(HttpServletRequest req) {
+    public JSONObject editCard(HttpServletRequest req,Long comid) {
 
         JSONObject result = new JSONObject();
         result.put("state",0);
         Long id = RequestUtil.getLong(req,"id",-1L);
-        Long comid = RequestUtil.getLong(req,"comid",-1L);
+//        Long comid = RequestUtil.getLong(req,"comid",-1L);
         String name = RequestUtil.getString(req,"name");
         String mobile = RequestUtil.getString(req,"mobile");
         String carNumber = RequestUtil.getString(req,"car_number");
@@ -219,6 +249,16 @@ public class PrepayCardServiceImpl implements PrepayCardService {
             result.put("state",1);
             result.put("msg","删除储值卡成功！");
         }
+        return result;
+    }
+
+    @Override
+    public JSONObject groupQuery(Map<String, String> reqParameterMap) {
+        Long groupid = Long.parseLong(reqParameterMap.get("groupid"));
+        PrepayCardTb prepayCardTb = new PrepayCardTb();
+        prepayCardTb.setGroupId(groupid);
+        prepayCardTb.setState(0);
+        JSONObject result = supperSearchService.supperSearch(prepayCardTb,reqParameterMap);
         return result;
     }
 }

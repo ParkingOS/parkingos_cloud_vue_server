@@ -25,6 +25,16 @@ public class PrepayCardTb {
 
     private String name;
 
+    private Long groupId;
+
+    public Long getGroupId() {
+        return groupId;
+    }
+
+    public void setGroupId(Long groupId) {
+        this.groupId = groupId;
+    }
+
     public String getName() {
         return name;
     }
