@@ -12,10 +12,7 @@ import parkingos.com.bolink.enums.FieldOperator;
 import parkingos.com.bolink.models.*;
 import parkingos.com.bolink.qo.PageOrderConfig;
 import parkingos.com.bolink.qo.SearchBean;
-import parkingos.com.bolink.service.CityParkService;
-import parkingos.com.bolink.service.OrderService;
-import parkingos.com.bolink.service.SaveLogService;
-import parkingos.com.bolink.service.SupperSearchService;
+import parkingos.com.bolink.service.*;
 import parkingos.com.bolink.service.redis.RedisService;
 import parkingos.com.bolink.utils.*;
 
@@ -44,6 +41,8 @@ public class CityParkServiceImpl implements CityParkService {
     private OrderService orderService;
     @Autowired
     RedisService redisService;
+    @Autowired
+    CommonService commonService;
 
     @Override
     public JSONObject selectResultByConditions(Map<String, String> reqmap) {
@@ -55,7 +54,7 @@ public class CityParkServiceImpl implements CityParkService {
         List<Map<String, Object>> resList = new ArrayList<Map<String, Object>>();
 
         ComInfoTb comInfoTb = new ComInfoTb();
-        comInfoTb.setState(0);
+//        comInfoTb.setState(0);
 
         String groupidStart = reqmap.get("groupid_start");
         if(!Check.isEmpty(groupidStart)){
@@ -63,7 +62,6 @@ public class CityParkServiceImpl implements CityParkService {
         }
         String groupid = reqmap.get("groupid");
         String cityid = reqmap.get("cityid");
-        System.out.println("=====groupid:" + groupid + "===cityid:" + cityid);
 
         Map searchMap = supperSearchService.getBaseSearch(comInfoTb, reqmap);
         if (searchMap != null && !searchMap.isEmpty()) {
@@ -82,9 +80,6 @@ public class CityParkServiceImpl implements CityParkService {
             } else if (cityid != null && !"".equals(cityid)) {
                 parks = commonMethods.getparks(Long.parseLong(cityid));
             }
-
-            System.out.println("=======parks:" + parks);
-
 
             if (parks == null || parks.size() < 1) {
                 return result;
@@ -108,7 +103,6 @@ public class CityParkServiceImpl implements CityParkService {
                 supperQuery = new ArrayList<SearchBean>();
             }
             supperQuery.add(searchBean);
-//            supperQuery.add(searchBean1);
 
             count = commonDao.selectCountByConditions(baseQuery, supperQuery);
             if (count > 0) {
@@ -120,46 +114,13 @@ public class CityParkServiceImpl implements CityParkService {
 
                         Long parkid = comInfoTb1.getId();
 
+                        int empty = commonService.getParkEmpty(parkid.intValue());
+                        map.put("empty", empty);
+
                         List<HashMap<String, Object>> tokenList = getParkStatusbc(parkid);
                         if(tokenList!=null&&tokenList.size()>0&&tokenList.get(0).get("beat_time")!=null){
                             map.put("beat_time",tokenList.get(0).get("beat_time"));
-                            //更新车场的心跳时间
-//                            comInfoTb1.setBeatTime(Long.parseLong(tokenList.get(0).get("beat_time")+""));
-//                            int update = commonDao.updateByPrimaryKey(comInfoTb1);
-//                            logger.error("更新车场心跳时间"+update);
                         }
-
-
-//                        OrderTb newOrder = new OrderTb();
-//                        newOrder.setComid(parkid);
-//                        newOrder.setState(0);
-//                        newOrder.setIshd(0);
-//
-//                        int total = commonDao.selectCountByConditions(newOrder);
-////
-//                        logger.error("=======>>>在场车辆"+total);
-//
-//
-//                            Integer parking_total = 0;
-//                            if(comInfoTb1.getParkingTotal()!= null){
-//                                parking_total=comInfoTb1.getParkingTotal();//车场车位数
-//                            }
-//                            Integer shareNumber = 0;
-//                            if(comInfoTb1.getShareNumber() != null){
-//                                shareNumber=comInfoTb1.getShareNumber();//车场车位分享数
-//                            }
-//                            Integer parktotal = 0;
-//                            if(shareNumber > 0){
-//                                parktotal = shareNumber;
-//                            }else{
-//                                parktotal = parking_total;
-//                            }
-//
-//                            Integer blank = parktotal -total;
-//                            if(blank<=0){
-//                                blank = 0;
-//                            }
-//                            map.put("blank",blank);
 
                             resList.add(map);
                     }
@@ -169,7 +130,7 @@ public class CityParkServiceImpl implements CityParkService {
         }
         result.put("total", count);
         result.put("page", Integer.parseInt(reqmap.get("page")));
-        logger.error("============>>>>>返回数据" + result);
+//        logger.error("============>>>>>返回数据" + result);
         return result;
     }
 
@@ -184,18 +145,18 @@ public class CityParkServiceImpl implements CityParkService {
 
 
         String bolinkid = RequestUtil.getString(request, "bolink_id");
-        if(id==-1) {
-            if (bolinkid != null && !"".equals(bolinkid)) {
-                ComInfoTb infoTb = new ComInfoTb();
-                infoTb.setBolinkId(bolinkid);
-                infoTb.setState(0);
-                int infoCount = commonDao.selectCountByConditions(infoTb);
-                if (infoCount > 0) {
-                    result.put("msg", "创建失败,泊链车场编号重复");
-                    return result;
-                }
-            }
-        }
+//        if(id==-1) {
+//            if (bolinkid != null && !"".equals(bolinkid)) {
+//                ComInfoTb infoTb = new ComInfoTb();
+//                infoTb.setBolinkId(bolinkid);
+//                infoTb.setState(0);
+//                int infoCount = commonDao.selectCountByConditions(infoTb);
+//                if (infoCount > 0) {
+//                    result.put("msg", "创建失败,泊链车场编号重复");
+//                    return result;
+//                }
+//            }
+//        }
 
 
         Long cityid = RequestUtil.getLong(request, "cityid", -1L);
@@ -204,7 +165,7 @@ public class CityParkServiceImpl implements CityParkService {
         if (groupId == -1) {
             groupId = RequestUtil.getLong(request, "group_id", -1L);
         }
-
+        logger.info("注册车场cityId+groupid"+cityid+"~~"+groupId);
         String nickname = StringUtils.decodeUTF8(RequestUtil.getString(request,"nickname1"));
         Long uin = RequestUtil.getLong(request, "loginuin", -1L);
 
@@ -254,7 +215,7 @@ public class CityParkServiceImpl implements CityParkService {
         comInfoTb.setBolinkId(bolinkid);
 
 
-        List<Map<String, Object>> unionInfoList = commonDao.getObjectBySql("select oc.union_id, oc.ukey union_key, og.operatorid operator_id from org_city_merchants oc " +
+        List<Map<String, Object>> unionInfoList = commonDao.getObjectBySql("select oc.union_id, oc.ukey union_key, og.operatorid operator_id,oc.id from org_city_merchants oc " +
                 "left outer join org_group_tb og on oc.id = og.cityid " +
                 "where og.id = " + groupId);
         String operator_id = "";
@@ -266,6 +227,9 @@ public class CityParkServiceImpl implements CityParkService {
             }
             union_key = unionInfoList.get(0).get("union_key") + "";
             union_id = unionInfoList.get(0).get("union_id") + "";
+            if(cityid<0){
+                cityid = Long.parseLong(unionInfoList.get(0).get("id")+"");
+            }
         } else {
             //查询没有集团编号的 车场
             unionInfoList = commonDao.getObjectBySql("select oc.union_id, oc.ukey union_key from org_city_merchants oc " +
@@ -274,14 +238,21 @@ public class CityParkServiceImpl implements CityParkService {
             union_id = unionInfoList.get(0).get("union_id") + "";
         }
 
+        logger.info("===>>>>>unionId:"+union_id+"~~~~cityid:"+cityid);
         if (id == -1) {
-//            if(groupId==null||groupId==-1){
-//                groupId = RequestUtil.getLong(request,"group_id",-1L);
-//                if(groupId==null||groupId==-1){
-//                    result.put("msg","请选择运营集团");
-//                    return result;
-//                }
-//            }
+
+            if (!Check.isEmpty(bolinkid)) {
+                ComInfoTb infoTb = new ComInfoTb();
+                infoTb.setBolinkId(bolinkid);
+                infoTb.setState(0);
+                infoTb.setUnionId(union_id);
+                int infoCount = commonDao.selectCountByConditions(infoTb);
+                if (infoCount > 0) {
+                    result.put("msg", "创建失败,泊链车场编号重复");
+                    return result;
+                }
+            }
+
             //获取id
             Long comid = commonDao.selectSequence(ComInfoTb.class);
             comInfoTb.setId(comid);
@@ -292,11 +263,7 @@ public class CityParkServiceImpl implements CityParkService {
             comInfoTb.setUkey(ukey);
             comInfoTb.setCreateTime(System.currentTimeMillis() / 1000);
 
-
-//            int insert = commonDao.insert(comInfoTb);
-//            if (insert == 1) {
-//                result.put("state", 1);
-
+            comInfoTb.setUnionId(union_id);
 
             //判断车场是否要上传到泊链,如果没有写bolinkid,那么上传
             if (bolinkid == null || "".equals(bolinkid)) {
@@ -445,6 +412,9 @@ public class CityParkServiceImpl implements CityParkService {
             }
 //            }
         } else {
+
+            commonService.deleteCachPark(id,union_id,bolinkid);
+
             comInfoTb.setId(id);
             comInfoTb.setUpdateTime(System.currentTimeMillis() / 1000);
             int update = commonDao.updateByPrimaryKey(comInfoTb);
@@ -764,7 +734,7 @@ public class CityParkServiceImpl implements CityParkService {
                 logger.info("===>>>>cacheKey:"+cacheKey);
                 Long beattime = null;
                 if(redisService.get(cacheKey)!=null){
-                    beattime = Long.parseLong(redisService.get(cacheKey));
+                    beattime = Long.parseLong(redisService.get(cacheKey)+"");
                 }
                 logger.info("===>>>>>beatTime:"+beattime);
                 if(localid == null)localid="";

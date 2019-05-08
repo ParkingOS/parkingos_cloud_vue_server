@@ -61,16 +61,16 @@ public class OrderServiceImpl implements OrderService {
         JSONObject result = new JSONObject();
 
         //查询三天的数据显示
-        logger.error("=========..req" + reqmap.size());
         Long comid = Long.parseLong(reqmap.get("comid"));
         //根据comid获取 cityid  命中分表 约束
-        Long groupid = orderMapper.getGroupIdByComId(comid);
-        Long cityid = -1L;
-        if (groupid != null && groupid > 0) {
-            cityid = orderMapper.getCityIdByGroupId(groupid);
-        } else {
-            cityid = orderMapper.getCityIdByComId(comid);
-        }
+        Long cityid = commonService.getCityIdByComid(comid);
+//        Long groupid = orderMapper.getGroupIdByComId(comid);
+//        Long cityid = -1L;
+//        if (groupid != null && groupid > 0) {
+//            cityid = orderMapper.getCityIdByGroupId(groupid);
+//        } else {
+//            cityid = orderMapper.getCityIdByComId(comid);
+//        }
         logger.info("select city by comid:" + cityid);
         if (cityid != null && cityid > -1) {
             reqmap.put("cityId",cityid+"");
@@ -464,13 +464,14 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     public void resetDataByComid(Long comid) {
-        Long groupId = orderMapper.getGroupIdByComId(comid);
-        Long cityid = -1L;
-        if(groupId!=null&&groupId>-1){
-            cityid = orderMapper.getCityIdByGroupId(groupId);
-        }else {
-            cityid = orderMapper.getCityIdByComId(comid);
-        }
+//        Long groupId = orderMapper.getGroupIdByComId(comid);
+//        Long cityid = -1L;
+//        if(groupId!=null&&groupId>-1){
+//            cityid = orderMapper.getCityIdByGroupId(groupId);
+//        }else {
+//            cityid = orderMapper.getCityIdByComId(comid);
+//        }
+        Long cityid = commonService.getCityIdByComid(comid);
         String tableName = "order_tb_new";
         if(cityid!=null&&cityid>0){
             tableName= tableName+"_"+cityid%100;

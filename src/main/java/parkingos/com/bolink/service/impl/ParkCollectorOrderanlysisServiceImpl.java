@@ -52,13 +52,14 @@ public class ParkCollectorOrderanlysisServiceImpl implements ParkCollectorOrderA
         Long comid = Long.parseLong(reqmap.get("comid"));
         String outUid= reqmap.get("out_uid_start");
 
-        Long groupId = orderMapper.getGroupIdByComId(comid);
-        Long cityId = -1L;
-        if(groupId!=null&&groupId>-1){
-            cityId = orderMapper.getCityIdByGroupId(groupId);
-        }else{
-            cityId = orderMapper.getCityIdByComId(comid);
-        }
+//        Long groupId = orderMapper.getGroupIdByComId(comid);
+//        Long cityId = -1L;
+//        if(groupId!=null&&groupId>-1){
+//            cityId = orderMapper.getCityIdByGroupId(groupId);
+//        }else{
+//            cityId = orderMapper.getCityIdByComId(comid);
+//        }
+        Long cityId = commonService.getCityIdByComid(comid);
         String tableName = "order_tb_new";
         if(cityId!=null&&cityId>-1){
             reqmap.put("cityId",cityId+"");

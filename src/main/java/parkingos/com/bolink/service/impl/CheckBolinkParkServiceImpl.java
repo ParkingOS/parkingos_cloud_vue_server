@@ -30,10 +30,10 @@ public class CheckBolinkParkServiceImpl implements CheckBolinkParkService {
     @Override
     public String checkPark(String unionId, String parkId) {
 
-        String value = redisService.get("parkingos-yun-"+unionId);
+        Object value = redisService.get("parkingos-yun-"+unionId);
         logger.info("===>>>from redis ："+value);
         if(value!=null){
-            JSONArray array = JSONArray.parseArray(value);
+            JSONArray array = JSONArray.parseArray(value+"");
             logger.info("redis 取出string串解析："+array);
             if(array!=null&&array.size()>0) {
                 for (int i = 0; i < array.size(); i++) {

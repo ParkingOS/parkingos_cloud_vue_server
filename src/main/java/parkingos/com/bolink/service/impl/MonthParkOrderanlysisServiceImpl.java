@@ -54,13 +54,14 @@ public class MonthParkOrderanlysisServiceImpl implements MonthParkOrderAnlysisSe
 
         Long comid = Long.parseLong(reqmap.get("comid"));
 
-        Long groupid =orderMapper.getGroupIdByComId(comid);
-        Long cityid = -1L;
-        if(groupid!=null&&groupid>-1){
-            cityid = orderMapper.getCityIdByGroupId(groupid);
-        }else {
-            cityid = orderMapper.getCityIdByComId(comid);
-        }
+//        Long groupid =orderMapper.getGroupIdByComId(comid);
+//        Long cityid = -1L;
+//        if(groupid!=null&&groupid>-1){
+//            cityid = orderMapper.getCityIdByGroupId(groupid);
+//        }else {
+//            cityid = orderMapper.getCityIdByComId(comid);
+//        }
+        Long cityid = commonService.getCityIdByComid(comid);
         String tableName = "order_tb_new";
         if(cityid!=null&&cityid>-1){
             reqmap.put("cityId",cityid+"");

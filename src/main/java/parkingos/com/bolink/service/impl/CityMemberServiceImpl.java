@@ -157,7 +157,7 @@ public class CityMemberServiceImpl implements CityMemberService {
         if("".equals(nickname)) nickname=null;
         if("".equals(mobile)) mobile=null;
         if("".equals(phone)) phone=null;
-        if("".equals(resume)) phone=null;
+        if("".equals(resume)) resume=null;
 
         Long time = System.currentTimeMillis()/1000;
         //用户表

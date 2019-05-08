@@ -18,7 +18,7 @@ public class RedisServiceImpl implements RedisService {
 
 
     @Override
-    public void set(String key, String value) {
+    public void set(String key, Object value) {
         try {
             redisTemplate.opsForValue().set(key,value);
         }catch (Exception e){
@@ -36,10 +36,10 @@ public class RedisServiceImpl implements RedisService {
     }
 
     @Override
-    public String get(String key) {
+    public Object get(String key) {
         try {
             Object value = redisTemplate.opsForValue().get(key);
-            return value!=null?(String)value:null;
+            return value!=null?value:null;
         }catch (Exception e){
             logger.error("redis is invalid");
         }
@@ -76,5 +76,14 @@ public class RedisServiceImpl implements RedisService {
             logger.error("redis is invalid");
         }
         return null;
+    }
+
+    @Override
+    public void delete(String key) {
+        try{
+            redisTemplate.delete(key);
+        }catch (Exception e){
+            logger.error("redis delete error");
+        }
     }
 }

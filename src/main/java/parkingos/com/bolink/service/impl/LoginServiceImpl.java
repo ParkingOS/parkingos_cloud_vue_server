@@ -45,21 +45,6 @@ public class LoginServiceImpl implements LoginService {
         }
         userInfoTb = (UserInfoTb) commonDao.selectObjectByConditions(userInfoTb);
         if (userInfoTb == null) {
-//            if("admin".equals(userId)){
-//                userInfoTb.setPassword(null);
-//                userInfoTb = (UserInfoTb) commonDao.selectObjectByConditions(userInfoTb);
-//                if(userInfoTb==null){
-//                    result.put("state", true);
-//                    result.put("msg", "新建账号");
-//                    user.put("oid", CustomDefind.getValue("UNIONADMIN"));//开源云之后新建admin账号
-//                    result.put("user",user);
-//                    return result;
-//                }else{
-//                    result.put("state", false);
-//                    result.put("msg", "账号或密码错误");
-//                    return result;
-//                }
-//            }
             result.put("state", false);
             result.put("msg", "账号或密码错误");
             return result;
@@ -75,10 +60,6 @@ public class LoginServiceImpl implements LoginService {
             }
         }
 
-        Long role = -1L;
-        if (userInfoTb.getAuthFlag() != null) {
-            role = Long.valueOf(userInfoTb.getAuthFlag().toString());
-        }
         Long roleId = userInfoTb.getRoleId();
 
         UserRoleTb userRoleTb = new UserRoleTb();
@@ -162,24 +143,6 @@ public class LoginServiceImpl implements LoginService {
                                 result.put("state", false);
                                 result.put("msg", "该车场没有所属厂商！");
                                 return result;
-//                                Long groupid = comInfoTb.getGroupid();
-//                                OrgGroupTb orgGroupTb = new OrgGroupTb();
-//                                orgGroupTb.setId(groupid);
-//                                orgGroupTb.setState(0);
-//                                orgGroupTb= (OrgGroupTb)commonDao.selectObjectByConditions(orgGroupTb);
-//                                if (orgGroupTb!=null&&orgGroupTb.getCityid()!=null){
-//                                    if(!Check.isEmpty(orgGroupTb.getSelfLogo())){
-//                                        user.put("logo",orgGroupTb.getSelfLogo());
-//                                    }
-//                                    Long cityid = orgGroupTb.getCityid();
-//                                    OrgCityMerchants orgCityMerchants = new OrgCityMerchants();
-//                                    orgCityMerchants.setId(cityid);
-//                                    orgCityMerchants.setState(0);
-//                                    orgCityMerchants = (OrgCityMerchants)commonDao.selectObjectByConditions(orgCityMerchants);
-//                                    if(orgCityMerchants!=null&&orgCityMerchants.getSelfRefillSetting()!=null){
-//                                        user.put("self_setting",orgCityMerchants.getSelfRefillSetting());
-//                                    }
-//                                }
                             }
                         }
 
@@ -188,30 +151,10 @@ public class LoginServiceImpl implements LoginService {
                         user.put("comid", userInfoTb.getComid());
                         user.put("parkid", userInfoTb.getComid());
                     }
-                } else if (orgname.contains("渠道")) {
-                    user.put("isadmin", 1);
-                    user.put("cloudname", "智慧停车云-渠道云 ");
-                    user.put("chanid", userInfoTb.getChanid());
-//                    user.put("comid", -1);
-                    OrgChannelTb orgChannelTb = new OrgChannelTb();
-                    orgChannelTb.setId(userInfoTb.getChanid());
-                    int chancount = commonDao.selectCountByConditions(orgChannelTb);
-                    if (chancount == 0) {
-                        result.put("state", false);
-                        result.put("msg", "渠道不存在！");
-                        return result;
-                    } else {
-//                        Map<String, Object> map = daService.getMap("select * from logo_tb where type=? and orgid=? ",
-//                                new Object[]{0, user.get("chanid")});
-//                        if(map != null&& map.get("url_fir") != null){
-//                            logourl = "cloudlogo.do?action=downloadlogo&type=0&orgid="+user.get("chanid")+"&number=0&r="+Math.random();
-//                        }
-                    }
-                } else if (orgname.contains("集团")) {
+                }else if (orgname.contains("集团")) {
                     user.put("isadmin", 1);
                     user.put("cloudname", "智慧城市云 ");
                     user.put("groupid", userInfoTb.getGroupid());
-//                    user.put("comid", -1);
                     OrgGroupTb orgGroupTb = new OrgGroupTb();
                     orgGroupTb.setId(userInfoTb.getGroupid());
                     orgGroupTb.setState(0);
@@ -248,7 +191,6 @@ public class LoginServiceImpl implements LoginService {
                     user.put("isadmin", 1);
                     user.put("cloudname", "智慧停车云-城市云 ");
                     user.put("cityid", userInfoTb.getCityid());
-//                    user.put("comid", -1);
                     OrgCityMerchants orgCityMerchants = new OrgCityMerchants();
                     orgCityMerchants.setId(userInfoTb.getCityid());
                     orgCityMerchants.setState(0);
@@ -294,35 +236,8 @@ public class LoginServiceImpl implements LoginService {
 
             if (roleId == 0) {//总管理员拥有所有权限
                 user.put("name","总后台");
-               // AuthTb authTb = new AuthTb();
-               // authTb.setOid(userRoleTb.getOid());
-               // authTb.setState(0);
-               // String sql = "select actions,id auth_id,nname,pid,url,sort,sub_auth childauths from " +
-               //         "auth_tb where oid= "+userRoleTb.getOid()+" and state=0 ";
-               // authList = commonDao.getObjectBySql(sql);
-
                 String sql = "select actions,id auth_id,nname,pid,url,sort,sub_auth childauths from auth_tb where oid= "+userRoleTb.getOid()+" and state=0 ";
                 authList = commonDao.getObjectBySql(sql);//commonDao.selectListByConditions(authTb);
-
-//                if (authList != null) {
-//                    for (Map<String, Object> map : authList) {
-//                        if (map.get("childauths") != null) {
-//                            String childauths = (String) map.get("childauths");
-//                            if (!childauths.equals("")) {
-//                                String[] subs = childauths.split(",");
-//                                String subauth = null;
-//                                for (int i = 0; i < subs.length; i++) {
-//                                    if (i == 0) {
-//                                        subauth = "" + i;
-//                                    } else {
-//                                        subauth += "," + i;
-//                                    }
-//                                }
-//                                map.put("sub_auth", subauth);
-//                            }
-//                        }
-//                    }
-//                }
 
             } else {
                 //读取权限
@@ -373,41 +288,6 @@ public class LoginServiceImpl implements LoginService {
             user.put("menuauthlist", StringUtils.createJson(authList));
 
 
-        } else {
-            //role: 0总管理员，1停车场后台管理员 ，2车场收费员，3财务，4车主  5市场专员 6录入员
-            if (role.intValue() == ZLDType.ZLD_COLLECTOR_ROLE || role.intValue() == ZLDType.ZLD_CAROWER_ROLE || role.intValue() == ZLDType.ZLD_KEYMEN) {//车场收费员及车主不能登录后台
-                result.put("state", false);
-                result.put("msg", "没有查询后台数据权限，请联系管理员!！");
-                return result;
-            } else if (role.intValue() == ZLDType.ZLD_PARKADMIN_ROLE) {
-                user.put("target", "parkmanage");
-                user.put("cloudname", "智慧停车云-车场云 ");
-                ComInfoTb comInfoTb = new ComInfoTb();
-                comInfoTb.setId(userInfoTb.getComid());
-                comInfoTb.setState(0);
-                int count = commonDao.selectCountByConditions(comInfoTb);
-
-                if (count == 0) {
-                    result.put("state", false);
-                    result.put("msg", "车场不存在或者车场未通过审核！");
-                    return result;
-                }
-            } else if (role.intValue() == ZLDType.ZLD_ACCOUNTANT_ROLE) {
-                user.put("target", "finance");
-            } else if (role.intValue() == ZLDType.ZLD_CARDOPERATOR) {
-                user.put("target", "cardoperator");
-            } else if (role.intValue() == ZLDType.ZLD_MARKETER) {//市场专员 登录后台
-                user.put("marketerid", userInfoTb.getId());
-                user.put("target", "marketer");
-            } else if (role.intValue() == ZLDType.ZLD_RECORDER || role.intValue() == ZLDType.ZLD_KEFU || role.intValue() == ZLDType.ZLD_QUERYKEFU) {
-                user.put("target", "recorder");
-            } else if (role == 0) {//总管理员
-                user.put("supperadmin", 1);
-            } else {
-                result.put("state", false);
-                result.put("msg", "没有登录权限！");
-                return result;
-            }
         }
         String nickname = "";
         if (userInfoTb.getNickname() != null) {

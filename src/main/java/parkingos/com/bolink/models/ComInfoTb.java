@@ -157,6 +157,16 @@ public class ComInfoTb {
 
     private Integer superimposed;
 
+    private String unionId;
+
+    public String getUnionId() {
+        return unionId;
+    }
+
+    public void setUnionId(String unionId) {
+        this.unionId = unionId;
+    }
+
     public void setSuperimposed(Integer superimposed) {
         this.superimposed = superimposed;
     }

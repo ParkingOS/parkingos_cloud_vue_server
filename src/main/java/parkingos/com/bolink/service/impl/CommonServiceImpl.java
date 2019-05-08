@@ -79,44 +79,55 @@ public class CommonServiceImpl implements CommonService {
 
     @Override
     public String getBolinkIdByComid(Long parkId) {
-        Object bolinkId = redisService.get(CustomDefind.getValue("REDISPARKID4BOLINKID")+parkId);
-        logger.info("==>>>>根据comid从redis取bolinkId"+bolinkId);
-        if(bolinkId==null){
-            ComInfoTb comInfoTb = getComInfo(parkId);
-            if(comInfoTb!=null){
-                redisService.set(CustomDefind.getValue("REDISPARKID4BOLINKID")+parkId,comInfoTb.getBolinkId(),7200);
-                return comInfoTb.getBolinkId();
-            }
+
+        ComInfoTb comInfoTb = getComInfoByComid(parkId);
+        if(comInfoTb!=null){
+            return comInfoTb.getBolinkId();
         }
-        return bolinkId+"";
+        return "";
+//        Object bolinkId = redisService.get(CustomDefind.getValue("REDISPARKID4BOLINKID")+parkId);
+//        logger.info("==>>>>根据comid从redis取bolinkId"+bolinkId);
+//        if(bolinkId==null){
+//            ComInfoTb comInfoTb = getComInfo(parkId);
+//            if(comInfoTb!=null){
+//                redisService.set(CustomDefind.getValue("REDISPARKID4BOLINKID")+parkId,comInfoTb.getBolinkId(),7200);
+//                return comInfoTb.getBolinkId();
+//            }
+//        }
+//        return bolinkId+"";
     }
 
     @Override
     public Long getCityIdByComid(Long comid) {
 
-        try {
-            Object cityStr = redisService.get(CustomDefind.getValue("REDISKEY4CITY") + comid);
-            if (cityStr != null) {
-                return Long.parseLong(cityStr+"");
-            }
-        }catch (Exception e){
-            logger.error("redis get error ===>>>>");
+        ComInfoTb comInfoTb = getComInfoByComid(comid);
+        if(comInfoTb!=null){
+            return comInfoTb.getCityid();
         }
-        //根据车场编号查询集团编号
-        Long groupid = getGroupIdByComId(comid);
-        Long cityid=-1L;
-        if(groupid!=null&&groupid>0){
-            cityid = getCityIdByGroupId(groupid);
-        }else{
-            cityid = getCityIdByComId(comid);
-        }
-        //缓存先放一小时  看效果
-        try {
-            redisService.set(CustomDefind.getValue("REDISKEY4CITY") + comid, cityid + "", 3600);
-        }catch (Exception e){
-            logger.error("redis set error===>>>");
-        }
-        return cityid;
+        return -1L;
+//        try {
+//            Object cityStr = redisService.get(CustomDefind.getValue("REDISKEY4CITY") + comid);
+//            if (cityStr != null) {
+//                return Long.parseLong(cityStr+"");
+//            }
+//        }catch (Exception e){
+//            logger.error("redis get error ===>>>>");
+//        }
+//        //根据车场编号查询集团编号
+//        Long groupid = getGroupIdByComId(comid);
+//        Long cityid=-1L;
+//        if(groupid!=null&&groupid>0){
+//            cityid = getCityIdByGroupId(groupid);
+//        }else{
+//            cityid = getCityIdByComId(comid);
+//        }
+//        //缓存先放一小时  看效果
+//        try {
+//            redisService.set(CustomDefind.getValue("REDISKEY4CITY") + comid, cityid + "", 3600);
+//        }catch (Exception e){
+//            logger.error("redis set error===>>>");
+//        }
+//        return cityid;
     }
 
     @Override
@@ -176,14 +187,21 @@ public class CommonServiceImpl implements CommonService {
 
     @Override
     public Long getGroupIdByComid(Long parkId) {
-        Object group = redisService.get(CustomDefind.getValue("REDISCOMID4GROUPID")+parkId);
-        if(group==null) {
-            Long groupid = getGroupIdByComId(parkId);
-            redisService.set(CustomDefind.getValue("REDISCOMID4GROUPID")+parkId,groupid+"",7500);
-            return groupid;
-        }else{
-            return Long.parseLong(group+"");
+
+        ComInfoTb comInfoTb = getComInfoByComid(parkId);
+        if(comInfoTb!=null){
+            return comInfoTb.getGroupid();
         }
+        return -1L;
+
+//        Object group = redisService.get(CustomDefind.getValue("REDISCOMID4GROUPID")+parkId);
+//        if(group==null) {
+//            Long groupid = getGroupIdByComId(parkId);
+//            redisService.set(CustomDefind.getValue("REDISCOMID4GROUPID")+parkId,groupid+"",7500);
+//            return groupid;
+//        }else{
+//            return Long.parseLong(group+"");
+//        }
 //        return getGroupIdByComId(parkId);
     }
 
@@ -198,21 +216,21 @@ public class CommonServiceImpl implements CommonService {
         return "";
     }
 
-    @Override
-    public Long getParkIdByBolinkId(String comid) {
-        Object comidStr = redisService.get(CustomDefind.getValue("REDISBOLINKPARKKEY") + comid);
-        if(comidStr!=null){
-            return Long.parseLong((comidStr+"").split("_")[0]);
-        }
-        ComInfoTb comInfoTb = new ComInfoTb();
-        comInfoTb.setBolinkId(comid);
-        comInfoTb.setState(0);
-        comInfoTb=(ComInfoTb)commonDao.selectObjectByConditions(comInfoTb);
-        if(comInfoTb!=null){
-            return comInfoTb.getId();
-        }
-        return -1L;
-    }
+//    @Override
+//    public Long getParkIdByBolinkId(String comid) {
+//        Object comidStr = redisService.get(CustomDefind.getValue("REDISBOLINKPARKKEY") + comid);
+//        if(comidStr!=null){
+//            return Long.parseLong((comidStr+"").split("_")[0]);
+//        }
+//        ComInfoTb comInfoTb = new ComInfoTb();
+//        comInfoTb.setBolinkId(comid);
+//        comInfoTb.setState(0);
+//        comInfoTb=(ComInfoTb)commonDao.selectObjectByConditions(comInfoTb);
+//        if(comInfoTb!=null){
+//            return comInfoTb.getId();
+//        }
+//        return -1L;
+//    }
 
 
     private Long getUnionIdByGroupId(Long groupid) {
@@ -234,6 +252,64 @@ public class CommonServiceImpl implements CommonService {
         }
         return Long.parseLong(union+"");
     }
+
+
+
+    @Override
+    public ComInfoTb getComInfoByUnionIdAndParkId(String unionId, String comid) {
+        ComInfoTb comInfoTb = null;
+        Object object = redisService.get(CustomDefind.getValue("COMINFOBYUNIONIDANDBOLINKID")+unionId+comid);
+        if(object==null){
+            comInfoTb = new ComInfoTb();
+            comInfoTb.setUnionId(unionId);
+            comInfoTb.setBolinkId(comid);
+            comInfoTb.setState(0);
+            comInfoTb = (ComInfoTb) commonDao.selectObjectByConditions(comInfoTb);
+            if(comInfoTb!=null){
+                redisService.set(CustomDefind.getValue("COMINFOBYUNIONIDANDBOLINKID")+unionId+comid,comInfoTb);
+                return comInfoTb;
+            }
+        }else{
+            comInfoTb =(ComInfoTb)object;
+        }
+        return comInfoTb;
+    }
+
+    @Override
+    public ComInfoTb getComInfoByComid(Long comid) {
+        ComInfoTb comInfoTb = null;
+        Object object = redisService.get(CustomDefind.getValue("COMINFOBYCOMID")+comid);
+        if(object==null){
+            comInfoTb=new ComInfoTb();
+            comInfoTb.setId(comid);
+            comInfoTb=(ComInfoTb)commonDao.selectObjectByConditions(comInfoTb);
+            if(comInfoTb!=null){
+                redisService.set(CustomDefind.getValue("COMINFOBYCOMID")+comid,comInfoTb);
+                return comInfoTb;
+            }
+        }else{
+            comInfoTb=(ComInfoTb)object;
+        }
+//        logger.info("==>>>>从缓存中获取cominfo成功:"+comInfoTb);
+        return comInfoTb;
+    }
+
+    @Override
+    public void deleteCachPark(Long id, String unionId,String bolinkid) {
+        redisService.delete(CustomDefind.getValue("COMINFOBYCOMID")+id);
+        redisService.delete(CustomDefind.getValue("COMINFOBYUNIONIDANDBOLINKID")+unionId+bolinkid);
+    }
+
+    @Override
+    public int getParkEmpty(int comid) {
+        Object redisEmpty = redisService.get(CustomDefind.getValue("COMIDEMPTY")+comid);
+        if(redisEmpty!=null) {
+            return Integer.parseInt(redisEmpty+"");
+        }
+        ComInfoTb comInfoTb= getComInfoByComid(Long.parseLong(comid+""));
+        return comInfoTb.getEmpty();
+    }
+
 
     private Long getCityIdByGroupId(Long groupid) {
         OrgGroupTb orgGroupTb = new OrgGroupTb();

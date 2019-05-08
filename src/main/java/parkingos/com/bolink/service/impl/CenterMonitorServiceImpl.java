@@ -19,11 +19,13 @@ import parkingos.com.bolink.dao.mybatis.mapper.OrderMapper;
 import parkingos.com.bolink.dao.mybatis.mapper.ParkInfoMapper;
 import parkingos.com.bolink.dao.spring.CommonDao;
 import parkingos.com.bolink.models.CarpicTb;
+import parkingos.com.bolink.models.ComInfoTb;
 import parkingos.com.bolink.models.LiftrodInfoTb;
 import parkingos.com.bolink.models.OrderTb;
 import parkingos.com.bolink.orderserver.OrderServer;
 import parkingos.com.bolink.service.CenterMonitorService;
 import parkingos.com.bolink.service.CityOrderAnlysisService;
+import parkingos.com.bolink.service.CommonService;
 import parkingos.com.bolink.service.ParkOrderAnlysisService;
 import parkingos.com.bolink.utils.*;
 import parkingos.com.bolink.websocket.WebSocketServer;
@@ -58,6 +60,10 @@ public class CenterMonitorServiceImpl implements CenterMonitorService {
     private OrderServer orderServer;
     @Autowired
     private MemCachedClient memCachedClient;
+    @Autowired
+    CommonService commonService;
+
+
     DecimalFormat af1 = new DecimalFormat("0");
 
     private Gson gson = new GsonBuilder().setDateFormat("yyyy-MM-dd HH:mm:ss").create();
@@ -162,13 +168,14 @@ public class CenterMonitorServiceImpl implements CenterMonitorService {
 
         } else if (comid > 0) {
 
-            Long cityid=-1L;
-            Long groupId = orderMapper.getGroupIdByComId(comid);
-            if(groupId!=null&&groupId>-1){
-                cityid = orderMapper.getCityIdByGroupId(groupId);
-            }else {
-                cityid = orderMapper.getCityIdByComId(comid);
-            }
+            Long cityid=commonService.getCityIdByComid(comid);
+
+//            Long groupId = orderMapper.getGroupIdByComId(comid);
+//            if(groupId!=null&&groupId>-1){
+//                cityid = orderMapper.getCityIdByGroupId(groupId);
+//            }else {
+//                cityid = orderMapper.getCityIdByComId(comid);
+//            }
             String tableName = "order_tb_new";
             if(cityid!=null&&cityid>-1){
                 tableName+="_"+cityid%100;
@@ -434,13 +441,18 @@ public class CenterMonitorServiceImpl implements CenterMonitorService {
 
     @Override
     public Map getSelectOrder(String comid, String carNumber) {
-        Long cityid =-1L;
-        Long groupid = orderMapper.getGroupIdByComId(Long.parseLong(comid));
-        if(groupid!=null&&groupid>-1){
-            cityid = orderMapper.getCityIdByGroupId(groupid);
-        }else {
-            cityid = orderMapper.getCityIdByComId(Long.parseLong(comid));
-        }
+        Long cityid=commonService.getCityIdByComid(Long.parseLong(comid));
+//        Long cityid =-1L;
+//        ComInfoTb comInfoTb = commonService.getComInfoByComid(Long.parseLong(comid));
+//        if(comInfoTb!=null){
+//            cityid = comInfoTb.getCityid();
+//        }
+//        Long groupid = orderMapper.getGroupIdByComId(Long.parseLong(comid));
+//        if(groupid!=null&&groupid>-1){
+//            cityid = orderMapper.getCityIdByGroupId(groupid);
+//        }else {
+//            cityid = orderMapper.getCityIdByComId(Long.parseLong(comid));
+//        }
         String tableName = "order_tb_new";
         if(cityid!=null&&cityid>-1){
             tableName+= "_"+cityid%100;
@@ -663,13 +675,14 @@ public class CenterMonitorServiceImpl implements CenterMonitorService {
 
     private List<OrderTb> queryBlurOrdersByCarnumber(long comid, String carNumber) {
 
-        Long groupid = orderMapper.getGroupIdByComId(comid);
-        Long cityid = -1L;
-        if(groupid!=null&&groupid>-1){
-            cityid = orderMapper.getCityIdByGroupId(groupid);
-        }else {
-            cityid = orderMapper.getCityIdByComId(comid);
-        }
+//        Long groupid = orderMapper.getGroupIdByComId(comid);
+//        Long cityid = -1L;
+//        if(groupid!=null&&groupid>-1){
+//            cityid = orderMapper.getCityIdByGroupId(groupid);
+//        }else {
+//            cityid = orderMapper.getCityIdByComId(comid);
+//        }
+        Long cityid=commonService.getCityIdByComid(comid);
         String tableName = "order_tb_new";
         if(cityid!=null&&cityid>-1){
             tableName+= "_"+cityid%100;

@@ -10,7 +10,7 @@ public interface RedisService {
      * @param key key
      * @param value 值
      */
-    void set(String key, String value);
+    void set(String key, Object value);
 
 
     /**
@@ -27,7 +27,7 @@ public interface RedisService {
      * @param key key
      * @return 存储的值
      */
-    String get(String key);
+    Object get(String key);
 
 
     /**
@@ -51,5 +51,8 @@ public interface RedisService {
      * @return 整数
      */
     Long getLong(String key);
+
+
+    void delete(String key);
 
 }

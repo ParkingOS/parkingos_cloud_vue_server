@@ -1,6 +1,7 @@
 package parkingos.com.bolink.service;
 
 
+import parkingos.com.bolink.models.ComInfoTb;
 
 public interface CommonService {
 
@@ -21,9 +22,17 @@ public interface CommonService {
 
     String getParkNameById(Long comId);
 
-    Long getParkIdByBolinkId(String comid);
+//    Long getParkIdByBolinkId(String comid);
 
     Long getGroupIdByComid(Long parkId);
 
     String getComName(long comid);
+
+    ComInfoTb getComInfoByUnionIdAndParkId(String unionId, String comid);
+
+    ComInfoTb getComInfoByComid(Long comid);
+
+    void deleteCachPark(Long id,String unionId, String bolinkid);
+
+    int getParkEmpty(int comid);
 }

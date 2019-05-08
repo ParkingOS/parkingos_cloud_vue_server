@@ -10,9 +10,11 @@ import org.springframework.stereotype.Service;
 import parkingos.com.bolink.dao.mybatis.mapper.OrderMapper;
 import parkingos.com.bolink.dao.mybatis.mapper.ParkInfoMapper;
 import parkingos.com.bolink.dao.spring.CommonDao;
+import parkingos.com.bolink.models.ComInfoTb;
 import parkingos.com.bolink.models.ParkChannelsTb;
 import parkingos.com.bolink.orderserver.OrderServer;
 import parkingos.com.bolink.service.CityOrderAnlysisService;
+import parkingos.com.bolink.service.CommonService;
 import parkingos.com.bolink.service.GetParkInfoService;
 import parkingos.com.bolink.service.ParkOrderAnlysisService;
 import parkingos.com.bolink.service.redis.RedisService;
@@ -44,6 +46,8 @@ public class GetParkInfoServiceImpl implements GetParkInfoService {
     private RedisService redisService;
     @Autowired
     private CommonDao commonDao;
+    @Autowired
+    CommonService commonService;
 
     DecimalFormat af1 = new DecimalFormat("0");
     @Override
@@ -223,28 +227,33 @@ public class GetParkInfoServiceImpl implements GetParkInfoService {
 //            cityid = orderMapper.getCityIdByComId(Long.parseLong(comid+""));
 //        }
         Long cityid =-1L;
-        try {
-
-            String cityidStr = redisService.get(CustomDefind.getValue("REDISKEY4CITY")+comid);
-            logger.info("===>>>>>>cityidstr:"+cityidStr);
-            if(cityidStr!=null){
-                cityid=Long.parseLong(cityidStr);
-            }else{
-                Long groupid = orderMapper.getGroupIdByComId(Long.parseLong(comid+""));
-                if(groupid!=null&&groupid>-1){
-                    cityid = orderMapper.getCityIdByGroupId(groupid);
-                }else {
-                    cityid = orderMapper.getCityIdByComId(Long.parseLong(comid+""));
-                }
-            }
-        }catch (Exception e){
-            Long groupid = orderMapper.getGroupIdByComId(Long.parseLong(comid+""));
-            if(groupid!=null&&groupid>-1){
-                cityid = orderMapper.getCityIdByGroupId(groupid);
-            }else {
-                cityid = orderMapper.getCityIdByComId(Long.parseLong(comid+""));
-            }
+        ComInfoTb comInfoTb = commonService.getComInfoByComid(Long.parseLong(comid+""));
+        if(comInfoTb!=null){
+            cityid = comInfoTb.getCityid();
         }
+
+//        try {
+//
+//            String cityidStr = redisService.get(CustomDefind.getValue("REDISKEY4CITY")+comid);
+//            logger.info("===>>>>>>cityidstr:"+cityidStr);
+//            if(cityidStr!=null){
+//                cityid=Long.parseLong(cityidStr);
+//            }else{
+//                Long groupid = orderMapper.getGroupIdByComId(Long.parseLong(comid+""));
+//                if(groupid!=null&&groupid>-1){
+//                    cityid = orderMapper.getCityIdByGroupId(groupid);
+//                }else {
+//                    cityid = orderMapper.getCityIdByComId(Long.parseLong(comid+""));
+//                }
+//            }
+//        }catch (Exception e){
+//            Long groupid = orderMapper.getGroupIdByComId(Long.parseLong(comid+""));
+//            if(groupid!=null&&groupid>-1){
+//                cityid = orderMapper.getCityIdByGroupId(groupid);
+//            }else {
+//                cityid = orderMapper.getCityIdByComId(Long.parseLong(comid+""));
+//            }
+//        }
         String tableName = "order_tb_new";
         if(cityid!=null&&cityid>-1){
             tableName = tableName+"_"+cityid%100;
@@ -257,7 +266,8 @@ public class GetParkInfoServiceImpl implements GetParkInfoService {
         calendar.set(Calendar.SECOND, 0);
         long tday = calendar.getTimeInMillis() / 1000;
         //获取车场空车位
-        int parkEmpty = parkInfoMapper.getParkEmpty(comid);
+//        int parkEmpty = parkInfoMapper.getParkEmpty(comid);
+        int parkEmpty = commonService.getParkEmpty(comid);
         //获取车场今天新建月卡会员  (现在是车场全部)
         int monthTotal = parkInfoMapper.getMonthTotal(comid,tday);
         //获取今天的优惠券下发数量
@@ -477,7 +487,7 @@ public class GetParkInfoServiceImpl implements GetParkInfoService {
                     logger.info("===>>>>cacheKey:"+cacheKey);
                     Long beattime = null;
                     if(redisService.get(cacheKey)!=null){
-                        beattime = Long.parseLong(redisService.get(cacheKey));
+                        beattime = Long.parseLong(redisService.get(cacheKey)+"");
                     }
                     logger.info("===>>>>>beatTime:"+beattime);
                     boolean isonline = false;
@@ -523,7 +533,7 @@ public class GetParkInfoServiceImpl implements GetParkInfoService {
             logger.info("===>>>>cacheKey:"+cacheKey);
             Long beattime = null;
             if(redisService.get(cacheKey)!=null){
-                beattime = Long.parseLong(redisService.get(cacheKey));
+                beattime = Long.parseLong(redisService.get(cacheKey)+"");
             }
 
             logger.info("===>>>>>beatTime:"+beattime);
