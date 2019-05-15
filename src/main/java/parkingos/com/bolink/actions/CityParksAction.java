@@ -68,21 +68,27 @@ public class CityParksAction {
         String nickname = StringUtils.decodeUTF8(RequestUtil.getString(request,"nickname1"));
         Long uin = RequestUtil.getLong(request, "loginuin", -1L);
 
-        Long id = Long.parseLong(request.getParameter("id"));
+//        Long id = Long.parseLong(request.getParameter("id"));
+//        ComInfoTb comInfoTb = new ComInfoTb();
+//        comInfoTb.setId(id);
+//        comInfoTb.setState(1);
+//        JSONObject result = null;
+//        if(id!=null){
+//            result = cityParkService.deletepark(comInfoTb);
+//        }
+        String unionId = RequestUtil.getString(request,"union_id");
+        String parkId = RequestUtil.getString(request,"bolink_id");
         ComInfoTb comInfoTb = new ComInfoTb();
-        comInfoTb.setId(id);
-        comInfoTb.setState(1);
-        JSONObject result = null;
-        if(id!=null){
-            result = cityParkService.deletepark(comInfoTb);
-        }
+        comInfoTb.setBolinkId(parkId);
+        comInfoTb.setUnionId(unionId);
+        JSONObject result =cityParkService.deletepark(comInfoTb);
 
         if((Integer)result.get("state")==1&&groupid>0){
             ParkLogTb parkLogTb = new ParkLogTb();
             parkLogTb.setOperateUser(nickname);
             parkLogTb.setOperateTime(System.currentTimeMillis()/1000);
             parkLogTb.setOperateType(3);
-            parkLogTb.setContent(uin+"("+nickname+")"+"删除了车场"+id);
+            parkLogTb.setContent(uin+"("+nickname+")"+"删除了车场"+parkId);
             parkLogTb.setType("parkinfo");
             parkLogTb.setGroupId(groupid);
             saveLogService.saveLog(parkLogTb);

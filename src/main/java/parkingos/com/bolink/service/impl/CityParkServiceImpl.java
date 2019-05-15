@@ -57,7 +57,7 @@ public class CityParkServiceImpl implements CityParkService {
 //        comInfoTb.setState(0);
 
         String groupidStart = reqmap.get("groupid_start");
-        if(!Check.isEmpty(groupidStart)){
+        if (!Check.isEmpty(groupidStart)) {
             comInfoTb.setGroupid(Long.parseLong(groupidStart));
         }
         String groupid = reqmap.get("groupid");
@@ -91,14 +91,6 @@ public class CityParkServiceImpl implements CityParkService {
             searchBean.setFieldName("id");
             searchBean.setBasicValue(parks);
 
-//            SearchBean searchBean1 = new SearchBean();
-//            searchBean1.setOperator(FieldOperator.CONTAINS);
-//            searchBean1.setFieldName("state");
-//            ArrayList stateList = new ArrayList<Integer>();
-//            stateList.add(0);
-//            stateList.add(2);
-//            searchBean1.setBasicValue(stateList);
-
             if (supperQuery == null) {
                 supperQuery = new ArrayList<SearchBean>();
             }
@@ -118,11 +110,11 @@ public class CityParkServiceImpl implements CityParkService {
                         map.put("empty", empty);
 
                         List<HashMap<String, Object>> tokenList = getParkStatusbc(parkid);
-                        if(tokenList!=null&&tokenList.size()>0&&tokenList.get(0).get("beat_time")!=null){
-                            map.put("beat_time",tokenList.get(0).get("beat_time"));
+                        if (tokenList != null && tokenList.size() > 0 && tokenList.get(0).get("beat_time") != null) {
+                            map.put("beat_time", tokenList.get(0).get("beat_time"));
                         }
 
-                            resList.add(map);
+                        resList.add(map);
                     }
                     result.put("rows", JSON.toJSON(resList));
                 }
@@ -165,8 +157,8 @@ public class CityParkServiceImpl implements CityParkService {
         if (groupId == -1) {
             groupId = RequestUtil.getLong(request, "group_id", -1L);
         }
-        logger.info("注册车场cityId+groupid"+cityid+"~~"+groupId);
-        String nickname = StringUtils.decodeUTF8(RequestUtil.getString(request,"nickname1"));
+        logger.info("注册车场cityId+groupid" + cityid + "~~" + groupId);
+        String nickname = StringUtils.decodeUTF8(RequestUtil.getString(request, "nickname1"));
         Long uin = RequestUtil.getLong(request, "loginuin", -1L);
 
         String company = RequestUtil.processParams(request, "company_name");
@@ -180,39 +172,15 @@ public class CityParkServiceImpl implements CityParkService {
         }
         Integer parking_total = RequestUtil.getInteger(request, "parking_total", 0);
         Integer state = RequestUtil.getInteger(request, "state", 0);
-        Integer city = RequestUtil.getInteger(request, "city", 0);
         Double longitude = RequestUtil.getDouble(request, "longitude", 0d);
         Double latitude = RequestUtil.getDouble(request, "latitude", 0d);
-
-
-//        if (longitude == 0 || latitude == 0) {
-//            result.put("msg", "请标注地理位置");
-//            return result;
-//        }
-
-        //判断地图位置是否冲突
-//        ComInfoTb newCominfoTb = new ComInfoTb();
-//
-////        logger.info("park zuobiao:"+longitude+"~~"+new BigDecimal(longitude).setScale(6, BigDecimal.ROUND_HALF_UP));
-//        newCominfoTb.setLongitude(new BigDecimal(longitude).setScale(6, BigDecimal.ROUND_HALF_UP));
-//        newCominfoTb.setLatitude(new BigDecimal(latitude).setScale(6, BigDecimal.ROUND_HALF_UP));
-//        int count = commonDao.selectCountByConditions(newCominfoTb);
-//        if (count > 0) {
-//            result.put("msg", "地理位置冲突，请重新标注!");
-//            return result;
-//        }
 
 
         ComInfoTb comInfoTb = new ComInfoTb();
         comInfoTb.setState(state);
         comInfoTb.setCompanyName(company);
-        comInfoTb.setLatitude(new BigDecimal(latitude));
-        comInfoTb.setLongitude(new BigDecimal(longitude));
-        comInfoTb.setAddress(address);
-        comInfoTb.setCity(city);
         comInfoTb.setMobile(mobile);
         comInfoTb.setParkingTotal(parking_total);
-        comInfoTb.setBolinkId(bolinkid);
 
 
         List<Map<String, Object>> unionInfoList = commonDao.getObjectBySql("select oc.union_id, oc.ukey union_key, og.operatorid operator_id,oc.id from org_city_merchants oc " +
@@ -227,8 +195,8 @@ public class CityParkServiceImpl implements CityParkService {
             }
             union_key = unionInfoList.get(0).get("union_key") + "";
             union_id = unionInfoList.get(0).get("union_id") + "";
-            if(cityid<0){
-                cityid = Long.parseLong(unionInfoList.get(0).get("id")+"");
+            if (cityid < 0) {
+                cityid = Long.parseLong(unionInfoList.get(0).get("id") + "");
             }
         } else {
             //查询没有集团编号的 车场
@@ -238,20 +206,24 @@ public class CityParkServiceImpl implements CityParkService {
             union_id = unionInfoList.get(0).get("union_id") + "";
         }
 
-        logger.info("===>>>>>unionId:"+union_id+"~~~~cityid:"+cityid);
+        logger.info("===>>>>>unionId:" + union_id + "~~~~cityid:" + cityid);
         if (id == -1) {
 
             if (!Check.isEmpty(bolinkid)) {
                 ComInfoTb infoTb = new ComInfoTb();
                 infoTb.setBolinkId(bolinkid);
-                infoTb.setState(0);
+//                infoTb.setState(0);
                 infoTb.setUnionId(union_id);
                 int infoCount = commonDao.selectCountByConditions(infoTb);
                 if (infoCount > 0) {
-                    result.put("msg", "创建失败,泊链车场编号重复");
+                    result.put("msg", "创建失败,互联车场编号重复");
                     return result;
                 }
             }
+
+            comInfoTb.setLatitude(new BigDecimal(latitude));
+            comInfoTb.setLongitude(new BigDecimal(longitude));
+            comInfoTb.setBolinkId(bolinkid);
 
             //获取id
             Long comid = commonDao.selectSequence(ComInfoTb.class);
@@ -268,17 +240,13 @@ public class CityParkServiceImpl implements CityParkService {
             //判断车场是否要上传到泊链,如果没有写bolinkid,那么上传
             if (bolinkid == null || "".equals(bolinkid)) {
 
-                comInfoTb.setBolinkId(comid+"");
+                comInfoTb.setBolinkId(comid + "");
                 //查询他的厂商编号以及服务商编号 (查询有集团编号的)
 //                List<Map<String, Object>> unionInfoList = commonDao.getObjectBySql("select oc.union_id, oc.ukey union_key, og.operatorid operator_id from org_city_merchants oc " +
 //                        "left outer join org_group_tb og on oc.id = og.cityid " +
 //                        "left outer join com_info_tb co on co.groupid = og.id " +
 //                        "where co.id = " + comid);
-                int uploadCount = 0;
-                int unUploadCount = 0;
-                //String url = "https://127.0.0.1/api-web/park/addpark";
                 String url = CustomDefind.UNIONIP + "park/addpark";
-                //String url = "https://s.bolink.club/unionapi/park/addpark";
                 Map<String, Object> paramMap = new HashMap<String, Object>();
                 paramMap.put("park_id", comid);
                 paramMap.put("name", company);
@@ -297,7 +265,7 @@ public class CityParkServiceImpl implements CityParkService {
                 paramMap.put("is_cloud_park", 1);
                 String ret = "";
                 try {
-                    logger.error(url+paramMap);
+                    logger.error(url + paramMap);
                     String linkParams = StringUtils.createLinkString(paramMap) + "key=" + union_key;
                     System.out.println(linkParams);
                     String sign = StringUtils.MD5(linkParams).toUpperCase();
@@ -307,30 +275,42 @@ public class CityParkServiceImpl implements CityParkService {
                     String param = StringUtils.createJson(paramMap);
                     logger.error(param);
                     HttpProxy httpProxy = new HttpProxy();
-                    ret = httpProxy.doHeadPost(url,param);
+                    ret = httpProxy.doHeadPost(url, param);
 //                    ret = HttpsProxy.doPost(url, param, "utf-8", 20000, 20000);
                     logger.error(ret);
                     JSONObject object = JSONObject.parseObject(ret);
                     if (object != null) {
                         Integer uploadState = Integer.parseInt(object.get("state") + "");
-                        logger.info("上传车场："+uploadState+"");
+                        logger.info("上传车场：" + uploadState + "");
                         if (uploadState == 1) {
-//                            ComInfoTb comInfoTb1 = new ComInfoTb();
-//                            comInfoTb1.setUploadUnionTime(System.currentTimeMillis() / 1000L);
-//                            comInfoTb1.setUnionState(2);
-//                            comInfoTb1.setId(comid);
-//                            uploadCount = commonDao.updateByPrimaryKey(comInfoTb1);
                             int insert = commonDao.insert(comInfoTb);
                             logger.error("上传车场个数:1,云平台新建车场:" + insert);
                             result.put("state", 1);
-                            result.put("msg", "新建车场成功,上传到泊链成功");
+                            result.put("msg", "新建车场成功!");
 
-                            if(groupId>0){
+
+                            UserInfoTb user= new UserInfoTb();
+                            Long userId = commonDao.selectSequence(UserInfoTb.class);
+                            user.setId(userId);
+                            user.setNickname(company+"管理员");
+                            user.setPassword(userId+"");
+                            user.setStrid(userId+"");
+                            user.setRegTime(System.currentTimeMillis()/1000);
+                            user.setRoleId(30L);
+                            user.setAuthFlag(1L);
+                            user.setUserId(userId+"");
+                            user.setComid(comid);
+                            user.setMobile(mobile);
+                            user.setPhone(mobile);
+                            commonDao.insert(user);
+                            logger.info("==>>>>新建员工success:");
+
+                            if (groupId > 0) {
                                 ParkLogTb parkLogTb = new ParkLogTb();
                                 parkLogTb.setOperateUser(nickname);
-                                parkLogTb.setOperateTime(System.currentTimeMillis()/1000);
+                                parkLogTb.setOperateTime(System.currentTimeMillis() / 1000);
                                 parkLogTb.setOperateType(1);
-                                parkLogTb.setContent(uin+"("+nickname+")"+"新建了车场"+comid+company);
+                                parkLogTb.setContent(uin + "(" + nickname + ")" + "新建了车场" + comid + company);
                                 parkLogTb.setType("parkinfo");
                                 parkLogTb.setGroupId(groupId);
                                 saveLogService.saveLog(parkLogTb);
@@ -340,41 +320,41 @@ public class CityParkServiceImpl implements CityParkService {
                             return result;
                         } else {
                             result.put("state", 0);
-                            logger.error(object.get("errmsg")+"");
+                            logger.error(object.get("errmsg") + "");
                             String errmsg = object.get("errmsg") + "";
                             if (errmsg.contains("运营商编号")) {
-                                result.put("msg", "新建车场失败,泊链运营集团编号错误");
+                                result.put("msg", "新建车场失败,互联运营集团编号错误");
                                 return result;
                             }
-                            result.put("msg", "新建车场失败,上传到泊链失败");
+                            result.put("msg", "新建车场失败,上传到互联失败");
                         }
                     }
                 } catch (Exception e) {
-                    logger.error("新建车场失败===",e);
+                    logger.error("新建车场失败===", e);
                 }
-            }else {//如果填写了泊链车场编号,证明泊链那边有车场,去验证所填泊链编号是否正确
+            } else {//如果填写了泊链车场编号,证明泊链那边有车场,去验证所填泊链编号是否正确
                 String url = CustomDefind.UNIONIP + "park/checkparkid";
                 Map<String, Object> paramMap = new HashMap<String, Object>();
                 paramMap.put("park_id", bolinkid);
-                paramMap.put("union_id",union_id);
+                paramMap.put("union_id", union_id);
                 String param = StringUtils.createJson(paramMap);
-                try{
+                try {
 //                    String ret = HttpsProxy.doPost(url, param, "utf-8", 20000, 20000);
                     HttpProxy httpProxy = new HttpProxy();
-                    String ret = httpProxy.doHeadPost(url,param);
+                    String ret = httpProxy.doHeadPost(url, param);
                     JSONObject object = JSONObject.parseObject(ret);
                     Integer checkstate = Integer.parseInt(object.get("state") + "");
-                    if(checkstate==1){//泊链车场编号正确
+                    if (checkstate == 1) {//泊链车场编号正确
                         int insert = commonDao.insert(comInfoTb);
                         logger.error("填写了泊链编号进行校验新建车场:" + insert);
-                        if(insert==1) {
+                        if (insert == 1) {
                             JSONObject jsonObject = new JSONObject();
                             jsonObject.put("park_id", bolinkid);
-                            jsonObject.put("union_id",union_id);
+                            jsonObject.put("union_id", union_id);
                             url = CustomDefind.UNIONIP + "newpark/updatepark";
-                            try{
-                                jsonObject.put("is_cloud_park",1);
-                                jsonObject.put("type",3);
+                            try {
+                                jsonObject.put("is_cloud_park", 1);
+                                jsonObject.put("type", 3);
                                 jsonObject.put("rand", Math.random());
 
 
@@ -383,29 +363,25 @@ public class CityParkServiceImpl implements CityParkService {
                                 String _sign = StringUtils.MD5(_signStr).toUpperCase();
                                 System.out.println(_sign);
                                 JSONObject json = new JSONObject();
-                                json.put("data",jsonObject.toJSONString());
-                                json.put("sign",_sign);
+                                json.put("data", jsonObject.toJSONString());
+                                json.put("sign", _sign);
 
                                 httpProxy = new HttpProxy();
-                                ret = httpProxy.doHeadPost(url,json.toJSONString());
-                                logger.info("=======>>>>"+ret);
-//                                ret = HttpsProxy.doPost(url, param, "utf-8", 20000, 20000);
-
-//                                int updateState = Integer.parseInt(object.get("state") + "");
-//                                logger.info("====>>>>>update bolink park state:"+updateState);
-                            }catch (Exception e){
-                                logger.error("update bolink park state error",e);
+                                ret = httpProxy.doHeadPost(url, json.toJSONString());
+                                logger.info("=======>>>>" + ret);
+                            } catch (Exception e) {
+                                logger.error("update bolink park state error", e);
                             }
                             result.put("state", insert);
                             result.put("msg", "新建车场成功");
                             return result;
                         }
-                    }else{
+                    } else {
                         result.put("state", 0);
-                        result.put("msg","新建车场失败,泊链车场编号错误");
+                        result.put("msg", "新建车场失败,互联车场编号错误");
                         return result;
                     }
-                }catch (Exception e){
+                } catch (Exception e) {
                     logger.error("去泊链查询operatorid是否存在出现异常");
                 }
 
@@ -413,24 +389,31 @@ public class CityParkServiceImpl implements CityParkService {
 //            }
         } else {
 
-            commonService.deleteCachPark(id,union_id,bolinkid);
+            //只是证明是在更新 但是id  不是云平台的主键id
+            commonService.deleteCachPark(union_id, bolinkid);
 
-            comInfoTb.setId(id);
             comInfoTb.setUpdateTime(System.currentTimeMillis() / 1000);
-            int update = commonDao.updateByPrimaryKey(comInfoTb);
+
+            ComInfoTb con = new ComInfoTb();
+            con.setUnionId(union_id);
+            con.setBolinkId(bolinkid);
+            int update = commonDao.updateByConditions(comInfoTb, con);
+
+//            int update = commonDao.updateByPrimaryKey(comInfoTb);
             if (update == 1) {
                 result.put("state", 1);
                 result.put("msg", "修改车场成功");
 
                 JSONObject jsonObject = new JSONObject();
                 jsonObject.put("park_id", bolinkid);
-                jsonObject.put("union_id",union_id);
+                jsonObject.put("union_id", union_id);
                 String url = CustomDefind.UNIONIP + "newpark/updatepark";
-                try{
-                    jsonObject.put("is_cloud_park",1);
-                    jsonObject.put("type",3);
-                    jsonObject.put("name",company);
-                    jsonObject.put("total_plot",parking_total);
+                try {
+                    jsonObject.put("is_cloud_park", 1);
+                    jsonObject.put("type", 3);
+                    jsonObject.put("name", company);
+                    jsonObject.put("phone",mobile );
+                    jsonObject.put("total_plot", parking_total);
                     jsonObject.put("rand", Math.random());
 
 
@@ -439,23 +422,22 @@ public class CityParkServiceImpl implements CityParkService {
                     String _sign = StringUtils.MD5(_signStr).toUpperCase();
                     logger.info(_sign);
                     JSONObject json = new JSONObject();
-                    json.put("data",jsonObject.toJSONString());
-                    json.put("sign",_sign);
+                    json.put("data", jsonObject.toJSONString());
+                    json.put("sign", _sign);
 
                     HttpProxy httpProxy = new HttpProxy();
-                    String ret = httpProxy.doHeadPost(url,json.toJSONString());
-                    logger.info("=======>>>>"+ret);
-                }catch (Exception e){
-                    logger.error("update bolink park state error",e);
+                    String ret = httpProxy.doHeadPost(url, json.toJSONString());
+                    logger.info("=======>>>>" + ret);
+                } catch (Exception e) {
+                    logger.error("update bolink park state error", e);
                 }
 
-
-                if(groupId>0){
+                if (groupId > 0) {
                     ParkLogTb parkLogTb = new ParkLogTb();
                     parkLogTb.setOperateUser(nickname);
-                    parkLogTb.setOperateTime(System.currentTimeMillis()/1000);
+                    parkLogTb.setOperateTime(System.currentTimeMillis() / 1000);
                     parkLogTb.setOperateType(2);
-                    parkLogTb.setContent(uin+"("+nickname+")"+"修改了车场"+id);
+                    parkLogTb.setContent(uin + "(" + nickname + ")" + "修改了车场" + id);
                     parkLogTb.setType("parkinfo");
                     parkLogTb.setGroupId(groupId);
                     saveLogService.saveLog(parkLogTb);
@@ -512,71 +494,59 @@ public class CityParkServiceImpl implements CityParkService {
     public JSONObject deletepark(ComInfoTb comInfoTb) {
         JSONObject result = new JSONObject();
         result.put("state", 0);
-        result.put("msg", "删除失败");
+        result.put("msg", "禁用失败");
 
-        int count = commonDao.updateByPrimaryKey(comInfoTb);
-        if (count == 1) {
+        String unionId = comInfoTb.getUnionId();
+        String parkId = comInfoTb.getBolinkId();
 
-            Long id = comInfoTb.getId();
-            comInfoTb=(ComInfoTb)commonDao.selectObjectByConditions(comInfoTb);
-            Long union_id = -1L;
-            Long cityId = -1L;
-            if(comInfoTb.getCityid()!=null&&comInfoTb.getCityid()>0){
-                cityId = comInfoTb.getCityid();
-            }else{
-                Long groupId = comInfoTb.getGroupid();
-                OrgGroupTb orgGroupTb = new OrgGroupTb();
-                orgGroupTb.setId(groupId);
-                orgGroupTb.setState(0);
-                orgGroupTb=(OrgGroupTb)commonDao.selectObjectByConditions(orgGroupTb);
-                if(orgGroupTb!=null){
-                    cityId = orgGroupTb.getCityid();
+        ComInfoTb comInfoTb1 = commonService.getComInfoByUnionIdAndParkId(unionId, parkId);
+        Long cityId = comInfoTb1.getCityid();
+
+        OrgCityMerchants city = new OrgCityMerchants();
+        city.setId(cityId);
+        city.setState(0);
+        city = (OrgCityMerchants) commonDao.selectObjectByConditions(city);
+        if (city != null && city.getUnionId() != null) {
+
+            JSONObject paramMap = new JSONObject();
+            paramMap.put("park_id", comInfoTb.getBolinkId());
+            paramMap.put("union_id", city.getUnionId());
+//                    paramMap.put("is_cloud_park", 0);
+            //type 2 禁用   type 3  更改is_cloud_park 参数
+            paramMap.put("type", 2);
+            paramMap.put("rand", Math.random());
+            String url = CustomDefind.UNIONIP + "newpark/updatepark";
+            try {
+                String ukey = city.getUkey();
+                String _signStr = paramMap.toJSONString() + "key=" + ukey;
+                System.out.println(_signStr);
+                String _sign = StringUtils.MD5(_signStr).toUpperCase();
+                System.out.println(_sign);
+                JSONObject json = new JSONObject();
+                json.put("data", paramMap.toJSONString());
+                json.put("sign", _sign);
+
+                HttpProxy httpProxy = new HttpProxy();
+
+                String ret = httpProxy.doHeadPost(url, json.toJSONString());
+                logger.info("====>>>>>>>>>>>>>>>" + ret);
+                if(!Check.isEmpty(ret)){
+                     JSONObject jsonRes = JSON.parseObject(ret);
+                     if(jsonRes.containsKey("state")&&jsonRes.getInteger("state")==1){
+                         ComInfoTb update = new ComInfoTb();
+                         update.setState(2);
+                         int upCount = commonDao.updateByConditions(update,comInfoTb);
+                         if(upCount>0){
+                             result.put("state", 1);
+                             result.put("msg", "禁用成功");
+                         }
+                     }
                 }
+            } catch (Exception e) {
+                logger.error("update bolink park state error", e);
             }
-            if(cityId!=null&&cityId>0) {
-                OrgCityMerchants city = new OrgCityMerchants();
-                city.setId(cityId);
-                city.setState(0);
-                city = (OrgCityMerchants)commonDao.selectObjectByConditions(city);
-                if(city!=null&&city.getUnionId()!=null) {
-
-                    JSONObject paramMap = new JSONObject();
-                    paramMap.put("park_id", comInfoTb.getBolinkId());
-                    paramMap.put("union_id", city.getUnionId());
-                    paramMap.put("is_cloud_park", 0);
-                    paramMap.put("type",3);
-                    paramMap.put("rand", Math.random());
-//                    String param = StringUtils.createJson(paramMap);
-                    String url = CustomDefind.UNIONIP + "newpark/updatepark";
-                    try {
-                        String ukey = city.getUkey();
-                        String _signStr = paramMap.toJSONString() + "key=" + ukey;
-                        System.out.println(_signStr);
-                        String _sign = StringUtils.MD5(_signStr).toUpperCase();
-                        System.out.println(_sign);
-                        JSONObject json = new JSONObject();
-                        json.put("data",paramMap.toJSONString());
-                        json.put("sign",_sign);
-
-                        HttpProxy httpProxy = new HttpProxy();
-
-                        String ret = httpProxy.doHeadPost(url,json.toJSONString());
-//                        String ret = HttpsProxy.doPost(url, param, "utf-8", 20000, 20000);
-//                        HttpProxy httpProxy = new HttpProxy();
-//                        String ret = httpProxy.doHeadPost(url,param);
-//                        JSONObject object = JSONObject.parseObject(ret);
-                        logger.info("====>>>>>>>>>>>>>>>"+ret);
-//                        int updateState = Integer.parseInt(object.get("state") + "");
-//                        logger.info("====>>>>>update bolink park state:" + updateState);
-                    } catch (Exception e) {
-                        logger.error("update bolink park state error", e);
-                    }
-                }
-            }
-
-            result.put("state", 1);
-            result.put("msg", "删除成功");
         }
+
         return result;
     }
 
@@ -601,20 +571,20 @@ public class CityParkServiceImpl implements CityParkService {
     @Override
     public JSONObject resetParkData(Long comid, Long loginuin, String password) {
         JSONObject result = new JSONObject();
-        result.put("state",0);
-        result.put("msg","重置失败");
+        result.put("state", 0);
+        result.put("msg", "重置失败");
 
         //根据登录厂商的账号查询密码 进行匹配
         UserInfoTb userInfoTb = new UserInfoTb();
         userInfoTb.setId(loginuin);
-        userInfoTb = (UserInfoTb)commonDao.selectObjectByConditions(userInfoTb);
-        if(userInfoTb!=null&&userInfoTb.getPassword()!=null){
-            if (!password.equals(userInfoTb.getPassword())){
-                result.put("msg","密码错误");
+        userInfoTb = (UserInfoTb) commonDao.selectObjectByConditions(userInfoTb);
+        if (userInfoTb != null && userInfoTb.getPassword() != null) {
+            if (!password.equals(userInfoTb.getPassword())) {
+                result.put("msg", "密码错误");
                 return result;
             }
-        }else{
-            result.put("msg","用户不存在");
+        } else {
+            result.put("msg", "用户不存在");
             return result;
         }
 
@@ -624,7 +594,7 @@ public class CityParkServiceImpl implements CityParkService {
 //            orderTb.setComid(comid);
 //            orderTb.setIshd(0);
             PageOrderConfig pageOrderConfig = new PageOrderConfig();
-            pageOrderConfig.setPageInfo(null,null);
+            pageOrderConfig.setPageInfo(null, null);
 //            List<OrderTb> orderTbList = commonDao.selectListByConditions(orderTb,pageOrderConfig);
 //            if(orderTbList!=null&&orderTbList.size()>0){
 //                for(OrderTb order:orderTbList){
@@ -635,24 +605,24 @@ public class CityParkServiceImpl implements CityParkService {
 
             orderService.resetDataByComid(comid);
 
-            logger.error(comid+"重置订单完成,开始重置抬杆数据");
+            logger.error(comid + "重置订单完成,开始重置抬杆数据");
             LiftRodTb liftRodTb = new LiftRodTb();
             liftRodTb.setComid(comid);
             liftRodTb.setIsDelete(0);
-            List<LiftRodTb> liftRodTbList = commonDao.selectListByConditions(liftRodTb,pageOrderConfig);
-            if(liftRodTbList!=null&&liftRodTbList.size()>0){
-                for(LiftRodTb liftRod:liftRodTbList){
+            List<LiftRodTb> liftRodTbList = commonDao.selectListByConditions(liftRodTb, pageOrderConfig);
+            if (liftRodTbList != null && liftRodTbList.size() > 0) {
+                for (LiftRodTb liftRod : liftRodTbList) {
                     liftRod.setIsDelete(1);
                     commonDao.updateByPrimaryKey(liftRod);
                 }
             }
-            logger.error(comid+"重置抬杆数据完成");
-        }catch (Exception e){
-            result.put("msg","重置失败，重置过程出现异常");
+            logger.error(comid + "重置抬杆数据完成");
+        } catch (Exception e) {
+            result.put("msg", "重置失败，重置过程出现异常");
             return result;
         }
-        result.put("state",1);
-        result.put("msg","重置数据成功！");
+        result.put("state", 1);
+        result.put("msg", "重置数据成功！");
         return result;
     }
 
@@ -721,28 +691,28 @@ public class CityParkServiceImpl implements CityParkService {
         List<HashMap<String, Object>> parkState = new ArrayList<HashMap<String, Object>>();
         List<HashMap<String, Object>> parkLoginList = parkInfoMapper.getParkLogin(parkid + "");
         if (parkLoginList != null && parkLoginList.size() > 0) {
-            for (HashMap<String, Object> loginmap : parkLoginList){
+            for (HashMap<String, Object> loginmap : parkLoginList) {
                 HashMap<String, Object> parkstatusmap = new HashMap<String, Object>();
                 Long logintime = (Long) loginmap.get("logintime");
                 String localid = (String) loginmap.get("localid");
-                String sourceIp=(String)loginmap.get("sourceIp");
-                logger.info("==>>>>localId:"+localid+"~~"+sourceIp+"~~"+parkid);
-                String cacheKey = "parkingos_dobeat_"+parkid+"_"+localid+sourceIp;
-                if(cacheKey.length() >200){
-                    cacheKey = "parkingos_dobeat_"+StringUtils.MD5(parkid+"_"+localid+sourceIp);
+                String sourceIp = (String) loginmap.get("sourceIp");
+                logger.info("==>>>>localId:" + localid + "~~" + sourceIp + "~~" + parkid);
+                String cacheKey = "parkingos_dobeat_" + parkid + "_" + localid + sourceIp;
+                if (cacheKey.length() > 200) {
+                    cacheKey = "parkingos_dobeat_" + StringUtils.MD5(parkid + "_" + localid + sourceIp);
                 }
-                logger.info("===>>>>cacheKey:"+cacheKey);
+                logger.info("===>>>>cacheKey:" + cacheKey);
                 Long beattime = null;
-                if(redisService.get(cacheKey)!=null){
-                    beattime = Long.parseLong(redisService.get(cacheKey)+"");
+                if (redisService.get(cacheKey) != null) {
+                    beattime = Long.parseLong(redisService.get(cacheKey) + "");
                 }
-                logger.info("===>>>>>beatTime:"+beattime);
-                if(localid == null)localid="";
+                logger.info("===>>>>>beatTime:" + beattime);
+                if (localid == null) localid = "";
 
-                if(beattime!=null){
-                    parkstatusmap.put("beat_time",beattime);
-                }else{
-                    parkstatusmap.put("beat_time",logintime);
+                if (beattime != null) {
+                    parkstatusmap.put("beat_time", beattime);
+                } else {
+                    parkstatusmap.put("beat_time", logintime);
                 }
                 parkState.add(parkstatusmap);
             }
@@ -753,16 +723,17 @@ public class CityParkServiceImpl implements CityParkService {
 
     /**
      * 判断车场是否在线
+     *
      * @param time
      * @param delayTime
      * @return
      * @time 2017年 下午12:03:41
      * @author QuanHao
      */
-    private boolean isParkOnline(long time,int delayTime){
-        long curTime = System.currentTimeMillis()/1000;
-        long margin = curTime-time;
-        if(margin-delayTime<=0){
+    private boolean isParkOnline(long time, int delayTime) {
+        long curTime = System.currentTimeMillis() / 1000;
+        long margin = curTime - time;
+        if (margin - delayTime <= 0) {
             return true;
         }
         return false;

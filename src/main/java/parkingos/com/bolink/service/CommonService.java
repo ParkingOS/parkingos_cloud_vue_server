@@ -2,6 +2,7 @@ package parkingos.com.bolink.service;
 
 
 import parkingos.com.bolink.models.ComInfoTb;
+import parkingos.com.bolink.models.OrgCityMerchants;
 
 public interface CommonService {
 
@@ -32,7 +33,9 @@ public interface CommonService {
 
     ComInfoTb getComInfoByComid(Long comid);
 
-    void deleteCachPark(Long id,String unionId, String bolinkid);
+    void deleteCachPark(String unionId, String bolinkid);
 
     int getParkEmpty(int comid);
+
+    OrgCityMerchants getCityByUnionId(String unionId);
 }

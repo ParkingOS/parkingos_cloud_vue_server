@@ -1,5 +1,6 @@
 package parkingos.com.bolink.service.impl;
 
+import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -79,6 +80,11 @@ public class LoginServiceImpl implements LoginService {
         }
 
         if (roleId != null && roleId > -1) {
+
+            String url = CustomDefind.getValue("UNIONWEB")+"parkingos/gettoken";
+            Map<String, Object> params = new HashMap<String, Object>();
+            HttpProxy httpProxy = new HttpProxy();
+
             user.put("roleid", roleId);
             Long shopId = -1L;
             ShopTb shopTb = new ShopTb();
@@ -90,10 +96,13 @@ public class LoginServiceImpl implements LoginService {
                 result.put("msg", "组织类型不存在！");
                 return result;
             } else {
+
                 user.put("oid", userRoleTb.getOid());
                 String orgname = zldOrgtypeTb.getName();
                 user.put("orgname",orgname);
+
                 if (orgname.contains("车场")) {
+
                     ComInfoTb comInfoTb = new ComInfoTb();
                     comInfoTb.setId(userInfoTb.getComid());
                     comInfoTb.setState(0);
@@ -106,6 +115,28 @@ public class LoginServiceImpl implements LoginService {
                     } else {
                         comInfoTb = (ComInfoTb)commonDao.selectObjectByConditions(comInfoTb);
                         if(comInfoTb!=null){
+                            String bolinkId = comInfoTb.getBolinkId();
+                            String unionId = comInfoTb.getUnionId();
+
+//                            es.execute(new Runnable() {
+//                                @Override
+//                                public void run() {
+
+                                    params.put("park_id", bolinkId);
+                                    params.put("union_id", unionId);
+                                    params.put("role_id", 4);
+                                    String tokenResult = httpProxy.doPostTwo(url, params);
+                                    logger.info("===get token from bolink:"+tokenResult);
+                                    JSONObject jsonResult = JSON.parseObject(tokenResult);
+                                    if(jsonResult.get("state")!=null&&jsonResult.getInteger("state")==1){
+                                        user.put("token",jsonResult.get("token"));
+                                    }
+
+//                                }
+//                            });
+
+
+
                             user.put("name",comInfoTb.getCompanyName());
 
                             if(comInfoTb.getGroupid()!=null&&comInfoTb.getGroupid()>-1){
@@ -168,6 +199,8 @@ public class LoginServiceImpl implements LoginService {
                         parkLogTb.setGroupId(userInfoTb.getGroupid());
                         orgGroupTb=(OrgGroupTb) commonDao.selectObjectByConditions(orgGroupTb);
                         if(orgGroupTb!=null){
+
+
                             user.put("name",orgGroupTb.getName());
                             if(!Check.isEmpty(orgGroupTb.getLogo1())){
                                 user.put("logo1",orgGroupTb.getLogo1());
@@ -200,8 +233,26 @@ public class LoginServiceImpl implements LoginService {
                         result.put("msg", "城市不存在！");
                         return result;
                     }else{
+
                         orgCityMerchants = (OrgCityMerchants)commonDao.selectObjectByConditions(orgCityMerchants);
                         if(orgCityMerchants!=null){
+                            String unionId = orgCityMerchants.getUnionId();
+//                            es.execute(new Runnable() {
+//                                @Override
+//                                public void run() {
+                                    params.put("union_id", unionId);
+                                    params.put("role_id", 2);
+                                    String tokenResult = httpProxy.doPostTwo(url, params);
+                                    logger.info("===get token from bolink:"+tokenResult);
+                                    JSONObject jsonResult = JSON.parseObject(tokenResult);
+                                    if(jsonResult.get("state")!=null&&jsonResult.getInteger("state")==1){
+                                        user.put("token",jsonResult.get("token"));
+                                        user.put("union_id",unionId);
+                                    }
+
+//                                }
+//                            });
+
                             user.put("name",orgCityMerchants.getName());
                         }
                     }
@@ -235,6 +286,22 @@ public class LoginServiceImpl implements LoginService {
             user.put("allauth", allAuthList);
 
             if (roleId == 0) {//总管理员拥有所有权限
+
+//                es.execute(new Runnable() {
+//                    @Override
+//                    public void run() {
+                        params.put("role_id", 1);
+                        String tokenResult = httpProxy.doPostTwo(url, params);
+                        logger.info("===get token from bolink:"+tokenResult);
+                        JSONObject jsonResult = JSON.parseObject(tokenResult);
+                        if(jsonResult.get("state")!=null&&jsonResult.getInteger("state")==1){
+                            user.put("token",jsonResult.get("token"));
+                        }
+
+//                    }
+//                });
+
+
                 user.put("name","总后台");
                 String sql = "select actions,id auth_id,nname,pid,url,sort,sub_auth childauths from auth_tb where oid= "+userRoleTb.getOid()+" and state=0 ";
                 authList = commonDao.getObjectBySql(sql);//commonDao.selectListByConditions(authTb);
@@ -283,7 +350,6 @@ public class LoginServiceImpl implements LoginService {
                 }
             }
 
-            user.put("ishdorder", userInfoTb.getOrderHid());
             user.put("authlist", authList);
             user.put("menuauthlist", StringUtils.createJson(authList));
 

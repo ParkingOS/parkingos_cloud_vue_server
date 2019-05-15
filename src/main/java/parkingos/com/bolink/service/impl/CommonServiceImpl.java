@@ -263,7 +263,7 @@ public class CommonServiceImpl implements CommonService {
             comInfoTb = new ComInfoTb();
             comInfoTb.setUnionId(unionId);
             comInfoTb.setBolinkId(comid);
-            comInfoTb.setState(0);
+//            comInfoTb.setState(0);
             comInfoTb = (ComInfoTb) commonDao.selectObjectByConditions(comInfoTb);
             if(comInfoTb!=null){
                 redisService.set(CustomDefind.getValue("COMINFOBYUNIONIDANDBOLINKID")+unionId+comid,comInfoTb);
@@ -295,8 +295,12 @@ public class CommonServiceImpl implements CommonService {
     }
 
     @Override
-    public void deleteCachPark(Long id, String unionId,String bolinkid) {
-        redisService.delete(CustomDefind.getValue("COMINFOBYCOMID")+id);
+    public void deleteCachPark(String unionId,String bolinkid) {
+//        redisService.delete(CustomDefind.getValue("COMINFOBYCOMID")+id);
+        ComInfoTb comInfoTb = getComInfoByUnionIdAndParkId(unionId, bolinkid);
+        if(comInfoTb!=null){
+            redisService.delete(CustomDefind.getValue("COMINFOBYCOMID")+comInfoTb.getId());
+        }
         redisService.delete(CustomDefind.getValue("COMINFOBYUNIONIDANDBOLINKID")+unionId+bolinkid);
     }
 
@@ -308,6 +312,26 @@ public class CommonServiceImpl implements CommonService {
         }
         ComInfoTb comInfoTb= getComInfoByComid(Long.parseLong(comid+""));
         return comInfoTb.getEmpty();
+    }
+
+    @Override
+    public OrgCityMerchants getCityByUnionId(String unionId) {
+
+        OrgCityMerchants orgCityMerchants = null;
+        Object object = redisService.get(CustomDefind.getValue("UNIONID4CITYINFO")+unionId);
+        if(object==null){
+            orgCityMerchants=new OrgCityMerchants();
+            orgCityMerchants.setUnionId(unionId);
+            orgCityMerchants=(OrgCityMerchants)commonDao.selectObjectByConditions(orgCityMerchants);
+            if(orgCityMerchants!=null){
+                redisService.set(CustomDefind.getValue("UNIONID4CITYINFO")+unionId,orgCityMerchants);
+                return orgCityMerchants;
+            }
+        }else{
+            orgCityMerchants=(OrgCityMerchants)object;
+        }
+//        logger.info("==>>>>从缓存中获取cominfo成功:"+comInfoTb);
+        return orgCityMerchants;
     }
 
 

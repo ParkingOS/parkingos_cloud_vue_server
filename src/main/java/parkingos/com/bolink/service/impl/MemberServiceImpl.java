@@ -13,8 +13,10 @@ import parkingos.com.bolink.models.SyncInfoPoolTb;
 import parkingos.com.bolink.models.UserInfoTb;
 import parkingos.com.bolink.qo.PageOrderConfig;
 import parkingos.com.bolink.qo.SearchBean;
+import parkingos.com.bolink.service.CommonService;
 import parkingos.com.bolink.service.MemberService;
 import parkingos.com.bolink.service.SupperSearchService;
+import parkingos.com.bolink.utils.Check;
 import parkingos.com.bolink.utils.CommonUtils;
 import parkingos.com.bolink.utils.OrmUtil;
 import parkingos.com.bolink.utils.StringUtils;
@@ -34,6 +36,8 @@ public class MemberServiceImpl implements MemberService {
     private SupperSearchService<UserInfoTb> supperSearchService;
     @Autowired
     private CommonUtils commonUtils;
+    @Autowired
+    CommonService commonService;
 
     @Override
     public JSONObject selectResultByConditions(Map<String, String> reqmap) {
@@ -41,8 +45,29 @@ public class MemberServiceImpl implements MemberService {
         String str = "{\"total\":12,\"page\":1,\"rows\":[]}";
         JSONObject result = JSONObject.parseObject(str);
 
+
+        Long id = -1L;
+        if(!Check.isEmpty(reqmap.get("comid"))) {
+            id = Long.parseLong(reqmap.get("comid"));
+        }
+
+        String unionId = reqmap.get("union_id");
+        String parkId = reqmap.get("bolink_id");
+        if(!Check.isEmpty(unionId)&&!Check.isEmpty(parkId)){
+            ComInfoTb com = commonService.getComInfoByUnionIdAndParkId(unionId,parkId);
+            if(com==null){
+                return result;
+            }
+            id = com.getId();
+        }
+
+        if(id<0){
+            logger.info("===>>>>:不存在车场");
+            return result;
+        }
+
         UserInfoTb userInfoTb = new UserInfoTb();
-        userInfoTb.setComid(Long.parseLong(reqmap.get("comid")));
+        userInfoTb.setComid(id);
         userInfoTb.setState(0);
 
 
@@ -113,40 +138,17 @@ public class MemberServiceImpl implements MemberService {
 
     @Override
     public String getRoleByConditions(Map<String, String> reqParameterMap) {
-        List list =null;
-        String sql = "";
-//        Long shopid = Long.parseLong(reqParameterMap.get("shopid"));
-//        if(shopid>0){
-//            sql = "select id as value_no,role_name as value_name from user_role_tb where oid =(select id from zld_orgtype_tb WHERE NAME like '商户%' AND state=0) and state =0";
-//        }else{
-            sql = "select id as value_no,role_name as value_name from user_role_tb where oid =(select id from zld_orgtype_tb WHERE NAME = '停车场' AND state=0) and state =0 and (adminid in (SELECT id from user_info_tb where state=0 and comid = "+reqParameterMap.get("comid")+" and auth_flag>0 and auth_flag!=14 and auth_flag!=15) or adminid =0) ";
-//        }
 
-        list = commonDao.getObjectBySql(sql);
-
-//        String sql = "select r.id,r.role_name from user_role_tb r,zld_orgtype_tb o where r.oid=o.id and o.name like '%车场%' and r.adminid=0 and r.type=0 and r.state = 0";
-//        List<Map<String,Object>> rolelist = commonDao.getObjectBySql(sql);
-//        if(rolelist != null){
-//            Long com_id = Long.parseLong(reqParameterMap.get("comid"));
-////            if(com_id > 0){//车场管理员登录，显示该管理员创建的角色
-////                Long loginuin = Long.parseLong(reqParameterMap.get("loginuin"));
-////                String rolesql = "select id as value_no,role_name as value_name from user_role_tb where (adminid="+loginuin+" or id="+rolelist.get(0).get("id")+") and state = 0";
-////                list = commonDao.getObjectBySql(rolesql);
-////            }
-//           Long roleid= Long.parseLong(reqParameterMap.get("loginroleid"));
-//           if(com_id > 0&&roleid>0){
-////                list = commonDao.getObjectBySql("select id as value_no,role_name as value_name from user_role_tb where adminid" +
-////                        " in(select id from user_info_tb where comid="+com_id+" and role_id="+roleid+") and state = 0 ");
-//                if(list == null){
-//                    list = new ArrayList();
-//                }
-//                Map adminMap = new HashMap<String, Object>();
-//                adminMap.put("value_no", rolelist.get(0).get("id"));
-//                adminMap.put("value_name",  rolelist.get(0).get("role_name"));
-//                list.add(0,adminMap);
-//            }
-//        }
         String result = "[]";
+        String unionId = reqParameterMap.get("union_id");
+        String parkId = reqParameterMap.get("bolink_id");
+        ComInfoTb com = commonService.getComInfoByUnionIdAndParkId(unionId,parkId);
+        if(com==null){
+            return result;
+        }
+        String sql = "select id as value_no,role_name as value_name from user_role_tb where oid =(select id from zld_orgtype_tb WHERE NAME = '停车场' AND state=0) and state =0 and (adminid in (SELECT id from user_info_tb where state=0 and comid = "+com.getId()+" and auth_flag>0 and auth_flag!=14 and auth_flag!=15) or adminid =0) ";
+        List list = commonDao.getObjectBySql(sql);
+
         if(list!=null&&!list.isEmpty()){
             result = StringUtils.createJson(list);
         }
@@ -181,18 +183,10 @@ public class MemberServiceImpl implements MemberService {
             role_id = Long.parseLong(reqParameterMap.get("role_id"));
         }
 
-        Integer isview = -1;
-        if(reqParameterMap.get("isview")!=null&&!"".equals(reqParameterMap.get("isview"))){
-            isview = Integer.parseInt(reqParameterMap.get("isview"));
-        }
-
         Long sex = -1L;
         if(reqParameterMap.get("sex")!=null&&!"".equals(reqParameterMap.get("sex"))){
             sex = Long.parseLong(reqParameterMap.get("sex"));
         }
-        if("".equals(nickname)) nickname=null;
-        if("".equals(mobile)) mobile=null;
-        if("".equals(phone)) phone=null;
 
         Long time = System.currentTimeMillis()/1000;
         //用户表
@@ -208,29 +202,42 @@ public class MemberServiceImpl implements MemberService {
         if(count>0){
             return result;
         }
-        Long comId = Long.parseLong(reqParameterMap.get("comid"));
-//        if(comId == null || comId==0)
-//            comId = RequestUtil.getLong(request, "comid", 0L);
+
+
+        String unionId = reqParameterMap.get("union_id");
+        String parkId = reqParameterMap.get("bolink_id");
+        ComInfoTb com = commonService.getComInfoByUnionIdAndParkId(unionId,parkId);
+        if(com==null){
+            return result;
+        }
+        Long comId =com.getId();
+//        Long comId = Long.parseLong(reqParameterMap.get("comid"));
+
+
+
         Long groupId = -1L;
         if(reqParameterMap.get("groupid")!=null&&!"undefined".equals(reqParameterMap.get("groupid"))&&!"".equals(reqParameterMap.get("groupid"))){
             groupId = Long.parseLong(reqParameterMap.get("groupid"));
         }
         if(groupId==null||groupId<0){
-            ComInfoTb comInfoTb = new ComInfoTb();
-            comInfoTb.setId(comId);
-            comInfoTb = (ComInfoTb) commonDao.selectObjectByConditions(comInfoTb);
-            if(comInfoTb!=null)
-                groupId = comInfoTb.getGroupid();//(Long)comMap.get("groupid");
+            groupId = com.getGroupid();
+//            ComInfoTb comInfoTb = new ComInfoTb();
+//            comInfoTb.setId(comId);
+//            comInfoTb = (ComInfoTb) commonDao.selectObjectByConditions(comInfoTb);
+//            if(comInfoTb!=null)
+//                groupId = comInfoTb.getGroupid();//(Long)comMap.get("groupid");
         }
-        logger.error("groupid:"+groupId);
+        logger.info("groupid:"+groupId);
         Long cityid = -1L;
         if(reqParameterMap.get("cityid")!=null&&!"undefined".equals(reqParameterMap.get("cityid"))&&!"".equals(reqParameterMap.get("cityid"))){
             cityid = Long.parseLong(reqParameterMap.get("cityid"));
         }
         if(auth_flag==1){//总后台设置的管理员，默认为后台车场管理员
             role_id=30L;
-        }else if(auth_flag==-1)
-            auth_flag=2L;
+        }else if(auth_flag==-1) {
+            auth_flag = 2L;
+        }
+
         if(role_id == 30){
             auth_flag = 1L;
         }
@@ -247,7 +254,6 @@ public class MemberServiceImpl implements MemberService {
         user.setAuthFlag(auth_flag);
         user.setComid(comId);
         user.setRoleId(role_id);
-        user.setIsview(isview);
         user.setUserId(userId);
         user.setCityid(cityid);
         user.setGroupid(groupId);
@@ -263,22 +269,6 @@ public class MemberServiceImpl implements MemberService {
             commonUtils.sendMessage(user,user.getComid(),nextid,1);
             insertSysn(user,0);
         }
-//        if(r==1){
-//            //判断是否支持验证ETCPark
-//            String isSupportEtcPark = CustomDefind.ISSUPPORTETCPARK;
-//            if(isSupportEtcPark.equals("1")){
-//                if(publicMethods.isEtcPark(comId)){
-//                    int ret = daService.update("insert into sync_info_pool_tb(comid,table_name,table_id,create_time,operate) values(?,?,?,?,?)", new Object[]{comId,"user_info_tb",nextid,System.currentTimeMillis()/1000,0});
-//                    logger.error("parkadmin or admin:"+loginuin+" add uid:"+nextid+" parkuser ,add sync ret:"+ret);
-//                }else{
-//                    logger.error("parkadmin or admin:"+loginuin+" add uid:"+nextid+" parkuser ");
-//                }
-//            }else{
-//                int ret = daService.update("insert into sync_info_pool_tb(comid,table_name,table_id,create_time,operate) values(?,?,?,?,?)", new Object[]{comId,"user_info_tb",nextid,System.currentTimeMillis()/1000,0});
-//                logger.error("parkadmin or admin:"+loginuin+" add uid:"+nextid+" parkuser ,add sync ret:"+ret);
-//            }
-//            mongoDbUtils.saveLogs( request,0, 2, "添加了车场成员，手机号："+mobile);
-//        }
         return result;
     }
 

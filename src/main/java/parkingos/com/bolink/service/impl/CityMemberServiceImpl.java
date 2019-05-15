@@ -8,11 +8,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import parkingos.com.bolink.dao.spring.CommonDao;
 import parkingos.com.bolink.enums.FieldOperator;
+import parkingos.com.bolink.models.OrgCityMerchants;
 import parkingos.com.bolink.models.UserInfoTb;
 import parkingos.com.bolink.models.UserRoleTb;
 import parkingos.com.bolink.qo.PageOrderConfig;
 import parkingos.com.bolink.qo.SearchBean;
 import parkingos.com.bolink.service.CityMemberService;
+import parkingos.com.bolink.service.CommonService;
 import parkingos.com.bolink.service.SupperSearchService;
 import parkingos.com.bolink.utils.OrmUtil;
 import parkingos.com.bolink.utils.StringUtils;
@@ -30,6 +32,8 @@ public class CityMemberServiceImpl implements CityMemberService {
     private CommonDao commonDao;
     @Autowired
     private SupperSearchService<UserInfoTb> supperSearchService;
+    @Autowired
+    CommonService commonService;
 
     @Override
     public JSONObject selectResultByConditions(Map<String, String> reqmap) {
@@ -37,12 +41,19 @@ public class CityMemberServiceImpl implements CityMemberService {
         String str = "{\"total\":0,\"page\":1,\"rows\":[]}";
         JSONObject result = JSONObject.parseObject(str);
 
+
+        String unionId = reqmap.get("union_id");
+//        OrgCityMerchants orgCityMerchants = new OrgCityMerchants();
+//        orgCityMerchants.setUnionId(unionId);
+//        orgCityMerchants = (OrgCityMerchants)commonDao.selectObjectByConditions(orgCityMerchants);
+        OrgCityMerchants orgCityMerchants = commonService.getCityByUnionId(unionId);
+        if(orgCityMerchants==null){
+            return result;
+        }
+
         UserInfoTb userInfoTb = new UserInfoTb();
-        userInfoTb.setCityid((Long.parseLong(reqmap.get("cityid"))));
+        userInfoTb.setCityid(orgCityMerchants.getId());
         userInfoTb.setState(0);
-
-        System.out.println("=====:"+reqmap.get("oid"));
-
 
         UserRoleTb userRoleTb = new UserRoleTb();
         userRoleTb.setState(0);
@@ -64,11 +75,13 @@ public class CityMemberServiceImpl implements CityMemberService {
         if(searchMap!=null&&!searchMap.isEmpty()){
             UserInfoTb baseQuery =(UserInfoTb)searchMap.get("base");
             List<SearchBean> supperQuery = null;
-            if(searchMap.containsKey("supper"))
-                supperQuery = (List<SearchBean>)searchMap.get("supper");
+            if(searchMap.containsKey("supper")) {
+                supperQuery = (List<SearchBean>) searchMap.get("supper");
+            }
             PageOrderConfig config = null;
-            if(searchMap.containsKey("config"))
-                config = (PageOrderConfig)searchMap.get("config");
+            if(searchMap.containsKey("config")) {
+                config = (PageOrderConfig) searchMap.get("config");
+            }
 
 
             //封装searchbean  城市和集团下所有车场
@@ -97,7 +110,6 @@ public class CityMemberServiceImpl implements CityMemberService {
         }
         result.put("total",count);
         result.put("page",Integer.parseInt(reqmap.get("page")));
-        logger.error("============>>>>>返回数据"+result);
         return result;
 
     }
@@ -149,15 +161,9 @@ public class CityMemberServiceImpl implements CityMemberService {
         }
 
         Long role_id =-1L;
-        if(reqParameterMap.get("role_id")!=null&&!"".equals(reqParameterMap.get("role_id"))){
-            role_id = Long.parseLong(reqParameterMap.get("role_id"));
-        }
-
-
-        if("".equals(nickname)) nickname=null;
-        if("".equals(mobile)) mobile=null;
-        if("".equals(phone)) phone=null;
-        if("".equals(resume)) resume=null;
+//        if(reqParameterMap.get("role_id")!=null&&!"".equals(reqParameterMap.get("role_id"))){
+//            role_id = Long.parseLong(reqParameterMap.get("role_id"));
+//        }
 
         Long time = System.currentTimeMillis()/1000;
         //用户表
@@ -174,10 +180,16 @@ public class CityMemberServiceImpl implements CityMemberService {
             return result;
         }
         Long cityid = -1L;
-        if(reqParameterMap.get("cityid")!=null&&!"undefined".equals(reqParameterMap.get("cityid"))){
-            cityid = Long.parseLong(reqParameterMap.get("cityid"));
+        String unionId = reqParameterMap.get("union_id");
+        OrgCityMerchants orgCityMerchants = commonService.getCityByUnionId(unionId);
+        if(orgCityMerchants==null){
+            return result;
         }
-        logger.error("cityid:"+cityid);
+        cityid = orgCityMerchants.getId();
+//        if(reqParameterMap.get("cityid")!=null&&!"undefined".equals(reqParameterMap.get("cityid"))){
+//            cityid = Long.parseLong(reqParameterMap.get("cityid"));
+//        }
+//        logger.error("cityid:"+cityid);
 
 
         if(cityid!=-1&&role_id==-1){
@@ -196,7 +208,7 @@ public class CityMemberServiceImpl implements CityMemberService {
         user.setUserId(userId);
         user.setCityid(cityid);
         user.setResume(resume);
-        logger.error("======>>>>>user"+user);
+        logger.info("======>>>>>user"+user);
         int ret = commonDao.insert(user);
         if(ret==1){
             result.put("state",1);
