@@ -105,25 +105,25 @@ public class CenterMonitorServiceImpl implements CenterMonitorService {
             parammap.put("date", todyyymmdd + " 00:00:00至" + todyyymmdd + " 23:59:59");
             JSONObject retjson = cityOrderAnlysisService.selectResultByConditions(parammap);
             JSONArray retarry = retjson.getJSONArray("rows");
-            Double cashPay = 0d;
-            Double electronicPay = 0d;
-            Double freePay = 0d;
-            if (retarry.size() > 0) {
-                JSONObject object = (JSONObject) retarry.get(retarry.size() - 1);
-                if (object.getString("cash_pay") != null && !"".equals(object.getString("cash_pay"))) {
+            Double cashPay=0d;
+            Double electronicPay=0d;
+            Double freePay=0d;
+            if(retarry.size()>0){
+                JSONObject object =(JSONObject)retarry.get(retarry.size()-1);
+                if(object.getString("cash_pay")!=null&&!"".equals(object.getString("cash_pay"))) {
                     cashPay = Double.parseDouble(object.getString("cash_pay"));
-                    System.out.print("cashpay" + cashPay);
                 }
-                if (object.getString("electronic_pay") != null && !"".equals(object.getString("electronic_pay"))) {
-                    electronicPay = Double.parseDouble(object.getString("electronic_pay"));
-                    System.out.print("electronicPay" + electronicPay);
+                if(object.getString("ele_pay")!=null&&!"".equals(object.getString("ele_pay"))) {
+                    electronicPay = Double.parseDouble(object.getString("ele_pay"));
                 }
-                if (object.getString("free_pay") != null && !"".equals(object.getString("free_pay"))) {
+                if(object.getString("free_pay")!=null&&!"".equals(object.getString("free_pay"))) {
                     freePay = Double.parseDouble(object.getString("free_pay"));
-                    System.out.print("electronicPay" + electronicPay);
                 }
+//                if(object.getString("act_total")!=null&&!"".equals(object.getString("act_total"))){
+//                    groupTotal = Double.parseDouble(object.getString("act_total"));
+//                    otherData.put("receiveTotal",groupTotal);
+//                }
             }
-            ;
 
             totalIncomemap.put("elePay", af1.format(electronicPay));
             totalIncomemap.put("cashPay", af1.format(cashPay));
@@ -190,19 +190,16 @@ public class CenterMonitorServiceImpl implements CenterMonitorService {
             Double cashPay = 0d;
             Double electronicPay = 0d;
             Double freePay = 0d;
-            if (retarry!=null&&retarry.size() > 0) {
-                JSONObject object = (JSONObject) retarry.get(retarry.size() - 1);
-                if (object.getString("cash_pay") != null && !"".equals(object.getString("cash_pay"))) {
-                    cashPay = Double.parseDouble(object.getString("cash_pay"));
-                    System.out.print("cashpay" + cashPay);
+            if(retarry!=null&&retarry.size()>0){
+                JSONObject object =(JSONObject)retarry.get(retarry.size()-1);
+                if(object.getString("cash_total")!=null&&!"".equals(object.getString("cash_total"))) {
+                    cashPay = Double.parseDouble(object.getString("cash_total"));
                 }
-                if (object.getString("electronic_pay") != null && !"".equals(object.getString("electronic_pay"))) {
-                    electronicPay = Double.parseDouble(object.getString("electronic_pay"));
-                    System.out.print("electronicPay" + electronicPay);
-                }
-                if (object.getString("free_pay") != null && !"".equals(object.getString("free_pay"))) {
+                if(object.getString("free_pay")!=null&&!"".equals(object.getString("free_pay"))) {
                     freePay = Double.parseDouble(object.getString("free_pay"));
-                    System.out.print("electronicPay" + electronicPay);
+                }
+                if(object.getString("ele_total")!=null&&!"".equals(object.getString("ele_total"))) {
+                    electronicPay = Double.parseDouble(object.getString("ele_total"));
                 }
             }
 
