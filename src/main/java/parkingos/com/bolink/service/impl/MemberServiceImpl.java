@@ -203,14 +203,21 @@ public class MemberServiceImpl implements MemberService {
             return result;
         }
 
+        Long comId = -1L;
+//        Long comId = Long.parseLong(reqParameterMap.get("comid"));
+        if(!Check.isEmpty(reqParameterMap.get("comid"))){
+            comId = Long.parseLong(reqParameterMap.get("comid"));
+        }
 
         String unionId = reqParameterMap.get("union_id");
         String parkId = reqParameterMap.get("bolink_id");
-        ComInfoTb com = commonService.getComInfoByUnionIdAndParkId(unionId,parkId);
-        if(com==null){
-            return result;
+        if(!Check.isEmpty(unionId)&&!Check.isEmpty(parkId)) {
+            ComInfoTb com = commonService.getComInfoByUnionIdAndParkId(unionId, parkId);
+            if (com == null) {
+                return result;
+            }
+            comId =com.getId();
         }
-        Long comId =com.getId();
 //        Long comId = Long.parseLong(reqParameterMap.get("comid"));
 
 
@@ -220,12 +227,7 @@ public class MemberServiceImpl implements MemberService {
             groupId = Long.parseLong(reqParameterMap.get("groupid"));
         }
         if(groupId==null||groupId<0){
-            groupId = com.getGroupid();
-//            ComInfoTb comInfoTb = new ComInfoTb();
-//            comInfoTb.setId(comId);
-//            comInfoTb = (ComInfoTb) commonDao.selectObjectByConditions(comInfoTb);
-//            if(comInfoTb!=null)
-//                groupId = comInfoTb.getGroupid();//(Long)comMap.get("groupid");
+            groupId = commonService.getGroupIdByComid(comId);
         }
         logger.info("groupid:"+groupId);
         Long cityid = -1L;
@@ -352,21 +354,6 @@ public class MemberServiceImpl implements MemberService {
             userInfoTb =(UserInfoTb)commonDao.selectObjectByConditions(userInfoTb);
             commonUtils.sendMessage(userInfoTb,userInfoTb.getComid(),id,3);
             insertSysn(userInfoTb,2);
-
-//            //判断是否支持ETCPARK
-//            String isSupportEtcPark = CustomDefind.ISSUPPORTETCPARK;
-//            if(isSupportEtcPark.equals("1")){
-//                if(publicMethods.isEtcPark(comid)){
-//                    int ret = daService.update("insert into sync_info_pool_tb(comid,table_name,table_id,create_time,operate) values(?,?,?,?,?)", new Object[]{comid,"user_info_tb",Long.valueOf(id),System.currentTimeMillis()/1000,2});
-//                    logger.error("parkadmin or admin:"+loginuin+" delete parkuserpass:"+id+",password:,ret:"+result+",add sync ret："+ret);
-//                }else{
-//                    logger.error("parkadmin or admin:"+loginuin+" delete parkuserpass:"+id+",password:,ret:"+result);
-//                }
-//            }else{
-//                int ret = daService.update("insert into sync_info_pool_tb(comid,table_name,table_id,create_time,operate) values(?,?,?,?,?)", new Object[]{comid,"user_info_tb",Long.valueOf(id),System.currentTimeMillis()/1000,2});
-//                logger.error("parkadmin or admin:"+loginuin+" delete parkuserpass:"+id+",password:,ret:"+result+",add sync ret："+ret);
-//            }
-//            mongoDbUtils.saveLogs(request, 0, 4, "删除了员工："+userMap);
         }
         return result;
     }
@@ -389,12 +376,6 @@ public class MemberServiceImpl implements MemberService {
                 userInfoTb =(UserInfoTb)commonDao.selectObjectByConditions(userInfoTb);
                 commonUtils.sendMessage(userInfoTb,userInfoTb.getComid(),id,2);
                 insertSysn(userInfoTb,1);
-//                if(publicMethods.isEtcPark(comid)){
-//                    int r = daService.update("insert into sync_info_pool_tb(comid,table_name,table_id,create_time,operate) values(?,?,?,?,?)", new Object[]{comid,"user_info_tb",id,System.currentTimeMillis()/1000,1});
-//                    logger.error("parkadmin or admin:"+loginuin+" edit parkuser isview:"+id+",add sync ret："+r);
-//                }else{
-//                    logger.error("parkadmin or admin:"+loginuin+" edit parkuser isview:"+id);
-//                }
             }
             result.put("state",ret);
             result.put("msg","修改成功");
