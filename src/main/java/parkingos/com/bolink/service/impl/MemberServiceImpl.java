@@ -140,13 +140,24 @@ public class MemberServiceImpl implements MemberService {
     public String getRoleByConditions(Map<String, String> reqParameterMap) {
 
         String result = "[]";
-        String unionId = reqParameterMap.get("union_id");
-        String parkId = reqParameterMap.get("bolink_id");
-        ComInfoTb com = commonService.getComInfoByUnionIdAndParkId(unionId,parkId);
-        if(com==null){
+
+        Long  comid = -1L;
+        if(Check.isEmpty(reqParameterMap.get("comid"))){
+            String unionId = reqParameterMap.get("union_id");
+            String parkId = reqParameterMap.get("bolink_id");
+            ComInfoTb com = commonService.getComInfoByUnionIdAndParkId(unionId,parkId);
+            if(com==null){
+                return result;
+            }
+            comid = com.getId();
+        }else{
+            comid = Long.parseLong(reqParameterMap.get("comid"));
+        }
+
+        if(comid<0){
             return result;
         }
-        String sql = "select id as value_no,role_name as value_name from user_role_tb where oid =(select id from zld_orgtype_tb WHERE NAME = '停车场' AND state=0) and state =0 and (adminid in (SELECT id from user_info_tb where state=0 and comid = "+com.getId()+" and auth_flag>0 and auth_flag!=14 and auth_flag!=15) or adminid =0) ";
+        String sql = "select id as value_no,role_name as value_name from user_role_tb where oid =(select id from zld_orgtype_tb WHERE NAME = '停车场' AND state=0) and state =0 and (adminid in (SELECT id from user_info_tb where state=0 and comid = "+comid+" and auth_flag>0 and auth_flag!=14 and auth_flag!=15) or adminid =0) ";
         List list = commonDao.getObjectBySql(sql);
 
         if(list!=null&&!list.isEmpty()){
