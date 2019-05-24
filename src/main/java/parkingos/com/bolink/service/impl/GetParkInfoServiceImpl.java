@@ -54,6 +54,24 @@ public class GetParkInfoServiceImpl implements GetParkInfoService {
     public String getInfo(int groupid) {
 
 //        Map<String, String> reqmap = new HashMap<>();
+        HashMap<String, Object> retMap = new HashMap<String, Object>();
+        retMap.put("inPartData",null ); //存入进场车辆
+        retMap.put("outPartData", null); //存入离场车辆
+        retMap.put("totalIncomPie",null); //存入金额分类统计list
+        retMap.put("totalIncome", null);//今日收入统计
+        retMap.put("parkRank", null); //收入排行
+        retMap.put("inOutCarsCount", null);//进出车统计
+        retMap.put("berthPercentData", null);//泊位使用率
+        retMap.put("parkState", null); //车场状态
+        retMap.put("exceptionEvents", null);//车场异常信息
+        retMap.put("otherData", null);
+        List<Long> comList = orderMapper.getComlistByGroupid(Long.parseLong(groupid+""));
+        if(comList==null||comList.isEmpty()){
+            String result = JSON.toJSON(retMap).toString();
+            return result;
+        }
+        String comListStr = JSON.toJSONString(comList);
+
 
         Long cityid = orderMapper.getCityIdByGroupId(Long.parseLong(groupid+""));
         String tableName = "order_tb_new";
@@ -75,11 +93,11 @@ public class GetParkInfoServiceImpl implements GetParkInfoService {
 //            groupTotal = StringUtils.formatDouble(cashPay)+StringUtils.formatDouble(elePay);
 //        }
         //查询该集团下面所有月卡
-        int monthTotal = parkInfoMapper.getMonthTotalByGroupid(groupid);
+        int monthTotal = parkInfoMapper.getMonthTotalByGroupid(groupid,comList);
         //查询该集团下面在线的车场数
 //        int parkAliveCount = parkInfoMapper.parkAliveCount(groupid);
         //查询集团下面黑名单总数
-        int blackTotal = parkInfoMapper.getBlackTotal(groupid);
+        int blackTotal = parkInfoMapper.getBlackTotal(groupid,comList);
 
         Map<String,Object> otherData = new HashMap<>();
         otherData.put("receiveTotal",groupTotal);
@@ -87,7 +105,7 @@ public class GetParkInfoServiceImpl implements GetParkInfoService {
 
         otherData.put("blackTotal",blackTotal);
 
-        HashMap<String, Object> retMap = new HashMap<String, Object>();
+
         Calendar calendar = Calendar.getInstance();
         calendar.setTime(new Date());
         calendar.set(Calendar.HOUR_OF_DAY, 0);
@@ -95,9 +113,8 @@ public class GetParkInfoServiceImpl implements GetParkInfoService {
         calendar.set(Calendar.SECOND, 0);
         long tday = calendar.getTimeInMillis() / 1000;
         //获取进场和离场数据
-
-        List<Map<String, String>> entryCarList=orderServer.getEntryCar(tday, Long.parseLong(groupid + ""),tableName,cityid);
-        List<Map<String, String>> outCarList=orderServer.getExitCar(tday, Long.parseLong(groupid + ""),tableName,cityid);
+        List<Map<String, String>> entryCarList=orderServer.getEntryCar(tday, Long.parseLong(groupid + ""),tableName,cityid,comListStr);
+        List<Map<String, String>> outCarList=orderServer.getExitCar(tday, Long.parseLong(groupid + ""),tableName,cityid,comListStr);
 
         int parkingtotal = parkInfoMapper.getBerthTotal(groupid);
         //获取今日电子支付，现金支付，减免金额的统计
@@ -144,11 +161,11 @@ public class GetParkInfoServiceImpl implements GetParkInfoService {
         totalIncomPie.add(electronicPaymap);
         totalIncomPie.add(reduceamap);
         //获取收费排行数据
-        List<Map<String, String>> parkRankList = orderServer.getParkRank(tday, groupid,tableName,cityid);
+        List<Map<String, String>> parkRankList = orderServer.getParkRank(tday, groupid,tableName,cityid,comListStr);
         //获取车辆进场，离场，在场的数量统计
-        int inCars =orderServer.getEntryCount(tday, groupid,tableName,cityid);
-        int outCars =orderServer.getExitCount(tday, groupid,tableName,cityid);
-        int inPark =orderServer.getInparkCount(tday, groupid,tableName,cityid);
+        int inCars =orderServer.getEntryCount(tday, groupid,tableName,cityid,comListStr);
+        int outCars =orderServer.getExitCount(tday, groupid,tableName,cityid,comListStr);
+        int inPark =orderServer.getInparkCount(tday, groupid,tableName,cityid,comListStr);
         HashMap<String, Object> countMap = new HashMap<String, Object>();
         countMap.put("inCars", inCars);
         countMap.put("outCars", outCars);

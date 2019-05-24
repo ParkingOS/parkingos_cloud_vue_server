@@ -8,9 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import parkingos.com.bolink.dao.mybatis.BolinkExpenseTbExample;
 import parkingos.com.bolink.dao.mybatis.BolinkIncomeTbExample;
-import parkingos.com.bolink.dao.mybatis.mapper.BolinkDataMapper;
-import parkingos.com.bolink.dao.mybatis.mapper.BolinkExpenseTbMapper;
-import parkingos.com.bolink.dao.mybatis.mapper.BolinkIncomeTbMapper;
+import parkingos.com.bolink.dao.mybatis.mapper.*;
 import parkingos.com.bolink.models.BolinkExpenseTb;
 import parkingos.com.bolink.service.BolinkExpenseService;
 import parkingos.com.bolink.service.CommonService;
@@ -36,6 +34,8 @@ public class BolinkExpenseServiceImpl implements BolinkExpenseService {
     private CommonService commonService;
     @Autowired
     private BolinkExpenseTbMapper bolinkExpenseTbMapper;
+    @Autowired
+    OrderMapper orderMapper;
 
     @Override
     public JSONObject query(Map<String, String> reqParameterMap) {
@@ -55,6 +55,7 @@ public class BolinkExpenseServiceImpl implements BolinkExpenseService {
 
     private JSONObject getExpenses(Map<String, String> reqParameterMap,int type) {
         JSONObject result = new JSONObject();
+        List<Map<String, Object>> resList = new ArrayList<Map<String, Object>>();
         String tableName = "bolink_expense_tb";
         if(type==1) {
             Long comid = Long.parseLong(reqParameterMap.get("comid"));
@@ -63,6 +64,15 @@ public class BolinkExpenseServiceImpl implements BolinkExpenseService {
         }else if (type==2){
             Long groupId = Long.parseLong(reqParameterMap.get("groupid"));
             tableName=commonService.getTableNameByGroupId(groupId,2);
+
+            List<Long> list = orderMapper.getComlistByGroupid(groupId);
+            if(list==null||list.isEmpty()){
+                result.put("rows", JSON.toJSON(resList));
+                result.put("total",0);
+                return result;
+            }
+            reqParameterMap.put("comList",JSON.toJSONString(list));
+
         }
         reqParameterMap.put("tableName",tableName);
         //增加默认的pay_time,默认今天一天的数据
@@ -76,7 +86,7 @@ public class BolinkExpenseServiceImpl implements BolinkExpenseService {
 
         BolinkExpenseTbExample example = ExampleUtis.createExpenseExampleByMap(reqParameterMap);
         int count = bolinkExpenseTbMapper.getExpenseCounts(example);
-        List<Map<String, Object>> resList = new ArrayList<Map<String, Object>>();
+
         if(count>0){
             resList = bolinkExpenseTbMapper.getExpenses(example);
             if(type==2){

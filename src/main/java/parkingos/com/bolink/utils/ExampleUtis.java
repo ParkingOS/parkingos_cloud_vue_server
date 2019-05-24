@@ -1,10 +1,13 @@
 package parkingos.com.bolink.utils;
 
+import com.alibaba.fastjson.JSON;
+import com.qiniu.util.Json;
 import parkingos.com.bolink.dao.mybatis.BolinkExpenseTbExample;
 import parkingos.com.bolink.dao.mybatis.BolinkIncomeTbExample;
 import parkingos.com.bolink.dao.mybatis.OrderTbExample;
 
 import java.math.BigDecimal;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -249,9 +252,11 @@ public class ExampleUtis {
                         break;
 
                     case "groupid":
-                        String groupid = reqmap.get("groupid");
-                        if (Check.isLong(groupid)) {
-                            example.createCriteria().andGroupIdEqualTo(Long.parseLong(groupid));
+                        String comStr = reqmap.get("comList");
+                        List<Long> comList = JSON.parseArray(comStr,Long.TYPE);
+                        if (comList!=null&&!comList.isEmpty()) {
+                            example.createCriteria().andParkIdIn(comList);
+//                            example.createCriteria().andGroupIdEqualTo(Long.parseLong(groupid));
                         }
                         break;
 
@@ -346,9 +351,11 @@ public class ExampleUtis {
                         }
                         break;
                     case "groupid":
-                        String groupid = reqmap.get("groupid");
-                        if (Check.isLong(groupid)) {
-                            example.createCriteria().andGroupIdEqualTo(Long.parseLong(groupid));
+                        String comStr = reqmap.get("comList");
+                        List<Long> comList = JSON.parseArray(comStr,Long.TYPE);
+                        if (comList!=null&&!comList.isEmpty()) {
+                            example.createCriteria().andParkIdIn(comList);
+//                            example.createCriteria().andGroupIdEqualTo(Long.parseLong(groupid));
                         }
                         break;
                     case "comid":

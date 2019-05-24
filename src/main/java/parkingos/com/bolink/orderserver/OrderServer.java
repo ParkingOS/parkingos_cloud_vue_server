@@ -599,7 +599,7 @@ public class OrderServer extends BaseServer {
 //        return null;
 //    }
 
-    public List<Map<String,String>> getEntryCar(long tday, long l, String tableName,Long cityId) {
+    public List<Map<String,String>> getEntryCar(long tday, long l, String tableName,Long cityId,String comListStr) {
         MapList u =null;
         if(cityId==null||cityId<0){
             logger.error("===>>>>cityId error:"+cityId);
@@ -612,7 +612,8 @@ public class OrderServer extends BaseServer {
             try{
                 OrderServiceGrpc.OrderServiceBlockingStub stub = OrderServiceGrpc.newBlockingStub(channel);
                 Order order = Order.newBuilder()
-                        .setGroupid(l)
+//                        .setGroupid(l)
+                        .setReqStrForAll(comListStr)
                         .setTableName(tableName)
                         .setCreateTime(tday).build();
                 u = stub.getEntryCar(order);
@@ -638,7 +639,7 @@ public class OrderServer extends BaseServer {
         return list;
     }
 
-    public List<Map<String,String>> getExitCar(long tday, long l, String tableName,Long cityId) {
+    public List<Map<String,String>> getExitCar(long tday, long l, String tableName,Long cityId,String comListStr) {
         MapList u =null;
         if(cityId==null||cityId<0){
             logger.error("===>>>>cityId error:"+cityId);
@@ -651,7 +652,8 @@ public class OrderServer extends BaseServer {
             try{
                 OrderServiceGrpc.OrderServiceBlockingStub stub = OrderServiceGrpc.newBlockingStub(channel);
                 Order order = Order.newBuilder()
-                        .setGroupid(l)
+//                        .setGroupid(l)
+                        .setReqStrForAll(comListStr)
                         .setTableName(tableName)
                         .setEndTime(tday).build();
                 u = stub.getExitCar(order);
@@ -678,7 +680,7 @@ public class OrderServer extends BaseServer {
         return list;
     }
 
-    public List<Map<String,String>> getParkRank(long tday, int groupid, String tableName,Long cityId) {
+    public List<Map<String,String>> getParkRank(long tday, int groupid, String tableName,Long cityId,String comListStr) {
         MapList u =null;
         if(cityId==null||cityId<0){
             logger.error("===>>>>cityId error:"+cityId);
@@ -691,7 +693,8 @@ public class OrderServer extends BaseServer {
             try{
                 OrderServiceGrpc.OrderServiceBlockingStub stub = OrderServiceGrpc.newBlockingStub(channel);
                 Order order = Order.newBuilder()
-                        .setGroupid(groupid)
+//                        .setGroupid(groupid)
+                        .setReqStrForAll(comListStr)
                         .setTableName(tableName)
                         .setEndTime(tday).build();
                 u = stub.getParkRank(order);
@@ -720,7 +723,7 @@ public class OrderServer extends BaseServer {
         return list;
     }
 
-    public int getEntryCount(long tday, int groupid, String tableName,Long cityId) {
+    public int getEntryCount(long tday, int groupid, String tableName,Long cityId,String comListStr) {
         OrderCount u =null;
         if(cityId==null||cityId<0){
             logger.error("===>>>>cityId error:"+cityId);
@@ -733,7 +736,8 @@ public class OrderServer extends BaseServer {
             try{
                 OrderServiceGrpc.OrderServiceBlockingStub stub = OrderServiceGrpc.newBlockingStub(channel);
                 Order order = Order.newBuilder()
-                        .setGroupid(groupid)
+//                        .setGroupid(groupid)
+                        .setReqStrForAll(comListStr)
                         .setTableName(tableName)
                         .setCreateTime(tday).build();
                 u = stub.getEntryCount(order);
@@ -748,7 +752,7 @@ public class OrderServer extends BaseServer {
         return u.getCount();
     }
 
-    public int getExitCount(long tday, int groupid, String tableName,Long cityId) {
+    public int getExitCount(long tday, int groupid, String tableName,Long cityId,String comListStr) {
         OrderCount u =null;
         if(cityId==null||cityId<0){
             logger.error("===>>>>cityId error:"+cityId);
@@ -761,7 +765,8 @@ public class OrderServer extends BaseServer {
             try{
                 OrderServiceGrpc.OrderServiceBlockingStub stub = OrderServiceGrpc.newBlockingStub(channel);
                 Order order = Order.newBuilder()
-                        .setGroupid(groupid)
+//                        .setGroupid(groupid)
+                        .setReqStrForAll(comListStr)
                         .setTableName(tableName)
                         .setEndTime(tday).build();
                 u = stub.getExitCount(order);
@@ -776,7 +781,7 @@ public class OrderServer extends BaseServer {
         return u.getCount();
     }
 
-    public int getInparkCount(long tday, int groupid, String tableName,Long cityId) {
+    public int getInparkCount(long tday, int groupid, String tableName,Long cityId,String comListStr) {
         OrderCount u =null;
         if(cityId==null||cityId<0){
             logger.error("===>>>>cityId error:"+cityId);
@@ -789,7 +794,8 @@ public class OrderServer extends BaseServer {
             try{
                 OrderServiceGrpc.OrderServiceBlockingStub stub = OrderServiceGrpc.newBlockingStub(channel);
                 Order order = Order.newBuilder()
-                        .setGroupid(Long.parseLong(groupid+""))
+//                        .setGroupid(Long.parseLong(groupid+""))
+                        .setReqStrForAll(comListStr)
                         .setTableName(tableName)
                         .setCreateTime(tday).build();
                 u = stub.getInparkCount(order);

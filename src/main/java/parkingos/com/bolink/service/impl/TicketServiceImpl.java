@@ -563,7 +563,7 @@ public class TicketServiceImpl implements TicketService {
             qrCodeTb.setCode(code);
             qrCodeTb = (QrCodeTb) commonDao.selectObjectByConditions(qrCodeTb);
             if (qrCodeTb != null) {
-                logger.info("qrcodeTb不为空:" + qrCodeTb);
+//                logger.info("qrcodeTb不为空:");
                 //是否要一直轮询查询, 确认是否自动更新二维码
                 Integer isauto = qrCodeTb.getIsauto();
                 if (isauto != null && isauto == 1) {//自动更新

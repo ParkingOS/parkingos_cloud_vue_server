@@ -86,6 +86,19 @@ public class CenterMonitorServiceImpl implements CenterMonitorService {
         Map<String, Object> videoMap = new HashMap<String, Object>();//需要返回的播放列表
         List<Map<String, Object>> list =new ArrayList<>();
         if (groupid > 0) {
+
+            List<Long> comList = orderMapper.getComlistByGroupid(Long.parseLong(groupid+""));
+            if(comList==null||comList.isEmpty()){
+                retMap.put("totalIncome", totalIncomemap);//今日收入统计
+                retMap.put("inOutCarsCount", countMap);//进出车统计
+                retMap.put("berthPercentData", ss);//泊位使用率
+                retMap.put("confirmOrders", confirmOrders);//确认订单
+                retMap.put("videoMap",videoMap);
+                String result = JSON.toJSON(retMap).toString();
+                return result;
+            }
+            String comListStr = JSON.toJSONString(comList);
+
             Long cityid = orderMapper.getCityIdByGroupId(groupid);
             //获取今日电子支付，现金支付，减免金额的统计
             String tableName = "order_tb_new";
@@ -130,9 +143,9 @@ public class CenterMonitorServiceImpl implements CenterMonitorService {
             totalIncomemap.put("freePay", af1.format(freePay));
 
             //获取车辆进场，离场，在场的数量统计
-            int inCars = orderServer.getEntryCount(tday, groupid.intValue(),tableName,cityid);
-            int outCars = orderServer.getExitCount(tday, groupid.intValue(),tableName,cityid);
-            int inPark = orderServer.getInparkCount(tday, groupid.intValue(),tableName,cityid);
+            int inCars = orderServer.getEntryCount(tday, groupid.intValue(),tableName,cityid,comListStr);
+            int outCars = orderServer.getExitCount(tday, groupid.intValue(),tableName,cityid,comListStr);
+            int inPark = orderServer.getInparkCount(tday, groupid.intValue(),tableName,cityid,comListStr);
             countMap = new HashMap<String, Object>();
             countMap.put("inCars", inCars);
             countMap.put("outCars", outCars);
@@ -160,9 +173,9 @@ public class CenterMonitorServiceImpl implements CenterMonitorService {
             }
 
             //获取集团下面所有的确认订单
-            confirmOrders = centerMonitorMapper.getConfirmOrdersByGroupid(groupid+"");
+            confirmOrders = centerMonitorMapper.getConfirmOrdersByGroupid(groupid);
             //获取所有的播放资源  然后存到videoMap里面进行返回
-            list = centerMonitorMapper.getMonitorsByGroupid(groupid+"");
+            list = centerMonitorMapper.getMonitorsByGroupid(groupid);
 
 
 

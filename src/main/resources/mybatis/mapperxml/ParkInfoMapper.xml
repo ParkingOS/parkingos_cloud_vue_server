@@ -284,16 +284,11 @@ and a.is_delete = 0
 FROM
 	zld_black_tb
 WHERE
-	comid IN (
-		SELECT
-			ID
-		FROM
-			com_info_tb
-		WHERE
-			groupid = #{groupid,jdbcType=BIGINT}
-		AND STATE = 0
-	)
-AND STATE = 0
+      comid in
+        <foreach collection="comList" index="index" item="item" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+        AND STATE = 0
     </select>
 
     <select id="parkAliveCount"  resultType="java.lang.Integer">
@@ -314,21 +309,18 @@ WHERE
     </select>
 
     <select id="getMonthTotalByGroupid"  resultType="java.lang.Integer">
+
         SELECT
 	"count" (*)
     FROM
 	carower_product
     WHERE
 	is_delete = 0
-      AND com_id IN (
-	SELECT
-		ID
-	FROM
-		com_info_tb
-	WHERE
-		groupid = #{groupid,jdbcType=BIGINT}
-	AND STATE = 0
-)
+	and com_id in
+	<foreach collection="comList" index="index" item="item" open="(" separator="," close=")">
+            #{item}
+    </foreach>
+
     </select>
 
     <select id="getTicketCount"  resultType="java.lang.Integer">

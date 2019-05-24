@@ -48,30 +48,26 @@ public class CityOrderServiceImpl implements CityOrderService {
         String str = "{\"total\":0,\"page\":1,\"rows\":[]}";
         JSONObject result = JSONObject.parseObject(str);
 
-
-
         int count =0;
-        Double sumtotal = 0.00;
-        Double cashpay = 0.00;
-        Double elepay = 0.00;
         //需要显示数据的集合
         List<OrderTb> list =null;
         //统计满足条件的所有订单的集合  用来统计价格
-        List<OrderTb> moneyList =null;
         List<Map<String, Object>> resList =new ArrayList<Map<String, Object>>();
 
         //查询今天的数据显示
-        logger.error("=========..req"+reqmap.size());
-//        OrderTb orderTb = new OrderTb();
-//
-//        orderTb.setState(1);
-//        orderTb.setIshd(0);
+        logger.info("=========req"+reqmap);
 
         Long groupid = Long.parseLong(reqmap.get("groupid"));
         Long cityid = -1L;
+        List<Long> comList = null;
         if(groupid!=null&&groupid>-1){
             cityid = orderMapper.getCityIdByGroupId(groupid);
+            comList = orderMapper.getComlistByGroupid(groupid);
         }
+        if(comList==null||comList.isEmpty()){
+            return result;
+        }
+        reqmap.put("comList",JSON.toJSONString(comList));
 
         if(cityid!=null&&cityid>-1){
             reqmap.put("cityId",cityid+"");
@@ -80,12 +76,10 @@ public class CityOrderServiceImpl implements CityOrderService {
             reqmap.put("tableName","order_tb_new");
         }
         String endTime = reqmap.get("end_time");
-        logger.error("===>>>endTime"+endTime);
         //组装出场车辆时间参数   默认今天出场
         if(endTime==null||"undefined".equals(endTime)||"".equals(endTime)){
             reqmap.put("end_time","1");
             reqmap.put("end_time_start",(TimeTools.getToDayBeginTime()+""));
-            logger.error("=========..req"+reqmap.size());
         }
 
         String rp = "20";
@@ -94,24 +88,17 @@ public class CityOrderServiceImpl implements CityOrderService {
         }
 
         count = orderServer.selectOrdersCount(reqmap);
-        Map moneymap = null;
         if(count>0){
             //价格统计不需要分页  要查询所有
-//            logger.info("///////////"+reqmap);
-//            moneymap = getMoneyMap(reqmap);
-//            moneymap=orderServer.selectMoneyByExample(reqmap);
-                //带分页的 要显示在页面  的数据list
+            //带分页的 要显示在页面  的数据list
             if(reqmap.get("export")==null){//不是导出
                 reqmap.put("rp",rp);
             }
-//            list = getOrdersListByGroupid(reqmap);
             list=orderServer.getOrdersByMapConditons(reqmap);
             if (list != null && !list.isEmpty()) {
                 for (OrderTb orderTb1 : list) {
-//                    logger.info("===>>>>orderTb1:"+orderTb1);
                     OrmUtil<OrderTb> otm = new OrmUtil<OrderTb>();
                     Map<String, Object> map = otm.pojoToMap(orderTb1);
-//                    logger.info("===>>>>map:"+map);
                     Long start = (Long) map.get("create_time");
                     Long end = (Long) map.get("end_time");
                     if (start != null && end != null) {
@@ -119,27 +106,11 @@ public class CityOrderServiceImpl implements CityOrderService {
                     } else {
                         map.put("duration","");
                     }
-//                    String carNumber = map.get("car_number")+"";
-//                    String orderId = map.get("order_id_local")+"";
-//                    Long comid = (Long)map.get("comid");
-//                    JSONObject moneyData = orderService.getOrderDetail(orderId,comid,carNumber);
-//                    map.put("electronic_prepay",moneyData.get("ele_prepay"));
-//                    map.put("electronic_pay",moneyData.get("ele_pay"));
-//                    map.put("cash_prepay",moneyData.get("cash_prepay"));
                     resList.add(map);
                 }
                 result.put("rows", JSON.toJSON(resList));
             }
         }
-//        if(moneymap!=null){
-//            result.put("sumtotal",moneymap.get("total"));
-//            result.put("cashpay",moneymap.get("cashpay"));
-//            result.put("elepay",moneymap.get("elepay"));
-//        }else {
-//            result.put("sumtotal", 0.00);
-//            result.put("cashpay", 0.00);
-//            result.put("elepay", 0.00);
-//        }
         result.put("total",count);
         if(reqmap.get("page")!=null){
             result.put("page",Integer.parseInt(reqmap.get("page")));

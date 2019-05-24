@@ -187,9 +187,15 @@ public class GetDataServiceImpl implements GetDataService {
     }
 
     @Override
-    public String getChannelType(String comid) {
+    public String getChannelType(String comid,Long groupId) {
         String result = "[";
-        logger.error("=========>>>>>comid="+comid);
+        logger.info("=========>>>>>comid="+comid);
+
+        if(groupId>0){
+            result = getGroupChannelTypes(groupId);
+            return result;
+        }
+
         if(!comid.equals("-1")){
             String sql = "select id,passname from com_pass_tb where state = 0 and comid = "+"\'"+comid+"\'";
             List<Map<String,Object>>  pList = null;

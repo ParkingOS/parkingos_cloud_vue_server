@@ -37,4 +37,16 @@ public interface BolinkDataMapper {
     List<Map<String,Object>> getMonthTransactionsByGroupId(@Param("table_name")String bolinkTableName, @Param("b_time")Long b, @Param("e_time")Long e, @Param("groupId")Long groupid);
 
     List<Map<String,Object>> getMonthOutTransactionsByGroupId(@Param("table_name")String bolinkTableName, @Param("b_time")Long b, @Param("e_time")Long e, @Param("groupId")Long groupid);
+
+    List<Map<String,Object>> getParkDaylyStaticAnls(@Param("comid")Long comid,@Param("b_time") Long btime, @Param("e_time")Long etime);
+
+    List<Map<String,Object>> getParkMonthlyStaticAnls(@Param("comid")Long comid, @Param("b_time")Long btime, @Param("e_time")Long etime);
+
+    List<Map<String,Object>> getGroupParksAnly(@Param("groupid")Long groupid, @Param("comid")Long comid,  @Param("b_time")Long btime, @Param("e_time")Long etime);
+
+    List<Map<String,Object>> getGroupDaylyAnly(@Param("groupid")Long groupid,  @Param("b_time")Long btime, @Param("e_time")Long etime);
+
+    List<Map<String,Object>> getGroupMonthLyAnly(@Param("groupid")Long groupid,  @Param("b_time")Long btime, @Param("e_time")Long etime);
+
+    List<Map<String,Object>> getParkCollectorAnly(@Param("comid")Long comid, @Param("outUid")Long outCollector, @Param("b_time")Long start, @Param("e_time")Long end);
 }

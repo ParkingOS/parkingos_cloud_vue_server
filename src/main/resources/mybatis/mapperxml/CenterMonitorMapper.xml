@@ -13,7 +13,7 @@
         WHERE
         co.comid = cp.comid
         AND co.event_id = cp.event_id
-        AND co.groupid =#{groupid,jdbcType=VARCHAR}
+        AND co.comid in (SELECT id||'' from com_info_tb where groupid = #{groupid,jdbcType=BIGINT})
         AND co. STATE =0
         ORDER BY
         upload_time ASC
@@ -169,7 +169,7 @@
         FROM
         monitor_info_tb M
         WHERE
-        M .groupid =#{groupid,jdbcType=VARCHAR}
+        M .comid in (SELECT id||'' FROM com_info_tb where groupid =#{groupid,jdbcType=BIGINT})
         AND M . STATE =1
         AND "length"(M .play_src) > 0
         ORDER BY

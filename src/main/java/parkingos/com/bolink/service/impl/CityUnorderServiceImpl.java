@@ -54,10 +54,18 @@ public class CityUnorderServiceImpl implements CityUnorderService {
 
         String groupIdStr = reqmap.get("groupid");
         Long cityID = -1L;
+        List<Long> comList = null;
         if(!Check.isEmpty(groupIdStr)){
             Long groupId = Long.parseLong(groupIdStr);
             cityID = orderMapper.getCityIdByGroupId(groupId);
+            comList = orderMapper.getComlistByGroupid(groupId);
+            reqmap.put("comList",JSON.toJSONString(comList));
         }
+
+        if(comList==null||comList.isEmpty()){
+            return result;
+        }
+
         if(cityID!=null&&cityID>-1){
             reqmap.put("cityId",cityID+"");
             reqmap.put("tableName","order_tb_new_"+cityID%100);

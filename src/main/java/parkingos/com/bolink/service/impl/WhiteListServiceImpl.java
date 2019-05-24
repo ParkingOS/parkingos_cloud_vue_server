@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import parkingos.com.bolink.dao.spring.CommonDao;
+import parkingos.com.bolink.enums.FieldOperator;
 import parkingos.com.bolink.models.*;
 import parkingos.com.bolink.qo.PageOrderConfig;
 import parkingos.com.bolink.qo.SearchBean;
@@ -41,6 +42,8 @@ public class WhiteListServiceImpl implements WhiteListService {
     SaveLogService saveLogService;
     @Autowired
     CommonUtils commonUtils;
+    @Autowired
+    CommonMethods commonMethods;
 
 
     @Override
@@ -55,7 +58,7 @@ public class WhiteListServiceImpl implements WhiteListService {
 
         WhiteListTb whiteListTb = new WhiteListTb();
         Long groupId = Long.parseLong(reqParameterMap.get("groupid"));
-        whiteListTb.setGroupId(groupId);
+//        whiteListTb.setGroupId(groupId);
         String str = "{\"total\":0,\"page\":1,\"rows\":[]}";
         JSONObject result = JSONObject.parseObject(str);
         int count =0;
@@ -65,11 +68,34 @@ public class WhiteListServiceImpl implements WhiteListService {
         if(searchMap!=null&&!searchMap.isEmpty()){
             WhiteListTb t1 =(WhiteListTb)searchMap.get("base");
             List<SearchBean> supperQuery = null;
-            if(searchMap.containsKey("supper"))
-                supperQuery = (List<SearchBean>)searchMap.get("supper");
+            if(searchMap.containsKey("supper")) {
+                supperQuery = (List<SearchBean>) searchMap.get("supper");
+            }
             PageOrderConfig config = null;
-            if(searchMap.containsKey("config"))
-                config = (PageOrderConfig)searchMap.get("config");
+            if(searchMap.containsKey("config")) {
+                config = (PageOrderConfig) searchMap.get("config");
+            }
+            if(supperQuery==null){
+                supperQuery = new ArrayList<>();
+                List parks =new ArrayList();
+
+                if(groupId !=null&&!"".equals(groupId)){
+                    parks = commonMethods.getParks(groupId);
+                }
+                if(parks!=null&&!parks.isEmpty()){
+
+                    //封装searchbean  集团或者城市下面所有车场
+                    SearchBean searchBean = new SearchBean();
+                    searchBean.setOperator(FieldOperator.CONTAINS);
+                    searchBean.setFieldName("park_id");
+                    searchBean.setBasicValue(parks);
+
+                    supperQuery.add(searchBean);
+                }else{
+                    return result;
+                }
+            }
+
             count = commonDao.selectCountByConditions(t1,supperQuery);
             if(count>0){
                 if (config == null) {
@@ -85,7 +111,6 @@ public class WhiteListServiceImpl implements WhiteListService {
                         if((int)map.get("end_type")==0&&map.get("e_time")!=null&&(int)map.get("state")!=1){
                             if(Long.parseLong(map.get("e_time")+"")<System.currentTimeMillis()/1000){//已过期
                                 map.put("state",1);
-//                                updateList.add(map);
                                 WhiteListTb wh = new WhiteListTb();
                                 wh.setId((Long)map.get("id"));
                                 wh.setState(1);

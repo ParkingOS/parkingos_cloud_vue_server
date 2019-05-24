@@ -137,19 +137,6 @@ public class CityParkServiceImpl implements CityParkService {
 
 
         String bolinkid = RequestUtil.getString(request, "bolink_id");
-//        if(id==-1) {
-//            if (bolinkid != null && !"".equals(bolinkid)) {
-//                ComInfoTb infoTb = new ComInfoTb();
-//                infoTb.setBolinkId(bolinkid);
-//                infoTb.setState(0);
-//                int infoCount = commonDao.selectCountByConditions(infoTb);
-//                if (infoCount > 0) {
-//                    result.put("msg", "创建失败,泊链车场编号重复");
-//                    return result;
-//                }
-//            }
-//        }
-
 
         Long cityid = RequestUtil.getLong(request, "cityid", -1L);
 
@@ -181,6 +168,11 @@ public class CityParkServiceImpl implements CityParkService {
         comInfoTb.setCompanyName(company);
         comInfoTb.setMobile(mobile);
         comInfoTb.setParkingTotal(parking_total);
+
+        //新加可以修改集团
+        if(groupId>0) {
+            comInfoTb.setGroupid(groupId);
+        }
 
 
         List<Map<String, Object>> unionInfoList = commonDao.getObjectBySql("select oc.union_id, oc.ukey union_key, og.operatorid operator_id,oc.id from org_city_merchants oc " +
@@ -228,7 +220,7 @@ public class CityParkServiceImpl implements CityParkService {
             //获取id
             Long comid = commonDao.selectSequence(ComInfoTb.class);
             comInfoTb.setId(comid);
-            comInfoTb.setGroupid(groupId);
+//            comInfoTb.setGroupid(groupId);
             comInfoTb.setCityid(cityid);
             //添加自动生成车场16位秘钥的逻辑
             String ukey = StringUtils.createRandomCharData(16);
@@ -316,7 +308,6 @@ public class CityParkServiceImpl implements CityParkService {
                                 saveLogService.saveLog(parkLogTb);
                             }
 
-
                             return result;
                         } else {
                             result.put("state", 0);
@@ -389,18 +380,45 @@ public class CityParkServiceImpl implements CityParkService {
 //            }
         } else {
 
-            //只是证明是在更新 但是id  不是云平台的主键id
-            commonService.deleteCachPark(union_id, bolinkid);
+            //有id只是证明是在更新 但是id  不是云平台的主键id
+
+//            ComInfoTb con = new ComInfoTb();
+//            con.setUnionId(union_id);
+//            con.setBolinkId(bolinkid);
+                //如果现在修改了车场的所属集团
+            ComInfoTb con = commonService.getComInfoByUnionIdAndParkId(union_id,bolinkid);
+            Long groupIdBefore = con.getGroupid();
+            if(!groupIdBefore.equals(groupId)&&groupId>0){
+                //如果以前的车场有集团，那么需要更新之前的统计报表
+//                if(groupIdBefore>0) {
+//                    StaticAnalysisTb staticCon = new StaticAnalysisTb();
+//                    staticCon.setGroupId(groupIdBefore);
+//                    StaticAnalysisTb updateSta = new StaticAnalysisTb();
+//                    updateSta.setGroupId(groupId);
+//                    int updateStatic = commonDao.updateByConditions(updateSta, staticCon);
+//                    logger.info("更新车场所属集团:" + updateStatic);
+//                }else{
+                    //以前的车场没有所属集团
+                    StaticAnalysisTb staticCon = new StaticAnalysisTb();
+                    staticCon.setParkId(con.getId());
+                    StaticAnalysisTb updateSta = new StaticAnalysisTb();
+                    updateSta.setGroupId(groupId);
+                    int updateStatic = commonDao.updateByConditions(updateSta, staticCon);
+                    logger.info("更新车场所属集团:" + updateStatic);
+//                }
+            }
 
             comInfoTb.setUpdateTime(System.currentTimeMillis() / 1000);
-
-            ComInfoTb con = new ComInfoTb();
-            con.setUnionId(union_id);
-            con.setBolinkId(bolinkid);
-            int update = commonDao.updateByConditions(comInfoTb, con);
+            comInfoTb.setId(con.getId());
+            int update = commonDao.updateByPrimaryKey(comInfoTb);
 
 //            int update = commonDao.updateByPrimaryKey(comInfoTb);
             if (update == 1) {
+
+
+                //清除缓存
+                commonService.deleteCachPark(union_id, bolinkid);
+
                 result.put("state", 1);
                 result.put("msg", "修改车场成功");
 

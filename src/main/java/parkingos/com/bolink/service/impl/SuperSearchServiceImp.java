@@ -105,7 +105,7 @@ public class SuperSearchServiceImp<T> implements SupperSearchService<T> {
         Map searchMap = getBaseSearch(t,params);
         String groupid = params.get("groupid");
         String cityid = params.get("cityid");
-        System.out.println("======groupid:"+groupid+"===!!cityid:"+cityid);
+        logger.info("======groupid:"+groupid+"===!!cityid:"+cityid+"~~~"+searchMap);
         if(searchMap!=null&&!searchMap.isEmpty()){
             T baseQuery =(T)searchMap.get("base");
             List<SearchBean> supperQuery = null;

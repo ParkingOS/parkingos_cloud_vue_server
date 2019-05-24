@@ -46,31 +46,16 @@ public class ParkOrderanlysisServiceImpl implements ParkOrderAnlysisService {
 
         Long comid = Long.parseLong(reqmap.get("comid"));
 
-//        Long groupId = orderMapper.getGroupIdByComId(comid);
-//        Long cityId = -1L;
-//        if(groupId!=null&&groupId>-1){
-//            cityId = orderMapper.getCityIdByGroupId(groupId);
-//        }else{
-//            cityId = orderMapper.getCityIdByComId(comid);
-//        }
-        Long cityId = commonService.getCityIdByComid(comid);
-
-        String tableName = "order_tb_new";
-        if(cityId!=null&&cityId>-1){
-            reqmap.put("cityId",cityId+"");
-            tableName += "_"+cityId%100;
-        }
-        reqmap.put("tableName",tableName);
-        reqmap.put("comid_start",comid+"");
-        reqmap.put("end_time","between");
 
         String date = StringUtils.decodeUTF8(StringUtils.decodeUTF8(reqmap.get("date")));
-        logger.error("=====date:"+date);
+        logger.info("=====查询车场日报:"+reqmap);
 
         Long btime = null;
         Long etime = null;
+        int istoday = 1;
         if(date==null||"".equals(date)){
-            btime = TimeTools.getThisWeekBeginTime();
+//            btime = TimeTools.getThisWeekBeginTime();
+            btime = TimeTools.getToDayBeginTime();
             etime =TimeTools.getToDayBeginTime()+86399;
         }else {
             String[] dateArr = date.split("至");
@@ -79,235 +64,250 @@ public class ParkOrderanlysisServiceImpl implements ParkOrderAnlysisService {
             btime = TimeTools.getLongMilliSecondFrom_HHMMDDHHmmss(start);
             etime = TimeTools.getLongMilliSecondFrom_HHMMDDHHmmss(end);
         }
-        reqmap.put("end_time_start",btime+"");
-        reqmap.put("end_time_end",etime+"");
 
-        /*3.0从订单取出所有金额数据。4.0开始泊链开始对账数据取泊链数据。现在该接口只取现金和减免
-           cash_pay
-           free_pay
-           e_time
-        */
-//        List<Map<String,String>> backList = new ArrayList<>();
-        List<Map<String,String>> cashList = orderServer.selectParkDayAnlysis(reqmap);
-        logger.info("====>>>>>>车场日报："+cashList);
-
-
-        /*
-        * 查询交易订单记录
-        *   第一步  根据comid查询unionId
-        *
-        * */
-        String bolinkTableName = commonService.getTableNameByComid(comid,1);
-        List<Map<String,Object>> inTransactions = bolinkDataMapper.getTransactions(bolinkTableName,btime,etime,comid);
-
-        /*
-        * 根据、、查询支出记录
-        *
-        * */
-        bolinkTableName=commonService.getTableNameByComid(comid,2);
-        List<Map<String,Object>> outTransactions = bolinkDataMapper.getTransactions(bolinkTableName,btime,etime,comid);
-
-
-        //把所有的日期组织成list
-        List<String> timeList = new ArrayList<>();
-        if(cashList!=null&&cashList.size()>0){
-            for(Map<String,String> cashMap:cashList){
-                timeList.add(cashMap.get("e_time"));
-            }
-        }
-        if(inTransactions!=null&&inTransactions.size()>0){
-            for(Map<String,Object> inMap:inTransactions){
-                if (!timeList.contains(inMap.get("p_time")+"")) {
-                    timeList.add(inMap.get("p_time") + "");
-                }
-            }
-        }
-        if(outTransactions!=null&&outTransactions.size()>0){
-            for(Map<String,Object> outMap:outTransactions){
-                if (!timeList.contains(outMap.get("p_time")+"")) {
-                    timeList.add(outMap.get("p_time") + "");
-                }
-            }
+        if(btime<TimeTools.getToDayBeginTime()){
+            istoday =0 ;
         }
 
-        Collections.sort(timeList);
+
+        Double cash_money = 0.0d;//所有的现金金额
+        Double ele_money=0.0d;//所有的电子金额
+        Double out_money=0.0d;//所有的支出金额
+        Double ele_prepay_money=0.0d;//所有的电子预付金额
+        Double ele_pay_money=0.0d;//所有的电子结算金额
+        Double month_money=0.0d;//所有的月卡金额
+        Double prepay_card=0.0d;//所有的储值卡(通用支付)
+        Double cash_pay_money=0.0d;//所有的现金结算
+        Double cash_prepay_money=0.0d;//所有的现金预付金额;
+        Double free_money=0.0d;//所有的免费金额
+        Double refund_money=0.0d;//所有的退款金额；
+        Double fee_money=0.0d;//所有的手续费金额；
+        Double change_money=0.0d;//所有的找零金额；
 
         List<Map<String,String>> backList = new ArrayList<>();
-        if(timeList!=null&&timeList.size()>0){
-            Double cash_money = 0.0d;//所有的现金金额
-            Double ele_money=0.0d;//所有的电子金额
-            Double out_money=0.0d;//所有的支出金额
-            Double ele_prepay_money=0.0d;//所有的电子预付金额
-            Double ele_pay_money=0.0d;//所有的电子结算金额
-            Double month_money=0.0d;//所有的月卡金额
-            Double prepay_card=0.0d;//所有的储值卡(通用支付)
-            Double cash_pay_money=0.0d;//所有的现金结算
-            Double cash_prepay_money=0.0d;//所有的现金预付金额;
-            Double free_money=0.0d;//所有的免费金额
-            Double refund_money=0.0d;//所有的退款金额；
-            Double fee_money=0.0d;//所有的手续费金额；
-            Double change_money=0.0d;//所有的找零金额；
-            for(String time:timeList){
-                Map<String,String> resultMap = new HashMap<>();
-                resultMap.put("e_time",time);
-                resultMap.put("ele_prepay",StringUtils.formatDouble(0.0d)+"");
-                resultMap.put("ele_pay",StringUtils.formatDouble(0.0d)+"");
-                resultMap.put("month_pay",StringUtils.formatDouble(0.0d)+"");
-                //通用支付。
-                resultMap.put("prepay_card",StringUtils.formatDouble(0.0d)+"");
-                resultMap.put("ele_total",StringUtils.formatDouble(0.0d)+"");
-                resultMap.put("cash_pay",StringUtils.formatDouble(0.0d)+"");
-                resultMap.put("cash_prepay",StringUtils.formatDouble(0.0d)+"");
-                resultMap.put("cash_total",StringUtils.formatDouble(0.0d)+"");
-                resultMap.put("free_pay",StringUtils.formatDouble(0.0d)+"");
-                resultMap.put("refund",StringUtils.formatDouble(0.0d)+"");
-                resultMap.put("fee",StringUtils.formatDouble(0.0d)+"");
-                resultMap.put("change",StringUtils.formatDouble(0.0d)+"");
-                resultMap.put("expense_total",StringUtils.formatDouble(0.0d)+"");
-                Double cash_total = 0.0d;//某一天的现金金额
-                Double eleTotal = 0.0d;//某一天的电子金额
-                Double outTotal = 0.0d;//某一天的支出金额
-                if(cashList!=null&&cashList.size()>0){
-                    for(Map<String,String>cashMap:cashList){
-                        if(time.equals(cashMap.get("e_time"))){
-                            cash_money+=StringUtils.formatDouble(cashMap.get("cash_pay"));
-                            cash_pay_money+=StringUtils.formatDouble(cashMap.get("cash_pay"));
-                            cash_total+=StringUtils.formatDouble(cashMap.get("cash_pay"));
-                            free_money+=StringUtils.formatDouble(cashMap.get("free_pay"));
-                            resultMap.put("cash_pay",StringUtils.formatDouble(cashMap.get("cash_pay"))+"");
-//                            resultMap.put("cash_total",StringUtils.formatDouble(cash_total)+"");
-                            resultMap.put("free_pay",StringUtils.formatDouble(cashMap.get("free_pay"))+"");
-                            break;
-                        }
-                    }
-                }
-                if(inTransactions!=null&&inTransactions.size()>0){
-                    for(Map<String,Object> inMap:inTransactions){
-                        if(time.equals(inMap.get("p_time"))) {
-                            int type = (int) inMap.get("type");
-                            if (type == BolinkAccountTypeEnum.CASH_PREPAY.type) {
-                                cash_money += StringUtils.formatDouble(inMap.get("pay_money"));
-                                cash_prepay_money += StringUtils.formatDouble(inMap.get("pay_money"));
-                                cash_total += StringUtils.formatDouble(inMap.get("pay_money"));
-                                resultMap.put("cash_prepay", StringUtils.formatDouble(inMap.get("pay_money")) + "");
-                            } else if (type == BolinkAccountTypeEnum.ELE_PREPAY.type) {
-                                ele_money += StringUtils.formatDouble(inMap.get("pay_money"));
-                                ele_prepay_money += StringUtils.formatDouble(inMap.get("pay_money"));
-                                eleTotal += StringUtils.formatDouble(inMap.get("pay_money"));
-                                resultMap.put("ele_prepay", StringUtils.formatDouble(inMap.get("pay_money")) + "");
-                            } else if (type == BolinkAccountTypeEnum.ELE_PAY.type) {
-                                ele_money += StringUtils.formatDouble(inMap.get("pay_money"));
-                                ele_pay_money += StringUtils.formatDouble(inMap.get("pay_money"));
-                                eleTotal += StringUtils.formatDouble(inMap.get("pay_money"));
-                                resultMap.put("ele_pay", StringUtils.formatDouble(inMap.get("pay_money")) + "");
-                            } else if (type == BolinkAccountTypeEnum.MONTH_PAY.type) {
-                                ele_money += StringUtils.formatDouble(inMap.get("pay_money"));
-                                month_money += StringUtils.formatDouble(inMap.get("pay_money"));
-                                eleTotal += StringUtils.formatDouble(inMap.get("pay_money"));
-                                resultMap.put("month_pay", StringUtils.formatDouble(inMap.get("pay_money")) + "");
-                            } else if (type == BolinkAccountTypeEnum.UNIFIED_ORDER.type) {
-                                ele_money += StringUtils.formatDouble(inMap.get("pay_money"));
-                                prepay_card += StringUtils.formatDouble(inMap.get("pay_money"));
-                                eleTotal += StringUtils.formatDouble(inMap.get("pay_money"));
-                                resultMap.put("prepay_card", StringUtils.formatDouble(inMap.get("pay_money")) + "");
-                            }
-                        }
-                    }
-                }
-                resultMap.put("ele_total",StringUtils.formatDouble(eleTotal)+"");
-                resultMap.put("cash_total",StringUtils.formatDouble(cash_total)+"");
 
-                if(outTransactions!=null&&outTransactions.size()>0){
-                    for(Map<String,Object> outMap:outTransactions){
-                        if(time.equals(outMap.get("p_time"))) {
-                            int type = (int) outMap.get("type");
-                            if (type == BolinkAccountTypeEnum.FEE.type) {
-                                out_money += StringUtils.formatDouble(outMap.get("pay_money"));
-                                fee_money += StringUtils.formatDouble(outMap.get("pay_money"));
-                                outTotal += StringUtils.formatDouble(outMap.get("pay_money"));
-                                resultMap.put("fee", StringUtils.formatDouble(outMap.get("pay_money")) + "");
-                            } else if (type == BolinkAccountTypeEnum.REFUND.type) {
-                                out_money += StringUtils.formatDouble(outMap.get("pay_money"));
-                                refund_money += StringUtils.formatDouble(outMap.get("pay_money"));
-                                outTotal += StringUtils.formatDouble(outMap.get("pay_money"));
-                                resultMap.put("refund", StringUtils.formatDouble(outMap.get("pay_money")) + "");
-                            } else if (type == BolinkAccountTypeEnum.CHANGE.type) {
-                                out_money += StringUtils.formatDouble(outMap.get("pay_money"));
-                                change_money += StringUtils.formatDouble(outMap.get("pay_money"));
-                                outTotal += StringUtils.formatDouble(outMap.get("pay_money"));
-                                resultMap.put("change", StringUtils.formatDouble(outMap.get("pay_money")) + "");
+        if(istoday==1){
+            //如果是查询今天的数据  那么是动态的数据
+
+            Long cityId = commonService.getCityIdByComid(comid);
+            String tableName = "order_tb_new";
+            if(cityId!=null&&cityId>-1){
+                reqmap.put("cityId",cityId+"");
+                tableName += "_"+cityId%100;
+            }
+            reqmap.put("tableName",tableName);
+            reqmap.put("comid_start",comid+"");
+            reqmap.put("end_time","between");
+                    reqmap.put("end_time_start",btime+"");
+            reqmap.put("end_time_end",etime+"");
+
+            List<Map<String,String>> cashList = orderServer.selectParkDayAnlysis(reqmap);
+            logger.info("====>>>>>>车场日报："+cashList);
+
+            /*
+            * 查询交易订单记录
+            *   第一步  根据comid查询unionId
+            *
+            * */
+            String bolinkTableName = commonService.getTableNameByComid(comid,1);
+            List<Map<String,Object>> inTransactions = bolinkDataMapper.getTransactions(bolinkTableName,btime,etime,comid);
+
+            /*
+            * 根据、、查询支出记录
+            *
+            * */
+            bolinkTableName=commonService.getTableNameByComid(comid,2);
+            List<Map<String,Object>> outTransactions = bolinkDataMapper.getTransactions(bolinkTableName,btime,etime,comid);
+
+            //把所有的日期组织成list
+            List<String> timeList = new ArrayList<>();
+            if(cashList!=null&&cashList.size()>0){
+                for(Map<String,String> cashMap:cashList){
+                    timeList.add(cashMap.get("e_time"));
+                }
+            }
+            if(inTransactions!=null&&inTransactions.size()>0){
+                for(Map<String,Object> inMap:inTransactions){
+                    if (!timeList.contains(inMap.get("p_time")+"")) {
+                        timeList.add(inMap.get("p_time") + "");
+                    }
+                }
+            }
+            if(outTransactions!=null&&outTransactions.size()>0){
+                for(Map<String,Object> outMap:outTransactions){
+                    if (!timeList.contains(outMap.get("p_time")+"")) {
+                        timeList.add(outMap.get("p_time") + "");
+                    }
+                }
+            }
+
+            Collections.sort(timeList);
+
+            if(timeList!=null&&timeList.size()>0) {
+                for (String time : timeList) {
+                    Map<String, String> resultMap = new HashMap<>();
+                    resultMap.put("e_time", time);
+                    resultMap.put("ele_prepay", StringUtils.formatDouble(0.0d) + "");
+                    resultMap.put("ele_pay", StringUtils.formatDouble(0.0d) + "");
+                    resultMap.put("month_pay", StringUtils.formatDouble(0.0d) + "");
+                    //通用支付。
+                    resultMap.put("prepay_card", StringUtils.formatDouble(0.0d) + "");
+                    resultMap.put("ele_total", StringUtils.formatDouble(0.0d) + "");
+                    resultMap.put("cash_pay", StringUtils.formatDouble(0.0d) + "");
+                    resultMap.put("cash_prepay", StringUtils.formatDouble(0.0d) + "");
+                    resultMap.put("cash_total", StringUtils.formatDouble(0.0d) + "");
+                    resultMap.put("free_pay", StringUtils.formatDouble(0.0d) + "");
+                    resultMap.put("refund", StringUtils.formatDouble(0.0d) + "");
+                    resultMap.put("fee", StringUtils.formatDouble(0.0d) + "");
+                    resultMap.put("change", StringUtils.formatDouble(0.0d) + "");
+                    resultMap.put("expense_total", StringUtils.formatDouble(0.0d) + "");
+                    Double cash_total = 0.0d;//某一天的现金金额
+                    Double eleTotal = 0.0d;//某一天的电子金额
+                    Double outTotal = 0.0d;//某一天的支出金额
+                    if (cashList != null && cashList.size() > 0) {
+                        for (Map<String, String> cashMap : cashList) {
+                            if (time.equals(cashMap.get("e_time"))) {
+                                cash_money += StringUtils.formatDouble(cashMap.get("cash_pay"));
+                                cash_pay_money += StringUtils.formatDouble(cashMap.get("cash_pay"));
+                                cash_total += StringUtils.formatDouble(cashMap.get("cash_pay"));
+                                free_money += StringUtils.formatDouble(cashMap.get("free_pay"));
+                                resultMap.put("cash_pay", StringUtils.formatDouble(cashMap.get("cash_pay")) + "");
+                                //                            resultMap.put("cash_total",StringUtils.formatDouble(cash_total)+"");
+                                resultMap.put("free_pay", StringUtils.formatDouble(cashMap.get("free_pay")) + "");
+                                break;
                             }
                         }
                     }
+                    if (inTransactions != null && inTransactions.size() > 0) {
+                        for (Map<String, Object> inMap : inTransactions) {
+                            if (time.equals(inMap.get("p_time"))) {
+                                int type = (int) inMap.get("type");
+                                if (type == BolinkAccountTypeEnum.CASH_PREPAY.type) {
+                                    cash_money += StringUtils.formatDouble(inMap.get("pay_money"));
+                                    cash_prepay_money += StringUtils.formatDouble(inMap.get("pay_money"));
+                                    cash_total += StringUtils.formatDouble(inMap.get("pay_money"));
+                                    resultMap.put("cash_prepay", StringUtils.formatDouble(inMap.get("pay_money")) + "");
+                                } else if (type == BolinkAccountTypeEnum.ELE_PREPAY.type) {
+                                    ele_money += StringUtils.formatDouble(inMap.get("pay_money"));
+                                    ele_prepay_money += StringUtils.formatDouble(inMap.get("pay_money"));
+                                    eleTotal += StringUtils.formatDouble(inMap.get("pay_money"));
+                                    resultMap.put("ele_prepay", StringUtils.formatDouble(inMap.get("pay_money")) + "");
+                                } else if (type == BolinkAccountTypeEnum.ELE_PAY.type) {
+                                    ele_money += StringUtils.formatDouble(inMap.get("pay_money"));
+                                    ele_pay_money += StringUtils.formatDouble(inMap.get("pay_money"));
+                                    eleTotal += StringUtils.formatDouble(inMap.get("pay_money"));
+                                    resultMap.put("ele_pay", StringUtils.formatDouble(inMap.get("pay_money")) + "");
+                                } else if (type == BolinkAccountTypeEnum.MONTH_PAY.type) {
+                                    ele_money += StringUtils.formatDouble(inMap.get("pay_money"));
+                                    month_money += StringUtils.formatDouble(inMap.get("pay_money"));
+                                    eleTotal += StringUtils.formatDouble(inMap.get("pay_money"));
+                                    resultMap.put("month_pay", StringUtils.formatDouble(inMap.get("pay_money")) + "");
+                                } else if (type == BolinkAccountTypeEnum.UNIFIED_ORDER.type) {
+                                    ele_money += StringUtils.formatDouble(inMap.get("pay_money"));
+                                    prepay_card += StringUtils.formatDouble(inMap.get("pay_money"));
+                                    eleTotal += StringUtils.formatDouble(inMap.get("pay_money"));
+                                    resultMap.put("prepay_card", StringUtils.formatDouble(inMap.get("pay_money")) + "");
+                                }
+                            }
+                        }
+                    }
+                    resultMap.put("ele_total", StringUtils.formatDouble(eleTotal) + "");
+                    resultMap.put("cash_total", StringUtils.formatDouble(cash_total) + "");
+
+                    if (outTransactions != null && outTransactions.size() > 0) {
+                        for (Map<String, Object> outMap : outTransactions) {
+                            if (time.equals(outMap.get("p_time"))) {
+                                int type = (int) outMap.get("type");
+                                if (type == BolinkAccountTypeEnum.FEE.type) {
+                                    out_money += StringUtils.formatDouble(outMap.get("pay_money"));
+                                    fee_money += StringUtils.formatDouble(outMap.get("pay_money"));
+                                    outTotal += StringUtils.formatDouble(outMap.get("pay_money"));
+                                    resultMap.put("fee", StringUtils.formatDouble(outMap.get("pay_money")) + "");
+                                } else if (type == BolinkAccountTypeEnum.REFUND.type) {
+                                    out_money += StringUtils.formatDouble(outMap.get("pay_money"));
+                                    refund_money += StringUtils.formatDouble(outMap.get("pay_money"));
+                                    outTotal += StringUtils.formatDouble(outMap.get("pay_money"));
+                                    resultMap.put("refund", StringUtils.formatDouble(outMap.get("pay_money")) + "");
+                                } else if (type == BolinkAccountTypeEnum.CHANGE.type) {
+                                    out_money += StringUtils.formatDouble(outMap.get("pay_money"));
+                                    change_money += StringUtils.formatDouble(outMap.get("pay_money"));
+                                    outTotal += StringUtils.formatDouble(outMap.get("pay_money"));
+                                    resultMap.put("change", StringUtils.formatDouble(outMap.get("pay_money")) + "");
+                                }
+                            }
+                        }
+                    }
+                    resultMap.put("expense_total", StringUtils.formatDouble(outTotal) + "");
+                    backList.add(resultMap);
                 }
-                resultMap.put("expense_total",StringUtils.formatDouble(outTotal)+"");
+            }
+        }else{
+            List<Map<String,Object>> parkAnlys = bolinkDataMapper.getParkDaylyStaticAnls(comid,btime,etime);
+            logger.info("===>>>>>backList:"+parkAnlys);
+
+            if(parkAnlys==null||parkAnlys.isEmpty()){
+                return result;
+            }
+
+            for(Map<String,Object> map:parkAnlys){
+
+                cash_money+=StringUtils.formatDouble(map.get("cash_total"));
+                ele_money+=StringUtils.formatDouble(map.get("ele_total"));
+                out_money+=StringUtils.formatDouble(map.get("out_total"));
+                ele_prepay_money+=StringUtils.formatDouble(map.get("ele_prepay"));
+                ele_pay_money+=StringUtils.formatDouble(map.get("ele_pay"));
+                month_money+=StringUtils.formatDouble(map.get("monthcard_pay"));
+                prepay_card+=StringUtils.formatDouble(map.get("other_pay"));
+                cash_pay_money+=StringUtils.formatDouble(map.get("cash_pay"));
+                cash_prepay_money+=StringUtils.formatDouble(map.get("cash_prepay"));
+                free_money+=StringUtils.formatDouble(map.get("reduce"));
+                refund_money+=StringUtils.formatDouble(map.get("refund"));
+                fee_money+=StringUtils.formatDouble(map.get("fee"));
+                change_money+=StringUtils.formatDouble(map.get("recharge"));
+
+                Map<String,String> resultMap = new HashMap<>();
+                resultMap.put("e_time",map.get("pay_time_day_str")+"");
+                resultMap.put("ele_prepay",StringUtils.formatDouble(map.get("ele_prepay"))+"");
+                resultMap.put("ele_pay",StringUtils.formatDouble(map.get("ele_pay"))+"");
+                resultMap.put("month_pay",StringUtils.formatDouble(map.get("monthcard_pay"))+"");
+                resultMap.put("prepay_card",StringUtils.formatDouble(map.get("other_pay"))+"");
+                resultMap.put("ele_total",StringUtils.formatDouble(map.get("ele_total"))+"");
+                resultMap.put("cash_pay",StringUtils.formatDouble(map.get("cash_pay"))+"");
+                resultMap.put("cash_prepay",StringUtils.formatDouble(map.get("cash_prepay"))+"");
+                resultMap.put("cash_total",StringUtils.formatDouble(map.get("cash_total"))+"");
+                resultMap.put("free_pay",StringUtils.formatDouble(map.get("reduce"))+"");
+                resultMap.put("refund",StringUtils.formatDouble(map.get("refund"))+"");
+                resultMap.put("fee",StringUtils.formatDouble(map.get("fee"))+"");
+                resultMap.put("change",StringUtils.formatDouble(map.get("recharge"))+"");
+                resultMap.put("expense_total",StringUtils.formatDouble(map.get("out_total"))+"");
                 backList.add(resultMap);
             }
-            Map<String,String> resultMap = new HashMap<>();
-            resultMap.put("e_time","合计");
-            resultMap.put("ele_prepay",StringUtils.formatDouble(ele_prepay_money)+"");
-            resultMap.put("ele_pay",StringUtils.formatDouble(ele_pay_money)+"");
-            resultMap.put("month_pay",StringUtils.formatDouble(month_money)+"");
-            resultMap.put("prepay_card",StringUtils.formatDouble(prepay_card)+"");
-            resultMap.put("ele_total",StringUtils.formatDouble(ele_money)+"");
-            resultMap.put("cash_pay",StringUtils.formatDouble(cash_pay_money)+"");
-            resultMap.put("cash_prepay",StringUtils.formatDouble(cash_prepay_money)+"");
-            resultMap.put("cash_total",StringUtils.formatDouble(cash_money)+"");
-            resultMap.put("free_pay",StringUtils.formatDouble(free_money)+"");
-            resultMap.put("refund",StringUtils.formatDouble(refund_money)+"");
-            resultMap.put("fee",StringUtils.formatDouble(fee_money)+"");
-            resultMap.put("change",StringUtils.formatDouble(change_money)+"");
-            resultMap.put("expense_total",StringUtils.formatDouble(out_money)+"");
-            backList.add(resultMap);
         }
 
-//        if(cashList!=null&&cashList.size()>0){
-//            //现金数据不为空，往里面添加电子支付的内容
-//            for (Map<String, String> cashMap : cashList) {
-//                String time = cashMap.get("e_time");
-//                cashMap.put("ele_prepay",StringUtils.formatDouble(0.0d)+"");
-//                cashMap.put("ele_pay",StringUtils.formatDouble(0.0d)+"");
-//                cashMap.put("month_pay",StringUtils.formatDouble(0.0d)+"");
-//                cashMap.put("prepay_card",StringUtils.formatDouble(0.0d)+"");
-//                cashMap.put("ele_total",StringUtils.formatDouble(0.0d)+"");
-//                cashMap.put("cash_prepay",StringUtils.formatDouble(0.0d)+"");
-//                cashMap.put("cash_total",StringUtils.formatDouble(cashMap.get("cash_pay"))+"");
-//                if(inTransactions!=null){
-//                    for(Map<String,Object> inMap:inTransactions){
-//                        Double eleTotal = 0.0d;
-//                        Double cashTotal = StringUtils.formatDouble(cashMap.get("cash_pay"));
-//                        if(time.equals(inMap.get("p_time"))){
-//                            int type = (int)inMap.get("type");
-//                            if(type== BolinkAccountTypeEnum.CASH_PREPAY.type){
-//                                cashTotal+=StringUtils.formatDouble(inMap.get("pay_money"));
-//                                cashMap.put("cash_prepay",StringUtils.formatDouble(inMap.get("pay_money"))+"");
-//                            }else if(type==BolinkAccountTypeEnum.ELE_PREPAY.type){
-//                                eleTotal+=StringUtils.formatDouble(inMap.get("pay_money"));
-//                                cashMap.put("ele_prepay",StringUtils.formatDouble(inMap.get("pay_money"))+"");
-//                            }else if(type==BolinkAccountTypeEnum.ELE_PAY.type){
-//                                eleTotal+=StringUtils.formatDouble(inMap.get("pay_money"));
-//                                cashMap.put("ele_pay",StringUtils.formatDouble(inMap.get("pay_money"))+"");
-//                            }else if(type==BolinkAccountTypeEnum.MONTH_PAY.type){
-//                                eleTotal+=StringUtils.formatDouble(inMap.get("pay_money"));
-//                                cashMap.put("month_pay",StringUtils.formatDouble(inMap.get("pay_money"))+"");
-//                            }else if(type==BolinkAccountTypeEnum.PREPAY_CARD.type){
-//                                eleTotal+=StringUtils.formatDouble(inMap.get("pay_money"));
-//                                cashMap.put("prepay_card",StringUtils.formatDouble(inMap.get("pay_money"))+"");
-//                            }
-//                            cashMap.put("ele_total",StringUtils.formatDouble(eleTotal)+"");
-//                            cashMap.put("cash_total",StringUtils.formatDouble(cashTotal)+"");
-//                        }
-//                    }
-//                }
-//            }
-//
-//
-//        }else if(inTransactions!=null){
-//            //现金数据和见面数据为空，电子支付不为空
-//        }else{
-//            //现金和电子数据都为空
-//        }
 
+
+
+        /*
+        * 4.0实时查数据  下面是增加了定时任务 每天凌晨跑前一天的数据 成静态表
+        *
+        * */
+
+        Map<String,String> resultMap = new HashMap<>();
+        resultMap.put("e_time","合计");
+        resultMap.put("ele_prepay",StringUtils.formatDouble(ele_prepay_money)+"");
+        resultMap.put("ele_pay",StringUtils.formatDouble(ele_pay_money)+"");
+        resultMap.put("month_pay",StringUtils.formatDouble(month_money)+"");
+        resultMap.put("prepay_card",StringUtils.formatDouble(prepay_card)+"");
+        resultMap.put("ele_total",StringUtils.formatDouble(ele_money)+"");
+        resultMap.put("cash_pay",StringUtils.formatDouble(cash_pay_money)+"");
+        resultMap.put("cash_prepay",StringUtils.formatDouble(cash_prepay_money)+"");
+        resultMap.put("cash_total",StringUtils.formatDouble(cash_money)+"");
+        resultMap.put("free_pay",StringUtils.formatDouble(free_money)+"");
+        resultMap.put("refund",StringUtils.formatDouble(refund_money)+"");
+        resultMap.put("fee",StringUtils.formatDouble(fee_money)+"");
+        resultMap.put("change",StringUtils.formatDouble(change_money)+"");
+        resultMap.put("expense_total",StringUtils.formatDouble(out_money)+"");
+        backList.add(resultMap);
 
         result.put("rows",JSON.toJSON(backList));
         return result;

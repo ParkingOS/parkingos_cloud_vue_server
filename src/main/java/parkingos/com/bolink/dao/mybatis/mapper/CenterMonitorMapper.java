@@ -8,7 +8,7 @@ import java.util.List;
 import java.util.Map;
 @Mapper
 public interface CenterMonitorMapper {
-    List<HashMap<String,Object>> getConfirmOrdersByGroupid( @Param("groupid") String groupid);
+    List<HashMap<String,Object>> getConfirmOrdersByGroupid( @Param("groupid") Long groupid);
 
     List<HashMap<String,Object>> getConfirmOrdersByComid( @Param("comid") String comid);
 
@@ -26,7 +26,7 @@ public interface CenterMonitorMapper {
 
     Map<String,Object> getMonitorMap(@Param("calleridnum")Long callerid_num);
 
-    List<Map<String,Object>> getMonitorsByGroupid(@Param("groupid")String groupid);
+    List<Map<String,Object>> getMonitorsByGroupid(@Param("groupid")Long groupid);
 
     List<Map<String,Object>> getMonitorsByComid(@Param("comid")String comid);
 

@@ -149,7 +149,7 @@
         FROM
         ${table_name}
         WHERE
-        group_id = #{groupId,jdbcType=BIGINT}
+         park_id in (SELECT  id from com_info_tb where groupid = #{groupId,jdbcType=BIGINT})
         AND pay_time BETWEEN #{b_time,jdbcType=BIGINT}
         AND #{e_time,jdbcType=BIGINT}
         GROUP BY
@@ -179,7 +179,7 @@
         FROM
         ${table_name}
         WHERE
-        group_id = #{groupId,jdbcType=BIGINT}
+         park_id in (SELECT  id from com_info_tb where groupid = #{groupId,jdbcType=BIGINT})
         AND pay_time BETWEEN #{b_time,jdbcType=BIGINT}
         AND #{e_time,jdbcType=BIGINT}
         GROUP BY
@@ -198,7 +198,7 @@
         FROM
         ${table_name}
         WHERE
-        group_id = #{groupId,jdbcType=BIGINT}
+        park_id in (SELECT  id from com_info_tb where groupid = #{groupId,jdbcType=BIGINT})
         AND pay_time BETWEEN #{b_time,jdbcType=BIGINT}
         AND #{e_time,jdbcType=BIGINT}
         GROUP BY
@@ -219,7 +219,7 @@
         FROM
         ${table_name}
         WHERE
-        group_id = #{groupId,jdbcType=BIGINT}
+        park_id in (SELECT  id from com_info_tb where groupid = #{groupId,jdbcType=BIGINT})
         AND pay_time BETWEEN #{b_time,jdbcType=BIGINT}
         AND #{e_time,jdbcType=BIGINT}
         GROUP BY
@@ -240,7 +240,7 @@
         FROM
         ${table_name}
         WHERE
-        group_id = #{groupId,jdbcType=BIGINT}
+         park_id in (SELECT  id from com_info_tb where groupid = #{groupId,jdbcType=BIGINT})
         AND pay_time BETWEEN #{b_time,jdbcType=BIGINT}
         AND #{e_time,jdbcType=BIGINT}
         GROUP BY
@@ -261,7 +261,7 @@
         FROM
         ${table_name}
         WHERE
-        group_id = #{groupId,jdbcType=BIGINT}
+         park_id in (SELECT  id from com_info_tb where groupid = #{groupId,jdbcType=BIGINT})
         AND pay_time BETWEEN #{b_time,jdbcType=BIGINT}
         AND #{e_time,jdbcType=BIGINT}
         GROUP BY
@@ -269,5 +269,152 @@
         ORDER BY
         time
     </select>
+
+
+
+
+    <select id="getParkDaylyStaticAnls" resultType="map">
+        SELECT
+    SUM (ele_prepay+ele_pay+monthcard_pay+other_pay) ele_total,
+    SUM (cash_pay+cash_prepay) cash_total,
+    SUM (fee+refund+recharge) out_total,
+	SUM (cash_pay) cash_pay,
+	SUM (cash_prepay) cash_prepay,
+	SUM (ele_prepay) ele_prepay,
+	SUM (ele_pay) ele_pay,
+	SUM (monthcard_pay) monthcard_pay,
+	SUM (other_pay) other_pay,
+	SUM (fee) fee,
+	SUM (refund) refund,
+	SUM (recharge) recharge,
+	SUM (reduce) reduce,
+	pay_time_day_str
+FROM
+	static_analysis_tb
+WHERE
+	pay_time BETWEEN #{b_time,jdbcType=BIGINT}
+AND #{e_time,jdbcType=BIGINT}
+AND park_id = #{comid,jdbcType=BIGINT}
+GROUP BY
+	pay_time_day_str
+	ORDER BY  pay_time_day_str
+    </select>
+
+
+
+
+    <select id="getParkMonthlyStaticAnls" resultType="map">
+        SELECT
+	SUM (cash_pay+cash_prepay+ele_pay+ele_prepay+monthcard_pay+other_pay) act_total,
+	SUM (cash_pay+cash_prepay) cash_pay,
+	SUM (ele_pay+ele_prepay+monthcard_pay+other_pay) ele_pay ,
+	SUM (refund+fee+recharge) out_total ,
+	SUM (reduce) reduce,
+	pay_time_month_str
+FROM
+	static_analysis_tb
+WHERE
+	pay_time BETWEEN #{b_time,jdbcType=BIGINT}
+AND #{e_time,jdbcType=BIGINT}
+AND park_id = #{comid,jdbcType=BIGINT}
+GROUP BY
+	pay_time_month_str
+	ORDER BY  pay_time_month_str
+    </select>
+
+
+
+    <select id="getGroupParksAnly" resultType="map">
+     SELECT
+	SUM (cash_pay+cash_prepay+ele_pay+ele_prepay+monthcard_pay+other_pay) act_total,
+	SUM (cash_pay+cash_prepay) cash_pay,
+	SUM (ele_pay+ele_prepay+monthcard_pay+other_pay) ele_pay ,
+	SUM (refund+fee+recharge) out_total ,
+	SUM (ele_pay+ele_prepay+monthcard_pay+other_pay-refund-fee-recharge) ele_total ,
+	SUM (reduce) reduce,
+	pay_time_day_str,
+	park_id
+FROM
+	static_analysis_tb
+WHERE
+	pay_time BETWEEN #{b_time,jdbcType=BIGINT}
+AND #{e_time,jdbcType=BIGINT}
+    <if test="comid > 0" >
+        AND park_id = #{comid,jdbcType=BIGINT}
+    </if>
+
+and group_id = #{groupid,jdbcType=BIGINT}
+GROUP BY
+	pay_time_day_str,park_id
+        ORDER BY  pay_time_day_str
+    </select>
+
+
+    <select id="getGroupDaylyAnly" resultType="map">
+       SELECT
+	SUM (cash_pay+cash_prepay+ele_pay+ele_prepay+monthcard_pay+other_pay) act_total,
+	SUM (cash_pay+cash_prepay) cash_pay,
+	SUM (ele_pay+ele_prepay+monthcard_pay+other_pay) ele_pay ,
+	SUM (refund+fee+recharge) out_total ,
+	SUM (ele_pay+ele_prepay+monthcard_pay+other_pay-refund-fee-recharge) ele_total ,
+	SUM (reduce) reduce,
+	pay_time_day_str
+FROM
+	static_analysis_tb
+WHERE
+	pay_time BETWEEN #{b_time,jdbcType=BIGINT}
+AND #{e_time,jdbcType=BIGINT}
+and group_id =#{groupid,jdbcType=BIGINT}
+GROUP BY
+	pay_time_day_str
+	ORDER BY  pay_time_day_str
+    </select>
+
+
+    <select id="getGroupMonthLyAnly" resultType="map">
+        SELECT
+        SUM (cash_pay+cash_prepay+ele_pay+ele_prepay+monthcard_pay+other_pay) act_total,
+        SUM (cash_pay+cash_prepay) cash_pay,
+        SUM (ele_pay+ele_prepay+monthcard_pay+other_pay) ele_pay ,
+        SUM (refund+fee+recharge) out_total ,
+        SUM (ele_pay+ele_prepay+monthcard_pay+other_pay-refund-fee-recharge) ele_total ,
+        SUM (reduce) reduce,
+        pay_time_month_str
+        FROM
+        static_analysis_tb
+        WHERE
+        pay_time BETWEEN #{b_time,jdbcType=BIGINT}
+        AND #{e_time,jdbcType=BIGINT}
+        and group_id =#{groupid,jdbcType=BIGINT}
+        GROUP BY
+        pay_time_month_str
+        ORDER BY  pay_time_month_str
+    </select>
+
+
+
+    <select id="getParkCollectorAnly" resultType="map">
+        SELECT
+        SUM (cash_pay) cash_pay,
+        SUM (cash_prepay) cash_prepay,
+        SUM (cash_pay+cash_prepay) cash_total,
+        SUM (reduce) reduce,
+        pay_time_day_str,
+        out_uid
+        FROM
+        static_analysis_collector_tb
+        WHERE
+        pay_time BETWEEN #{b_time,jdbcType=BIGINT}
+        AND #{e_time,jdbcType=BIGINT}
+        <if test="outUid > 0" >
+            AND out_uid = #{outUid,jdbcType=BIGINT}
+        </if>
+
+        and park_id = #{comid,jdbcType=BIGINT}
+        GROUP BY
+        out_uid,pay_time_day_str
+
+    </select>
+
 
 </mapper>

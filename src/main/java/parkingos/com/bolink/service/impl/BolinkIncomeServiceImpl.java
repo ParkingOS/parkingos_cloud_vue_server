@@ -2,6 +2,7 @@ package parkingos.com.bolink.service.impl;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
+import com.zld.proto.OrderMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -9,6 +10,7 @@ import org.springframework.stereotype.Service;
 import parkingos.com.bolink.dao.mybatis.BolinkIncomeTbExample;
 import parkingos.com.bolink.dao.mybatis.mapper.BolinkDataMapper;
 import parkingos.com.bolink.dao.mybatis.mapper.BolinkIncomeTbMapper;
+import parkingos.com.bolink.dao.mybatis.mapper.OrderMapper;
 import parkingos.com.bolink.models.BigScreenTrade;
 import parkingos.com.bolink.models.BolinkIncomeTb;
 import parkingos.com.bolink.models.ShortMessageTb;
@@ -30,12 +32,11 @@ public class BolinkIncomeServiceImpl implements BolinkIncomeService {
 
     Logger logger = LoggerFactory.getLogger(BolinkIncomeServiceImpl.class);
     @Autowired
-    private BolinkIncomeService bolinkIncomeService;
-//    private SupperSearchService supperSearchService;
-    @Autowired
     private CommonService commonService;
     @Autowired
     private BolinkIncomeTbMapper bolinkIncomeTbMapper;
+    @Autowired
+    private OrderMapper orderMapper;
 
     @Override
     public JSONObject query(Map<String, String> reqParameterMap) {
@@ -55,6 +56,7 @@ public class BolinkIncomeServiceImpl implements BolinkIncomeService {
 
     private JSONObject getIncomes(Map<String, String> reqParameterMap,int type) {
         logger.info("====>>>>>>>>>>>reqParameterMap:"+reqParameterMap);
+        List<Map<String, Object>> resList = new ArrayList<Map<String, Object>>();
         String tableName = "bolink_income_tb";
         JSONObject result = new JSONObject();
         if(type==1) {
@@ -64,6 +66,15 @@ public class BolinkIncomeServiceImpl implements BolinkIncomeService {
         }else if(type==2){
             Long groupId = Long.parseLong(reqParameterMap.get("groupid"));
             tableName =commonService.getTableNameByGroupId(groupId,1);
+
+            List<Long> list = orderMapper.getComlistByGroupid(groupId);
+            if(list==null||list.isEmpty()){
+                result.put("rows", JSON.toJSON(resList));
+                result.put("total",0);
+                return result;
+            }
+            reqParameterMap.put("comList",JSON.toJSONString(list));
+
         }
         reqParameterMap.put("tableName",tableName);
         //增加默认的pay_time,默认今天一天的数据
@@ -78,7 +89,7 @@ public class BolinkIncomeServiceImpl implements BolinkIncomeService {
         BolinkIncomeTbExample example = ExampleUtis.createIncomeExampleByMap(reqParameterMap);
         logger.info("====>>>>>>>>>>>example:"+example);
         int count = bolinkIncomeTbMapper.getIncomeCounts(example);
-        List<Map<String, Object>> resList = new ArrayList<Map<String, Object>>();
+
         if(count>0){
             resList = bolinkIncomeTbMapper.getIncomes(example);
             if(type==2){

@@ -29,4 +29,7 @@ public interface OrderMapper {
     Map<String,Object> getParkNameById(long comid);
 
     String getUserInfo(long l);
+
+    @Select("select id from com_info_tb where groupid =#{groupid} and state<>1")
+    List<Long> getComlistByGroupid(@Param("groupid")Long groupid);
 }

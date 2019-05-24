@@ -130,7 +130,8 @@ public class GetDataAction {
     @RequestMapping(value = "/getChannelType")
     public String getChannelType(HttpServletRequest request, HttpServletResponse resp){
         String comid = RequestUtil.processParams(request, "comid");
-        String result = getDataService.getChannelType(comid);
+        Long groupid = RequestUtil.getLong(request,"groupid",-1L);
+        String result = getDataService.getChannelType(comid,groupid);
         StringUtils.ajaxOutput(resp,result);
         return null;
     }

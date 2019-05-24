@@ -16,7 +16,7 @@ public interface GetDataService {
 
     String getMonitorName(String comid);
 
-    String getChannelType(String comid);
+    String getChannelType(String comid,Long groupId);
 
     String getWorkSiteId(String comid);
 
