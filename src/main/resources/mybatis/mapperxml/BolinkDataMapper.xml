@@ -417,4 +417,28 @@ GROUP BY
     </select>
 
 
+
+    <select id="getParkIdsByGroupId" resultType="String">
+        SELECT
+        bolink_id
+        FROM
+        com_info_tb
+        WHERE
+        groupid = #{groupid,jdbcType=BIGINT}
+
+    </select>
+
+
+    <select id="getUnionServerIdByCloudId" resultType="Long">
+        SELECT
+        bolink_server_id
+        FROM
+        union_server_tb
+        WHERE
+        id = #{id,jdbcType=BIGINT}
+
+    </select>
+
+
+
 </mapper>

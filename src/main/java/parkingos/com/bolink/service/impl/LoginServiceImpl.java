@@ -220,7 +220,33 @@ public class LoginServiceImpl implements LoginService {
 
                         }
                     }
-                } else if (orgname.contains("城市")) {
+                }else if(orgname.contains("服务商")){
+
+                    user.put("serverid", userInfoTb.getServerId());
+                    UnionServerTb unionServerTb  = new UnionServerTb();
+                    unionServerTb.setId(userInfoTb.getServerId());
+
+                    unionServerTb =(UnionServerTb)commonDao.selectObjectByConditions(unionServerTb);
+                    if(unionServerTb==null){
+                        result.put("state", false);
+                        result.put("msg", "服务商不存在！");
+                        return result;
+                    }
+                    user.put("bolink_serverid", unionServerTb.getBolinkServerId());
+                    user.put("name",unionServerTb.getName());
+                    Long unionId = unionServerTb.getUnionId();
+                    Long serverId = unionServerTb.getBolinkServerId();
+                    params.put("union_id", unionId);
+                    params.put("role_id", 3);
+                    params.put("server_id", serverId);
+                    String tokenResult = httpProxy.doPostTwo(url, params);
+                    logger.info("===get token from bolink:"+tokenResult);
+                    JSONObject jsonResult = JSON.parseObject(tokenResult);
+                    if(jsonResult.get("state")!=null&&jsonResult.getInteger("state")==1){
+                        user.put("token",jsonResult.get("token"));
+                    }
+
+                }else if (orgname.contains("城市")) {
                     user.put("isadmin", 1);
                     user.put("cloudname", "智慧停车云-城市云 ");
                     user.put("cityid", userInfoTb.getCityid());

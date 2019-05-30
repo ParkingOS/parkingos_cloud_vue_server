@@ -6,6 +6,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import parkingos.com.bolink.dao.mybatis.mapper.ParkInfoMapper;
 import parkingos.com.bolink.dao.spring.CommonDao;
 import parkingos.com.bolink.enums.FieldOperator;
@@ -22,6 +23,7 @@ import java.math.BigDecimal;
 import java.util.*;
 
 @Service
+@Transactional
 public class CityParkServiceImpl implements CityParkService {
 
     Logger logger = LoggerFactory.getLogger(CityParkServiceImpl.class);
@@ -134,24 +136,98 @@ public class CityParkServiceImpl implements CityParkService {
         result.put("msg", "创建车场失败");
 
         Long id = RequestUtil.getLong(request, "id", -1L);
-
-
         String bolinkid = RequestUtil.getString(request, "bolink_id");
-
         Long cityid = RequestUtil.getLong(request, "cityid", -1L);
 
         Long groupId = RequestUtil.getLong(request, "groupid", -1L);
+
+
+        String union_id = RequestUtil.getString(request,"unionid");
+
+        //服务商登录 注册车场，参数为serverid
+        Long server_id = RequestUtil.getLong(request, "serverid", -1L);
+        Long bolinkServerId = -1L;
+
+        String union_key ="";
+
+        int fromServerCreatePark = 0;
+
+        if(!Check.isEmpty(union_id)){
+            OrgCityMerchants orgCityMerchants = commonService.getCityByUnionId(union_id);
+            union_key = orgCityMerchants.getUkey();
+            cityid = orgCityMerchants.getId();
+        }else if(server_id>0){
+            //服务商注册   这时候的serverId  是云平台的主键
+            fromServerCreatePark = 1;
+
+            UnionServerTb unionServerTb = new UnionServerTb();
+            unionServerTb.setId(server_id);
+            unionServerTb=(UnionServerTb)commonDao.selectObjectByConditions(unionServerTb);
+//            bolinkServerId = unionServerTb.getBolinkServerId();
+
+            //选择的服务商   这的列表就是泊链的列表
+            bolinkServerId = RequestUtil.getLong(request, "server_id", -1L);;
+
+            Long unionId = unionServerTb.getUnionId();
+            OrgCityMerchants orgCityMerchants = commonService.getCityByUnionId(unionId+"");
+            union_id = unionId+"";
+            union_key = orgCityMerchants.getUkey();
+            cityid = orgCityMerchants.getId();
+        }else if(groupId>0){
+            //集团注册
+            OrgGroupTb orgGroupTb = new OrgGroupTb();
+            orgGroupTb.setId(groupId);
+            orgGroupTb=(OrgGroupTb)commonDao.selectObjectByConditions(orgGroupTb);
+            cityid = orgGroupTb.getCityid();
+            OrgCityMerchants orgCityMerchants = new OrgCityMerchants();
+            orgCityMerchants.setId(cityid);
+            orgCityMerchants =(OrgCityMerchants)commonDao.selectObjectByConditions(orgCityMerchants);
+            union_key = orgCityMerchants.getUkey();
+            cityid = orgCityMerchants.getId();
+            union_id = orgCityMerchants.getUnionId();
+        }
+
+
+        //上面是获取ukey  ，如果groupId小于0  证明不是集团注册，有可能是厂商或者服务商注册，获取一下参数值
         if (groupId == -1) {
             groupId = RequestUtil.getLong(request, "group_id", -1L);
         }
-        logger.info("注册车场cityId+groupid" + cityid + "~~" + groupId);
+
+        String operator_id = "";
+        //查询operator_id   以及如果只选择了运营商
+        if(groupId>0){
+            //根据groupId查询 serverId
+            OrgGroupTb orgGroupTb = new OrgGroupTb();
+            orgGroupTb.setId(groupId);
+            orgGroupTb =(OrgGroupTb)commonDao.selectObjectByConditions(orgGroupTb);
+            if(orgGroupTb!=null){
+                operator_id = orgGroupTb.getOperatorid();
+            }
+        }
+
+        //如果server_id小于0  证明不是服务商注册，有可能是厂商注册，获取一下参数值
+        int fromUnionCreatePark = 0;
+
+        if(server_id==-1){
+            server_id= RequestUtil.getLong(request, "server_id", -1L);
+            //如果取到server_id值  那证明是从厂商注册，厂商的服务商列表是泊链的。
+            if(server_id>0){
+                fromUnionCreatePark = 1;
+            }
+        }
+
+        //去查询bolinkServerId
+        if(bolinkServerId<0&&fromUnionCreatePark>0){
+            bolinkServerId = server_id;
+        }
+
+        logger.info("注册车场cityId+groupid+serverId" + cityid + "~~" + groupId+"~~"+server_id);
+
         String nickname = StringUtils.decodeUTF8(RequestUtil.getString(request, "nickname1"));
         Long uin = RequestUtil.getLong(request, "loginuin", -1L);
 
         String company = RequestUtil.processParams(request, "company_name");
         company = company.replace("\r", "").replace("\n", "");
-        String address = StringUtils.decodeUTF8(RequestUtil.processParams(request, "address"));
-        address = address.replace("\r", "").replace("\n", "");
         String mobile = RequestUtil.processParams(request, "mobile");
         if (mobile.length() > 15) {
             result.put("msg", "手机号输入有误");
@@ -170,33 +246,77 @@ public class CityParkServiceImpl implements CityParkService {
         comInfoTb.setParkingTotal(parking_total);
 
         //新加可以修改集团
-        if(groupId>0) {
-            comInfoTb.setGroupid(groupId);
+        comInfoTb.setGroupid(groupId);
+
+        //可以修改服务商
+        UnionServerTb unionServerTb = new UnionServerTb();
+        unionServerTb.setBolinkServerId(bolinkServerId);
+        unionServerTb=(UnionServerTb)commonDao.selectObjectByConditions(unionServerTb);
+        if(unionServerTb!=null){
+            comInfoTb.setServerId(bolinkServerId);
+            comInfoTb.setCloudServerId(unionServerTb.getId());
         }
 
+//        if(fromServerCreatePark==1) {
+//            //如果是服务商登录 这个serverId就是云平台的主键
+//            comInfoTb.setServerId(server_id);
+//        }else{
+//            //这个有可能是厂商或者集团在注册车场  这的serverid 是泊链的编号需要查一下云自己的编号
+//            if(server_id>0){
+//                UnionServerTb unionServerTb = new UnionServerTb();
+//                unionServerTb.setBolinkServerId(server_id);
+//                unionServerTb=(UnionServerTb)commonDao.selectObjectByConditions(unionServerTb);
+//                if(unionServerTb!=null){
+//                    comInfoTb.setServerId(unionServerTb.getId());
+//                }
+//            }
+//        }
 
-        List<Map<String, Object>> unionInfoList = commonDao.getObjectBySql("select oc.union_id, oc.ukey union_key, og.operatorid operator_id,oc.id from org_city_merchants oc " +
-                "left outer join org_group_tb og on oc.id = og.cityid " +
-                "where og.id = " + groupId);
-        String operator_id = "";
-        String union_key = "";
-        String union_id = "";
-        if (unionInfoList != null && unionInfoList.size() > 0) {
-            if (unionInfoList.get(0).get("operator_id") != null) {
-                operator_id = unionInfoList.get(0).get("operator_id") + "";
-            }
-            union_key = unionInfoList.get(0).get("union_key") + "";
-            union_id = unionInfoList.get(0).get("union_id") + "";
-            if (cityid < 0) {
-                cityid = Long.parseLong(unionInfoList.get(0).get("id") + "");
-            }
-        } else {
-            //查询没有集团编号的 车场
-            unionInfoList = commonDao.getObjectBySql("select oc.union_id, oc.ukey union_key from org_city_merchants oc " +
-                    "where oc.id = " + cityid);
-            union_key = unionInfoList.get(0).get("union_key") + "";
-            union_id = unionInfoList.get(0).get("union_id") + "";
-        }
+
+//        List<Map<String, Object>> unionInfoList = commonDao.getObjectBySql("select oc.union_id, oc.ukey union_key, og.operatorid operator_id,oc.id from org_city_merchants oc " +
+//                "left outer join org_group_tb og on oc.id = og.cityid " +
+//                "where og.id = " + groupId);
+//        String operator_id = "";
+//        String union_key = "";
+//        String union_id = "";
+//        if (unionInfoList != null && unionInfoList.size() > 0) {
+//            if (unionInfoList.get(0).get("operator_id") != null) {
+//                operator_id = unionInfoList.get(0).get("operator_id") + "";
+//            }
+//            union_key = unionInfoList.get(0).get("union_key") + "";
+//            union_id = unionInfoList.get(0).get("union_id") + "";
+//            if (cityid < 0) {
+//                cityid = Long.parseLong(unionInfoList.get(0).get("id") + "");
+//            }
+//        } else {
+//            //查询没有集团编号的 车场
+//            unionInfoList = commonDao.getObjectBySql("select oc.union_id, oc.ukey union_key from org_city_merchants oc " +
+//                    "where oc.id = " + cityid);
+//            union_key = unionInfoList.get(0).get("union_key") + "";
+//            union_id = unionInfoList.get(0).get("union_id") + "";
+//        }
+//        String union_key = "";
+//        String union_id = "";
+//        if(cityid>0){
+//            //如果是厂商登录，那么根据cityid查询
+//            OrgCityMerchants orgCityMerchants = new OrgCityMerchants();
+//            orgCityMerchants.setId(cityid);
+//            orgCityMerchants = (OrgCityMerchants)commonDao.selectObjectByConditions(orgCityMerchants);
+//
+//
+//        } else if(server_id>0){
+//            //如果有服务商，那么根据服务商去查询厂商
+//
+//
+//        }else if(groupId>0){
+//            //如果没有服务商，只有运营商，那么根据集团去查询厂商
+//
+//        }else{
+//            logger.error("===>>>>>没有条件可以查询厂商信息");
+//            return result;
+//        }
+
+
 
         logger.info("===>>>>>unionId:" + union_id + "~~~~cityid:" + cityid);
         if (id == -1) {
@@ -204,7 +324,6 @@ public class CityParkServiceImpl implements CityParkService {
             if (!Check.isEmpty(bolinkid)) {
                 ComInfoTb infoTb = new ComInfoTb();
                 infoTb.setBolinkId(bolinkid);
-//                infoTb.setState(0);
                 infoTb.setUnionId(union_id);
                 int infoCount = commonDao.selectCountByConditions(infoTb);
                 if (infoCount > 0) {
@@ -220,13 +339,11 @@ public class CityParkServiceImpl implements CityParkService {
             //获取id
             Long comid = commonDao.selectSequence(ComInfoTb.class);
             comInfoTb.setId(comid);
-//            comInfoTb.setGroupid(groupId);
             comInfoTb.setCityid(cityid);
             //添加自动生成车场16位秘钥的逻辑
             String ukey = StringUtils.createRandomCharData(16);
             comInfoTb.setUkey(ukey);
             comInfoTb.setCreateTime(System.currentTimeMillis() / 1000);
-
             comInfoTb.setUnionId(union_id);
 
             //判断车场是否要上传到泊链,如果没有写bolinkid,那么上传
@@ -234,15 +351,28 @@ public class CityParkServiceImpl implements CityParkService {
 
                 comInfoTb.setBolinkId(comid + "");
                 //查询他的厂商编号以及服务商编号 (查询有集团编号的)
-//                List<Map<String, Object>> unionInfoList = commonDao.getObjectBySql("select oc.union_id, oc.ukey union_key, og.operatorid operator_id from org_city_merchants oc " +
-//                        "left outer join org_group_tb og on oc.id = og.cityid " +
-//                        "left outer join com_info_tb co on co.groupid = og.id " +
-//                        "where co.id = " + comid);
-                String url = CustomDefind.UNIONIP + "park/addpark";
-                Map<String, Object> paramMap = new HashMap<String, Object>();
+//                String url = CustomDefind.UNIONIP + "park/addpark";
+//                Map<String, Object> paramMap = new HashMap<String, Object>();
+//                paramMap.put("park_id", comid);
+//                paramMap.put("name", company);
+//                paramMap.put("address", "");
+//                paramMap.put("phone", mobile);
+//                paramMap.put("lng", longitude);
+//                paramMap.put("lat", latitude);
+//                paramMap.put("total_plot", parking_total);
+//                paramMap.put("empty_plot", parking_total);
+//                paramMap.put("price_desc", getPrice(comid));
+//                paramMap.put("remark", "");
+//                paramMap.put("union_id", union_id);
+//                paramMap.put("server_id", bolinkServerId);
+//                paramMap.put("operator_id", operator_id);
+//                paramMap.put("rand", Math.random());
+//                paramMap.put("is_cloud_park", 1);
+                String url = CustomDefind.UNIONIP + "newpark/addpark";
+                JSONObject paramMap = new JSONObject();
                 paramMap.put("park_id", comid);
                 paramMap.put("name", company);
-                paramMap.put("address", address);
+                paramMap.put("address", "");
                 paramMap.put("phone", mobile);
                 paramMap.put("lng", longitude);
                 paramMap.put("lat", latitude);
@@ -251,25 +381,38 @@ public class CityParkServiceImpl implements CityParkService {
                 paramMap.put("price_desc", getPrice(comid));
                 paramMap.put("remark", "");
                 paramMap.put("union_id", union_id);
-//                    paramMap.put("server_id", server_id);
+                paramMap.put("server_id", bolinkServerId);
                 paramMap.put("operator_id", operator_id);
                 paramMap.put("rand", Math.random());
                 paramMap.put("is_cloud_park", 1);
                 String ret = "";
                 try {
-                    logger.error(url + paramMap);
-                    String linkParams = StringUtils.createLinkString(paramMap) + "key=" + union_key;
-                    System.out.println(linkParams);
-                    String sign = StringUtils.MD5(linkParams).toUpperCase();
-                    logger.error(sign);
-                    paramMap.put("sign", sign);
-                    //param = DesUtils.encrypt(param,"NQ0eSXs720170114");
-                    String param = StringUtils.createJson(paramMap);
-                    logger.error(param);
+                    logger.info(url + paramMap);
+//                    String linkParams = StringUtils.createLinkString(paramMap) + "key=" + union_key;
+//                    logger.info(linkParams);
+//                    String sign = StringUtils.MD5(linkParams).toUpperCase();
+//                    logger.info(sign);
+//                    paramMap.put("sign", sign);
+//                    //param = DesUtils.encrypt(param,"NQ0eSXs720170114");
+//                    String param = StringUtils.createJson(paramMap);
+//                    logger.info(param);
+//                    HttpProxy httpProxy = new HttpProxy();
+//                    ret = httpProxy.doHeadPost(url, param);
+
+
+                    String _signStr = paramMap.toJSONString() + "key=" + union_key;
+                    logger.info(_signStr);
+                    String _sign = StringUtils.MD5(_signStr).toUpperCase();
+                    logger.info(_sign);
+                    JSONObject json = new JSONObject();
+                    json.put("data", paramMap.toJSONString());
+                    json.put("sign", _sign);
+
                     HttpProxy httpProxy = new HttpProxy();
-                    ret = httpProxy.doHeadPost(url, param);
+                    ret = httpProxy.doHeadPost(url, json.toJSONString());
+
 //                    ret = HttpsProxy.doPost(url, param, "utf-8", 20000, 20000);
-                    logger.error(ret);
+                    logger.info(ret);
                     JSONObject object = JSONObject.parseObject(ret);
                     if (object != null) {
                         Integer uploadState = Integer.parseInt(object.get("state") + "");
@@ -347,6 +490,7 @@ public class CityParkServiceImpl implements CityParkService {
                                 jsonObject.put("is_cloud_park", 1);
                                 jsonObject.put("type", 3);
                                 jsonObject.put("rand", Math.random());
+                                jsonObject.put("server_id", bolinkServerId);
 
 
                                 String _signStr = jsonObject.toJSONString() + "key=" + union_key;
@@ -382,40 +526,24 @@ public class CityParkServiceImpl implements CityParkService {
 
             //有id只是证明是在更新 但是id  不是云平台的主键id
 
-//            ComInfoTb con = new ComInfoTb();
-//            con.setUnionId(union_id);
-//            con.setBolinkId(bolinkid);
-                //如果现在修改了车场的所属集团
+            //如果现在修改了车场的所属集团
             ComInfoTb con = commonService.getComInfoByUnionIdAndParkId(union_id,bolinkid);
             Long groupIdBefore = con.getGroupid();
             if(!groupIdBefore.equals(groupId)&&groupId>0){
                 //如果以前的车场有集团，那么需要更新之前的统计报表
-//                if(groupIdBefore>0) {
-//                    StaticAnalysisTb staticCon = new StaticAnalysisTb();
-//                    staticCon.setGroupId(groupIdBefore);
-//                    StaticAnalysisTb updateSta = new StaticAnalysisTb();
-//                    updateSta.setGroupId(groupId);
-//                    int updateStatic = commonDao.updateByConditions(updateSta, staticCon);
-//                    logger.info("更新车场所属集团:" + updateStatic);
-//                }else{
-                    //以前的车场没有所属集团
-                    StaticAnalysisTb staticCon = new StaticAnalysisTb();
-                    staticCon.setParkId(con.getId());
-                    StaticAnalysisTb updateSta = new StaticAnalysisTb();
-                    updateSta.setGroupId(groupId);
-                    int updateStatic = commonDao.updateByConditions(updateSta, staticCon);
-                    logger.info("更新车场所属集团:" + updateStatic);
-//                }
+                StaticAnalysisTb staticCon = new StaticAnalysisTb();
+                staticCon.setParkId(con.getId());
+                StaticAnalysisTb updateSta = new StaticAnalysisTb();
+                updateSta.setGroupId(groupId);
+                int updateStatic = commonDao.updateByConditions(updateSta, staticCon);
+                logger.info("更新车场所属集团:" + updateStatic);
             }
 
             comInfoTb.setUpdateTime(System.currentTimeMillis() / 1000);
             comInfoTb.setId(con.getId());
             int update = commonDao.updateByPrimaryKey(comInfoTb);
 
-//            int update = commonDao.updateByPrimaryKey(comInfoTb);
             if (update == 1) {
-
-
                 //清除缓存
                 commonService.deleteCachPark(union_id, bolinkid);
 
@@ -433,6 +561,7 @@ public class CityParkServiceImpl implements CityParkService {
                     jsonObject.put("phone",mobile );
                     jsonObject.put("total_plot", parking_total);
                     jsonObject.put("rand", Math.random());
+                    jsonObject.put("server_id", bolinkServerId);
 
 
                     String _signStr = jsonObject.toJSONString() + "key=" + union_key;

@@ -159,6 +159,26 @@ public class ComInfoTb {
 
     private String unionId;
 
+    private Long serverId;
+
+    private Long cloudServerId;
+
+    public Long getCloudServerId() {
+        return cloudServerId;
+    }
+
+    public void setCloudServerId(Long cloudServerId) {
+        this.cloudServerId = cloudServerId;
+    }
+
+    public Long getServerId() {
+        return serverId;
+    }
+
+    public void setServerId(Long serverId) {
+        this.serverId = serverId;
+    }
+
     public String getUnionId() {
         return unionId;
     }

@@ -45,13 +45,13 @@ public class CityGroupAction {
     }
 
     @RequestMapping(value = "/addAndEdit")
-    public String addCity(String name,String latitude, String longitude ,String cityid, String operatorid,String address,Long id,HttpServletResponse resp) {
+    public String addCity(String name, String cityid, String operatorid,String address,Long id,Long serverid,HttpServletResponse resp) {
 //
 //        String company_name = RequestUtil.processParams(request,"company_name");
 //        logger.error("接收数据:"+company_name);
-        logger.error("接收数据:"+name+address+operatorid+id);
+        logger.error("addAndEdit 运营集团接收数据:"+name+address+operatorid+id +"~~cityid:"+cityid+"~~serverId:"+serverid);
 
-        JSONObject result = cityGroupService.addGroup(name,latitude,longitude,cityid,operatorid,address,id);
+        JSONObject result = cityGroupService.addGroup(name,cityid,operatorid,id,serverid);
         StringUtils.ajaxOutput(resp, result.toJSONString());
         return null;
     }

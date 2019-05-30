@@ -30,9 +30,6 @@ public class GroupRoleAction {
     @Autowired
     private SaveLogService saveLogService;
 
-    @Autowired
-    private MongoDbUtils mongoDbUtils;
-
     @RequestMapping(value = "/query")
     public String query(HttpServletRequest request, HttpServletResponse resp){
 
@@ -190,7 +187,7 @@ public class GroupRoleAction {
 
         JSONObject result = groupRoleService.editRoleAuth(id,auths);
 
-        if((Integer)result.get("state")==1){
+        if((Integer)result.get("state")==1&&groupid!=null&&groupid>0){
             ParkLogTb parkLogTb = new ParkLogTb();
             parkLogTb.setOperateUser(nickname);
             parkLogTb.setOperateTime(System.currentTimeMillis()/1000);

@@ -39,4 +39,10 @@ public interface GetDataService {
     String getMessagePrice(int type);
 
     List<Object> getAllBolinkParks(Long cityId);
+
+    String getServersByUnion(Long unionId);
+
+    String getGroupsByServer(Long serverId);
+
+    String getServersByServer(Long serverid);
 }

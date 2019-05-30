@@ -162,10 +162,6 @@ public class GroupMemberServiceImpl implements GroupMemberService {
         String nickname =reqParameterMap.get("nickname");
         String phone =reqParameterMap.get("phone");
         String mobile =reqParameterMap.get("mobile");
-//        if(mobile.length()>15||phone.length()>15){
-//            result.put("msg","电话或手机长度不大于15位");
-//            return result;
-//        }
         if(mobile!=null&&mobile.length()>15){
             result.put("msg","手机长度不大于15位");
             return result;
@@ -178,7 +174,6 @@ public class GroupMemberServiceImpl implements GroupMemberService {
         if(reqParameterMap.get("auth_flag")!=null&&!"".equals(reqParameterMap.get("auth_flag"))){
             auth_flag =Long.parseLong(reqParameterMap.get("auth_flag"));
         }
-        String loginuin = reqParameterMap.get("loginuin");
 
         Long role_id =-1L;
         if(reqParameterMap.get("role_id")!=null&&!"".equals(reqParameterMap.get("role_id"))){
@@ -194,9 +189,6 @@ public class GroupMemberServiceImpl implements GroupMemberService {
         if(reqParameterMap.get("sex")!=null&&!"".equals(reqParameterMap.get("sex"))){
             sex = Long.parseLong(reqParameterMap.get("sex"));
         }
-        if("".equals(nickname)) nickname=null;
-        if("".equals(mobile)) mobile=null;
-        if("".equals(phone)) phone=null;
 
         Long time = System.currentTimeMillis()/1000;
         //用户表
@@ -208,29 +200,19 @@ public class GroupMemberServiceImpl implements GroupMemberService {
         UserInfoTb userInfoTb = new UserInfoTb();
         userInfoTb.setStrid(strid);
         int count = commonDao.selectCountByConditions(userInfoTb);
-        logger.error("=====count"+count);
+        logger.info("=====count"+count);
         if(count>0){
             return result;
         }
-//        Long comId = Long.parseLong(reqParameterMap.get("comid"));
-//        if(comId == null || comId==0)
-//            comId = RequestUtil.getLong(request, "comid", 0L);
         Long groupId = -1L;
         if(reqParameterMap.get("groupid")!=null&&!"undefined".equals(reqParameterMap.get("groupid"))){
             groupId = Long.parseLong(reqParameterMap.get("groupid"));
         }
-//        if(groupId==null||groupId<0){
-//            ComInfoTb comInfoTb = new ComInfoTb();
-//            comInfoTb.setId(comId);
-//            comInfoTb = (ComInfoTb) commonDao.selectObjectByConditions(comInfoTb);
-//            if(comInfoTb!=null)
-//                groupId = comInfoTb.getGroupid();//(Long)comMap.get("groupid");
+        logger.info("groupid:"+groupId);
+//        Long cityid = -1L;
+//        if(reqParameterMap.get("cityid")!=null&&!"undefined".equals(reqParameterMap.get("cityid"))&&!"".equals(reqParameterMap.get("cityid"))){
+//            cityid = Long.parseLong(reqParameterMap.get("cityid"));
 //        }
-        logger.error("groupid:"+groupId);
-        Long cityid = -1L;
-        if(reqParameterMap.get("cityid")!=null&&!"undefined".equals(reqParameterMap.get("cityid"))&&!"".equals(reqParameterMap.get("cityid"))){
-            cityid = Long.parseLong(reqParameterMap.get("cityid"));
-        }
 
         if(groupId!=-1&&role_id==-1){//运营商直接添加员工,没有角色,默认管理员
             role_id = 26L;
@@ -240,18 +222,16 @@ public class GroupMemberServiceImpl implements GroupMemberService {
         user.setNickname(nickname);
         user.setPassword(strid);
         user.setStrid(strid);
-//        user.setAddress();
         user.setRegTime(time);
         user.setMobile(mobile);
         user.setPhone(phone);
         user.setAuthFlag(auth_flag);
-//        user.setComid(comId);
         user.setRoleId(role_id);
         user.setIsview(isview);
         user.setUserId(userId);
-        user.setCityid(cityid);
-        user.setGroupid(groupId);
         user.setSex(sex);
+//        user.setCityid(cityid);
+        user.setGroupid(groupId);
         logger.error("======>>>>>user"+user);
         int ret = commonDao.insert(user);
         if(ret==1){
@@ -259,7 +239,7 @@ public class GroupMemberServiceImpl implements GroupMemberService {
             result.put("msg","增加成功");
             result.put("id",nextid);
             //不支持ETCPark,支持的话再加
-            insertSysn(user,0);
+//            insertSysn(user,0);
         }
         return result;
     }
@@ -272,10 +252,10 @@ public class GroupMemberServiceImpl implements GroupMemberService {
 
         int ret = commonDao.updateByPrimaryKey(userInfoTb);
         if(ret==1){
-            UserInfoTb condition = new UserInfoTb();
-            condition.setId(userInfoTb.getId());
-            userInfoTb = (UserInfoTb)commonDao.selectObjectByConditions(condition);
-            insertSysn(userInfoTb,1);
+//            UserInfoTb condition = new UserInfoTb();
+//            condition.setId(userInfoTb.getId());
+//            userInfoTb = (UserInfoTb)commonDao.selectObjectByConditions(condition);
+//            insertSysn(userInfoTb,1);
             result.put("state",1);
             result.put("msg","修改成功");
         }
@@ -307,16 +287,16 @@ public class GroupMemberServiceImpl implements GroupMemberService {
             userInfoTb.setMd5pass(md5pass);
             userInfoTb.setId(Long.parseLong(uin));
             int ret =commonDao.updateByPrimaryKey(userInfoTb);
-            if(ret==1){
+//            if(ret==1){
                 userInfoTb =(UserInfoTb)commonDao.selectObjectByConditions(userInfoTb);
-                insertSysn(userInfoTb,1);
+//                insertSysn(userInfoTb,1);
 //                if(publicMethods.isEtcPark(comid)){
 //                    int ret = daService.update("insert into sync_info_pool_tb(comid,table_name,table_id,create_time,operate) values(?,?,?,?,?)", new Object[]{comid,"user_info_tb",Long.valueOf(uin),System.currentTimeMillis()/1000,1});
 //                    logger.error("parkadmin or admin:"+loginuin+" edit parkuserpass:"+uin+",password:"+newPass+",ret:"+result+",add sync ret："+ret);
 //                }else{
 //                    logger.error("parkadmin or admin:"+loginuin+" edit parkuserpass:"+uin+",password:"+newPass+",ret:"+result);
 //                }
-            }
+//            }
             result.put("state",ret);
             result.put("msg","修改密码成功");
         }else {
@@ -339,8 +319,8 @@ public class GroupMemberServiceImpl implements GroupMemberService {
         if(ret==1){
             result.put("state",1);
             result.put("msg","删除成功");
-            userInfoTb =(UserInfoTb)commonDao.selectObjectByConditions(userInfoTb);
-            insertSysn(userInfoTb,1);
+//            userInfoTb =(UserInfoTb)commonDao.selectObjectByConditions(userInfoTb);
+//            insertSysn(userInfoTb,1);
 
 //            //判断是否支持ETCPARK
 //            String isSupportEtcPark = CustomDefind.ISSUPPORTETCPARK;

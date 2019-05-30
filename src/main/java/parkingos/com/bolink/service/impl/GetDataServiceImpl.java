@@ -579,6 +579,63 @@ public class GetDataServiceImpl implements GetDataService {
 
     }
 
+    @Override
+    public String getServersByUnion(Long unionId) {
+        String sql = "select id,name from union_server_tb where union_id ="+unionId;
+        String result = "[";
+        List<Map<String,Object>> serverList = commonDao.getObjectBySql(sql);
+        if(serverList!=null&&serverList.size()>0){
+            for(int i = 0;i<serverList.size();i++){
+                Map map = serverList.get(i);
+                if(i==0){
+                    result+="{\"value_no\":\""+map.get("id")+"\",\"value_name\":\""+map.get("name")+"\"}";
+                }else{
+                    result+=",{\"value_no\":\""+map.get("id")+"\",\"value_name\":\""+map.get("name")+"\"}";
+                }
+            }
+        }
+        result+="]";
+        return result;
+    }
+
+    @Override
+    public String getGroupsByServer(Long serverId) {
+        String sql = "select id,name from org_group_tb where state =0 and serverid =  (select id||'' from union_server_tb where bolink_server_id =  "+serverId+" )";
+        String result = "[";
+        List<Map<String,Object>> groupList = commonDao.getObjectBySql(sql);
+        if(groupList!=null&&groupList.size()>0){
+            for(int i = 0;i<groupList.size();i++){
+                Map map = groupList.get(i);
+                if(i==0){
+                    result+="{\"value_no\":\""+map.get("id")+"\",\"value_name\":\""+map.get("name")+"\"}";
+                }else{
+                    result+=",{\"value_no\":\""+map.get("id")+"\",\"value_name\":\""+map.get("name")+"\"}";
+                }
+            }
+        }
+        result+="]";
+        return result;
+    }
+
+    @Override
+    public String getServersByServer(Long serverId) {
+        String sql = "select id,name from union_server_tb where id = "+serverId +" or pid = "+serverId;
+        String result = "[";
+        List<Map<String,Object>> serverList = commonDao.getObjectBySql(sql);
+        if(serverList!=null&&serverList.size()>0){
+            for(int i = 0;i<serverList.size();i++){
+                Map map = serverList.get(i);
+                if(i==0){
+                    result+="{\"value_no\":\""+map.get("id")+"\",\"value_name\":\""+map.get("name")+"\"}";
+                }else{
+                    result+=",{\"value_no\":\""+map.get("id")+"\",\"value_name\":\""+map.get("name")+"\"}";
+                }
+            }
+        }
+        result+="]";
+        return result;
+    }
+
     private List<Map<String, Object>> getcollectors(Long cityid){
         try {
             if(cityid != null && cityid > 0){

@@ -49,4 +49,8 @@ public interface BolinkDataMapper {
     List<Map<String,Object>> getGroupMonthLyAnly(@Param("groupid")Long groupid,  @Param("b_time")Long btime, @Param("e_time")Long etime);
 
     List<Map<String,Object>> getParkCollectorAnly(@Param("comid")Long comid, @Param("outUid")Long outCollector, @Param("b_time")Long start, @Param("e_time")Long end);
+
+    List<String> getParkIdsByGroupId(@Param("groupid")Long id);
+
+    Long getUnionServerIdByCloudId(@Param("id")Long serverId);
 }

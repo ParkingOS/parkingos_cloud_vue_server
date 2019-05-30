@@ -149,6 +149,42 @@ public class GetDataAction {
     }
 
 
+    /*
+* 获得厂商下面所有的服务商
+*
+*/
+    @RequestMapping(value = "/getServersByUnion")
+    public String getServersByUnion(HttpServletRequest request, HttpServletResponse resp){
+        Long unionId = RequestUtil.getLong(request,"unionid",-1L);
+        String result = getDataService.getServersByUnion(unionId);
+        StringUtils.ajaxOutput(resp,result);
+        return null;
+    }
+
+    /*
+* 获得服务商下面所有的服务商
+*
+*/
+    @RequestMapping(value = "/getServersByServer")
+    public String getServersByServer(HttpServletRequest request, HttpServletResponse resp){
+        Long serverid = RequestUtil.getLong(request,"serverid",-1L);
+        String result = getDataService.getServersByServer(serverid);
+        StringUtils.ajaxOutput(resp,result);
+        return null;
+    }
+
+
+    /*
+* 获得服务商下面所有的运营集团
+*
+*/
+    @RequestMapping(value = "/getGroupsByServer")
+    public String getGroupsByServer(HttpServletRequest request, HttpServletResponse resp){
+        Long serverId = RequestUtil.getLong(request,"serverid",-1L);
+        String result = getDataService.getGroupsByServer(serverId);
+        StringUtils.ajaxOutput(resp,result);
+        return null;
+    }
 
     /*
     * 获得工作站点
