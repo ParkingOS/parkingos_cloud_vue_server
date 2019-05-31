@@ -421,7 +421,13 @@ public class TicketServiceImpl implements TicketService {
 
         logger.info("=======btime"+btime+"~~~~"+validite_time+"~~~"+validite_time.longValue());
         //截止有效时间
-        Long etime = btime + validite_time.longValue() * 60 * 60;
+        Long etime = btime;
+        Integer limitDayUnit = shopInfo.getLimitDayUnit();
+        if(limitDayUnit==1){
+            etime +=  validite_time.longValue() * 60 * 60;
+        }else if(limitDayUnit==2){
+            etime +=  validite_time.longValue() * 60 ;
+        }
         logger.info("=======etime"+etime);
         //判断商户额度是否可以发券
         if (type == 3) {//优惠券-时长

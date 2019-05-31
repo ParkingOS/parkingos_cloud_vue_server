@@ -297,7 +297,8 @@ public class ShopManageServiceImpl implements ShopManageService {
         Integer supportType = RequestUtil.getInteger(request,"support_type",1);
         Integer freeLimitTimes = RequestUtil.getInteger(request,"free_limit_times",0);
         Integer useFixCode = RequestUtil.getInteger(request,"use_fix_code",1);//默认支持
-
+        //有效期小时  1   有效期分钟2
+        Integer limitDayUnit = RequestUtil.getInteger(request,"limit_day_unit",1);
 
 
         if(comid==-1){
@@ -382,6 +383,7 @@ public class ShopManageServiceImpl implements ShopManageService {
         shopTb.setUseLimit(useLimit);
         shopTb.setFreeLimitTimes(freeLimitTimes);
         shopTb.setUseFixCode(useFixCode);
+        shopTb.setLimitDayUnit(limitDayUnit);
 
         shopTb.setComid( RequestUtil.getLong( request, "comid", -1L ) );
         int update = 0;

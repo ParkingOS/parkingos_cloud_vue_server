@@ -59,6 +59,16 @@ public class ShopTb {
 
     private Integer publicState;
 
+    private Integer limitDayUnit;
+
+    public Integer getLimitDayUnit() {
+        return limitDayUnit;
+    }
+
+    public void setLimitDayUnit(Integer limitDayUnit) {
+        this.limitDayUnit = limitDayUnit;
+    }
+
     public Integer getPublicState() {
         return publicState;
     }
