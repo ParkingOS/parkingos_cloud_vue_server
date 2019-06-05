@@ -181,7 +181,8 @@ public class GetDataAction {
     @RequestMapping(value = "/getGroupsByServer")
     public String getGroupsByServer(HttpServletRequest request, HttpServletResponse resp){
         Long serverId = RequestUtil.getLong(request,"serverid",-1L);
-        String result = getDataService.getGroupsByServer(serverId);
+        Integer type = RequestUtil.getInteger(request,"type",1);
+        String result = getDataService.getGroupsByServer(serverId,type);
         StringUtils.ajaxOutput(resp,result);
         return null;
     }

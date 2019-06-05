@@ -254,10 +254,12 @@ public class GetDataServiceImpl implements GetDataService {
         if(parks != null && !parks.isEmpty()){
             String preParams  ="";
             for(Object parkid : parks){
-                if(preParams.equals(""))
-                    preParams =parkid+"";
-                else
-                    preParams += ","+parkid;
+                if(preParams.equals("")) {
+                    preParams = parkid + "";
+                }
+                else {
+                    preParams += "," + parkid;
+                }
             }
             sql += " where id in ("+preParams+") ";
             list = commonDao.getObjectBySql(sql);
@@ -321,10 +323,12 @@ public class GetDataServiceImpl implements GetDataService {
             if(groupList!=null&&groupList.size()>0){
                 String params = "";
                 for(Object id:groupList){
-                    if(params.equals(""))
-                        params =id+"";
-                    else
-                        params += ","+id;
+                    if(params.equals("")) {
+                        params = id + "";
+                    }
+                    else {
+                        params += "," + id;
+                    }
                 }
                 sql += "where groupid in ("+params+")";
                 pList = commonDao.getObjectBySql(sql);
@@ -599,8 +603,15 @@ public class GetDataServiceImpl implements GetDataService {
     }
 
     @Override
-    public String getGroupsByServer(Long serverId) {
-        String sql = "select id,name from org_group_tb where state =0 and serverid =  (select id||'' from union_server_tb where bolink_server_id =  "+serverId+" )";
+    public String getGroupsByServer(Long serverId,Integer type) {
+        String sql = "";
+        if(type==1){
+            sql = "select id,name from org_group_tb where state =0 and serverid =  (select id from union_server_tb where bolink_server_id =  "+serverId+" )";
+        }else if(type==0){
+            //查询服务商下面以及他下面的子服务商的运营商
+            sql = "select id,name from org_group_tb where state =0 and serverid in (select id from union_server_tb where id = "+serverId+" or pid = "+serverId+")";
+        }
+
         String result = "[";
         List<Map<String,Object>> groupList = commonDao.getObjectBySql(sql);
         if(groupList!=null&&groupList.size()>0){

@@ -42,7 +42,7 @@ public interface GetDataService {
 
     String getServersByUnion(Long unionId);
 
-    String getGroupsByServer(Long serverId);
+    String getGroupsByServer(Long serverId,Integer type);
 
     String getServersByServer(Long serverid);
 }

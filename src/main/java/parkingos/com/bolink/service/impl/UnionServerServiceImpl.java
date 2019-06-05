@@ -43,6 +43,7 @@ public class UnionServerServiceImpl implements UnionServerService {
         unionServerTb.setName(name);
         unionServerTb.setArea(address);
         unionServerTb.setPhone(phone);
+        unionServerTb.setMobile(phone);
         unionServerTb.setState(state);
 
         String union_key = "";
@@ -128,6 +129,7 @@ public class UnionServerServiceImpl implements UnionServerService {
             String url = CustomDefind.UNIONIP + "newserver/add";
             JSONObject jsonObject = new JSONObject();
             jsonObject.put("name", name);
+            jsonObject.put("state", state);
             jsonObject.put("area", address);
             jsonObject.put("phone", phone);
             jsonObject.put("union_id", unionId);
@@ -451,7 +453,7 @@ public class UnionServerServiceImpl implements UnionServerService {
             result.put("msg","缺少server_id参数");
             return result;
         }
-        orgGroupTb.setServerid(serverId);
+        orgGroupTb.setServerid(Long.parseLong(serverId));
         orgGroupTb.setState(0);
         result = superSearchService.supperSearch(orgGroupTb,paramMap);
         return result;

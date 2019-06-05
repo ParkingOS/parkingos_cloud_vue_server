@@ -84,7 +84,7 @@ public class CityGroupServiceImpl implements CityGroupService {
         orgGroupTb.setCityid(cityId);
         orgGroupTb.setOperatorid(operatorid);
         if(!Check.isEmpty(serverId+"")) {
-            orgGroupTb.setServerid(serverId + "");
+            orgGroupTb.setServerid(serverId);
         }
 
         //如果填写了ope

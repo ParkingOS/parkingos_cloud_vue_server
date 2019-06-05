@@ -25,7 +25,7 @@ public class OrgGroupTb {
 
     private String address;
 
-    private String serverid;
+    private Long serverid;
 
     private String operatorid;
 
@@ -138,12 +138,12 @@ public class OrgGroupTb {
         this.address = address == null ? null : address.trim();
     }
 
-    public String getServerid() {
+    public Long getServerid() {
         return serverid;
     }
 
-    public void setServerid(String serverid) {
-        this.serverid = serverid == null ? null : serverid.trim();
+    public void setServerid(Long serverid) {
+        this.serverid = serverid;
     }
 
     public String getOperatorid() {
