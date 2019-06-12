@@ -82,6 +82,7 @@ public class ParkCollectorOrderanlysisServiceImpl implements ParkCollectorOrderA
         Double act_money = 0.0d;//所有的收入金额
         Double cash_pay_money = 0.0d;//所有的现金结算
         Double cash_prepay_money = 0.0d;//所有的现金预付金额;
+        Double ele_pay = 0.0d;//所有的电子结算金额;
         Double free_money = 0.0d;//所有的免费金额
         //如果是查询今天
         if(isToday==1) {
@@ -130,20 +131,22 @@ public class ParkCollectorOrderanlysisServiceImpl implements ParkCollectorOrderA
                     resultMap.put("name", name);
                     resultMap.put("cash_pay", StringUtils.formatDouble(0.0d) + "");
                     resultMap.put("cash_prepay", StringUtils.formatDouble(0.0d) + "");
+                    resultMap.put("ele_pay", StringUtils.formatDouble(0.0d) + "");
                     resultMap.put("act_total", StringUtils.formatDouble(0.0d) + "");
                     resultMap.put("free_pay", StringUtils.formatDouble(0.0d) + "");
 
                     Double actReceive = 0.0d;
-                    Double cashTotal = 0.0d;
                     if (cashList != null && cashList.size() > 0) {
                         for (Map<String, String> cashMap : cashList) {
                             if (cashMap.get("name").equals(userId + "")) {
-                                cashTotal += StringUtils.formatDouble(cashMap.get("cash_pay"));
-                                actReceive += StringUtils.formatDouble(cashMap.get("cash_pay"));
+                                //总金额加上了电子结算
+                                actReceive += StringUtils.formatDouble(cashMap.get("cash_pay")) +  StringUtils.formatDouble(cashMap.get("electronic_pay"));
                                 cash_pay_money += StringUtils.formatDouble(cashMap.get("cash_pay"));
+                                ele_pay += StringUtils.formatDouble(cashMap.get("electronic_pay"));
                                 free_money += StringUtils.formatDouble(cashMap.get("free_pay"));
                                 resultMap.put("cash_pay", cashMap.get("cash_pay"));
                                 resultMap.put("free_pay", cashMap.get("free_pay"));
+                                resultMap.put("ele_pay",cashMap.get("electronic_pay"));
                             }
                         }
                     }
@@ -154,7 +157,6 @@ public class ParkCollectorOrderanlysisServiceImpl implements ParkCollectorOrderA
                             if (user.equals(userId)) {
                                 int type = (int) inMap.get("type");
                                 if (type == BolinkAccountTypeEnum.CASH_PREPAY.type) {
-                                    cashTotal += StringUtils.formatDouble(inMap.get("pay_money"));
                                     actReceive += StringUtils.formatDouble(inMap.get("pay_money"));
                                     cash_prepay_money += StringUtils.formatDouble(inMap.get("pay_money"));
                                     resultMap.put("cash_prepay", inMap.get("pay_money") + "");
@@ -164,7 +166,6 @@ public class ParkCollectorOrderanlysisServiceImpl implements ParkCollectorOrderA
                     }
                     act_money += StringUtils.formatDouble(actReceive);
                     resultMap.put("act_total", StringUtils.formatDouble(actReceive) + "");
-                    resultMap.put("cash_total", StringUtils.formatDouble(cashTotal) + "");
                     backList.add(resultMap);
                 }
             }
@@ -181,12 +182,14 @@ public class ParkCollectorOrderanlysisServiceImpl implements ParkCollectorOrderA
                 cash_prepay_money+=StringUtils.formatDouble(map.get("cash_prepay"));
                 act_money += StringUtils.formatDouble(map.get("cash_total"));
                 free_money+=StringUtils.formatDouble(map.get("reduce"));
+                ele_pay+=StringUtils.formatDouble(map.get("ele_pay"));
 
                 Map<String, String> resultMap = new HashMap<>();
                 resultMap.put("name", name);
                 resultMap.put("time", dateStr);
                 resultMap.put("cash_pay", StringUtils.formatDouble(map.get("cash_pay")) + "");
                 resultMap.put("cash_prepay", StringUtils.formatDouble(map.get("cash_prepay")) + "");
+                resultMap.put("ele_pay", StringUtils.formatDouble(map.get("ele_pay")) + "");
                 resultMap.put("act_total", StringUtils.formatDouble(map.get("cash_total")) + "");
                 resultMap.put("free_pay", StringUtils.formatDouble(map.get("reduce")) + "");
                 backList.add(resultMap);
@@ -197,6 +200,7 @@ public class ParkCollectorOrderanlysisServiceImpl implements ParkCollectorOrderA
         resultMap.put("name", "合计");
         resultMap.put("cash_pay", StringUtils.formatDouble(cash_pay_money) + "");
         resultMap.put("cash_prepay", StringUtils.formatDouble(cash_prepay_money) + "");
+        resultMap.put("ele_pay", StringUtils.formatDouble(ele_pay) + "");
         resultMap.put("act_total", StringUtils.formatDouble(act_money) + "");
         resultMap.put("free_pay", StringUtils.formatDouble(free_money) + "");
         backList.add(resultMap);
@@ -219,7 +223,6 @@ public class ParkCollectorOrderanlysisServiceImpl implements ParkCollectorOrderA
 
         List<Object> resList = JSON.parseArray(result.get("rows").toString());
 
-        logger.error("=========>>>>>>.导出订单" + resList.size());
         List<List<Object>> bodyList = new ArrayList<List<Object>>();
         if (resList != null && resList.size() > 0) {
             for (Object object : resList) {
@@ -228,7 +231,7 @@ public class ParkCollectorOrderanlysisServiceImpl implements ParkCollectorOrderA
                 values.add(map.get("name"));
                 values.add(map.get("cash_prepay"));
                 values.add(map.get("cash_pay"));
-//                values.add(map.get("ele_prepay"));
+                values.add(map.get("ele_pay"));
                 values.add(map.get("act_total"));
                 values.add(map.get("free_pay"));
                 bodyList.add(values);

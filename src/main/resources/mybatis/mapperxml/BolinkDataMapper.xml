@@ -397,7 +397,8 @@ GROUP BY
         SELECT
         SUM (cash_pay) cash_pay,
         SUM (cash_prepay) cash_prepay,
-        SUM (cash_pay+cash_prepay) cash_total,
+        SUM (ele_pay) ele_pay,
+        SUM (cash_pay+cash_prepay+ele_pay) cash_total,
         SUM (reduce) reduce,
         pay_time_day_str,
         out_uid

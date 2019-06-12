@@ -334,6 +334,51 @@ public class CommonServiceImpl implements CommonService {
         return orgCityMerchants;
     }
 
+    @Override
+    public OrgGroupTb getOrgGroupById(Long groupId) {
+        OrgGroupTb orgGroupTb = null;
+        Object object = redisService.get(CustomDefind.getValue("ORGGROUPBYID")+groupId);
+        if(object==null){
+            orgGroupTb=new OrgGroupTb();
+            orgGroupTb.setId(groupId);
+            orgGroupTb=(OrgGroupTb)commonDao.selectObjectByConditions(orgGroupTb);
+            if(orgGroupTb!=null){
+                redisService.set(CustomDefind.getValue("ORGGROUPBYID")+groupId,orgGroupTb);
+                return orgGroupTb;
+            }
+        }else{
+            orgGroupTb=(OrgGroupTb)object;
+        }
+        return orgGroupTb;
+    }
+
+    @Override
+    public OrgCityMerchants getOrgCityById(Long union_id) {
+        OrgCityMerchants orgCityMerchants = null;
+        Object object = redisService.get(CustomDefind.getValue("ORGCITYBYID")+union_id);
+        if(object==null){
+            orgCityMerchants=new OrgCityMerchants();
+            orgCityMerchants.setId(union_id);
+            orgCityMerchants=(OrgCityMerchants)commonDao.selectObjectByConditions(orgCityMerchants);
+            if(orgCityMerchants!=null){
+                redisService.set(CustomDefind.getValue("ORGCITYBYID")+union_id,orgCityMerchants);
+                return orgCityMerchants;
+            }
+        }else{
+            orgCityMerchants=(OrgCityMerchants)object;
+        }
+        return orgCityMerchants;
+    }
+
+    @Override
+    public void deleteCachOrgGroup(Long groupid) {
+        redisService.delete(CustomDefind.getValue("ORGGROUPBYID")+groupid);
+    }
+
+    @Override
+    public void deleteCachCity(Long id) {
+        redisService.delete(CustomDefind.getValue("ORGCITYBYID")+id);
+    }
 
     private Long getCityIdByGroupId(Long groupid) {
         OrgGroupTb orgGroupTb = new OrgGroupTb();

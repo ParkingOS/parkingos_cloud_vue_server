@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 import parkingos.com.bolink.dao.spring.CommonDao;
 import parkingos.com.bolink.models.OrgCityMerchants;
 import parkingos.com.bolink.service.AdminCityService;
+import parkingos.com.bolink.service.CommonService;
 import parkingos.com.bolink.service.SupperSearchService;
 
 import java.util.Map;
@@ -21,6 +22,8 @@ public class AdminCityServiceImpl implements AdminCityService {
     private CommonDao commonDao;
     @Autowired
     private SupperSearchService<OrgCityMerchants> supperSearchService;
+    @Autowired
+    CommonService commonService;
 
     @Override
     public JSONObject selectResultByConditions(Map<String, String> reqmap) {
@@ -40,7 +43,6 @@ public class AdminCityServiceImpl implements AdminCityService {
         orgCityMerchants.setUnionId(union_id);
         orgCityMerchants.setUkey(ukey);
         if(id==null){
-
             OrgCityMerchants con = new OrgCityMerchants();
             con.setUnionId(union_id);
             con.setState(0);
@@ -61,6 +63,7 @@ public class AdminCityServiceImpl implements AdminCityService {
             orgCityMerchants.setId(id);
             int res = commonDao.updateByPrimaryKey(orgCityMerchants);
             if(res==1){
+                commonService.deleteCachCity(id);
                 result.put("state",1);
                 result.put("msg","修改成功");
             }
@@ -78,6 +81,7 @@ public class AdminCityServiceImpl implements AdminCityService {
             orgCityMerchants.setState(1);
             int res = commonDao.updateByPrimaryKey(orgCityMerchants);
             if(res==1){
+                commonService.deleteCachCity(id);
                 result.put("state",1);
                 result.put("msg","删除成功");
             }

@@ -8,6 +8,7 @@ import org.springframework.stereotype.Component;
 import parkingos.com.bolink.dao.spring.CommonDao;
 import parkingos.com.bolink.models.*;
 import parkingos.com.bolink.qo.PageOrderConfig;
+import parkingos.com.bolink.service.CommonService;
 
 import javax.net.ssl.HttpsURLConnection;
 import javax.net.ssl.SSLContext;
@@ -26,6 +27,9 @@ public class CommonUtils<T> {
     Logger logger = LoggerFactory.getLogger(CommonUtils.class);
     @Autowired
     CommonDao commonDao;
+
+    @Autowired
+    CommonService commonService;
 
     /**
      * 获取下发数据的TCP通道
@@ -826,6 +830,48 @@ public class CommonUtils<T> {
             if(shortMessageAccount!=null){
                 count=shortMessageAccount.getCount();
             }
+
+            ComInfoTb comInfoTb = null;
+            Long groupId = -1L;
+            Integer sendFromGroup = 0;
+            if(count<=0){
+                //查询车场所属集团的短信条数
+                comInfoTb = commonService.getComInfoByComid(parkId);
+                groupId = comInfoTb.getGroupid();
+
+                if(groupId>0){
+                    ShortMessageAccount con = new ShortMessageAccount();
+                    con.setGroupId(groupId);
+                    con = (ShortMessageAccount)commonDao.selectObjectByConditions(con);
+                    if(con!=null) {
+                        if (con.getCount() > 0) {
+                            //如果有条数   查询该车场能不能用
+                            GroupMessageTb groupMessageTb = new GroupMessageTb();
+                            groupMessageTb.setGroupId(groupId);
+                            groupMessageTb = (GroupMessageTb) commonDao.selectObjectByConditions(groupMessageTb);
+                            if (groupMessageTb != null) {
+                                if (groupMessageTb.getSelectAll() == 1) {
+                                    count = con.getCount();
+                                    sendFromGroup = 1;
+                                } else {
+                                    String parks = groupMessageTb.getParks();
+                                    String[] arr = parks.split(",");
+                                    if (arr != null && arr.length > 0) {
+                                        for (String id : arr) {
+                                            if (id.equals(parkId + "")) {
+                                                count = con.getCount();
+                                                sendFromGroup = 1;
+                                                break;
+                                            }
+                                        }
+                                    }
+                                }
+
+                            }
+                        }
+                    }
+                }
+            }
             logger.info("===>>>>>>>send message:"+count);
             if(count>0) {
                 Map<String,Object> result = AliMessageUtil.sendVipNotice(type, carNumber, date, month, mobile,parkName);
@@ -837,6 +883,8 @@ public class CommonUtils<T> {
                     String bizId=(String)result.get("biz_id");
                     //开线程处理
                     ExecutorService es = ExecutorsUtil.getExecutorService();
+                    final Integer sendGroupFlag = sendFromGroup;
+                    final Long groupid = groupId;
                     es.execute(new Runnable() {
                         @Override
                         public void run() {
@@ -856,7 +904,15 @@ public class CommonUtils<T> {
                                     //记录发送流水
                                     SendMessageTb sendMessageTb = new SendMessageTb();
                                     sendMessageTb.setCtime(System.currentTimeMillis() / 1000);
+                                    if(sendGroupFlag>0){
+                                        sendMessageTb.setFromGroup(1);
+                                        sendMessageTb.setGroupId(groupid);
+                                        ComInfoTb com = commonService.getComInfoByComid(parkId);
+                                        String comName = com.getCompanyName();
+                                        sendMessageTb.setParkInfo(comName+"("+parkId+")");
+                                    }
                                     sendMessageTb.setParkId(parkId);
+
                                     sendMessageTb.setMobile(mobile);
                                     sendMessageTb.setType(1);
                                     sendMessageTb.setState(1);
@@ -868,7 +924,11 @@ public class CommonUtils<T> {
                                     int size = getSizeByCon(content);
                                     logger.info("===>>>>"+size);
                                     ShortMessageAccount con = new ShortMessageAccount();
-                                    con.setParkId(parkId);
+                                    if(sendGroupFlag>0){
+                                        con.setGroupId(groupid);
+                                    }else{
+                                        con.setParkId(parkId);
+                                    }
                                     con=(ShortMessageAccount)commonDao.selectObjectByConditions(con);
                                     int updateCount = con.getCount()-size;
                                     con.setCount(updateCount);
@@ -877,6 +937,13 @@ public class CommonUtils<T> {
                                 }else if(state==2){//发送失败
                                     SendMessageTb sendMessageTb = new SendMessageTb();
                                     sendMessageTb.setCtime(System.currentTimeMillis() / 1000);
+                                    if(sendGroupFlag>0){
+                                        sendMessageTb.setFromGroup(1);
+                                        sendMessageTb.setGroupId(groupid);
+                                        ComInfoTb com = commonService.getComInfoByComid(parkId);
+                                        String comName = com.getCompanyName();
+                                        sendMessageTb.setParkInfo(comName+"("+parkId+")");
+                                    }
                                     sendMessageTb.setParkId(parkId);
                                     sendMessageTb.setMobile(mobile);
                                     sendMessageTb.setType(1);
@@ -892,6 +959,12 @@ public class CommonUtils<T> {
                 }else{//发送失败，记失败记录
                     SendMessageTb sendMessageTb = new SendMessageTb();
                     sendMessageTb.setCtime(System.currentTimeMillis() / 1000);
+                    if(sendFromGroup>0){
+                        sendMessageTb.setFromGroup(1);
+                        sendMessageTb.setGroupId(groupId);
+                        String comName = comInfoTb.getCompanyName();
+                        sendMessageTb.setParkInfo(comName+"("+parkId+")");
+                    }
                     sendMessageTb.setParkId(parkId);
                     sendMessageTb.setMobile(mobile);
                     sendMessageTb.setType(1);
@@ -902,6 +975,12 @@ public class CommonUtils<T> {
             }else{
                 SendMessageTb sendMessageTb = new SendMessageTb();
                 sendMessageTb.setCtime(System.currentTimeMillis() / 1000);
+                if(sendFromGroup>0){
+                    sendMessageTb.setFromGroup(1);
+                    sendMessageTb.setGroupId(groupId);
+                    String comName = comInfoTb.getCompanyName();
+                    sendMessageTb.setParkInfo(comName+"("+parkId+")");
+                }
                 sendMessageTb.setParkId(parkId);
                 sendMessageTb.setMobile(mobile);
                 sendMessageTb.setType(1);

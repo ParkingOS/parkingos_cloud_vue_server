@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 import parkingos.com.bolink.dao.spring.CommonDao;
 import parkingos.com.bolink.models.OrgGroupTb;
 import parkingos.com.bolink.models.UserInfoTb;
+import parkingos.com.bolink.service.CommonService;
 import parkingos.com.bolink.service.GroupInfoService;
 import parkingos.com.bolink.utils.RequestUtil;
 import parkingos.com.bolink.utils.StringUtils;
@@ -21,6 +22,9 @@ public class GroupInfoServiceImpl implements GroupInfoService {
 
     @Autowired
     private CommonDao commonDao;
+
+    @Autowired
+    private CommonService commonService;
 
 
     @Override
@@ -76,6 +80,8 @@ public class GroupInfoServiceImpl implements GroupInfoService {
             }
         }
         if(r==1){
+            commonService.deleteCachOrgGroup(groupid);
+
             OrgGroupTb orgGroupTb = new OrgGroupTb();
             orgGroupTb.setName(name);
             orgGroupTb.setType(type);

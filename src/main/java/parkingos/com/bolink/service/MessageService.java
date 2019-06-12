@@ -18,7 +18,19 @@ public interface MessageService {
 
     List<List<Object>> exportSendTrade(Map<String, String> reqParameterMap);
 
-    List<List<Object>> exportBuyTrade(Map<String, String> reqParameterMap);
+    List<List<Object>> exportBuyTrade(Map<String, String> reqParameterMap,int type);
 
     JSONObject getCodeState(String tradeNo);
+
+    JSONObject buyGroupMessage(Integer count, Double money, String tradeNo, Long groupId);
+
+    JSONObject getGroupBuyTrade(Map<String, String> reqParameterMap);
+
+    JSONObject getGroupSendTrade(Map<String, String> reqParameterMap);
+
+    List<List<Object>> exportGroupSendTrade(Map<String, String> reqParameterMap);
+
+    JSONObject getSelectParks(Long groupId);
+
+    JSONObject setSelectParks(Long groupId, String parks,Integer selectAll);
 }

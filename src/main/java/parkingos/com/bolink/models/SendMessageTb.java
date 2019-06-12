@@ -17,6 +17,36 @@ public class SendMessageTb {
 
     private String errmsg;
 
+    private Long groupId;
+
+    private String parkInfo;
+
+    private Integer fromGroup;
+
+    public Integer getFromGroup() {
+        return fromGroup;
+    }
+
+    public void setFromGroup(Integer fromGroup) {
+        this.fromGroup = fromGroup;
+    }
+
+    public String getParkInfo() {
+        return parkInfo;
+    }
+
+    public void setParkInfo(String parkInfo) {
+        this.parkInfo = parkInfo;
+    }
+
+    public Long getGroupId() {
+        return groupId;
+    }
+
+    public void setGroupId(Long groupId) {
+        this.groupId = groupId;
+    }
+
     public Long getId() {
         return id;
     }

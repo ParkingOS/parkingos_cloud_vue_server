@@ -33,6 +33,46 @@ public class ParkuserWorkRecordTb {
 
     private Long parkId;
 
+    private BigDecimal elePay;
+
+    private BigDecimal cashPay;
+
+    private BigDecimal cashPrepay;
+
+    private Integer analyState;
+
+    public BigDecimal getElePay() {
+        return elePay;
+    }
+
+    public void setElePay(BigDecimal elePay) {
+        this.elePay = elePay;
+    }
+
+    public BigDecimal getCashPay() {
+        return cashPay;
+    }
+
+    public void setCashPay(BigDecimal cashPay) {
+        this.cashPay = cashPay;
+    }
+
+    public BigDecimal getCashPrepay() {
+        return cashPrepay;
+    }
+
+    public void setCashPrepay(BigDecimal cashPrepay) {
+        this.cashPrepay = cashPrepay;
+    }
+
+    public Integer getAnalyState() {
+        return analyState;
+    }
+
+    public void setAnalyState(Integer analyState) {
+        this.analyState = analyState;
+    }
+
     public Long getId() {
         return id;
     }

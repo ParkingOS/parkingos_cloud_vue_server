@@ -3,6 +3,7 @@ package parkingos.com.bolink.service;
 
 import parkingos.com.bolink.models.ComInfoTb;
 import parkingos.com.bolink.models.OrgCityMerchants;
+import parkingos.com.bolink.models.OrgGroupTb;
 
 public interface CommonService {
 
@@ -38,4 +39,12 @@ public interface CommonService {
     int getParkEmpty(int comid);
 
     OrgCityMerchants getCityByUnionId(String unionId);
+
+    OrgGroupTb getOrgGroupById(Long groupId);
+
+    OrgCityMerchants getOrgCityById(Long union_id);
+
+    void deleteCachOrgGroup(Long groupid);
+
+    void deleteCachCity(Long id);
 }

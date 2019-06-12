@@ -12,6 +12,7 @@ import parkingos.com.bolink.models.OrgCityMerchants;
 import parkingos.com.bolink.models.OrgGroupTb;
 import parkingos.com.bolink.models.UnionServerTb;
 import parkingos.com.bolink.service.CityGroupService;
+import parkingos.com.bolink.service.CommonService;
 import parkingos.com.bolink.service.SupperSearchService;
 import parkingos.com.bolink.utils.Check;
 import parkingos.com.bolink.utils.CustomDefind;
@@ -29,8 +30,8 @@ public class CityGroupServiceImpl implements CityGroupService {
     private CommonDao commonDao;
     @Autowired
     private SupperSearchService<OrgGroupTb> supperSearchService;
-    @Autowired
-    private BolinkDataMapper bolinkDataMapper;
+@Autowired
+private CommonService commonService;
 
     @Override
     public JSONObject selectResultByConditions(Map<String, String> reqmap) {
@@ -53,6 +54,7 @@ public class CityGroupServiceImpl implements CityGroupService {
         orgGroupTb.setId(id);
         int res = commonDao.updateByPrimaryKey(orgGroupTb);
         if(res==1){
+            commonService.deleteCachOrgGroup(id);
             result.put("state",1);
             result.put("msg","删除成功");
         }
@@ -177,6 +179,7 @@ public class CityGroupServiceImpl implements CityGroupService {
 //            if(flag) {
                 int res = commonDao.updateByPrimaryKey(orgGroupTb);
                 if (res == 1) {
+                    commonService.deleteCachOrgGroup(id);
                     result.put("state", 1);
                     result.put("msg", "修改成功");
                 }

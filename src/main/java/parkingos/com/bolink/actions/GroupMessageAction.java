@@ -2,6 +2,7 @@ package parkingos.com.bolink.actions;
 
 
 import com.alibaba.fastjson.JSONObject;
+import com.sun.org.apache.regexp.internal.RE;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,10 +26,10 @@ import java.util.Map;
 import java.util.Random;
 
 @Controller
-@RequestMapping("/message")
-public class MessageAction {
+@RequestMapping("/groupmessage")
+public class GroupMessageAction {
 
-    Logger logger = LoggerFactory.getLogger(MessageAction.class);
+    Logger logger = LoggerFactory.getLogger(GroupMessageAction.class);
     @Autowired
     MessageService messageService;
     @Autowired
@@ -43,53 +44,32 @@ public class MessageAction {
         //生成流水号
         String seed = (new Random().nextDouble() + "").substring(2, 9);
         String tradeNo = "Msg"+System.currentTimeMillis() + seed;
-        //购买短信的厂商
-        Long union_id = RequestUtil.getLong(request,"union_id",-1L);
-        //如果细化到车场购买
-        Long park_id = RequestUtil.getLong(request,"comid",-1L);
+        Long groupId = RequestUtil.getLong(request,"groupid",-1L);
 
-        JSONObject result = messageService.buyMessage(count,money,tradeNo,union_id,park_id);
+        JSONObject result = messageService.buyGroupMessage(count,money,tradeNo,groupId);
         StringUtils.ajaxOutput(resp, result.toJSONString());
         return null;
     }
 
-    @RequestMapping(value = "/notice")
-    public String notice(HttpServletRequest request,HttpServletResponse resp) {
-        String data = readBodyFormRequsetStream(request);
-        logger.info(StringUtils.decodeUTF8(data));
-        JSONObject jsonObject = JSONObject.parseObject(StringUtils.decodeUTF8(data));
-        Long parkId = jsonObject.getLong("park_id");
-        String carNumber = jsonObject.getString("car_number");
-        Long eTime = jsonObject.getLong("e_time");
-        String mobile = jsonObject.getString("mobile");
-        Integer day = jsonObject.getInteger("day");
-
-//        Long parkId = RequestUtil.getLong(request,"park_id",-1L);
-//        String carNumber = RequestUtil.getString(request,"car_number");
-//        Long eTime = RequestUtil.getLong(request,"e_time",-1L);
-//        String mobile = RequestUtil.getString(request,"mobile");
-//        Integer day = RequestUtil.getInteger(request,"day",1);
-//        logger.info("===>>>"+parkId);
-        String result = messageService.notice(parkId,carNumber,eTime,mobile,day);
-        return null;
-    }
 
 
     @RequestMapping(value = "/getsendtrade")
     public String getSendTrade(HttpServletRequest request,HttpServletResponse resp) {
+
         Map<String, String> reqParameterMap = RequestUtil.readBodyFormRequset(request);
 
-        JSONObject result = messageService.getSendTrade(reqParameterMap);
+        JSONObject result = messageService.getGroupSendTrade(reqParameterMap);
         //把结果返回页面
         StringUtils.ajaxOutput(resp, result.toJSONString());
         return null;
     }
 
+
     @RequestMapping(value = "/getbuytrade")
     public String getBuyTrade(HttpServletRequest request,HttpServletResponse resp) {
         Map<String, String> reqParameterMap = RequestUtil.readBodyFormRequset(request);
 
-        JSONObject result = messageService.getBuyTrade(reqParameterMap);
+        JSONObject result = messageService.getGroupBuyTrade(reqParameterMap);
         //把结果返回页面
         StringUtils.ajaxOutput(resp, result.toJSONString());
         return null;
@@ -99,14 +79,14 @@ public class MessageAction {
 
     @RequestMapping(value = "/exportsendtrade")
     public String exportSendTrade(HttpServletRequest request, HttpServletResponse response) throws Exception{
-        Long comid = RequestUtil.getLong(request,"comid",-1L);
+        Long groupid = RequestUtil.getLong(request,"groupid",-1L);
         String nickname1 = StringUtils.decodeUTF8(RequestUtil.getString(request,"nickname1"));
         Long uin = RequestUtil.getLong(request, "loginuin", -1L);
         Map<String, String> reqParameterMap = RequestUtil.readBodyFormRequset(request);
 
-        String [][] heards = new String[][]{{"使用日期","STR"},{"手机号","STR"},{"使用模块","STR"}};
+        String [][] heards = new String[][]{{"车场(编号)","STR"},{"使用日期","STR"},{"手机号","STR"},{"使用模块","STR"}};
         //获取要到处的数据
-        List<List<Object>> bodyList = messageService.exportSendTrade(reqParameterMap);
+        List<List<Object>> bodyList = messageService.exportGroupSendTrade(reqParameterMap);
 
         ExportDataExcel excel = new ExportDataExcel("短信使用明细", heards, "sheet1");
         String fname = "短信使用明细";
@@ -127,7 +107,7 @@ public class MessageAction {
         parkLogTb.setOperateType(4);
         parkLogTb.setContent(uin+"("+nickname1+")"+"导出了短信流水");
         parkLogTb.setType("message");
-        parkLogTb.setParkId(comid);
+        parkLogTb.setGroupId(groupid);
         saveLogService.saveLog(parkLogTb);
 
         return null;
@@ -135,14 +115,14 @@ public class MessageAction {
 
     @RequestMapping(value = "/exportbuytrade")
     public String exportBuyTrade(HttpServletRequest request, HttpServletResponse response) throws Exception{
-        Long comid = RequestUtil.getLong(request,"comid",-1L);
+        Long groupid = RequestUtil.getLong(request,"groupid",-1L);
         String nickname1 = StringUtils.decodeUTF8(RequestUtil.getString(request,"nickname1"));
         Long uin = RequestUtil.getLong(request, "loginuin", -1L);
         Map<String, String> reqParameterMap = RequestUtil.readBodyFormRequset(request);
 
         String [][] heards = new String[][]{{"购买数量","STR"},{"续费日期","STR"},{"到期日期","STR"},{"支付金额","STR"},{"流水号","STR"}};
         //获取要到处的数据
-        List<List<Object>> bodyList = messageService.exportBuyTrade(reqParameterMap,1);
+        List<List<Object>> bodyList = messageService.exportBuyTrade(reqParameterMap,2);
 
         ExportDataExcel excel = new ExportDataExcel("短信充值明细", heards, "sheet1");
         String fname = "短信充值明细";
@@ -163,7 +143,7 @@ public class MessageAction {
         parkLogTb.setOperateType(4);
         parkLogTb.setContent(uin+"("+nickname1+")"+"导出了充值流水");
         parkLogTb.setType("message");
-        parkLogTb.setParkId(comid);
+        parkLogTb.setGroupId(groupid);
         saveLogService.saveLog(parkLogTb);
 
         return null;
@@ -197,10 +177,37 @@ public class MessageAction {
 
     @RequestMapping(value = "/getcodestate")
     public String getCodeState(HttpServletRequest request,HttpServletResponse resp) {
+
         String tradeNo = RequestUtil.getString(request,"trade_no");
 
 
         JSONObject result = messageService.getCodeState(tradeNo);
+        StringUtils.ajaxOutput(resp, result.toJSONString());
+
+        return null;
+    }
+
+
+    @RequestMapping(value = "/getselectparks")
+    public String getSelectParks(HttpServletRequest request,HttpServletResponse resp) {
+
+        Long groupId= RequestUtil.getLong(request,"groupid",-1L);
+
+        JSONObject result = messageService.getSelectParks(groupId);
+        StringUtils.ajaxOutput(resp, result.toJSONString());
+
+        return null;
+    }
+
+
+    @RequestMapping(value = "/setselectparks")
+    public String setSelectParks(HttpServletRequest request,HttpServletResponse resp) {
+
+        Long groupId= RequestUtil.getLong(request,"groupid",-1L);
+        String parks = RequestUtil.getString(request,"select_parks");
+        Integer selectAll = RequestUtil.getInteger(request,"select_all",0);
+        logger.info("===>>>>>>setselectparks:"+groupId+"~~"+parks+"~~selectAll:"+selectAll);
+        JSONObject result = messageService.setSelectParks(groupId,parks,selectAll);
         StringUtils.ajaxOutput(resp, result.toJSONString());
 
         return null;
