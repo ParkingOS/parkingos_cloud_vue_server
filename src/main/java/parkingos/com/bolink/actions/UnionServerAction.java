@@ -45,8 +45,10 @@ public class UnionServerAction {
             Long parentId = RequestUtil.getLong(request, "parent_id", -1L);
             Long unionId = RequestUtil.getLong(request, "unionid", -1L);
             Long cityId = RequestUtil.getLong(request, "cityid", -1L);
+            String nickname = StringUtils.decodeUTF8(RequestUtil.getString(request,"nickname1"));
+            Long uin = RequestUtil.getLong(request, "loginuin", -1L);
             logger.info("addAndEdit unionServer:name" + name +"~~address:"+ address+"~~phone:" + phone+"~~id:" + id);
-            result =  unionServerService.addOrEdit(name, address, phone, state, parentId, id, unionId, cityId);
+            result =  unionServerService.addOrEdit(name, address, phone, state, parentId, id, unionId, cityId,nickname,uin);
 //            StringUtils.ajaxOutput(resp, result.toJSONString());
 //            return null;
         }catch (Exception e){

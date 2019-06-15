@@ -151,15 +151,16 @@ public class CityParkServiceImpl implements CityParkService {
         String union_key ="";
 
         int fromServerCreatePark = 0;
-
+        int fromGroupCreatePark = 0;
+        int fromUnionCreatePark = 0;
         if(!Check.isEmpty(union_id)){
+            fromUnionCreatePark=1;
             OrgCityMerchants orgCityMerchants = commonService.getCityByUnionId(union_id);
             union_key = orgCityMerchants.getUkey();
             cityid = orgCityMerchants.getId();
         }else if(server_id>0){
             //服务商注册   这时候的serverId  是云平台的主键
             fromServerCreatePark = 1;
-
             UnionServerTb unionServerTb = new UnionServerTb();
             unionServerTb.setId(server_id);
             unionServerTb=(UnionServerTb)commonDao.selectObjectByConditions(unionServerTb);
@@ -175,6 +176,7 @@ public class CityParkServiceImpl implements CityParkService {
             cityid = orgCityMerchants.getId();
         }else if(groupId>0){
             //集团注册
+            fromGroupCreatePark=1;
             OrgGroupTb orgGroupTb = new OrgGroupTb();
             orgGroupTb.setId(groupId);
             orgGroupTb=(OrgGroupTb)commonDao.selectObjectByConditions(orgGroupTb);
@@ -206,7 +208,6 @@ public class CityParkServiceImpl implements CityParkService {
         }
 
         //如果server_id小于0  证明不是服务商注册，有可能是厂商注册，获取一下参数值
-        int fromUnionCreatePark = 0;
 
         if(server_id==-1){
             server_id= RequestUtil.getLong(request, "server_id", -1L);
@@ -353,7 +354,7 @@ public class CityParkServiceImpl implements CityParkService {
                             commonDao.insert(user);
                             logger.info("==>>>>新建员工success:");
 
-                            if (groupId > 0) {
+                            if (fromGroupCreatePark > 0) {
                                 ParkLogTb parkLogTb = new ParkLogTb();
                                 parkLogTb.setOperateUser(nickname);
                                 parkLogTb.setOperateTime(System.currentTimeMillis() / 1000);
@@ -363,6 +364,20 @@ public class CityParkServiceImpl implements CityParkService {
                                 parkLogTb.setGroupId(groupId);
                                 saveLogService.saveLog(parkLogTb);
                             }
+
+                            if (fromUnionCreatePark > 0) {
+                                ParkLogTb parkLogTb = new ParkLogTb();
+                                parkLogTb.setOperateUser(nickname);
+                                parkLogTb.setOperateTime(System.currentTimeMillis() / 1000);
+                                parkLogTb.setOperateType(1);
+                                parkLogTb.setContent(uin + "(" + nickname + ")" + "新建了车场" + comid + company);
+                                parkLogTb.setType("parkinfo");
+                                parkLogTb.setCityId(cityid);
+                                saveLogService.saveLog(parkLogTb);
+                            }
+
+
+
 
                             return result;
                         } else {
@@ -492,7 +507,7 @@ public class CityParkServiceImpl implements CityParkService {
                     logger.error("update bolink park state error", e);
                 }
 
-                if (groupId > 0) {
+                if (fromGroupCreatePark > 0) {
                     ParkLogTb parkLogTb = new ParkLogTb();
                     parkLogTb.setOperateUser(nickname);
                     parkLogTb.setOperateTime(System.currentTimeMillis() / 1000);
@@ -502,6 +517,18 @@ public class CityParkServiceImpl implements CityParkService {
                     parkLogTb.setGroupId(groupId);
                     saveLogService.saveLog(parkLogTb);
                 }
+
+                if (fromUnionCreatePark > 0) {
+                    ParkLogTb parkLogTb = new ParkLogTb();
+                    parkLogTb.setOperateUser(nickname);
+                    parkLogTb.setOperateTime(System.currentTimeMillis() / 1000);
+                    parkLogTb.setOperateType(2);
+                    parkLogTb.setContent(uin + "(" + nickname + ")" + "修改了车场" + id);
+                    parkLogTb.setType("parkinfo");
+                    parkLogTb.setCityId(cityid);
+                    saveLogService.saveLog(parkLogTb);
+                }
+
             }
         }
         return result;

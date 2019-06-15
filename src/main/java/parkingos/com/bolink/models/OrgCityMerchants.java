@@ -48,6 +48,16 @@ public class OrgCityMerchants {
 
     private Integer selfRefillSetting;
 
+    private Integer dockingType;
+
+    public Integer getDockingType() {
+        return dockingType;
+    }
+
+    public void setDockingType(Integer dockingType) {
+        this.dockingType = dockingType;
+    }
+
     public Integer getSelfRefillSetting() {
         return selfRefillSetting;
     }

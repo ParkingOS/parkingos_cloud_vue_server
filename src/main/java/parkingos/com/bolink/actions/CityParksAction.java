@@ -64,9 +64,10 @@ public class CityParksAction {
     @RequestMapping(value = "/deletepark")
     public String deletepark(HttpServletRequest request, HttpServletResponse resp) {
 
-        Long groupid = RequestUtil.getLong(request,"groupid",-1L);
+//        Long groupid = RequestUtil.getLong(request,"groupid",-1L);
         String nickname = StringUtils.decodeUTF8(RequestUtil.getString(request,"nickname1"));
         Long uin = RequestUtil.getLong(request, "loginuin", -1L);
+        Long cityid = RequestUtil.getLong(request,"cityid",-1L);
 
 //        Long id = Long.parseLong(request.getParameter("id"));
 //        ComInfoTb comInfoTb = new ComInfoTb();
@@ -83,14 +84,14 @@ public class CityParksAction {
         comInfoTb.setUnionId(unionId);
         JSONObject result =cityParkService.deletepark(comInfoTb);
 
-        if((Integer)result.get("state")==1&&groupid>0){
+        if((Integer)result.get("state")==1&&cityid>0){
             ParkLogTb parkLogTb = new ParkLogTb();
             parkLogTb.setOperateUser(nickname);
             parkLogTb.setOperateTime(System.currentTimeMillis()/1000);
             parkLogTb.setOperateType(3);
             parkLogTb.setContent(uin+"("+nickname+")"+"删除了车场"+parkId);
             parkLogTb.setType("parkinfo");
-            parkLogTb.setGroupId(groupid);
+            parkLogTb.setCityId(cityid);
             saveLogService.saveLog(parkLogTb);
         }
         //把结果返回页面

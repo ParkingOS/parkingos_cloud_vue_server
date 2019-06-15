@@ -34,4 +34,17 @@ public class CityLogAction {
         StringUtils.ajaxOutput(resp,result.toJSONString());
         return null;
     }
+
+
+    @RequestMapping(value = "/cityQuery")
+    public String cityQuery(HttpServletRequest request, HttpServletResponse resp){
+
+        Map<String, String> reqParameterMap = RequestUtil.readBodyFormRequset(request);
+
+        JSONObject result = cityLogService.cityQuery(reqParameterMap);
+        //把结果返回页面
+        StringUtils.ajaxOutput(resp,result.toJSONString());
+        return null;
+    }
+
 }

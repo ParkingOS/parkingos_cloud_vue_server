@@ -262,6 +262,7 @@ public class LoginServiceImpl implements LoginService {
 
                         orgCityMerchants = (OrgCityMerchants)commonDao.selectObjectByConditions(orgCityMerchants);
                         if(orgCityMerchants!=null){
+                            parkLogTb.setCityId(orgCityMerchants.getId());
                             String unionId = orgCityMerchants.getUnionId();
 //                            es.execute(new Runnable() {
 //                                @Override
@@ -278,7 +279,7 @@ public class LoginServiceImpl implements LoginService {
 
 //                                }
 //                            });
-
+                            user.put("docking_type",orgCityMerchants.getDockingType());
                             user.put("name",orgCityMerchants.getName());
                         }
                     }

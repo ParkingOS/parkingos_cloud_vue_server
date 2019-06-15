@@ -21,6 +21,16 @@ public class ParkLogTb {
 
     private Integer operateType;
 
+    private Long cityId;
+
+    public Long getCityId() {
+        return cityId;
+    }
+
+    public void setCityId(Long cityId) {
+        this.cityId = cityId;
+    }
+
     public Integer getOperateType() {
         return operateType;
     }

@@ -109,4 +109,13 @@ public class CityLogServiceImpl implements CityLogService {
 //        return result;
     }
 
+    @Override
+    public JSONObject cityQuery(Map<String, String> reqParameterMap) {
+        Long cityId= Long.parseLong(reqParameterMap.get("cityid"));
+        ParkLogTb parkLogTb = new ParkLogTb();
+        parkLogTb.setCityId(cityId);
+        JSONObject result = supperSearchService.supperSearch(parkLogTb,reqParameterMap);
+        return  result;
+    }
+
 }

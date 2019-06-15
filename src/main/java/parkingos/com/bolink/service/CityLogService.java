@@ -6,4 +6,6 @@ import java.util.Map;
 
 public interface CityLogService {
     JSONObject selectResultByConditions(Map<String, String> reqParameterMap);
+
+    JSONObject cityQuery(Map<String, String> reqParameterMap);
 }

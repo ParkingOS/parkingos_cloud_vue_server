@@ -12,6 +12,7 @@ import parkingos.com.bolink.models.*;
 import parkingos.com.bolink.qo.PageOrderConfig;
 import parkingos.com.bolink.qo.SearchBean;
 import parkingos.com.bolink.service.CommonService;
+import parkingos.com.bolink.service.SaveLogService;
 import parkingos.com.bolink.service.SupperSearchService;
 import parkingos.com.bolink.service.UnionServerService;
 import parkingos.com.bolink.utils.*;
@@ -32,9 +33,11 @@ public class UnionServerServiceImpl implements UnionServerService {
     SupperSearchService superSearchService;
     @Autowired
     CommonService commonService;
+    @Autowired
+    SaveLogService saveLogService;
 
     @Override
-    public JSONObject addOrEdit(String name, String address, String phone, Integer state, Long parentId, Long id,Long unionId,Long cityid) {
+    public JSONObject addOrEdit(String name, String address, String phone, Integer state, Long parentId, Long id,Long unionId,Long cityid,String nickname,Long uin) {
         JSONObject result = new JSONObject();
         result.put("state",0);
         result.put("msg","处理服务商失败");
@@ -193,6 +196,23 @@ public class UnionServerServiceImpl implements UnionServerService {
 
         }
         if(count==1){
+            if(cityid>0) {
+                ParkLogTb parkLogTb = new ParkLogTb();
+                parkLogTb.setOperateUser(nickname);
+                parkLogTb.setOperateTime(System.currentTimeMillis() / 1000);
+                parkLogTb.setOperateType(2);
+                if (id > 0) {
+                    parkLogTb.setOperateType(2);
+                    parkLogTb.setContent(uin + "(" + nickname + ")" + "编辑了服务商" + id);
+                } else {
+                    parkLogTb.setOperateType(1);
+                    parkLogTb.setContent(uin + "(" + nickname + ")" + "注册了服务商:" + name);
+                }
+                parkLogTb.setType("server");
+                parkLogTb.setCityId(cityid);
+                saveLogService.saveLog(parkLogTb);
+            }
+
             result.put("state",1);
             result.put("msg","处理服务商成功");
         }

@@ -6,7 +6,7 @@ import java.util.Map;
 
 public interface UnionServerService {
 
-    JSONObject addOrEdit(String name, String address, String phone, Integer state, Long parentId, Long id,Long unionId,Long cityid);
+    JSONObject addOrEdit(String name, String address, String phone, Integer state, Long parentId, Long id,Long unionId,Long cityid,String nickname,Long uin);
 
     JSONObject queryMembers(Map<String, String> reqParameterMap);
 
