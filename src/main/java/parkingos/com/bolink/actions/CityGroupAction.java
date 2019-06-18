@@ -69,7 +69,7 @@ public class CityGroupAction {
             ParkLogTb parkLogTb = new ParkLogTb();
             parkLogTb.setOperateUser(nickname1);
             parkLogTb.setOperateTime(System.currentTimeMillis()/1000);
-            if(id>0){
+            if(id!=null&&id>0){
                 parkLogTb.setOperateType(2);
                 parkLogTb.setContent(loginuin+"("+nickname1+")"+"编辑了集团"+id);
             }else{

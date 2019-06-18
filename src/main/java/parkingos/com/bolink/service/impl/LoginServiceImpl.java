@@ -128,7 +128,7 @@ public class LoginServiceImpl implements LoginService {
                                     String tokenResult = httpProxy.doPostTwo(url, params);
                                     logger.info("===get token from bolink:"+tokenResult);
                                     JSONObject jsonResult = JSON.parseObject(tokenResult);
-                                    if(jsonResult.get("state")!=null&&jsonResult.getInteger("state")==1){
+                                    if(jsonResult!=null&&jsonResult.get("state")!=null&&jsonResult.getInteger("state")==1){
                                         user.put("token",jsonResult.get("token"));
                                     }
 
@@ -242,7 +242,7 @@ public class LoginServiceImpl implements LoginService {
                     String tokenResult = httpProxy.doPostTwo(url, params);
                     logger.info("===get token from bolink:"+tokenResult);
                     JSONObject jsonResult = JSON.parseObject(tokenResult);
-                    if(jsonResult.get("state")!=null&&jsonResult.getInteger("state")==1){
+                    if(jsonResult!=null&&jsonResult.get("state")!=null&&jsonResult.getInteger("state")==1){
                         user.put("token",jsonResult.get("token"));
                     }
 
@@ -321,7 +321,7 @@ public class LoginServiceImpl implements LoginService {
                         String tokenResult = httpProxy.doPostTwo(url, params);
                         logger.info("===get token from bolink:"+tokenResult);
                         JSONObject jsonResult = JSON.parseObject(tokenResult);
-                        if(jsonResult.get("state")!=null&&jsonResult.getInteger("state")==1){
+                        if(jsonResult!=null&&jsonResult.get("state")!=null&&jsonResult.getInteger("state")==1){
                             user.put("token",jsonResult.get("token"));
                         }
 

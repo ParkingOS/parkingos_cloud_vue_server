@@ -16,6 +16,7 @@ import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509TrustManager;
 import javax.security.cert.CertificateException;
 import javax.security.cert.X509Certificate;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutorService;
@@ -193,19 +194,60 @@ public class CommonUtils<T> {
             localId = parkTokenTb.getParkId() + "_" + parkTokenTb.getLocalId();// parkTokenTb.get("park_id")+"_"+localId;
         }
         logger.error(localId);
-        JSONObject jsonObject = JSONObject.parseObject("{}");
-        jsonObject.put("channelid", localId);
-        jsonObject.put("data",message);
-        String url = "http://" + ip + ":8083/zld/sendmesgtopark";
-        logger.error(url);
-        logger.error(""+jsonObject);
-        String ret = new HttpProxy().doHeadPost(url, StringUtils.encodeUTF8(jsonObject.toString()));
-        logger.error(ret);
-        if (ret != null&&!"".equals(ret)) {
-            JSONObject result = JSONObject.parseObject(ret);
-            if (result.containsKey("result"))
-                return result.getBooleanValue("result");
+
+        String url = "http://" + ip +":8080/bpd/sendmessagetopark";
+        //String url = "http://" + serverIp + "/bpd/sendmessagetopark";
+        Map<String, Object> params = new HashMap<>();
+        params.put("channel_id", localId);
+        params.put("data", StringUtils.encodeUTF8(message.toString()));
+        params.put("send_type", "TCP");
+        logger.error("发送消息到车场=>url:"+url+" params:"+params);
+        try {
+            String result = HttpClientUtil.postParameters(url, params);
+            JSONObject retData = JSONObject.parseObject(result);
+            logger.error("发送消息到车场=result:"+ result+",data:"+params);
+            int state = retData.getInteger("state");
+            if (state == 1) {
+                //发送成功
+                return true;
+            }else {
+                return false;
+            }
+        }catch (Exception e){
+            logger.error(e.getMessage());
+            if(e.getMessage().contains("HTTP Status 404 - /bpd/sendmessagetopark")){
+                logger.info("===>>>new tcp not found:send old！");
+                JSONObject jsonObject = JSONObject.parseObject("{}");
+                jsonObject.put("channelid", localId);
+                jsonObject.put("data",message);
+                url = "http://" + ip + ":8083/zld/sendmesgtopark";
+                logger.error(url);
+                logger.error(""+jsonObject);
+                String ret = new HttpProxy().doHeadPost(url, StringUtils.encodeUTF8(jsonObject.toString()));
+                logger.error(ret);
+                if (ret != null&&!"".equals(ret)) {
+                    JSONObject result = JSONObject.parseObject(ret);
+                    if (result.containsKey("result")) {
+                        return result.getBooleanValue("result");
+                    }
+                }
+            }
+            e.printStackTrace();
         }
+
+//        JSONObject jsonObject = JSONObject.parseObject("{}");
+//        jsonObject.put("channelid", localId);
+//        jsonObject.put("data",message);
+//        String url = "http://" + ip + ":8083/zld/sendmesgtopark";
+//        logger.error(url);
+//        logger.error(""+jsonObject);
+//        String ret = new HttpProxy().doHeadPost(url, StringUtils.encodeUTF8(jsonObject.toString()));
+//        logger.error(ret);
+//        if (ret != null&&!"".equals(ret)) {
+//            JSONObject result = JSONObject.parseObject(ret);
+//            if (result.containsKey("result"))
+//                return result.getBooleanValue("result");
+//        }
         return false;
     }
 
