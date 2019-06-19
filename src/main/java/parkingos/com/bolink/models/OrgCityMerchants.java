@@ -48,6 +48,16 @@ public class OrgCityMerchants {
 
     private Integer selfRefillSetting;
 
+    private Integer endTimeSetting;
+
+    public Integer getEndTimeSetting() {
+        return endTimeSetting;
+    }
+
+    public void setEndTimeSetting(Integer endTimeSetting) {
+        this.endTimeSetting = endTimeSetting;
+    }
+
     public Integer getSelfRefillSetting() {
         return selfRefillSetting;
     }

@@ -38,10 +38,10 @@ public class CityUinAction {
     *
     * */
     @RequestMapping(value = "/edit")
-    public String editSetting(Long cityid,Integer state,HttpServletResponse resp) {
-        logger.error("自定义设置"+cityid+"~~~~~"+state);
+    public String editSetting(Long cityid,Integer state,Integer type,HttpServletResponse resp) {
+        logger.error("自定义设置"+cityid+"~~~~~"+state+"~~type:"+type);
 
-        JSONObject result = cityUinService.editSetting(cityid,state);
+        JSONObject result = cityUinService.editSetting(cityid,state,type);
         StringUtils.ajaxOutput(resp, result.toJSONString());
         return null;
     }

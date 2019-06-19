@@ -159,6 +159,7 @@ public class LoginServiceImpl implements LoginService {
                                     orgCityMerchants = (OrgCityMerchants)commonDao.selectObjectByConditions(orgCityMerchants);
                                     if(orgCityMerchants!=null&&orgCityMerchants.getSelfRefillSetting()!=null){
                                         user.put("self_setting",orgCityMerchants.getSelfRefillSetting());
+                                        user.put("end_time_setting",orgCityMerchants.getEndTimeSetting());
                                     }
                                 }
                             }else if(comInfoTb.getCityid()!=null&&comInfoTb.getCityid()>-1){
@@ -167,8 +168,9 @@ public class LoginServiceImpl implements LoginService {
                                 orgCityMerchants.setId(cityid);
                                 orgCityMerchants.setState(0);
                                 orgCityMerchants = (OrgCityMerchants)commonDao.selectObjectByConditions(orgCityMerchants);
-                                if(orgCityMerchants!=null&&orgCityMerchants.getSelfRefillSetting()!=null){
+                                if(orgCityMerchants!=null){
                                     user.put("self_setting",orgCityMerchants.getSelfRefillSetting());
+                                    user.put("end_time_setting",orgCityMerchants.getEndTimeSetting());
                                 }
                             }else{
                                 result.put("state", false);
@@ -216,6 +218,7 @@ public class LoginServiceImpl implements LoginService {
                             orgCityMerchants = (OrgCityMerchants)commonDao.selectObjectByConditions(orgCityMerchants);
                             if(orgCityMerchants!=null&&orgCityMerchants.getSelfRefillSetting()!=null){
                                 user.put("self_setting",orgCityMerchants.getSelfRefillSetting());
+                                user.put("end_time_setting",orgCityMerchants.getEndTimeSetting());
                             }
 
                         }

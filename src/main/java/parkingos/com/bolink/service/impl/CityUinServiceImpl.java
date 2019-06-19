@@ -62,11 +62,17 @@ public class CityUinServiceImpl implements CityUinService {
     }
 
     @Override
-    public JSONObject editSetting(Long cityid, Integer state) {
+    public JSONObject editSetting(Long cityid, Integer state, Integer type) {
         JSONObject result = new JSONObject();
         OrgCityMerchants orgCityMerchants = new OrgCityMerchants();
         orgCityMerchants.setId(cityid);
-        orgCityMerchants.setSelfRefillSetting(state);
+        if(type==1){
+            //月卡续费开始时间
+            orgCityMerchants.setSelfRefillSetting(state);
+        }else if(type==2){
+            //月卡续费结束时间
+            orgCityMerchants.setEndTimeSetting(state);
+        }
         int count = commonDao.updateByPrimaryKey(orgCityMerchants);
         if(count ==1){
             result.put("state",1);
@@ -87,6 +93,7 @@ public class CityUinServiceImpl implements CityUinService {
         Map<String,Object> map = new HashMap<String,Object>();
         if(orgCityMerchants!=null){
             map.put("self_setting",orgCityMerchants.getSelfRefillSetting());
+            map.put("end_time_setting",orgCityMerchants.getEndTimeSetting());
             result.put("self_setting",map);
             return result;
         }

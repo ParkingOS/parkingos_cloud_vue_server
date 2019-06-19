@@ -2,15 +2,11 @@ package parkingos.com.bolink.actions;
 
 
 import com.alibaba.fastjson.JSONObject;
-import com.sun.org.apache.regexp.internal.RE;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
-import parkingos.com.bolink.models.ParkLogTb;
-import parkingos.com.bolink.models.UserRoleTb;
-import parkingos.com.bolink.service.CityGroupService;
 import parkingos.com.bolink.service.UnionServerService;
 import parkingos.com.bolink.utils.RequestUtil;
 import parkingos.com.bolink.utils.StringUtils;

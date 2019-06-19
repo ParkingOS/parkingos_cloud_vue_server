@@ -12,10 +12,10 @@ import parkingos.com.bolink.models.ProductPackageTb;
 import parkingos.com.bolink.models.UserInfoTb;
 import parkingos.com.bolink.service.GetDataService;
 import parkingos.com.bolink.utils.StringUtils;
+import parkingos.com.bolink.utils.TimeTools;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import java.util.concurrent.TimeUnit;
 
 @Service
 public class GetDataServiceImpl implements GetDataService {
@@ -645,6 +645,15 @@ public class GetDataServiceImpl implements GetDataService {
         }
         result+="]";
         return result;
+    }
+
+    @Override
+    public Long getEndTime(Long beginTime, Integer months) {
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTimeInMillis(beginTime);
+        calendar.set(Calendar.MONTH, calendar.get(Calendar.MONTH) + months);
+        Long etime = calendar.getTimeInMillis() -1000;
+        return etime;
     }
 
     private List<Map<String, Object>> getcollectors(Long cityid){
