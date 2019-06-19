@@ -66,6 +66,19 @@ public class GetDataAction {
         return null;
     }
 
+
+
+    @RequestMapping(value = "/getEndTime")
+    public String getEndTime(HttpServletRequest request, HttpServletResponse resp){
+
+        Long beginTime = RequestUtil.getLong(request, "beginTime", -1L);
+        Integer months = RequestUtil.getInteger(request, "months", 0);
+        logger.info("=====>>>>getEndTime:"+months+"~~beginTime"+beginTime);
+        Long result = getDataService.getEndTime(beginTime,months);
+        StringUtils.ajaxOutput(resp,result+"");
+        return null;
+    }
+
     /*
     * 获得车场所有月卡套餐
     * */

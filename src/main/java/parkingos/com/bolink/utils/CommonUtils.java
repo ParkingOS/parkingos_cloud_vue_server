@@ -537,6 +537,7 @@ public class CommonUtils<T> {
             jsonSend.put("user_id",renewTb.getUserId());
             jsonSend.put("resume",renewTb.getResume());
             jsonSend.put("start_time",renewTb.getStartTime());
+            jsonSend.put("end_time",renewTb.getLimitTime());
             jsonSend.put("operate_type", operate);
             jsonSend.put("amount_pay",renewTb.getAmountPay());
             jsonSend.put("park_id", getBolinkId(Long.parseLong(renewTb.getComid())));

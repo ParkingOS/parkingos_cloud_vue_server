@@ -45,4 +45,6 @@ public interface GetDataService {
     String getGroupsByServer(Long serverId,Integer type);
 
     String getServersByServer(Long serverid);
+
+    Long getEndTime(Long beginTime, Integer months);
 }
