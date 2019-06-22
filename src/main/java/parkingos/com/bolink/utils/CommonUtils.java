@@ -215,7 +215,7 @@ public class CommonUtils<T> {
             }
         }catch (Exception e){
             logger.error(e.getMessage());
-            if(e.getMessage().contains("HTTP Status 404 - /bpd/sendmessagetopark")){
+            if(e.getMessage()!=null&&e.getMessage().contains("HTTP Status 404 - /bpd/sendmessagetopark")){
                 logger.info("===>>>new tcp not found:send old！");
                 JSONObject jsonObject = JSONObject.parseObject("{}");
                 jsonObject.put("channelid", localId);
