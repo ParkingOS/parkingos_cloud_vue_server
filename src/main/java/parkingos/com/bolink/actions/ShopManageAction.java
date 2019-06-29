@@ -7,6 +7,8 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import parkingos.com.bolink.models.ComInfoTb;
 import parkingos.com.bolink.service.ShopManageService;
+import parkingos.com.bolink.service.redis.RedisService;
+import parkingos.com.bolink.utils.CustomDefind;
 import parkingos.com.bolink.utils.RequestUtil;
 import parkingos.com.bolink.utils.StringUtils;
 
@@ -21,6 +23,8 @@ public class ShopManageAction {
 
     @Autowired
     private ShopManageService shopManageService;
+    @Autowired
+    RedisService redisService;
 
     /**
      * 续费
@@ -89,6 +93,7 @@ public class ShopManageAction {
         comInfoTb.setId(comid);
         comInfoTb.setSuperimposed(superimposed);
         int count = shopManageService.updateComSuperimposed(comInfoTb);
+        redisService.delete(CustomDefind.getValue("COMINFOBYCOMID")+comid);
         StringUtils.ajaxOutput( resp, count+"" );
         return null;
     }

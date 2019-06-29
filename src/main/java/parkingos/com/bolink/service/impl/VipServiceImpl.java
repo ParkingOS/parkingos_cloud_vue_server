@@ -204,32 +204,32 @@ public class VipServiceImpl implements VipService {
 
         Long uin = -1L;
         //添加生成月卡会员时的车主编号
-        if (carNumber != null && !carNumber.equals("")) {
-            String[] carNumStrings = carNumber.split(",");
-            Long validuin = -1L;
-            if (carNumStrings != null && carNumStrings.length > 0) {
-                for (String strNum : carNumStrings) {
-                    strNum = strNum.toUpperCase();
-                    logger.error("==>>>.strNum" + strNum);
-                    if (StringUtils.checkPlate(strNum)) {
-                        continue;
-//                        CarInfoTb carInfoTb = new CarInfoTb();
-//                        carInfoTb.setCarNumber(strNum);
-//                        carInfoTb = (CarInfoTb) commonDao.selectObjectByConditions(carInfoTb);
-//                        if (carInfoTb != null && carInfoTb.getId() != null) {
-//                            uin = carInfoTb.getUin();
-//                        }
-//                        if (uin > 0) {
-//                            validuin = uin;
-//                        }
-                    } else {
-                        result.put("msg", "车牌号有误");
-                        return result;
-                    }
-                }
-                uin = validuin;
-            }
-        }
+//        if (carNumber != null && !carNumber.equals("")) {
+//            String[] carNumStrings = carNumber.split(",");
+//            Long validuin = -1L;
+//            if (carNumStrings != null && carNumStrings.length > 0) {
+//                for (String strNum : carNumStrings) {
+//                    strNum = strNum.toUpperCase();
+//                    logger.error("==>>>.strNum" + strNum);
+//                    if (StringUtils.checkPlate(strNum)) {
+//                        continue;
+////                        CarInfoTb carInfoTb = new CarInfoTb();
+////                        carInfoTb.setCarNumber(strNum);
+////                        carInfoTb = (CarInfoTb) commonDao.selectObjectByConditions(carInfoTb);
+////                        if (carInfoTb != null && carInfoTb.getId() != null) {
+////                            uin = carInfoTb.getUin();
+////                        }
+////                        if (uin > 0) {
+////                            validuin = uin;
+////                        }
+//                    } else {
+//                        result.put("msg", "车牌号有误");
+//                        return result;
+//                    }
+//                }
+//                uin = validuin;
+//            }
+//        }
 //        if(productPackageTb!=null&&productPackageTb.getCarTypeId()!=null){
 //            try{
 //                carTypeId =Long.parseLong(productPackageTb.getCarTypeId());
@@ -328,29 +328,29 @@ public class VipServiceImpl implements VipService {
                 //对修改车牌的逻辑加一层校验，验证车牌是否有效
                 //添加修改月卡会员车牌时的车主编号
                 Long uin = -1L;
-                String[] carNumStrings = carNumber.split(",");
-                Long validuin = -1L;
-                logger.error("===========carNumStrings" + carNumStrings.length);
-                if (carNumStrings != null && carNumStrings.length > 0) {
-                    for (String strNum : carNumStrings) {
-                        strNum.toUpperCase();
-                        if (StringUtils.checkPlate(strNum)) {
-                            CarInfoTb carInfoTb = new CarInfoTb();
-                            carInfoTb.setCarNumber(strNum);
-                            carInfoTb = (CarInfoTb) commonDao.selectObjectByConditions(carInfoTb);
-                            if (carInfoTb != null && carInfoTb.getId() != null) {
-                                uin = carInfoTb.getUin();
-                            }
-                            if (uin > 0) {
-                                validuin = uin;
-                            }
-                        } else {
-                            result.put("msg", "车牌号有误");
-                            return result;
-                        }
-                    }
-                    uin = validuin;
-                }
+//                String[] carNumStrings = carNumber.split(",");
+//                Long validuin = -1L;
+//                logger.error("===========carNumStrings" + carNumStrings.length);
+//                if (carNumStrings != null && carNumStrings.length > 0) {
+//                    for (String strNum : carNumStrings) {
+//                        strNum.toUpperCase();
+//                        if (StringUtils.checkPlate(strNum)) {
+//                            CarInfoTb carInfoTb = new CarInfoTb();
+//                            carInfoTb.setCarNumber(strNum);
+//                            carInfoTb = (CarInfoTb) commonDao.selectObjectByConditions(carInfoTb);
+//                            if (carInfoTb != null && carInfoTb.getId() != null) {
+//                                uin = carInfoTb.getUin();
+//                            }
+//                            if (uin > 0) {
+//                                validuin = uin;
+//                            }
+//                        } else {
+//                            result.put("msg", "车牌号有误");
+//                            return result;
+//                        }
+//                    }
+//                    uin = validuin;
+//                }
                 CarowerProduct carowerProduct1 = new CarowerProduct();
                 if (id > 0 && carNumber.length() > 6) {
                     carowerProduct1.setId(id);

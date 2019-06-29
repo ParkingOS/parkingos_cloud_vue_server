@@ -268,20 +268,20 @@ public class CityVipServiceImpl implements CityVipService {
         b_time = sdf.format(d);
 
         //校验carNumber
-        if (!Check.isEmpty(carNumber)) {
-            String[] carNumStrings = carNumber.split(",");
-            if (carNumStrings != null && carNumStrings.length > 0) {
-                for (String strNum : carNumStrings) {
-                    strNum = strNum.toUpperCase();
-                    if (StringUtils.checkPlate(strNum)) {
-                        continue;
-                    } else {
-                        result.put("msg", "车牌号有误");
-                        return result;
-                    }
-                }
-            }
-        }
+//        if (!Check.isEmpty(carNumber)) {
+//            String[] carNumStrings = carNumber.split(",");
+//            if (carNumStrings != null && carNumStrings.length > 0) {
+//                for (String strNum : carNumStrings) {
+//                    strNum = strNum.toUpperCase();
+//                    if (StringUtils.checkPlate(strNum)) {
+//                        continue;
+//                    } else {
+//                        result.put("msg", "车牌号有误");
+//                        return result;
+//                    }
+//                }
+//            }
+//        }
 
         //校验车位号
         if(!Check.isEmpty(pLot)){
@@ -360,20 +360,20 @@ public class CityVipServiceImpl implements CityVipService {
     public JSONObject editVip(Long groupId, Long id, String carNumber, Integer limit_day_type, String mobile, String name, String pLot,String nickname,Long uin) {
         JSONObject result = new JSONObject();
         //校验carNumber
-        if (!Check.isEmpty(carNumber)) {
-            String[] carNumStrings = carNumber.split(",");
-            if (carNumStrings != null && carNumStrings.length > 0) {
-                for (String strNum : carNumStrings) {
-                    strNum = strNum.toUpperCase();
-                    if (StringUtils.checkPlate(strNum)) {
-                        continue;
-                    } else {
-                        result.put("msg", "车牌号有误");
-                        return result;
-                    }
-                }
-            }
-        }
+//        if (!Check.isEmpty(carNumber)) {
+//            String[] carNumStrings = carNumber.split(",");
+//            if (carNumStrings != null && carNumStrings.length > 0) {
+//                for (String strNum : carNumStrings) {
+//                    strNum = strNum.toUpperCase();
+//                    if (StringUtils.checkPlate(strNum)) {
+//                        continue;
+//                    } else {
+//                        result.put("msg", "车牌号有误");
+//                        return result;
+//                    }
+//                }
+//            }
+//        }
 
         //校验车位号
         if(!Check.isEmpty(pLot)){
