@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="parkingos.com.bolink.dao.mybatis.mapper.GroupLogMapper" >
+
+
+
+
+    <select id="getCount" resultType="Integer">
+       SELECT
+	COUNT (*)
+FROM
+	park_log_tb
+        <trim prefix="where" prefixOverrides="and |or">
+            <if test="operateType >-1">
+                and OPERATE_TYPE = #{operateType,jdbcType=INTEGER}
+            </if>
+            <if test="parkId > -1">
+                and park_id = #{parkId,jdbcType=BIGINT}
+            </if>
+            <if test="parkId == -1">
+                and ( group_id = #{groupId,jdbcType=BIGINT} or park_id in (select id from com_info_tb where groupid= #{groupId,jdbcType=BIGINT} and state !=1))
+            </if>
+            <if test="id > -1">
+                and id = #{id,jdbcType=BIGINT}
+            </if>
+            <if test="type !='' ">
+                and type = #{type,jdbcType=VARCHAR}
+            </if>
+            <if test="timeStart > -1">
+                and operate_time BETWEEN #{timeStart,jdbcType=INTEGER} and #{timeEnd,jdbcType=INTEGER}
+            </if>
+            <if test="remark != ''">
+                and remark like '%${remark}%'
+            </if>
+        </trim>
+
+    </select>
+
+
+    <select id="getRows" resultType="map">
+        SELECT
+        *
+        FROM
+        park_log_tb
+        <trim prefix="where" prefixOverrides="and |or">
+            <if test="operateType >-1">
+                and OPERATE_TYPE = #{operateType,jdbcType=INTEGER}
+            </if>
+            <if test="parkId > -1">
+                and park_id = #{parkId,jdbcType=BIGINT}
+            </if>
+            <if test="parkId == -1">
+                and ( group_id = #{groupId,jdbcType=BIGINT} or park_id in (select id from com_info_tb where groupid= #{groupId,jdbcType=BIGINT} and state != 1))
+            </if>
+            <if test="id > -1">
+                and id = #{id,jdbcType=BIGINT}
+            </if>
+            <if test="type !='' ">
+                and type = #{type,jdbcType=VARCHAR}
+            </if>
+            <if test="timeStart > -1">
+                and operate_time BETWEEN #{timeStart,jdbcType=INTEGER} and #{timeEnd,jdbcType=INTEGER}
+            </if>
+            <if test="remark != ''">
+                and remark like '%${remark}%'
+            </if>
+
+        </trim>
+        order by id desc
+        <if test="pageSize>0">
+            offset  #{offset,jdbcType=INTEGER} limit  #{pageSize,jdbcType=INTEGER}
+        </if>
+
+
+    </select>
+
+
+</mapper>

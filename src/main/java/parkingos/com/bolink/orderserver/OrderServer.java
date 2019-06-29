@@ -917,6 +917,9 @@ public class OrderServer extends BaseServer {
                 Map<String,String> map = orderMap.getMapMap();
                 String userId = map.get("parkName");
                 String userName = orderMapper.getUserInfo(Long.parseLong(userId));
+                if(userName==null){
+                    userName = "";
+                }
                 resultMap.putAll(map);
                 resultMap.put("parkName",userName);
                 list.add(resultMap);

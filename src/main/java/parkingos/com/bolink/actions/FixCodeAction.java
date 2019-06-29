@@ -93,8 +93,8 @@ public class FixCodeAction {
 //        }
 
         //可用的分段时间
-        String timeInuse0 = RequestUtil.getString(request,"time_inuse[0]");
-        String timeInuse1 = RequestUtil.getString(request,"time_inuse[1]");
+        String timeInuse0 = RequestUtil.getString(request,"time_inuse_start");
+        String timeInuse1 = RequestUtil.getString(request,"time_inuse_end");
 
         String timeInuse="00:00-23:59";
         if(!"".equals(timeInuse0)&&!"".equals(timeInuse1)) {

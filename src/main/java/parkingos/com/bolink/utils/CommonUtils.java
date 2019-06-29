@@ -195,7 +195,7 @@ public class CommonUtils<T> {
         }
         logger.error(localId);
 
-        String url = "http://" + ip +":8080/bpd/sendmessagetopark";
+        String url = "http://" + ip +":"+CustomDefind.getValue("BPDPORT")+"/bpd/sendmessagetopark";
         //String url = "http://" + serverIp + "/bpd/sendmessagetopark";
         Map<String, Object> params = new HashMap<>();
         params.put("channel_id", localId);
@@ -215,7 +215,7 @@ public class CommonUtils<T> {
             }
         }catch (Exception e){
             logger.error(e.getMessage());
-            if(e.getMessage()!=null&&e.getMessage().contains("HTTP Status 404 - /bpd/sendmessagetopark")){
+            if(e.getMessage()!=null&&(e.getMessage().contains("HTTP Status 404 - /bpd/sendmessagetopark")||e.getMessage().contains("Connection refused"))){
                 logger.info("===>>>new tcp not found:send old！");
                 JSONObject jsonObject = JSONObject.parseObject("{}");
                 jsonObject.put("channelid", localId);

@@ -27,9 +27,23 @@ public class CityLogAction {
     @RequestMapping(value = "/query")
     public String query(HttpServletRequest request, HttpServletResponse resp){
 
-        Map<String, String> reqParameterMap = RequestUtil.readBodyFormRequset(request);
+//        Map<String, String> reqParameterMap = RequestUtil.readBodyFormRequset(request);
+//
+//        JSONObject result = cityLogService.selectResultByConditions(reqParameterMap);
 
-        JSONObject result = cityLogService.selectResultByConditions(reqParameterMap);
+        Long groupid= RequestUtil.getLong(request,"groupid",-1L);
+        Long logId = RequestUtil.getLong(request,"id_start",-1L);
+        //增删改 登录
+        Integer operateType = RequestUtil.getInteger(request,"operate_type_start",-1);
+        Long parkId = RequestUtil.getLong(request,"park_id_start",-1L);
+        String typeStart = RequestUtil.getString(request,"type_start");
+        String remark = RequestUtil.getString(request,"remark");
+        Long timeStart = RequestUtil.getLong(request,"operate_time_start",-1L);
+        Long timeEnd = RequestUtil.getLong(request,"operate_time_end",-1L);
+        Integer rp = RequestUtil.getInteger(request,"rp",20);
+        Integer page = RequestUtil.getInteger(request,"page",1);
+
+        JSONObject result = cityLogService.getGroupLog(groupid,logId,operateType,parkId,typeStart,remark,timeStart,timeEnd,rp,page);
         //把结果返回页面
         StringUtils.ajaxOutput(resp,result.toJSONString());
         return null;

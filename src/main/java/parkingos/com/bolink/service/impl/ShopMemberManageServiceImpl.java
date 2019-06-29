@@ -248,6 +248,9 @@ public class ShopMemberManageServiceImpl implements ShopMemberManageService {
     @Override
     public String delete(HttpServletRequest req) {
 
+        JSONObject result = new JSONObject();
+        result.put("state",0);
+        result.put("msg","删除失败！");
         Long comid = RequestUtil.getLong(req,"comid",-1L);
         String nickname1 = StringUtils.decodeUTF8(RequestUtil.getString(req,"nickname1"));
         Long uin = RequestUtil.getLong(req, "loginuin", -1L);
@@ -261,6 +264,8 @@ public class ShopMemberManageServiceImpl implements ShopMemberManageService {
             //删除操作将state状态修改为1
             delete = commonDao.updateByPrimaryKey( userInfoTb );
             if(delete==1) {
+                result.put("state",1);
+                result.put("msg","删除成功！");
                 ParkLogTb parkLogTb = new ParkLogTb();
                 parkLogTb.setOperateUser(nickname1);
                 parkLogTb.setOperateTime(System.currentTimeMillis() / 1000);
@@ -271,6 +276,6 @@ public class ShopMemberManageServiceImpl implements ShopMemberManageService {
                 saveLogService.saveLog(parkLogTb);
             }
         }
-        return "{\"state\":" + delete + "}";
+        return result.toString();
     }
 }
