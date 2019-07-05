@@ -1069,32 +1069,32 @@ public class CommonMethods {
 		try {
 			List<Object> params = new ArrayList<Object>();
 			String sql = "select id from com_info_tb where state<>1 " ;
-			List<Object> groups = getGroups(cityid);//查询该城市所辖的运营集团
-			if(groups != null && !groups.isEmpty()){
-				String preParams  ="";
-				for(Object groupid : groups){
-					if(preParams.equals(""))
-						preParams =groupid+"";
-					else
-						preParams += ","+groupid;
-				}
-				sql += " and groupid in ("+preParams+") or cityid = "+ cityid;
-				List<Map<String, Object>> list = commonDao.getObjectBySql(sql);
-				if(list != null && !list.isEmpty()){
-					for(Map<String, Object> map : list){
-						parks.add(map.get("id"));
-					}
-				}
-			}else{
+//			List<Object> groups = getGroups(cityid);//查询该城市所辖的运营集团
+//			if(groups != null && !groups.isEmpty()){
+//				String preParams  ="";
+//				for(Object groupid : groups){
+//					if(preParams.equals(""))
+//						preParams =groupid+"";
+//					else
+//						preParams += ","+groupid;
+//				}
+//				sql += " and groupid in ("+preParams+") or cityid = "+ cityid;
+//				List<Map<String, Object>> list = commonDao.getObjectBySql(sql);
+//				if(list != null && !list.isEmpty()){
+//					for(Map<String, Object> map : list){
+//						parks.add(map.get("id"));
+//					}
+//				}
+//			}else{
 				sql +="and cityid = "+cityid;
-				System.out.println("==========获取城市下所有车场"+sql);
+//				System.out.println("==========获取城市下所有车场"+sql);
 				List<Map<String, Object>> list = commonDao.getObjectBySql(sql);
 				if(list != null && !list.isEmpty()){
 					for(Map<String, Object> map : list){
 						parks.add(map.get("id"));
 					}
 				}
-			}
+//			}
 		} catch (Exception e) {
 			e.printStackTrace();
 		}

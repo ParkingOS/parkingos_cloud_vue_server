@@ -358,11 +358,13 @@ public class CommonServiceImpl implements CommonService {
         Object object = redisService.get(CustomDefind.getValue("ORGCITYBYID")+union_id);
         if(object==null){
             orgCityMerchants=new OrgCityMerchants();
-            orgCityMerchants.setId(union_id);
-            orgCityMerchants=(OrgCityMerchants)commonDao.selectObjectByConditions(orgCityMerchants);
-            if(orgCityMerchants!=null){
-                redisService.set(CustomDefind.getValue("ORGCITYBYID")+union_id,orgCityMerchants);
-                return orgCityMerchants;
+            if(union_id!=null&&union_id>0) {
+                orgCityMerchants.setId(union_id);
+                orgCityMerchants = (OrgCityMerchants) commonDao.selectObjectByConditions(orgCityMerchants);
+                if (orgCityMerchants != null) {
+                    redisService.set(CustomDefind.getValue("ORGCITYBYID") + union_id, orgCityMerchants);
+                    return orgCityMerchants;
+                }
             }
         }else{
             orgCityMerchants=(OrgCityMerchants)object;

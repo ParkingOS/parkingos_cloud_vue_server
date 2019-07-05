@@ -58,9 +58,12 @@ public class EquipmentManageChannelAction {
 		String passname = RequestUtil.processParams(request,"passname");
 		String passtype = RequestUtil.processParams(request,"passtype");
 		Integer monthSet = RequestUtil.getInteger(request,"month_set",0);
-		Integer month2Set = RequestUtil.getInteger(request,"month2_set",0);
-		Long worksiteId = RequestUtil.getLong(request,"worksite_id",-1L);
+//		Integer month2Set = RequestUtil.getInteger(request,"month2_set",0);
+//		Long worksiteId = RequestUtil.getLong(request,"worksite_id",-1L);
 		String description = RequestUtil.processParams(request,"description");
+
+		Long cameraId = RequestUtil.getLong(request,"camera_id",-1L);
+
 
 		Map<String, String> reqParameterMap = RequestUtil.readBodyFormRequset(request);
 		Long comid = Long.valueOf(Integer.valueOf(reqParameterMap.get("comid")));
@@ -68,27 +71,14 @@ public class EquipmentManageChannelAction {
 		Long uin = RequestUtil.getLong(request, "loginuin", -1L);
 
 
-		Long id= equipmentManageChannelService.getId();
-		ComPassTb comPassTb = new ComPassTb();
-		comPassTb.setId(id);
-		comPassTb.setPassname(passname);
-		comPassTb.setPasstype(passtype);
-		comPassTb.setMonthSet(monthSet);
-		comPassTb.setMonth2Set(month2Set);
-		comPassTb.setWorksiteId(worksiteId);
-		comPassTb.setDescription(description);
-		comPassTb.setComid(comid);
-		comPassTb.setChannelId(id+"");
-		comPassTb.setState(0);
-
-		String result = equipmentManageChannelService.insertResultByConditions(comPassTb).toString();
+		String result = equipmentManageChannelService.addChannel(passname,passtype,monthSet,description,comid,cameraId);
 
 		if("1".equals(result)){
 			ParkLogTb parkLogTb = new ParkLogTb();
 			parkLogTb.setOperateUser(nickname);
 			parkLogTb.setOperateTime(System.currentTimeMillis()/1000);
 			parkLogTb.setOperateType(1);
-			parkLogTb.setContent(uin+"("+nickname+")"+"增加了通道"+id+passname);
+			parkLogTb.setContent(uin+"("+nickname+")"+"增加了通道"+passname);
 			parkLogTb.setType("equipment");
 			parkLogTb.setParkId(comid);
 			saveLogService.saveLog(parkLogTb);
@@ -115,20 +105,12 @@ public class EquipmentManageChannelAction {
 		String passname = RequestUtil.processParams(request,"passname");
 		String passtype = RequestUtil.processParams(request,"passtype");
 		Integer monthSet = RequestUtil.getInteger(request,"month_set",0);
-		Integer month2Set = RequestUtil.getInteger(request,"month2_set",0);
-		Long worksiteId = RequestUtil.getLong(request,"worksite_id",-1L);
+//		Integer month2Set = RequestUtil.getInteger(request,"month2_set",0);
+//		Long worksiteId = RequestUtil.getLong(request,"worksite_id",-1L);
 		String description = RequestUtil.processParams(request,"description");
+		Long cameraId = RequestUtil.getLong(request,"camera_id",-1L);
 
-		ComPassTb comPassTb = new ComPassTb();
-		comPassTb.setId(id);
-		comPassTb.setPassname(passname);
-		comPassTb.setPasstype(passtype);
-		comPassTb.setMonthSet(monthSet);
-		comPassTb.setMonth2Set(month2Set);
-		comPassTb.setWorksiteId(worksiteId);
-		comPassTb.setDescription(description);
-
-		String result = equipmentManageChannelService.updateResultByConditions(comPassTb).toString();
+		String result = equipmentManageChannelService.updateChannel(id,passname,passtype,monthSet,description,cameraId);
 		if("1".equals(result)){
 			ParkLogTb parkLogTb = new ParkLogTb();
 			parkLogTb.setOperateUser(nickname);

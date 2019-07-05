@@ -240,6 +240,28 @@ public class GetDataServiceImpl implements GetDataService {
         return result;
     }
 
+
+    @Override
+    public String getCameras(String comid) {
+        String result = "[";
+        String sql = "select id,cam_name from camera_tb  where comid = "+Long.parseLong(comid);
+        List<Map<String,Object>>  pList = null;
+        pList = commonDao.getObjectBySql(sql);
+        if(pList!=null&&pList.size()>0){
+            for(int i = 0;i<pList.size();i++){
+                Map map = pList.get(i);
+                if(i==0){
+                    result+="{\"value_no\":\""+map.get("id")+"\",\"value_name\":\""+map.get("cam_name")+"\"}";
+                }else{
+                    result+=",{\"value_no\":\""+map.get("id")+"\",\"value_name\":\""+map.get("cam_name")+"\"}";
+                }
+            }
+        }
+        result+="]";
+        return result;
+    }
+
+
     @Override
     public String getAllParks(String groupid, String cityid) {
 
@@ -654,6 +676,25 @@ public class GetDataServiceImpl implements GetDataService {
         calendar.set(Calendar.MONTH, calendar.get(Calendar.MONTH) + months);
         Long etime = calendar.getTimeInMillis() -1000;
         return etime;
+    }
+
+    @Override
+    public String getAllCitys() {
+        String sql = "SELECT id,name from org_city_merchants where state = 0";
+        String result = "[";
+        List<Map<String,Object>> cityList = commonDao.getObjectBySql(sql);
+        if(cityList!=null&&cityList.size()>0){
+            for(int i = 0;i<cityList.size();i++){
+                Map map = cityList.get(i);
+                if(i==0){
+                    result+="{\"value_no\":\""+map.get("id")+"\",\"value_name\":\""+map.get("name")+"\"}";
+                }else{
+                    result+=",{\"value_no\":\""+map.get("id")+"\",\"value_name\":\""+map.get("name")+"\"}";
+                }
+            }
+        }
+        result+="]";
+        return result;
     }
 
     private List<Map<String, Object>> getcollectors(Long cityid){

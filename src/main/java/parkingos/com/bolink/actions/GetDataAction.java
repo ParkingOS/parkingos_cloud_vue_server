@@ -212,6 +212,20 @@ public class GetDataAction {
         return null;
     }
 
+
+
+    /*
+  * 获得相机列表
+  *
+  * */
+    @RequestMapping(value = "/getCameras")
+    public String getCameras(HttpServletRequest request, HttpServletResponse resp){
+        String comid = RequestUtil.processParams(request, "comid");
+        String result = getDataService.getCameras(comid);
+        StringUtils.ajaxOutput(resp,result);
+        return null;
+    }
+
     /*
     *
     * 获得集团或者城市下面所有车场
@@ -306,6 +320,14 @@ public class GetDataAction {
     @RequestMapping(value = "/getprogramprice")
     public String getProgramPrice(HttpServletRequest request, HttpServletResponse resp){
         String result = getDataService.getMessagePrice(3);
+        StringUtils.ajaxOutput(resp,result);
+        return null;
+    }
+
+
+    @RequestMapping(value = "/getAllCitys")
+    public String getAllCitys(HttpServletRequest request, HttpServletResponse resp){
+        String result = getDataService.getAllCitys();
         StringUtils.ajaxOutput(resp,result);
         return null;
     }

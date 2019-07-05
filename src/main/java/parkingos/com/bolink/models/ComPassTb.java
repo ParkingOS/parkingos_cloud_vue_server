@@ -22,6 +22,16 @@ public class ComPassTb {
 
     private String channelId;
 
+    private Long cameraId;
+
+    public Long getCameraId() {
+        return cameraId;
+    }
+
+    public void setCameraId(Long cameraId) {
+        this.cameraId = cameraId;
+    }
+
     public Long getId() {
         return id;
     }

@@ -1,0 +1,258 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="parkingos.com.bolink.dao.mybatis.mapper.CameraTbMapper" >
+  <resultMap id="BaseResultMap" type="parkingos.com.bolink.models.CameraTb" >
+    <id column="id" property="id" jdbcType="BIGINT" />
+    <result column="cam_id" property="camId" jdbcType="VARCHAR" />
+    <result column="cam_name" property="camName" jdbcType="VARCHAR" />
+    <result column="cam_type" property="camType" jdbcType="VARCHAR" />
+    <result column="mode" property="mode" jdbcType="INTEGER" />
+    <result column="channel_id" property="channelId" jdbcType="BIGINT" />
+    <result column="comid" property="comid" jdbcType="BIGINT" />
+    <result column="cityid" property="cityid" jdbcType="BIGINT" />
+  </resultMap>
+  <sql id="Example_Where_Clause" >
+    <where >
+      <foreach collection="oredCriteria" item="criteria" separator="or" >
+        <if test="criteria.valid" >
+          <trim prefix="(" suffix=")" prefixOverrides="and" >
+            <foreach collection="criteria.criteria" item="criterion" >
+              <choose >
+                <when test="criterion.noValue" >
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue" >
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue" >
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue" >
+                  and ${criterion.condition}
+                  <foreach collection="criterion.value" item="listItem" open="(" close=")" separator="," >
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Update_By_Example_Where_Clause" >
+    <where >
+      <foreach collection="example.oredCriteria" item="criteria" separator="or" >
+        <if test="criteria.valid" >
+          <trim prefix="(" suffix=")" prefixOverrides="and" >
+            <foreach collection="criteria.criteria" item="criterion" >
+              <choose >
+                <when test="criterion.noValue" >
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue" >
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue" >
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue" >
+                  and ${criterion.condition}
+                  <foreach collection="criterion.value" item="listItem" open="(" close=")" separator="," >
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Base_Column_List" >
+    id, cam_id, cam_name, cam_type, mode, channel_id, comid, cityid
+  </sql>
+  <select id="selectByExample" resultMap="BaseResultMap" parameterType="parkingos.com.bolink.dao.mybatis.CameraTbExample" >
+    select
+    <if test="distinct" >
+      distinct
+    </if>
+    <include refid="Base_Column_List" />
+    from camera_tb
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+    <if test="orderByClause != null" >
+      order by ${orderByClause}
+    </if>
+  </select>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Long" >
+    select 
+    <include refid="Base_Column_List" />
+    from camera_tb
+    where id = #{id,jdbcType=BIGINT}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Long" >
+    delete from camera_tb
+    where id = #{id,jdbcType=BIGINT}
+  </delete>
+  <delete id="deleteByExample" parameterType="parkingos.com.bolink.dao.mybatis.CameraTbExample" >
+    delete from camera_tb
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+  </delete>
+  <insert id="insert" parameterType="parkingos.com.bolink.models.CameraTb" >
+    insert into camera_tb (id, cam_id, cam_name, 
+      cam_type, mode, channel_id, 
+      comid, cityid)
+    values (#{id,jdbcType=BIGINT}, #{camId,jdbcType=VARCHAR}, #{camName,jdbcType=VARCHAR}, 
+      #{camType,jdbcType=VARCHAR}, #{mode,jdbcType=INTEGER}, #{channelId,jdbcType=BIGINT}, 
+      #{comid,jdbcType=BIGINT}, #{cityid,jdbcType=BIGINT})
+  </insert>
+  <insert id="insertSelective" parameterType="parkingos.com.bolink.models.CameraTb" >
+    insert into camera_tb
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        id,
+      </if>
+      <if test="camId != null" >
+        cam_id,
+      </if>
+      <if test="camName != null" >
+        cam_name,
+      </if>
+      <if test="camType != null" >
+        cam_type,
+      </if>
+      <if test="mode != null" >
+        mode,
+      </if>
+      <if test="channelId != null" >
+        channel_id,
+      </if>
+      <if test="comid != null" >
+        comid,
+      </if>
+      <if test="cityid != null" >
+        cityid,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        #{id,jdbcType=BIGINT},
+      </if>
+      <if test="camId != null" >
+        #{camId,jdbcType=VARCHAR},
+      </if>
+      <if test="camName != null" >
+        #{camName,jdbcType=VARCHAR},
+      </if>
+      <if test="camType != null" >
+        #{camType,jdbcType=VARCHAR},
+      </if>
+      <if test="mode != null" >
+        #{mode,jdbcType=INTEGER},
+      </if>
+      <if test="channelId != null" >
+        #{channelId,jdbcType=BIGINT},
+      </if>
+      <if test="comid != null" >
+        #{comid,jdbcType=BIGINT},
+      </if>
+      <if test="cityid != null" >
+        #{cityid,jdbcType=BIGINT},
+      </if>
+    </trim>
+  </insert>
+  <select id="countByExample" parameterType="parkingos.com.bolink.dao.mybatis.CameraTbExample" resultType="java.lang.Integer" >
+    select count(*) from camera_tb
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+  </select>
+  <update id="updateByExampleSelective" parameterType="map" >
+    update camera_tb
+    <set >
+      <if test="record.id != null" >
+        id = #{record.id,jdbcType=BIGINT},
+      </if>
+      <if test="record.camId != null" >
+        cam_id = #{record.camId,jdbcType=VARCHAR},
+      </if>
+      <if test="record.camName != null" >
+        cam_name = #{record.camName,jdbcType=VARCHAR},
+      </if>
+      <if test="record.camType != null" >
+        cam_type = #{record.camType,jdbcType=VARCHAR},
+      </if>
+      <if test="record.mode != null" >
+        mode = #{record.mode,jdbcType=INTEGER},
+      </if>
+      <if test="record.channelId != null" >
+        channel_id = #{record.channelId,jdbcType=BIGINT},
+      </if>
+      <if test="record.comid != null" >
+        comid = #{record.comid,jdbcType=BIGINT},
+      </if>
+      <if test="record.cityid != null" >
+        cityid = #{record.cityid,jdbcType=BIGINT},
+      </if>
+    </set>
+    <if test="_parameter != null" >
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  <update id="updateByExample" parameterType="map" >
+    update camera_tb
+    set id = #{record.id,jdbcType=BIGINT},
+      cam_id = #{record.camId,jdbcType=VARCHAR},
+      cam_name = #{record.camName,jdbcType=VARCHAR},
+      cam_type = #{record.camType,jdbcType=VARCHAR},
+      mode = #{record.mode,jdbcType=INTEGER},
+      channel_id = #{record.channelId,jdbcType=BIGINT},
+      comid = #{record.comid,jdbcType=BIGINT},
+      cityid = #{record.cityid,jdbcType=BIGINT}
+    <if test="_parameter != null" >
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  <update id="updateByPrimaryKeySelective" parameterType="parkingos.com.bolink.models.CameraTb" >
+    update camera_tb
+    <set >
+      <if test="camId != null" >
+        cam_id = #{camId,jdbcType=VARCHAR},
+      </if>
+      <if test="camName != null" >
+        cam_name = #{camName,jdbcType=VARCHAR},
+      </if>
+      <if test="camType != null" >
+        cam_type = #{camType,jdbcType=VARCHAR},
+      </if>
+      <if test="mode != null" >
+        mode = #{mode,jdbcType=INTEGER},
+      </if>
+      <if test="channelId != null" >
+        channel_id = #{channelId,jdbcType=BIGINT},
+      </if>
+      <if test="comid != null" >
+        comid = #{comid,jdbcType=BIGINT},
+      </if>
+      <if test="cityid != null" >
+        cityid = #{cityid,jdbcType=BIGINT},
+      </if>
+    </set>
+    where id = #{id,jdbcType=BIGINT}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="parkingos.com.bolink.models.CameraTb" >
+    update camera_tb
+    set cam_id = #{camId,jdbcType=VARCHAR},
+      cam_name = #{camName,jdbcType=VARCHAR},
+      cam_type = #{camType,jdbcType=VARCHAR},
+      mode = #{mode,jdbcType=INTEGER},
+      channel_id = #{channelId,jdbcType=BIGINT},
+      comid = #{comid,jdbcType=BIGINT},
+      cityid = #{cityid,jdbcType=BIGINT}
+    where id = #{id,jdbcType=BIGINT}
+  </update>
+</mapper>

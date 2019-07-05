@@ -3,9 +3,7 @@ package parkingos.com.bolink.utils;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
-import java.io.PrintWriter;
-import java.io.UnsupportedEncodingException;
+import java.io.*;
 import java.math.BigDecimal;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
@@ -590,13 +588,29 @@ public class StringUtils {
 ////		 double f2 = new BigDecimal(ele/total).setScale(4, BigDecimal.ROUND_HALF_UP).doubleValue();
 ////		 double f3 = new BigDecimal(free/total).setScale(4, BigDecimal.ROUND_HALF_UP).doubleValue();
 ////		 System.out.println(f1+"~~"+f2+"~~"+f3);
-//		 List<String> list = new ArrayList<>();
-//		 list.add("2018-09-10");
-//		 list.add("2018-09-09");
-//		 list.add("2018-09-11");
-//		 System.out.println(list);
-//		 Collections.sort(list);
-//		 System.out.println(list);
+////		 List<String> list = new ArrayList<>();
+////		 list.add("2018-09-10");
+////		 list.add("2018-09-09");
+////		 list.add("2018-09-11");
+////		 System.out.println(list);
+////		 Collections.sort(list);
+////		 System.out.println(list);
+//
+//		 String pathname  = "C:\\Users\\Administrator\\Desktop\\a.txt";
+//		 try{
+//			 FileReader reader = new FileReader(pathname);
+//			 BufferedReader br = new BufferedReader(reader);
+//			 String line;
+//			 while ((line = br.readLine()) != null) {
+//				 // 一次读入一行数据
+////				 String s = WebResourceReader.doGet(line);
+//
+//				 System.out.println(line.substring(line.length()-8));
+//			 }
+//		 }catch (Exception e){
+//			 e.printStackTrace();
+//		 }
+//
 //	 }
 	public static String getMondayOfThisWeek() {
 		Calendar c = Calendar.getInstance();

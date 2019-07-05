@@ -6,11 +6,14 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import parkingos.com.bolink.dao.mybatis.mapper.CameraTbMapper;
 import parkingos.com.bolink.dao.spring.CommonDao;
+import parkingos.com.bolink.models.CameraTb;
 import parkingos.com.bolink.models.ComPassTb;
 import parkingos.com.bolink.models.SyncInfoPoolTb;
 import parkingos.com.bolink.service.EquipmentManageChannelService;
 import parkingos.com.bolink.service.SupperSearchService;
+import parkingos.com.bolink.service.redis.RedisService;
 import parkingos.com.bolink.utils.CommonUtils;
 
 import java.util.Map;
@@ -27,6 +30,10 @@ public class EquipmentManageChannelServiceImpl implements EquipmentManageChannel
     private CommonDao commonDao;
     @Autowired
     private CommonUtils commonUtils;
+    @Autowired
+    private RedisService redisService;
+    @Autowired
+    CameraTbMapper cameraTbMapper;
 
     @Override
     public JSONObject selectResultByConditions(Map<String, String> reqmap) {
@@ -112,6 +119,90 @@ public class EquipmentManageChannelServiceImpl implements EquipmentManageChannel
     @Override
     public Long getId() {
         return commonDao.selectSequence(ComPassTb.class);
+    }
+
+    @Override
+    @Transactional
+    public String addChannel(String passname, String passtype, Integer monthSet, String description, Long comid, Long cameraId) {
+        Long id= getId();
+        ComPassTb comPassTb = new ComPassTb();
+        comPassTb.setId(id);
+        comPassTb.setPassname(passname);
+        comPassTb.setPasstype(passtype);
+        comPassTb.setMonthSet(monthSet);
+        comPassTb.setDescription(description);
+        comPassTb.setComid(comid);
+        comPassTb.setChannelId(id+"");
+        comPassTb.setState(0);
+        if(cameraId>0) {
+            comPassTb.setCameraId(cameraId);
+        }
+        int insertCount = insertResultByConditions(comPassTb);
+
+        //双向同步  相机表 也要保存通道信息
+        if(cameraId>0){
+            CameraTb cameraTb = new CameraTb();
+            cameraTb.setId(cameraId);
+            cameraTb.setChannelId(id);
+            commonDao.updateByPrimaryKey(cameraTb);
+
+            cameraTb = cameraTbMapper.selectByPrimaryKey(cameraId);
+            String camId = cameraTb.getCamId();
+            redisService.set("camera_"+camId,cameraTb);
+        }
+        return insertCount+"";
+    }
+
+    @Override
+    @Transactional
+    public String updateChannel(Long id, String passname, String passtype, Integer monthSet, String description, Long cameraId) {
+
+
+        if(cameraId>0) {
+            //把相机里面是这个通道的更新掉
+            CameraTb cameraTb = new CameraTb();
+            cameraTb.setChannelId(id);
+            CameraTb update = new CameraTb();
+            update.setChannelId(-1L);
+            commonDao.updateByConditions(update, cameraTb);
+
+            //把之前绑定这个相机的 通道 的相机更新掉。
+            ComPassTb con = new ComPassTb();
+            con.setCameraId(cameraId);
+            ComPassTb updateCom = new ComPassTb();
+            updateCom.setCameraId(-1L);
+            commonDao.updateByConditions(updateCom,con);
+        }
+
+
+
+
+        ComPassTb comPassTb = new ComPassTb();
+        comPassTb.setId(id);
+        comPassTb.setPassname(passname);
+        comPassTb.setPasstype(passtype);
+        comPassTb.setMonthSet(monthSet);
+        comPassTb.setDescription(description);
+        if(cameraId>0) {
+            comPassTb.setCameraId(cameraId);
+        }
+        int updatePass = commonDao.updateByPrimaryKey(comPassTb);
+
+        //把相机绑定现在的通道
+        if(cameraId>0) {
+            CameraTb cameraTb = new CameraTb();
+            cameraTb.setId(cameraId);
+            cameraTb.setChannelId(id);
+            commonDao.updateByPrimaryKey(cameraTb);
+
+            cameraTb = cameraTbMapper.selectByPrimaryKey(cameraId);
+            String camId = cameraTb.getCamId();
+            redisService.set("camera_"+camId,cameraTb);
+        }
+
+
+        return updatePass+"";
+
     }
 
 }

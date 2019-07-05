@@ -47,4 +47,8 @@ public interface GetDataService {
     String getServersByServer(Long serverid);
 
     Long getEndTime(Long beginTime, Integer months);
+
+    String getAllCitys();
+
+    String getCameras(String comid);
 }
