@@ -16,10 +16,7 @@ import parkingos.com.bolink.service.ParkOrderAnlysisService;
 import parkingos.com.bolink.utils.StringUtils;
 import parkingos.com.bolink.utils.TimeTools;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Service
 public class ParkOrderBalanceServiceImpl implements ParkOrdeBalanceService {
@@ -107,6 +104,9 @@ public class ParkOrderBalanceServiceImpl implements ParkOrdeBalanceService {
                 }
             }
         }
+
+        Collections.sort(timeList);
+
 
         List<Map<String,String>> backList = new ArrayList<>();
         if(timeList!=null&&timeList.size()>0){

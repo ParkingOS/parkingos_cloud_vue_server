@@ -49,6 +49,16 @@ public class ComInfoTb {
 
     private Long beatTime;
 
+    private Integer cloudFirst;
+
+    public Integer getCloudFirst() {
+        return cloudFirst;
+    }
+
+    public void setCloudFirst(Integer cloudFirst) {
+        this.cloudFirst = cloudFirst;
+    }
+
     public Long getBeatTime() {
         return beatTime;
     }
