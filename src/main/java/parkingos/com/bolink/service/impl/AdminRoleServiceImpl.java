@@ -199,16 +199,22 @@ public class AdminRoleServiceImpl implements AdminRoleService {
         for (Map<String, Object> map : parentAuthsList) {
             Long autId = (Long) map.get("auth_id");
             String subAuth = (String) map.get("sub_auth");
+
+            String newSubAuth = "";
+            String newSUbAuthid = "";
             for (Map<String, Object> amap : allAuthsList) {
                 Long aid = (Long) amap.get("id");
 
                 String sub_auth = (String) amap.get("sub_auth");
+
                 if (autId.equals(aid)) {
+
+                    amap.put("sub_auth_name", newSubAuth);
+                    amap.put("sub_auth", newSUbAuthid);
+
                     if (subAuth != null && !subAuth.equals("")) {
                         String s1[] = subAuth.split(",");
                         String s2[] = sub_auth.split(",");
-                        String newSubAuth = "";
-                        String newSUbAuthid = "";
                         if (s2.length > 0) {
                             for (String index : s1) {
                                 if (!newSubAuth.equals("")) {
@@ -466,8 +472,9 @@ public class AdminRoleServiceImpl implements AdminRoleService {
                                     ssauthRoleTb.setSubAuth("");
                                     int third = commonDao.insert(ssauthRoleTb);
                                     logger.info("====>>>插入次级权限:"+third);
-                                    String subauth = "";
+
                                     for(int m =0;m<sauthList.size();m++){
+                                        String subauth = "";
                                         Map map3 = (Map)sauthList.get(m);
                                         if("true".equals(map3.get("ischeck").toString())){
                                             List subList =(List) map3.get("subpermission");

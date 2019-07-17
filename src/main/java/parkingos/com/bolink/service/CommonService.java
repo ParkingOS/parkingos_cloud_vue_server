@@ -47,4 +47,6 @@ public interface CommonService {
     void deleteCachOrgGroup(Long groupid);
 
     void deleteCachCity(Long id);
+
+    OrgCityMerchants reGetOrgCityById(Long cityid);
 }

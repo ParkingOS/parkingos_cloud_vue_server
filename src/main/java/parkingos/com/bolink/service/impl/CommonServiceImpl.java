@@ -380,6 +380,18 @@ public class CommonServiceImpl implements CommonService {
         redisService.delete(CustomDefind.getValue("ORGCITYBYID")+id);
     }
 
+    @Override
+    public OrgCityMerchants reGetOrgCityById(Long cityid) {
+        OrgCityMerchants orgCityMerchants=new OrgCityMerchants();
+        orgCityMerchants.setId(cityid);
+        orgCityMerchants=(OrgCityMerchants)commonDao.selectObjectByConditions(orgCityMerchants);
+        if(orgCityMerchants!=null){
+            redisService.set(CustomDefind.getValue("ORGCITYBYID")+cityid,orgCityMerchants);
+            return orgCityMerchants;
+        }
+        return null;
+    }
+
     private Long getCityIdByGroupId(Long groupid) {
         OrgGroupTb orgGroupTb = new OrgGroupTb();
         orgGroupTb.setId(groupid);

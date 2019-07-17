@@ -1,9 +1,8 @@
 package parkingos.com.bolink.models;
 
-import java.io.Serializable;
 import java.math.BigDecimal;
 
-public class UserInfoTb implements Serializable {
+public class UserInfoTb {
     private Long id;
 
     private String nickname;
@@ -110,65 +109,13 @@ public class UserInfoTb implements Serializable {
 
     private Integer isSync;
 
-    private Long serverId;
-
-    public Long getServerId() {
-        return serverId;
-    }
-
-    public void setServerId(Long serverId) {
-        this.serverId = serverId;
-    }
-
-    @Override
-    public String toString() {
-        return "UserInfoTb{" +
-                "id=" + id +
-                ", nickname='" + nickname + '\'' +
-                ", password='" + password + '\'' +
-                ", strid='" + strid + '\'' +
-                ", sex=" + sex +
-                ", email='" + email + '\'' +
-                ", phone='" + phone + '\'' +
-                ", mobile='" + mobile + '\'' +
-                ", address='" + address + '\'' +
-                ", resume='" + resume + '\'' +
-                ", regTime=" + regTime +
-                ", logonTime=" + logonTime +
-                ", logoffTime=" + logoffTime +
-                ", comid=" + comid +
-                ", balance=" + balance +
-                ", state=" + state +
-                ", md5pass='" + md5pass + '\'' +
-                ", wxpOpenid='" + wxpOpenid + '\'' +
-                ", wxName='" + wxName + '\'' +
-                ", wxImgurl='" + wxImgurl + '\'' +
-                ", shopId=" + shopId +
-                ", roleId=" + roleId +
-                ", groupid=" + groupid +
-                ", cityid=" + cityid +
-                ", unionState=" + unionState +
-                ", uploadUnionTime=" + uploadUnionTime +
-                ", operateType=" + operateType +
-                ", updateTime=" + updateTime +
-                ", userId='" + userId + '\'' +
-                ", appid='" + appid + '\'' +
-                '}';
-    }
-
     private Long updateTime;
 
     private String userId;
 
     private String appid;
 
-    public String getAppid() {
-        return appid;
-    }
-
-    public void setAppid(String appid) {
-        this.appid = appid;
-    }
+    private Long serverId;
 
     public Long getId() {
         return id;
@@ -608,5 +555,21 @@ public class UserInfoTb implements Serializable {
 
     public void setUserId(String userId) {
         this.userId = userId == null ? null : userId.trim();
+    }
+
+    public String getAppid() {
+        return appid;
+    }
+
+    public void setAppid(String appid) {
+        this.appid = appid == null ? null : appid.trim();
+    }
+
+    public Long getServerId() {
+        return serverId;
+    }
+
+    public void setServerId(Long serverId) {
+        this.serverId = serverId;
     }
 }

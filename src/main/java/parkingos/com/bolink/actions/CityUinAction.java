@@ -35,6 +35,7 @@ public class CityUinAction {
 
     /*
     * 自定义设置，可以修改月卡续费时间
+    * type  修改开始时间和结束时间
     *
     * */
     @RequestMapping(value = "/edit")
@@ -57,5 +58,34 @@ public class CityUinAction {
         StringUtils.ajaxOutput(resp, result.toJSONString());
         return null;
     }
+
+
+    /*
+   * 个性化设置里面 编辑权限
+   * 可以厂商定义自己的车场管理员的权限
+   *
+   * */
+    @RequestMapping(value = "/getSingleAuth")
+    public String getSingleAuth(Long cityid,HttpServletResponse resp) {
+        logger.info("获取自定义权限："+cityid);
+        String result = cityUinService.getSingleAuth(cityid);
+        StringUtils.ajaxOutput(resp, result);
+        return null;
+    }
+
+
+    /*
+  * 个性化设置里面 编辑权限
+  * 可以厂商定义自己的车场管理员的权限
+  *
+  * */
+    @RequestMapping(value = "/setSingleAuth")
+    public String setSingleAuth(Long cityid,Long roleId,String auths,HttpServletResponse resp) {
+        logger.info("设置自定义权限："+cityid+"~~~roleId:"+roleId);
+        JSONObject result = cityUinService.setSingleAuth(cityid,roleId,auths);
+        StringUtils.ajaxOutput(resp, result.toString());
+        return null;
+    }
+
 
 }

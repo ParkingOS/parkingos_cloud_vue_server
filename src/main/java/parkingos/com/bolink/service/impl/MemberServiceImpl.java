@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 import parkingos.com.bolink.dao.spring.CommonDao;
 import parkingos.com.bolink.enums.FieldOperator;
 import parkingos.com.bolink.models.ComInfoTb;
+import parkingos.com.bolink.models.OrgCityMerchants;
 import parkingos.com.bolink.models.SyncInfoPoolTb;
 import parkingos.com.bolink.models.UserInfoTb;
 import parkingos.com.bolink.qo.PageOrderConfig;
@@ -157,7 +158,24 @@ public class MemberServiceImpl implements MemberService {
         if(comid<0){
             return result;
         }
+
+        //因为加了厂商可以自定义车场管理员权限   所以需要查询是不是用云平台的管理员
+        //云平台的管理员 adminid =0 ，  如果是厂商自定义的  那么adminid =0 and cityid = ?
+        int parkAuth = 0;
+
+        Long cityId = commonService.getCityIdByComid(comid);
+        if(cityId!=null&&cityId>0){
+            OrgCityMerchants city = commonService.getOrgCityById(cityId);
+            if(city!=null){
+                parkAuth = city.getSelfParkAuth();
+            }
+        }
+
         String sql = "select id as value_no,role_name as value_name from user_role_tb where oid =(select id from zld_orgtype_tb WHERE NAME = '停车场' AND state=0) and state =0 and (adminid in (SELECT id from user_info_tb where state=0 and comid = "+comid+" and auth_flag>0 and auth_flag!=14 and auth_flag!=15) or adminid =0) ";
+
+        if(parkAuth==1){
+            sql=  "select id as value_no,role_name as value_name from user_role_tb where oid =(select id from zld_orgtype_tb WHERE NAME = '停车场' AND state=0) and state =0 and (adminid in (SELECT id from user_info_tb where state=0 and comid = "+comid+" and auth_flag>0 and auth_flag!=14 and auth_flag!=15) or (adminid =0 and cityid= "+cityId+")) ";
+        }
         List list = commonDao.getObjectBySql(sql);
 
         if(list!=null&&!list.isEmpty()){
@@ -183,11 +201,11 @@ public class MemberServiceImpl implements MemberService {
             result.put("msg","电话长度不大于15位");
             return result;
         }
-        Long auth_flag =-1L;
-        if(reqParameterMap.get("auth_flag")!=null&&!"".equals(reqParameterMap.get("auth_flag"))){
-            auth_flag =Long.parseLong(reqParameterMap.get("auth_flag"));
-        }
-        String loginuin = reqParameterMap.get("loginuin");
+//        Long auth_flag =-1L;
+//        if(reqParameterMap.get("auth_flag")!=null&&!"".equals(reqParameterMap.get("auth_flag"))){
+//            auth_flag =Long.parseLong(reqParameterMap.get("auth_flag"));
+//        }
+//        String loginuin = reqParameterMap.get("loginuin");
 
         Long role_id =-1L;
         if(reqParameterMap.get("role_id")!=null&&!"".equals(reqParameterMap.get("role_id"))){
@@ -215,7 +233,6 @@ public class MemberServiceImpl implements MemberService {
         }
 
         Long comId = -1L;
-//        Long comId = Long.parseLong(reqParameterMap.get("comid"));
         if(!Check.isEmpty(reqParameterMap.get("comid"))){
             comId = Long.parseLong(reqParameterMap.get("comid"));
         }
@@ -229,7 +246,6 @@ public class MemberServiceImpl implements MemberService {
             }
             comId =com.getId();
         }
-//        Long comId = Long.parseLong(reqParameterMap.get("comid"));
 
 
 
@@ -245,26 +261,21 @@ public class MemberServiceImpl implements MemberService {
         if(reqParameterMap.get("cityid")!=null&&!"undefined".equals(reqParameterMap.get("cityid"))&&!"".equals(reqParameterMap.get("cityid"))){
             cityid = Long.parseLong(reqParameterMap.get("cityid"));
         }
-        if(auth_flag==1){//总后台设置的管理员，默认为后台车场管理员
-            role_id=30L;
-        }else if(auth_flag==-1) {
-            auth_flag = 2L;
-        }
 
-        if(role_id == 30){
-            auth_flag = 1L;
-        }
+
+//        if(role_id == 30){
+//            auth_flag = 1L;
+//        }
 
         UserInfoTb user= new UserInfoTb();
         user.setId(nextid);
         user.setNickname(nickname);
         user.setPassword(strid);
         user.setStrid(strid);
-//        user.setAddress();
         user.setRegTime(time);
         user.setMobile(mobile);
         user.setPhone(phone);
-        user.setAuthFlag(auth_flag);
+        user.setAuthFlag(1L);
         user.setComid(comId);
         user.setRoleId(role_id);
         user.setUserId(userId);

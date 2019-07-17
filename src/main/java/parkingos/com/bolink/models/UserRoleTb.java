@@ -21,6 +21,16 @@ public class UserRoleTb {
 
     private Integer isOpencard;
 
+    private Long cityid;
+
+    public Long getCityid() {
+        return cityid;
+    }
+
+    public void setCityid(Long cityid) {
+        this.cityid = cityid;
+    }
+
     public Long getId() {
         return id;
     }

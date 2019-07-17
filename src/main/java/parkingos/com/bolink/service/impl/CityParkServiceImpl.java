@@ -338,6 +338,28 @@ public class CityParkServiceImpl implements CityParkService {
                             result.put("msg", "新建车场成功!");
 
 
+                            //新建车场的时候  生成车场管理员  因为厂商可以自定义权限，所以需要修改
+
+                            OrgCityMerchants city = commonService.getOrgCityById(cityid);
+                            int parkAuth = 0;
+                            if(city!=null){
+                                parkAuth = city.getSelfParkAuth();
+                            }
+
+                            Long roleId = 30L;
+                            if(parkAuth==1){
+                                //有自己的设置，查找自己管理员id
+                                UserRoleTb userRoleTb = new UserRoleTb();
+                                userRoleTb.setAdminid(0L);
+                                userRoleTb.setCityid(city.getId());
+                                userRoleTb.setOid(8L);
+
+                                userRoleTb = (UserRoleTb)commonDao.selectObjectByConditions(userRoleTb);
+                                if(userRoleTb!=null){
+                                    roleId = userRoleTb.getId();
+                                }
+                            }
+
                             UserInfoTb user= new UserInfoTb();
                             Long userId = commonDao.selectSequence(UserInfoTb.class);
                             user.setId(userId);
@@ -345,7 +367,7 @@ public class CityParkServiceImpl implements CityParkService {
                             user.setPassword(userId+"");
                             user.setStrid(userId+"");
                             user.setRegTime(System.currentTimeMillis()/1000);
-                            user.setRoleId(30L);
+                            user.setRoleId(roleId);
                             user.setAuthFlag(1L);
                             user.setUserId(userId+"");
                             user.setComid(comid);

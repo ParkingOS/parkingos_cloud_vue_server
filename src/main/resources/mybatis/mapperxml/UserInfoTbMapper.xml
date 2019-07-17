@@ -1,0 +1,1031 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="parkingos.com.bolink.dao.mybatis.mapper.UserInfoTbMapper" >
+  <resultMap id="BaseResultMap" type="parkingos.com.bolink.models.UserInfoTb" >
+    <id column="id" property="id" jdbcType="BIGINT" />
+    <result column="nickname" property="nickname" jdbcType="VARCHAR" />
+    <result column="password" property="password" jdbcType="VARCHAR" />
+    <result column="strid" property="strid" jdbcType="VARCHAR" />
+    <result column="sex" property="sex" jdbcType="BIGINT" />
+    <result column="email" property="email" jdbcType="VARCHAR" />
+    <result column="phone" property="phone" jdbcType="VARCHAR" />
+    <result column="mobile" property="mobile" jdbcType="VARCHAR" />
+    <result column="address" property="address" jdbcType="VARCHAR" />
+    <result column="resume" property="resume" jdbcType="VARCHAR" />
+    <result column="reg_time" property="regTime" jdbcType="BIGINT" />
+    <result column="logon_time" property="logonTime" jdbcType="BIGINT" />
+    <result column="logoff_time" property="logoffTime" jdbcType="BIGINT" />
+    <result column="online_flag" property="onlineFlag" jdbcType="BIGINT" />
+    <result column="comid" property="comid" jdbcType="BIGINT" />
+    <result column="auth_flag" property="authFlag" jdbcType="BIGINT" />
+    <result column="balance" property="balance" jdbcType="NUMERIC" />
+    <result column="state" property="state" jdbcType="INTEGER" />
+    <result column="recom_code" property="recomCode" jdbcType="BIGINT" />
+    <result column="md5pass" property="md5pass" jdbcType="VARCHAR" />
+    <result column="cid" property="cid" jdbcType="VARCHAR" />
+    <result column="department_id" property="departmentId" jdbcType="BIGINT" />
+    <result column="media" property="media" jdbcType="INTEGER" />
+    <result column="isview" property="isview" jdbcType="INTEGER" />
+    <result column="collector_pics" property="collectorPics" jdbcType="INTEGER" />
+    <result column="collector_auditor" property="collectorAuditor" jdbcType="BIGINT" />
+    <result column="imei" property="imei" jdbcType="CHAR" />
+    <result column="client_type" property="clientType" jdbcType="INTEGER" />
+    <result column="version" property="version" jdbcType="CHAR" />
+    <result column="wxp_openid" property="wxpOpenid" jdbcType="VARCHAR" />
+    <result column="wx_name" property="wxName" jdbcType="VARCHAR" />
+    <result column="wx_imgurl" property="wxImgurl" jdbcType="VARCHAR" />
+    <result column="shop_id" property="shopId" jdbcType="BIGINT" />
+    <result column="credit_limit" property="creditLimit" jdbcType="NUMERIC" />
+    <result column="is_auth" property="isAuth" jdbcType="INTEGER" />
+    <result column="reward_score" property="rewardScore" jdbcType="NUMERIC" />
+    <result column="firstorderquota" property="firstorderquota" jdbcType="NUMERIC" />
+    <result column="rewardquota" property="rewardquota" jdbcType="NUMERIC" />
+    <result column="recommendquota" property="recommendquota" jdbcType="NUMERIC" />
+    <result column="ticketquota" property="ticketquota" jdbcType="NUMERIC" />
+    <result column="hx_name" property="hxName" jdbcType="VARCHAR" />
+    <result column="hx_pass" property="hxPass" jdbcType="VARCHAR" />
+    <result column="role_id" property="roleId" jdbcType="BIGINT" />
+    <result column="order_hid" property="orderHid" jdbcType="INTEGER" />
+    <result column="chanid" property="chanid" jdbcType="BIGINT" />
+    <result column="groupid" property="groupid" jdbcType="BIGINT" />
+    <result column="creator_id" property="creatorId" jdbcType="BIGINT" />
+    <result column="cityid" property="cityid" jdbcType="BIGINT" />
+    <result column="union_state" property="unionState" jdbcType="INTEGER" />
+    <result column="upload_union_time" property="uploadUnionTime" jdbcType="BIGINT" />
+    <result column="member_id" property="memberId" jdbcType="VARCHAR" />
+    <result column="operate_type" property="operateType" jdbcType="INTEGER" />
+    <result column="is_sync" property="isSync" jdbcType="INTEGER" />
+    <result column="update_time" property="updateTime" jdbcType="BIGINT" />
+    <result column="user_id" property="userId" jdbcType="VARCHAR" />
+    <result column="appid" property="appid" jdbcType="VARCHAR" />
+    <result column="server_id" property="serverId" jdbcType="BIGINT" />
+  </resultMap>
+  <sql id="Example_Where_Clause" >
+    <where >
+      <foreach collection="oredCriteria" item="criteria" separator="or" >
+        <if test="criteria.valid" >
+          <trim prefix="(" suffix=")" prefixOverrides="and" >
+            <foreach collection="criteria.criteria" item="criterion" >
+              <choose >
+                <when test="criterion.noValue" >
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue" >
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue" >
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue" >
+                  and ${criterion.condition}
+                  <foreach collection="criterion.value" item="listItem" open="(" close=")" separator="," >
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Update_By_Example_Where_Clause" >
+    <where >
+      <foreach collection="example.oredCriteria" item="criteria" separator="or" >
+        <if test="criteria.valid" >
+          <trim prefix="(" suffix=")" prefixOverrides="and" >
+            <foreach collection="criteria.criteria" item="criterion" >
+              <choose >
+                <when test="criterion.noValue" >
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue" >
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue" >
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue" >
+                  and ${criterion.condition}
+                  <foreach collection="criterion.value" item="listItem" open="(" close=")" separator="," >
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Base_Column_List" >
+    id, nickname, password, strid, sex, email, phone, mobile, address, resume, reg_time, 
+    logon_time, logoff_time, online_flag, comid, auth_flag, balance, state, recom_code, 
+    md5pass, cid, department_id, media, isview, collector_pics, collector_auditor, imei, 
+    client_type, version, wxp_openid, wx_name, wx_imgurl, shop_id, credit_limit, is_auth, 
+    reward_score, firstorderquota, rewardquota, recommendquota, ticketquota, hx_name, 
+    hx_pass, role_id, order_hid, chanid, groupid, creator_id, cityid, union_state, upload_union_time, 
+    member_id, operate_type, is_sync, update_time, user_id, appid, server_id
+  </sql>
+  <select id="selectByExample" resultMap="BaseResultMap" parameterType="parkingos.com.bolink.models.UserInfoTbExample" >
+    select
+    <if test="distinct" >
+      distinct
+    </if>
+    <include refid="Base_Column_List" />
+    from user_info_tb
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+    <if test="orderByClause != null" >
+      order by ${orderByClause}
+    </if>
+  </select>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Long" >
+    select 
+    <include refid="Base_Column_List" />
+    from user_info_tb
+    where id = #{id,jdbcType=BIGINT}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Long" >
+    delete from user_info_tb
+    where id = #{id,jdbcType=BIGINT}
+  </delete>
+  <delete id="deleteByExample" parameterType="parkingos.com.bolink.models.UserInfoTbExample" >
+    delete from user_info_tb
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+  </delete>
+  <insert id="insert" parameterType="parkingos.com.bolink.models.UserInfoTb" >
+    insert into user_info_tb (id, nickname, password, 
+      strid, sex, email, phone, 
+      mobile, address, resume, 
+      reg_time, logon_time, logoff_time, 
+      online_flag, comid, auth_flag, 
+      balance, state, recom_code, 
+      md5pass, cid, department_id, 
+      media, isview, collector_pics, 
+      collector_auditor, imei, client_type, 
+      version, wxp_openid, wx_name, 
+      wx_imgurl, shop_id, credit_limit, 
+      is_auth, reward_score, firstorderquota, 
+      rewardquota, recommendquota, ticketquota, 
+      hx_name, hx_pass, role_id, 
+      order_hid, chanid, groupid, 
+      creator_id, cityid, union_state, 
+      upload_union_time, member_id, operate_type, 
+      is_sync, update_time, user_id, 
+      appid, server_id)
+    values (#{id,jdbcType=BIGINT}, #{nickname,jdbcType=VARCHAR}, #{password,jdbcType=VARCHAR}, 
+      #{strid,jdbcType=VARCHAR}, #{sex,jdbcType=BIGINT}, #{email,jdbcType=VARCHAR}, #{phone,jdbcType=VARCHAR}, 
+      #{mobile,jdbcType=VARCHAR}, #{address,jdbcType=VARCHAR}, #{resume,jdbcType=VARCHAR}, 
+      #{regTime,jdbcType=BIGINT}, #{logonTime,jdbcType=BIGINT}, #{logoffTime,jdbcType=BIGINT}, 
+      #{onlineFlag,jdbcType=BIGINT}, #{comid,jdbcType=BIGINT}, #{authFlag,jdbcType=BIGINT}, 
+      #{balance,jdbcType=NUMERIC}, #{state,jdbcType=INTEGER}, #{recomCode,jdbcType=BIGINT}, 
+      #{md5pass,jdbcType=VARCHAR}, #{cid,jdbcType=VARCHAR}, #{departmentId,jdbcType=BIGINT}, 
+      #{media,jdbcType=INTEGER}, #{isview,jdbcType=INTEGER}, #{collectorPics,jdbcType=INTEGER}, 
+      #{collectorAuditor,jdbcType=BIGINT}, #{imei,jdbcType=CHAR}, #{clientType,jdbcType=INTEGER}, 
+      #{version,jdbcType=CHAR}, #{wxpOpenid,jdbcType=VARCHAR}, #{wxName,jdbcType=VARCHAR}, 
+      #{wxImgurl,jdbcType=VARCHAR}, #{shopId,jdbcType=BIGINT}, #{creditLimit,jdbcType=NUMERIC}, 
+      #{isAuth,jdbcType=INTEGER}, #{rewardScore,jdbcType=NUMERIC}, #{firstorderquota,jdbcType=NUMERIC}, 
+      #{rewardquota,jdbcType=NUMERIC}, #{recommendquota,jdbcType=NUMERIC}, #{ticketquota,jdbcType=NUMERIC}, 
+      #{hxName,jdbcType=VARCHAR}, #{hxPass,jdbcType=VARCHAR}, #{roleId,jdbcType=BIGINT}, 
+      #{orderHid,jdbcType=INTEGER}, #{chanid,jdbcType=BIGINT}, #{groupid,jdbcType=BIGINT}, 
+      #{creatorId,jdbcType=BIGINT}, #{cityid,jdbcType=BIGINT}, #{unionState,jdbcType=INTEGER}, 
+      #{uploadUnionTime,jdbcType=BIGINT}, #{memberId,jdbcType=VARCHAR}, #{operateType,jdbcType=INTEGER}, 
+      #{isSync,jdbcType=INTEGER}, #{updateTime,jdbcType=BIGINT}, #{userId,jdbcType=VARCHAR}, 
+      #{appid,jdbcType=VARCHAR}, #{serverId,jdbcType=BIGINT})
+  </insert>
+  <insert id="insertSelective" parameterType="parkingos.com.bolink.models.UserInfoTb" >
+    insert into user_info_tb
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        id,
+      </if>
+      <if test="nickname != null" >
+        nickname,
+      </if>
+      <if test="password != null" >
+        password,
+      </if>
+      <if test="strid != null" >
+        strid,
+      </if>
+      <if test="sex != null" >
+        sex,
+      </if>
+      <if test="email != null" >
+        email,
+      </if>
+      <if test="phone != null" >
+        phone,
+      </if>
+      <if test="mobile != null" >
+        mobile,
+      </if>
+      <if test="address != null" >
+        address,
+      </if>
+      <if test="resume != null" >
+        resume,
+      </if>
+      <if test="regTime != null" >
+        reg_time,
+      </if>
+      <if test="logonTime != null" >
+        logon_time,
+      </if>
+      <if test="logoffTime != null" >
+        logoff_time,
+      </if>
+      <if test="onlineFlag != null" >
+        online_flag,
+      </if>
+      <if test="comid != null" >
+        comid,
+      </if>
+      <if test="authFlag != null" >
+        auth_flag,
+      </if>
+      <if test="balance != null" >
+        balance,
+      </if>
+      <if test="state != null" >
+        state,
+      </if>
+      <if test="recomCode != null" >
+        recom_code,
+      </if>
+      <if test="md5pass != null" >
+        md5pass,
+      </if>
+      <if test="cid != null" >
+        cid,
+      </if>
+      <if test="departmentId != null" >
+        department_id,
+      </if>
+      <if test="media != null" >
+        media,
+      </if>
+      <if test="isview != null" >
+        isview,
+      </if>
+      <if test="collectorPics != null" >
+        collector_pics,
+      </if>
+      <if test="collectorAuditor != null" >
+        collector_auditor,
+      </if>
+      <if test="imei != null" >
+        imei,
+      </if>
+      <if test="clientType != null" >
+        client_type,
+      </if>
+      <if test="version != null" >
+        version,
+      </if>
+      <if test="wxpOpenid != null" >
+        wxp_openid,
+      </if>
+      <if test="wxName != null" >
+        wx_name,
+      </if>
+      <if test="wxImgurl != null" >
+        wx_imgurl,
+      </if>
+      <if test="shopId != null" >
+        shop_id,
+      </if>
+      <if test="creditLimit != null" >
+        credit_limit,
+      </if>
+      <if test="isAuth != null" >
+        is_auth,
+      </if>
+      <if test="rewardScore != null" >
+        reward_score,
+      </if>
+      <if test="firstorderquota != null" >
+        firstorderquota,
+      </if>
+      <if test="rewardquota != null" >
+        rewardquota,
+      </if>
+      <if test="recommendquota != null" >
+        recommendquota,
+      </if>
+      <if test="ticketquota != null" >
+        ticketquota,
+      </if>
+      <if test="hxName != null" >
+        hx_name,
+      </if>
+      <if test="hxPass != null" >
+        hx_pass,
+      </if>
+      <if test="roleId != null" >
+        role_id,
+      </if>
+      <if test="orderHid != null" >
+        order_hid,
+      </if>
+      <if test="chanid != null" >
+        chanid,
+      </if>
+      <if test="groupid != null" >
+        groupid,
+      </if>
+      <if test="creatorId != null" >
+        creator_id,
+      </if>
+      <if test="cityid != null" >
+        cityid,
+      </if>
+      <if test="unionState != null" >
+        union_state,
+      </if>
+      <if test="uploadUnionTime != null" >
+        upload_union_time,
+      </if>
+      <if test="memberId != null" >
+        member_id,
+      </if>
+      <if test="operateType != null" >
+        operate_type,
+      </if>
+      <if test="isSync != null" >
+        is_sync,
+      </if>
+      <if test="updateTime != null" >
+        update_time,
+      </if>
+      <if test="userId != null" >
+        user_id,
+      </if>
+      <if test="appid != null" >
+        appid,
+      </if>
+      <if test="serverId != null" >
+        server_id,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        #{id,jdbcType=BIGINT},
+      </if>
+      <if test="nickname != null" >
+        #{nickname,jdbcType=VARCHAR},
+      </if>
+      <if test="password != null" >
+        #{password,jdbcType=VARCHAR},
+      </if>
+      <if test="strid != null" >
+        #{strid,jdbcType=VARCHAR},
+      </if>
+      <if test="sex != null" >
+        #{sex,jdbcType=BIGINT},
+      </if>
+      <if test="email != null" >
+        #{email,jdbcType=VARCHAR},
+      </if>
+      <if test="phone != null" >
+        #{phone,jdbcType=VARCHAR},
+      </if>
+      <if test="mobile != null" >
+        #{mobile,jdbcType=VARCHAR},
+      </if>
+      <if test="address != null" >
+        #{address,jdbcType=VARCHAR},
+      </if>
+      <if test="resume != null" >
+        #{resume,jdbcType=VARCHAR},
+      </if>
+      <if test="regTime != null" >
+        #{regTime,jdbcType=BIGINT},
+      </if>
+      <if test="logonTime != null" >
+        #{logonTime,jdbcType=BIGINT},
+      </if>
+      <if test="logoffTime != null" >
+        #{logoffTime,jdbcType=BIGINT},
+      </if>
+      <if test="onlineFlag != null" >
+        #{onlineFlag,jdbcType=BIGINT},
+      </if>
+      <if test="comid != null" >
+        #{comid,jdbcType=BIGINT},
+      </if>
+      <if test="authFlag != null" >
+        #{authFlag,jdbcType=BIGINT},
+      </if>
+      <if test="balance != null" >
+        #{balance,jdbcType=NUMERIC},
+      </if>
+      <if test="state != null" >
+        #{state,jdbcType=INTEGER},
+      </if>
+      <if test="recomCode != null" >
+        #{recomCode,jdbcType=BIGINT},
+      </if>
+      <if test="md5pass != null" >
+        #{md5pass,jdbcType=VARCHAR},
+      </if>
+      <if test="cid != null" >
+        #{cid,jdbcType=VARCHAR},
+      </if>
+      <if test="departmentId != null" >
+        #{departmentId,jdbcType=BIGINT},
+      </if>
+      <if test="media != null" >
+        #{media,jdbcType=INTEGER},
+      </if>
+      <if test="isview != null" >
+        #{isview,jdbcType=INTEGER},
+      </if>
+      <if test="collectorPics != null" >
+        #{collectorPics,jdbcType=INTEGER},
+      </if>
+      <if test="collectorAuditor != null" >
+        #{collectorAuditor,jdbcType=BIGINT},
+      </if>
+      <if test="imei != null" >
+        #{imei,jdbcType=CHAR},
+      </if>
+      <if test="clientType != null" >
+        #{clientType,jdbcType=INTEGER},
+      </if>
+      <if test="version != null" >
+        #{version,jdbcType=CHAR},
+      </if>
+      <if test="wxpOpenid != null" >
+        #{wxpOpenid,jdbcType=VARCHAR},
+      </if>
+      <if test="wxName != null" >
+        #{wxName,jdbcType=VARCHAR},
+      </if>
+      <if test="wxImgurl != null" >
+        #{wxImgurl,jdbcType=VARCHAR},
+      </if>
+      <if test="shopId != null" >
+        #{shopId,jdbcType=BIGINT},
+      </if>
+      <if test="creditLimit != null" >
+        #{creditLimit,jdbcType=NUMERIC},
+      </if>
+      <if test="isAuth != null" >
+        #{isAuth,jdbcType=INTEGER},
+      </if>
+      <if test="rewardScore != null" >
+        #{rewardScore,jdbcType=NUMERIC},
+      </if>
+      <if test="firstorderquota != null" >
+        #{firstorderquota,jdbcType=NUMERIC},
+      </if>
+      <if test="rewardquota != null" >
+        #{rewardquota,jdbcType=NUMERIC},
+      </if>
+      <if test="recommendquota != null" >
+        #{recommendquota,jdbcType=NUMERIC},
+      </if>
+      <if test="ticketquota != null" >
+        #{ticketquota,jdbcType=NUMERIC},
+      </if>
+      <if test="hxName != null" >
+        #{hxName,jdbcType=VARCHAR},
+      </if>
+      <if test="hxPass != null" >
+        #{hxPass,jdbcType=VARCHAR},
+      </if>
+      <if test="roleId != null" >
+        #{roleId,jdbcType=BIGINT},
+      </if>
+      <if test="orderHid != null" >
+        #{orderHid,jdbcType=INTEGER},
+      </if>
+      <if test="chanid != null" >
+        #{chanid,jdbcType=BIGINT},
+      </if>
+      <if test="groupid != null" >
+        #{groupid,jdbcType=BIGINT},
+      </if>
+      <if test="creatorId != null" >
+        #{creatorId,jdbcType=BIGINT},
+      </if>
+      <if test="cityid != null" >
+        #{cityid,jdbcType=BIGINT},
+      </if>
+      <if test="unionState != null" >
+        #{unionState,jdbcType=INTEGER},
+      </if>
+      <if test="uploadUnionTime != null" >
+        #{uploadUnionTime,jdbcType=BIGINT},
+      </if>
+      <if test="memberId != null" >
+        #{memberId,jdbcType=VARCHAR},
+      </if>
+      <if test="operateType != null" >
+        #{operateType,jdbcType=INTEGER},
+      </if>
+      <if test="isSync != null" >
+        #{isSync,jdbcType=INTEGER},
+      </if>
+      <if test="updateTime != null" >
+        #{updateTime,jdbcType=BIGINT},
+      </if>
+      <if test="userId != null" >
+        #{userId,jdbcType=VARCHAR},
+      </if>
+      <if test="appid != null" >
+        #{appid,jdbcType=VARCHAR},
+      </if>
+      <if test="serverId != null" >
+        #{serverId,jdbcType=BIGINT},
+      </if>
+    </trim>
+  </insert>
+  <select id="countByExample" parameterType="parkingos.com.bolink.models.UserInfoTbExample" resultType="java.lang.Integer" >
+    select count(*) from user_info_tb
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+  </select>
+  <update id="updateByExampleSelective" parameterType="map" >
+    update user_info_tb
+    <set >
+      <if test="record.id != null" >
+        id = #{record.id,jdbcType=BIGINT},
+      </if>
+      <if test="record.nickname != null" >
+        nickname = #{record.nickname,jdbcType=VARCHAR},
+      </if>
+      <if test="record.password != null" >
+        password = #{record.password,jdbcType=VARCHAR},
+      </if>
+      <if test="record.strid != null" >
+        strid = #{record.strid,jdbcType=VARCHAR},
+      </if>
+      <if test="record.sex != null" >
+        sex = #{record.sex,jdbcType=BIGINT},
+      </if>
+      <if test="record.email != null" >
+        email = #{record.email,jdbcType=VARCHAR},
+      </if>
+      <if test="record.phone != null" >
+        phone = #{record.phone,jdbcType=VARCHAR},
+      </if>
+      <if test="record.mobile != null" >
+        mobile = #{record.mobile,jdbcType=VARCHAR},
+      </if>
+      <if test="record.address != null" >
+        address = #{record.address,jdbcType=VARCHAR},
+      </if>
+      <if test="record.resume != null" >
+        resume = #{record.resume,jdbcType=VARCHAR},
+      </if>
+      <if test="record.regTime != null" >
+        reg_time = #{record.regTime,jdbcType=BIGINT},
+      </if>
+      <if test="record.logonTime != null" >
+        logon_time = #{record.logonTime,jdbcType=BIGINT},
+      </if>
+      <if test="record.logoffTime != null" >
+        logoff_time = #{record.logoffTime,jdbcType=BIGINT},
+      </if>
+      <if test="record.onlineFlag != null" >
+        online_flag = #{record.onlineFlag,jdbcType=BIGINT},
+      </if>
+      <if test="record.comid != null" >
+        comid = #{record.comid,jdbcType=BIGINT},
+      </if>
+      <if test="record.authFlag != null" >
+        auth_flag = #{record.authFlag,jdbcType=BIGINT},
+      </if>
+      <if test="record.balance != null" >
+        balance = #{record.balance,jdbcType=NUMERIC},
+      </if>
+      <if test="record.state != null" >
+        state = #{record.state,jdbcType=INTEGER},
+      </if>
+      <if test="record.recomCode != null" >
+        recom_code = #{record.recomCode,jdbcType=BIGINT},
+      </if>
+      <if test="record.md5pass != null" >
+        md5pass = #{record.md5pass,jdbcType=VARCHAR},
+      </if>
+      <if test="record.cid != null" >
+        cid = #{record.cid,jdbcType=VARCHAR},
+      </if>
+      <if test="record.departmentId != null" >
+        department_id = #{record.departmentId,jdbcType=BIGINT},
+      </if>
+      <if test="record.media != null" >
+        media = #{record.media,jdbcType=INTEGER},
+      </if>
+      <if test="record.isview != null" >
+        isview = #{record.isview,jdbcType=INTEGER},
+      </if>
+      <if test="record.collectorPics != null" >
+        collector_pics = #{record.collectorPics,jdbcType=INTEGER},
+      </if>
+      <if test="record.collectorAuditor != null" >
+        collector_auditor = #{record.collectorAuditor,jdbcType=BIGINT},
+      </if>
+      <if test="record.imei != null" >
+        imei = #{record.imei,jdbcType=CHAR},
+      </if>
+      <if test="record.clientType != null" >
+        client_type = #{record.clientType,jdbcType=INTEGER},
+      </if>
+      <if test="record.version != null" >
+        version = #{record.version,jdbcType=CHAR},
+      </if>
+      <if test="record.wxpOpenid != null" >
+        wxp_openid = #{record.wxpOpenid,jdbcType=VARCHAR},
+      </if>
+      <if test="record.wxName != null" >
+        wx_name = #{record.wxName,jdbcType=VARCHAR},
+      </if>
+      <if test="record.wxImgurl != null" >
+        wx_imgurl = #{record.wxImgurl,jdbcType=VARCHAR},
+      </if>
+      <if test="record.shopId != null" >
+        shop_id = #{record.shopId,jdbcType=BIGINT},
+      </if>
+      <if test="record.creditLimit != null" >
+        credit_limit = #{record.creditLimit,jdbcType=NUMERIC},
+      </if>
+      <if test="record.isAuth != null" >
+        is_auth = #{record.isAuth,jdbcType=INTEGER},
+      </if>
+      <if test="record.rewardScore != null" >
+        reward_score = #{record.rewardScore,jdbcType=NUMERIC},
+      </if>
+      <if test="record.firstorderquota != null" >
+        firstorderquota = #{record.firstorderquota,jdbcType=NUMERIC},
+      </if>
+      <if test="record.rewardquota != null" >
+        rewardquota = #{record.rewardquota,jdbcType=NUMERIC},
+      </if>
+      <if test="record.recommendquota != null" >
+        recommendquota = #{record.recommendquota,jdbcType=NUMERIC},
+      </if>
+      <if test="record.ticketquota != null" >
+        ticketquota = #{record.ticketquota,jdbcType=NUMERIC},
+      </if>
+      <if test="record.hxName != null" >
+        hx_name = #{record.hxName,jdbcType=VARCHAR},
+      </if>
+      <if test="record.hxPass != null" >
+        hx_pass = #{record.hxPass,jdbcType=VARCHAR},
+      </if>
+      <if test="record.roleId != null" >
+        role_id = #{record.roleId,jdbcType=BIGINT},
+      </if>
+      <if test="record.orderHid != null" >
+        order_hid = #{record.orderHid,jdbcType=INTEGER},
+      </if>
+      <if test="record.chanid != null" >
+        chanid = #{record.chanid,jdbcType=BIGINT},
+      </if>
+      <if test="record.groupid != null" >
+        groupid = #{record.groupid,jdbcType=BIGINT},
+      </if>
+      <if test="record.creatorId != null" >
+        creator_id = #{record.creatorId,jdbcType=BIGINT},
+      </if>
+      <if test="record.cityid != null" >
+        cityid = #{record.cityid,jdbcType=BIGINT},
+      </if>
+      <if test="record.unionState != null" >
+        union_state = #{record.unionState,jdbcType=INTEGER},
+      </if>
+      <if test="record.uploadUnionTime != null" >
+        upload_union_time = #{record.uploadUnionTime,jdbcType=BIGINT},
+      </if>
+      <if test="record.memberId != null" >
+        member_id = #{record.memberId,jdbcType=VARCHAR},
+      </if>
+      <if test="record.operateType != null" >
+        operate_type = #{record.operateType,jdbcType=INTEGER},
+      </if>
+      <if test="record.isSync != null" >
+        is_sync = #{record.isSync,jdbcType=INTEGER},
+      </if>
+      <if test="record.updateTime != null" >
+        update_time = #{record.updateTime,jdbcType=BIGINT},
+      </if>
+      <if test="record.userId != null" >
+        user_id = #{record.userId,jdbcType=VARCHAR},
+      </if>
+      <if test="record.appid != null" >
+        appid = #{record.appid,jdbcType=VARCHAR},
+      </if>
+      <if test="record.serverId != null" >
+        server_id = #{record.serverId,jdbcType=BIGINT},
+      </if>
+    </set>
+    <if test="_parameter != null" >
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  <update id="updateByExample" parameterType="map" >
+    update user_info_tb
+    set id = #{record.id,jdbcType=BIGINT},
+      nickname = #{record.nickname,jdbcType=VARCHAR},
+      password = #{record.password,jdbcType=VARCHAR},
+      strid = #{record.strid,jdbcType=VARCHAR},
+      sex = #{record.sex,jdbcType=BIGINT},
+      email = #{record.email,jdbcType=VARCHAR},
+      phone = #{record.phone,jdbcType=VARCHAR},
+      mobile = #{record.mobile,jdbcType=VARCHAR},
+      address = #{record.address,jdbcType=VARCHAR},
+      resume = #{record.resume,jdbcType=VARCHAR},
+      reg_time = #{record.regTime,jdbcType=BIGINT},
+      logon_time = #{record.logonTime,jdbcType=BIGINT},
+      logoff_time = #{record.logoffTime,jdbcType=BIGINT},
+      online_flag = #{record.onlineFlag,jdbcType=BIGINT},
+      comid = #{record.comid,jdbcType=BIGINT},
+      auth_flag = #{record.authFlag,jdbcType=BIGINT},
+      balance = #{record.balance,jdbcType=NUMERIC},
+      state = #{record.state,jdbcType=INTEGER},
+      recom_code = #{record.recomCode,jdbcType=BIGINT},
+      md5pass = #{record.md5pass,jdbcType=VARCHAR},
+      cid = #{record.cid,jdbcType=VARCHAR},
+      department_id = #{record.departmentId,jdbcType=BIGINT},
+      media = #{record.media,jdbcType=INTEGER},
+      isview = #{record.isview,jdbcType=INTEGER},
+      collector_pics = #{record.collectorPics,jdbcType=INTEGER},
+      collector_auditor = #{record.collectorAuditor,jdbcType=BIGINT},
+      imei = #{record.imei,jdbcType=CHAR},
+      client_type = #{record.clientType,jdbcType=INTEGER},
+      version = #{record.version,jdbcType=CHAR},
+      wxp_openid = #{record.wxpOpenid,jdbcType=VARCHAR},
+      wx_name = #{record.wxName,jdbcType=VARCHAR},
+      wx_imgurl = #{record.wxImgurl,jdbcType=VARCHAR},
+      shop_id = #{record.shopId,jdbcType=BIGINT},
+      credit_limit = #{record.creditLimit,jdbcType=NUMERIC},
+      is_auth = #{record.isAuth,jdbcType=INTEGER},
+      reward_score = #{record.rewardScore,jdbcType=NUMERIC},
+      firstorderquota = #{record.firstorderquota,jdbcType=NUMERIC},
+      rewardquota = #{record.rewardquota,jdbcType=NUMERIC},
+      recommendquota = #{record.recommendquota,jdbcType=NUMERIC},
+      ticketquota = #{record.ticketquota,jdbcType=NUMERIC},
+      hx_name = #{record.hxName,jdbcType=VARCHAR},
+      hx_pass = #{record.hxPass,jdbcType=VARCHAR},
+      role_id = #{record.roleId,jdbcType=BIGINT},
+      order_hid = #{record.orderHid,jdbcType=INTEGER},
+      chanid = #{record.chanid,jdbcType=BIGINT},
+      groupid = #{record.groupid,jdbcType=BIGINT},
+      creator_id = #{record.creatorId,jdbcType=BIGINT},
+      cityid = #{record.cityid,jdbcType=BIGINT},
+      union_state = #{record.unionState,jdbcType=INTEGER},
+      upload_union_time = #{record.uploadUnionTime,jdbcType=BIGINT},
+      member_id = #{record.memberId,jdbcType=VARCHAR},
+      operate_type = #{record.operateType,jdbcType=INTEGER},
+      is_sync = #{record.isSync,jdbcType=INTEGER},
+      update_time = #{record.updateTime,jdbcType=BIGINT},
+      user_id = #{record.userId,jdbcType=VARCHAR},
+      appid = #{record.appid,jdbcType=VARCHAR},
+      server_id = #{record.serverId,jdbcType=BIGINT}
+    <if test="_parameter != null" >
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  <update id="updateByPrimaryKeySelective" parameterType="parkingos.com.bolink.models.UserInfoTb" >
+    update user_info_tb
+    <set >
+      <if test="nickname != null" >
+        nickname = #{nickname,jdbcType=VARCHAR},
+      </if>
+      <if test="password != null" >
+        password = #{password,jdbcType=VARCHAR},
+      </if>
+      <if test="strid != null" >
+        strid = #{strid,jdbcType=VARCHAR},
+      </if>
+      <if test="sex != null" >
+        sex = #{sex,jdbcType=BIGINT},
+      </if>
+      <if test="email != null" >
+        email = #{email,jdbcType=VARCHAR},
+      </if>
+      <if test="phone != null" >
+        phone = #{phone,jdbcType=VARCHAR},
+      </if>
+      <if test="mobile != null" >
+        mobile = #{mobile,jdbcType=VARCHAR},
+      </if>
+      <if test="address != null" >
+        address = #{address,jdbcType=VARCHAR},
+      </if>
+      <if test="resume != null" >
+        resume = #{resume,jdbcType=VARCHAR},
+      </if>
+      <if test="regTime != null" >
+        reg_time = #{regTime,jdbcType=BIGINT},
+      </if>
+      <if test="logonTime != null" >
+        logon_time = #{logonTime,jdbcType=BIGINT},
+      </if>
+      <if test="logoffTime != null" >
+        logoff_time = #{logoffTime,jdbcType=BIGINT},
+      </if>
+      <if test="onlineFlag != null" >
+        online_flag = #{onlineFlag,jdbcType=BIGINT},
+      </if>
+      <if test="comid != null" >
+        comid = #{comid,jdbcType=BIGINT},
+      </if>
+      <if test="authFlag != null" >
+        auth_flag = #{authFlag,jdbcType=BIGINT},
+      </if>
+      <if test="balance != null" >
+        balance = #{balance,jdbcType=NUMERIC},
+      </if>
+      <if test="state != null" >
+        state = #{state,jdbcType=INTEGER},
+      </if>
+      <if test="recomCode != null" >
+        recom_code = #{recomCode,jdbcType=BIGINT},
+      </if>
+      <if test="md5pass != null" >
+        md5pass = #{md5pass,jdbcType=VARCHAR},
+      </if>
+      <if test="cid != null" >
+        cid = #{cid,jdbcType=VARCHAR},
+      </if>
+      <if test="departmentId != null" >
+        department_id = #{departmentId,jdbcType=BIGINT},
+      </if>
+      <if test="media != null" >
+        media = #{media,jdbcType=INTEGER},
+      </if>
+      <if test="isview != null" >
+        isview = #{isview,jdbcType=INTEGER},
+      </if>
+      <if test="collectorPics != null" >
+        collector_pics = #{collectorPics,jdbcType=INTEGER},
+      </if>
+      <if test="collectorAuditor != null" >
+        collector_auditor = #{collectorAuditor,jdbcType=BIGINT},
+      </if>
+      <if test="imei != null" >
+        imei = #{imei,jdbcType=CHAR},
+      </if>
+      <if test="clientType != null" >
+        client_type = #{clientType,jdbcType=INTEGER},
+      </if>
+      <if test="version != null" >
+        version = #{version,jdbcType=CHAR},
+      </if>
+      <if test="wxpOpenid != null" >
+        wxp_openid = #{wxpOpenid,jdbcType=VARCHAR},
+      </if>
+      <if test="wxName != null" >
+        wx_name = #{wxName,jdbcType=VARCHAR},
+      </if>
+      <if test="wxImgurl != null" >
+        wx_imgurl = #{wxImgurl,jdbcType=VARCHAR},
+      </if>
+      <if test="shopId != null" >
+        shop_id = #{shopId,jdbcType=BIGINT},
+      </if>
+      <if test="creditLimit != null" >
+        credit_limit = #{creditLimit,jdbcType=NUMERIC},
+      </if>
+      <if test="isAuth != null" >
+        is_auth = #{isAuth,jdbcType=INTEGER},
+      </if>
+      <if test="rewardScore != null" >
+        reward_score = #{rewardScore,jdbcType=NUMERIC},
+      </if>
+      <if test="firstorderquota != null" >
+        firstorderquota = #{firstorderquota,jdbcType=NUMERIC},
+      </if>
+      <if test="rewardquota != null" >
+        rewardquota = #{rewardquota,jdbcType=NUMERIC},
+      </if>
+      <if test="recommendquota != null" >
+        recommendquota = #{recommendquota,jdbcType=NUMERIC},
+      </if>
+      <if test="ticketquota != null" >
+        ticketquota = #{ticketquota,jdbcType=NUMERIC},
+      </if>
+      <if test="hxName != null" >
+        hx_name = #{hxName,jdbcType=VARCHAR},
+      </if>
+      <if test="hxPass != null" >
+        hx_pass = #{hxPass,jdbcType=VARCHAR},
+      </if>
+      <if test="roleId != null" >
+        role_id = #{roleId,jdbcType=BIGINT},
+      </if>
+      <if test="orderHid != null" >
+        order_hid = #{orderHid,jdbcType=INTEGER},
+      </if>
+      <if test="chanid != null" >
+        chanid = #{chanid,jdbcType=BIGINT},
+      </if>
+      <if test="groupid != null" >
+        groupid = #{groupid,jdbcType=BIGINT},
+      </if>
+      <if test="creatorId != null" >
+        creator_id = #{creatorId,jdbcType=BIGINT},
+      </if>
+      <if test="cityid != null" >
+        cityid = #{cityid,jdbcType=BIGINT},
+      </if>
+      <if test="unionState != null" >
+        union_state = #{unionState,jdbcType=INTEGER},
+      </if>
+      <if test="uploadUnionTime != null" >
+        upload_union_time = #{uploadUnionTime,jdbcType=BIGINT},
+      </if>
+      <if test="memberId != null" >
+        member_id = #{memberId,jdbcType=VARCHAR},
+      </if>
+      <if test="operateType != null" >
+        operate_type = #{operateType,jdbcType=INTEGER},
+      </if>
+      <if test="isSync != null" >
+        is_sync = #{isSync,jdbcType=INTEGER},
+      </if>
+      <if test="updateTime != null" >
+        update_time = #{updateTime,jdbcType=BIGINT},
+      </if>
+      <if test="userId != null" >
+        user_id = #{userId,jdbcType=VARCHAR},
+      </if>
+      <if test="appid != null" >
+        appid = #{appid,jdbcType=VARCHAR},
+      </if>
+      <if test="serverId != null" >
+        server_id = #{serverId,jdbcType=BIGINT},
+      </if>
+    </set>
+    where id = #{id,jdbcType=BIGINT}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="parkingos.com.bolink.models.UserInfoTb" >
+    update user_info_tb
+    set nickname = #{nickname,jdbcType=VARCHAR},
+      password = #{password,jdbcType=VARCHAR},
+      strid = #{strid,jdbcType=VARCHAR},
+      sex = #{sex,jdbcType=BIGINT},
+      email = #{email,jdbcType=VARCHAR},
+      phone = #{phone,jdbcType=VARCHAR},
+      mobile = #{mobile,jdbcType=VARCHAR},
+      address = #{address,jdbcType=VARCHAR},
+      resume = #{resume,jdbcType=VARCHAR},
+      reg_time = #{regTime,jdbcType=BIGINT},
+      logon_time = #{logonTime,jdbcType=BIGINT},
+      logoff_time = #{logoffTime,jdbcType=BIGINT},
+      online_flag = #{onlineFlag,jdbcType=BIGINT},
+      comid = #{comid,jdbcType=BIGINT},
+      auth_flag = #{authFlag,jdbcType=BIGINT},
+      balance = #{balance,jdbcType=NUMERIC},
+      state = #{state,jdbcType=INTEGER},
+      recom_code = #{recomCode,jdbcType=BIGINT},
+      md5pass = #{md5pass,jdbcType=VARCHAR},
+      cid = #{cid,jdbcType=VARCHAR},
+      department_id = #{departmentId,jdbcType=BIGINT},
+      media = #{media,jdbcType=INTEGER},
+      isview = #{isview,jdbcType=INTEGER},
+      collector_pics = #{collectorPics,jdbcType=INTEGER},
+      collector_auditor = #{collectorAuditor,jdbcType=BIGINT},
+      imei = #{imei,jdbcType=CHAR},
+      client_type = #{clientType,jdbcType=INTEGER},
+      version = #{version,jdbcType=CHAR},
+      wxp_openid = #{wxpOpenid,jdbcType=VARCHAR},
+      wx_name = #{wxName,jdbcType=VARCHAR},
+      wx_imgurl = #{wxImgurl,jdbcType=VARCHAR},
+      shop_id = #{shopId,jdbcType=BIGINT},
+      credit_limit = #{creditLimit,jdbcType=NUMERIC},
+      is_auth = #{isAuth,jdbcType=INTEGER},
+      reward_score = #{rewardScore,jdbcType=NUMERIC},
+      firstorderquota = #{firstorderquota,jdbcType=NUMERIC},
+      rewardquota = #{rewardquota,jdbcType=NUMERIC},
+      recommendquota = #{recommendquota,jdbcType=NUMERIC},
+      ticketquota = #{ticketquota,jdbcType=NUMERIC},
+      hx_name = #{hxName,jdbcType=VARCHAR},
+      hx_pass = #{hxPass,jdbcType=VARCHAR},
+      role_id = #{roleId,jdbcType=BIGINT},
+      order_hid = #{orderHid,jdbcType=INTEGER},
+      chanid = #{chanid,jdbcType=BIGINT},
+      groupid = #{groupid,jdbcType=BIGINT},
+      creator_id = #{creatorId,jdbcType=BIGINT},
+      cityid = #{cityid,jdbcType=BIGINT},
+      union_state = #{unionState,jdbcType=INTEGER},
+      upload_union_time = #{uploadUnionTime,jdbcType=BIGINT},
+      member_id = #{memberId,jdbcType=VARCHAR},
+      operate_type = #{operateType,jdbcType=INTEGER},
+      is_sync = #{isSync,jdbcType=INTEGER},
+      update_time = #{updateTime,jdbcType=BIGINT},
+      user_id = #{userId,jdbcType=VARCHAR},
+      appid = #{appid,jdbcType=VARCHAR},
+      server_id = #{serverId,jdbcType=BIGINT}
+    where id = #{id,jdbcType=BIGINT}
+  </update>
+</mapper>

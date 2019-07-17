@@ -715,27 +715,27 @@ public class VipServiceImpl implements VipService {
                 String[] carNumStrings = carNumber.split(",");
                 Long validuin = -1L;
                 logger.error("===========carNumStrings" + carNumStrings.length);
-                if (carNumStrings != null && carNumStrings.length > 0) {
-                    for (String strNum : carNumStrings) {
-                        strNum.toUpperCase();
-                        if (StringUtils.checkPlate(strNum)) {
-//                            CarInfoTb carInfoTb = new CarInfoTb();
-//                            carInfoTb.setCarNumber(strNum);
-//                            carInfoTb = (CarInfoTb) commonDao.selectObjectByConditions(carInfoTb);
-//                            if (carInfoTb != null && carInfoTb.getId() != null) {
-//                                uin = carInfoTb.getUin();
-//                            }
-//                            if (uin > 0) {
-//                                validuin = uin;
-//                            }
-                            continue;
-                        } else {
-                            result.put("msg", "车牌号有误");
-                            return result;
-                        }
-                    }
-                    uin = validuin;
-                }
+//                if (carNumStrings != null && carNumStrings.length > 0) {
+//                    for (String strNum : carNumStrings) {
+//                        strNum.toUpperCase();
+//                        if (StringUtils.checkPlate(strNum)) {
+////                            CarInfoTb carInfoTb = new CarInfoTb();
+////                            carInfoTb.setCarNumber(strNum);
+////                            carInfoTb = (CarInfoTb) commonDao.selectObjectByConditions(carInfoTb);
+////                            if (carInfoTb != null && carInfoTb.getId() != null) {
+////                                uin = carInfoTb.getUin();
+////                            }
+////                            if (uin > 0) {
+////                                validuin = uin;
+////                            }
+//                            continue;
+//                        } else {
+//                            result.put("msg", "车牌号有误");
+//                            return result;
+//                        }
+//                    }
+//                    uin = validuin;
+//                }
                 CarowerProduct carowerProduct1 = new CarowerProduct();
                 if (id > 0 && carNumber.length() > 6) {
                     carowerProduct1.setId(id);

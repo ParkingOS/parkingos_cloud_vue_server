@@ -60,6 +60,17 @@ public class OrgCityMerchants {
 
     private Integer endTimeSetting;
 
+    private Integer selfParkAuth;
+
+
+    public Integer getSelfParkAuth() {
+        return selfParkAuth;
+    }
+
+    public void setSelfParkAuth(Integer selfParkAuth) {
+        this.selfParkAuth = selfParkAuth;
+    }
+
     public Integer getEndTimeSetting() {
         return endTimeSetting;
     }

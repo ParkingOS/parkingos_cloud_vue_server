@@ -8,4 +8,8 @@ public interface CityUinService {
     JSONObject editSetting(Long cityid, Integer state,Integer type);
 
     JSONObject querySetting(Long cityid);
+
+    String getSingleAuth(Long cityid);
+
+    JSONObject setSingleAuth(Long cityid,Long roleId,String auths);
 }
