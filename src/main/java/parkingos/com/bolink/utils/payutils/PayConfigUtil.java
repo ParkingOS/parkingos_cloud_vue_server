@@ -3,7 +3,7 @@ package parkingos.com.bolink.utils.payutils;
 public class PayConfigUtil {
 
     //初始化
-    public static String APP_ID = "******";                       //开发平台应用ID
+    public static String APP_ID = "******eeee";                       //开发平台应用ID
 
     public static String APP_SECRET = "**********";    //商业凭证
 
