@@ -3,13 +3,13 @@ package parkingos.com.bolink.utils.payutils;
 public class PayConfigUtil {
 
     //初始化
-    public static String APP_ID = "wx9822b6875b730940";                       //开发平台应用ID
+    public static String APP_ID = "******";                       //开发平台应用ID
 
-    public static String APP_SECRET = "9e628209cd97f2ee2f566b7cee54f9aa";    //商业凭证
+    public static String APP_SECRET = "**********";    //商业凭证
 
-    public static String MCH_ID = "1277460401";                                 //商业号
+    public static String MCH_ID = "***********";                                 //商业号
 
-    public static String API_KEY = "gLCktgB1ncuBfT38Xlk3MuMLr6sVEYQa";        //API KEY
+    public static String API_KEY = "***********";        //API KEY
 
 
     public static String UFDODER_URL = "https://api.mch.weixin.qq.com/pay/unifiedorder";//统一下单接口
